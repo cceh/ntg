@@ -1,15 +1,31 @@
 #!/usr/bin/python
 # -*- encoding: utf-8 -*-
 
-"""Prepare for CBGM
+"""Prepare a database for CBGM
 
 This script converts the tables used for the production of Nestle-Aland into
 tables suitable for CBGM.  Basically it copies the tables, removes unwanted
 readings, and converts the apparatus into a positive one.
 
-Author: Marcello Perathoner <marcello.perathoner@uni-koeln.de>
+    Ausgangspunkt ist der Apparat mit allen für die Druckfassung notwendigen
+    Informationen.  Diese Datenbasis muss für die CBGM bearbeitet werden.  Die
+    Ausgangsdaten stellen einen negativen Apparat dar, d.h. die griechischen
+    handschriftlichen Zeugen, die mit dem rekonstruierten Ausgangstext
+    übereinstimmen, werden nicht ausdrücklich aufgelistet.  Aufgelistet werden
+    alle Zeugen, die von diesem Text abweichen bzw. Korrekturen oder
+    Alternativlesarten haben.  Ziel ist es, einen positiven Apparat zu erhalten.
+    Wir benötigen einen Datensatz pro griechischem handschriftlichen Zeugen
+    erster Hand und variierten Stelle (einschließlich der Lücken).  D.h. für
+    jede variierte Stelle liegt die explizite Information vor, ob die
+    Handschrift dem Ausgangstext folgt, einen anderen Text oder gar keinen Text
+    hat, weil z.B. die Seite beschädigt ist.  Korrekturen oder
+    Alternativlesarten werden für die CBGM ignoriert.
 
-See: https://github.com/cceh/ntg/wiki
+    -- ArbeitsablaufCBGMApg_Db.docx
+
+See also: https://github.com/cceh/ntg
+
+Author: Marcello Perathoner <marcello.perathoner@uni-koeln.de>
 
 """
 
@@ -24,38 +40,10 @@ import sys
 
 import six
 
-import ntg_db
+import ntg_db as db
 import ntg_tools as tools
 from ntg_tools import message, execute, fix
 
-
-"""
-Before manuscript numbers:
-    L      lectionary
-
-After manuscript numbers:
-    *      original reading
-    C      correction (C1, C2: subsequent corrections)
-    L1, L2 first, second reading (in lectionaries)
-    s      supplement (s1, s2: supplements 1, 2)
-    V      ut videtur (apparently)
-
-Instead of letters denoting variants:
-    zv     there is an illegible addition in the manuscript(s) cited which
-           makes it impossible to ascribe it to a known variant.
-    zw     what remains of the text of the manuscript(s) cited would allow
-           reconstruction in agreement with two or more different variants
-    zz     while at least one letter is extant in the manuscript(s) cited,
-           the reading is too lacunose to be identified
-
-After letters denoting variants:
-    f      Fehler (scribal error)
-    o      orthographicum (orthographical difference)
-
-In variants:
-    lac    lacuna
-    om     omissio (omission)
-"""
 
 DEFAULTS = {
     #'target_table'        : 'ActsAtt_3',
@@ -68,117 +56,19 @@ DEFAULTS = {
     'target_table_tmp'    : 'Tmp',
 }
 
-CREATE_TABLE_ATT = """
-(
-  "id"          INTEGER       AUTO_INCREMENT PRIMARY KEY,
-  "buch"        INTEGER       DEFAULT NULL,
-  "kapanf"      INTEGER       DEFAULT NULL,
-  "versanf"     INTEGER       DEFAULT NULL,
-  "wortanf"     INTEGER       DEFAULT NULL,
-  "kapend"      INTEGER       DEFAULT 0,
-  "versend"     INTEGER       DEFAULT 0,
-  "wortend"     INTEGER       DEFAULT NULL,
-  "hsnr"        INTEGER       DEFAULT NULL,
-  "hs"          VARCHAR(32)   DEFAULT NULL,
-  "anfadr"      INTEGER       DEFAULT NULL,
-  "endadr"      INTEGER       DEFAULT NULL,
-  "labez"       VARCHAR(32)   DEFAULT '',
-  "labezsuf"    VARCHAR(32)   DEFAULT '',
-  "lemma"       VARCHAR(1024) DEFAULT '',
-  "lesart"      VARCHAR(1024) DEFAULT '',
-  "suffix2"     VARCHAR(255)  DEFAULT '',
-  "kontrolle"   VARCHAR(1)    DEFAULT '',
-  "fehler"      INTEGER       DEFAULT 0,
-  "suff"        VARCHAR(32)   DEFAULT '',
-  "vid"         VARCHAR(32)   DEFAULT '',
-  "vl"          VARCHAR(32)   DEFAULT '',
-  "korr"        VARCHAR(32)   DEFAULT '',
-  "lekt"        VARCHAR(32)   DEFAULT '',
-  "komm"        VARCHAR(32)   DEFAULT '',
-  "anfalt"      INTEGER       DEFAULT NULL,
-  "endalt"      INTEGER       DEFAULT NULL,
-  "labezalt"    VARCHAR(32)   DEFAULT '',
-  "lasufalt"    VARCHAR(32)   DEFAULT '',
-  "base"        VARCHAR(1)    DEFAULT '',
-  "over"        VARCHAR(1)    DEFAULT '',
-  "comp"        VARCHAR(1)    DEFAULT '',
-  "over1"       VARCHAR(1)    DEFAULT '',
-  "comp1"       VARCHAR(1)    DEFAULT '',
-  "printout"    VARCHAR(32)   DEFAULT '',
-  "category"    VARCHAR(1)    DEFAULT '',
-  "created"     DATE          DEFAULT NULL
-)
-"""
-
-CREATE_TABLE_LAC = """
-(
-  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
-  "buch"      INTEGER       NOT NULL,
-  "kapanf"    INTEGER       NOT NULL,
-  "versanf"   INTEGER       NOT NULL,
-  "wortanf"   INTEGER       NOT NULL,
-  "wortend"   INTEGER       DEFAULT NULL,
-  "hsnr"      INTEGER       DEFAULT NULL,
-  "hs"        VARCHAR(32)   DEFAULT NULL,
-  "anfadr"    INTEGER       DEFAULT NULL,
-  "endadr"    INTEGER       DEFAULT NULL,
-  "labez"     VARCHAR(32)   NOT NULL,
-  "labezsuf"  VARCHAR(32)   DEFAULT NULL,
-  "lemma"     VARCHAR(1024) NOT NULL,
-  "lesart"    VARCHAR(1024) DEFAULT NULL,
-  "suffix2"   VARCHAR(32)   DEFAULT NULL,
-  "kontrolle" VARCHAR(1)    DEFAULT NULL,
-  "kapend"    INTEGER       DEFAULT 0,
-  "versend"   INTEGER       DEFAULT 0,
-  "fehler"    INTEGER       DEFAULT 0,
-  "suff"      VARCHAR(32)   DEFAULT NULL,
-  "vid"       VARCHAR(32)   DEFAULT NULL,
-  "vl"        VARCHAR(32)   DEFAULT NULL,
-  "korr"      VARCHAR(32)   DEFAULT NULL,
-  "lekt"      VARCHAR(32)   DEFAULT NULL,
-  "komm"      VARCHAR(32)   DEFAULT NULL,
-  "anfalt"    INTEGER       DEFAULT NULL,
-  "endalt"    INTEGER       DEFAULT NULL,
-  "labezalt"  VARCHAR(32)   DEFAULT NULL,
-  "lasufalt"  VARCHAR(32)   DEFAULT NULL,
-  "printout"  VARCHAR(32)   DEFAULT NULL,
-  "category"  VARCHAR(1)    DEFAULT NULL,
-  "base"      VARCHAR(1)    DEFAULT '',
-  "over"      VARCHAR(1)    DEFAULT '',
-  "comp"      VARCHAR(1)    DEFAULT '',
-  "over1"     VARCHAR(1)    DEFAULT '',
-  "comp1"     VARCHAR(1)    DEFAULT '',
-  "created"   DATE          DEFAULT NULL
-)
-"""
-
 def fehlverse ():
+    """ Untergeschobene Verse """
     return """
     (
-      anfadr >= 50837002 and endadr <= 50837047 or
-      anfadr >= 51534002 and endadr <= 51534013 or
-      anfadr >= 52506020 and endadr <= 52408015 or
-      anfadr >= 52829002 and endadr <= 52829025
+      anfadr >= 50837002 and endadr <= 50837046 or
+      anfadr >= 51534002 and endadr <= 51534012 or
+      anfadr >= 52406020 and endadr <= 52408014 or
+      anfadr >= 52829002 and endadr <= 52829024
     )
     """
 
 
-def lacunae_in_chapters_without_text (dba, parameters):
-
-    cursor = dba.cursor()
-
-    cursor.execute ("""
-    SELECT lac.hs, lac.anfadr, lac.endadr
-    FROM ActsLac_3 AS lac
-    LEFT JOIN ActsAtt_3 AS att
-    ON att.hs = lac.hs AND att.kapanf = lac.kapanf
-    WHERE att.id IS NULL
-    ORDER BY hs, anfadr, endadr
-
-    """.format (**parameters))
-
-
-def create_indices(cursor):
+def create_indices (cursor):
     message (2, "          Creating indices ...")
 
     cursor.execute ('CREATE INDEX Hs     ON {target} (hs)'.format (**parameters))
@@ -189,7 +79,7 @@ def create_indices(cursor):
     cursor.execute ('CREATE INDEX HsAdr  ON {target} (hs, anfadr, endadr)'.format (**parameters))
 
 
-def drop_indices(cursor):
+def drop_indices (cursor):
     message (2, "          Dropping indices ...")
 
     cursor.execute ('DROP INDEX IF EXISTS Hs     ON {target}'.format (**parameters))
@@ -204,7 +94,7 @@ def step1_single(dba, parameters):
     """ Copy tables to new database
 
     Copy the (28 * 2) tables to 2 tables in a new database.
-    Do NOT copy version manuscripts (bible translations).
+    Do NOT copy versions and patristic manuscripts.
     Create indices and some views.
 
     """
@@ -219,9 +109,9 @@ def step1_single(dba, parameters):
     cursor.execute ('DROP TABLE IF EXISTS {target_attlac}'.format (**parameters))
     cursor.execute ('DROP TABLE IF EXISTS {target_tmp}'.format (**parameters))
 
-    cursor.execute ('CREATE TABLE {target} '       .format (**parameters) + CREATE_TABLE_ATT)
-    cursor.execute ('CREATE TABLE {target_lac} '   .format (**parameters) + CREATE_TABLE_LAC)
-    cursor.execute ('CREATE TABLE {target_attlac} '.format (**parameters) + CREATE_TABLE_ATT)
+    cursor.execute ('CREATE TABLE {target} '       .format (**parameters) + db.CREATE_TABLE_ATT)
+    cursor.execute ('CREATE TABLE {target_lac} '   .format (**parameters) + db.CREATE_TABLE_LAC)
+    cursor.execute ('CREATE TABLE {target_attlac} '.format (**parameters) + db.CREATE_TABLE_ATT)
 
     cursor.execute ('SHOW COLUMNS IN {target}'.format (**parameters))
     target_columns_att = set ([row[0].lower() for row in cursor.fetchall()])
@@ -305,11 +195,11 @@ def step1c_single (dba, parameters):
     fix (cursor, "Wrong hsnr", """
     SELECT DISTINCT hs, hsnr, kapanf
     FROM {target}
-    WHERE hs LIKE 'L1188s2%%' AND hsnr = 411881
+    WHERE hs REGEXP 'L1188s2.*' AND hsnr = 411881
     """, """
     UPDATE {target}
     SET hsnr = 411882
-    WHERE hs LIKE 'L1188s2%%'
+    WHERE hs REGEXP 'L1188s2.*'
     """, parameters)
 
     dba.commit()
@@ -335,17 +225,17 @@ def step2_single (dba, parameters):
 
     for parameters['t'] in (parameters['target'], parameters['target_lac']):
         # Delete spurious '\r' characters in suffix2 field.
-        cursor.execute ("""
+        execute (cursor, """
         UPDATE {t}
         SET suffix2 = REGEXP_REPLACE (suffix2, '\r', '')
-        WHERE suffix2 LIKE '%\r%'
-        """.format (**parameters))
+        WHERE suffix2 REGEXP '\r'
+        """, parameters)
 
         # replace NULL fields with ''
         for parameters['col'] in ('lekt', 'korr', 'suffix2', 'komm', 'lemma', 'comp', 'base'):
-            cursor.execute ("""
+            execute (cursor, """
             UPDATE {t} SET {col} = '' WHERE {col} IS NULL
-            """.format (**parameters))
+            """, parameters)
 
     message (1, "Step  2 : Fix korr and lekt ...")
 
@@ -361,15 +251,15 @@ def step2_single (dba, parameters):
     UPDATE {target} SET korr = '*'  WHERE korr = '' AND suffix2 REGEXP '[*]'
     """, parameters)
 
-    cursor.execute ("""
+    execute (cursor, """
     UPDATE {target} SET lekt = REGEXP_SUBSTR (suffix2, 'L[1-9]')
     WHERE lekt IN ('', 'L') AND suffix2 REGEXP 'L[1-9]'
-    """.format (**parameters))
+    """, parameters)
 
-    cursor.execute ("""
+    execute (cursor, """
     UPDATE {target} SET korr = REGEXP_SUBSTR (suffix2, 'C[1-9*]')
     WHERE korr IN ('', 'C') AND suffix2 REGEXP 'C[1-9*]'
-    """.format (**parameters))
+    """, parameters)
 
     fix (cursor, "Wrong labez", """
     SELECT labez, labezsuf, kapanf, count (*) AS anz FROM {target}
@@ -555,8 +445,8 @@ def step6_single (dba, parameters):
 
     for parameters['t'] in (parameters['target'], parameters['target_lac']):
         # Delete all other readings if there is a C* reading.
-        for parameters['regexp'] in (r'C\\*', ):
-            cursor.execute ("""
+        for parameters['regexp'] in ('C[*]', ):
+            execute (cursor, """
             DELETE FROM {t}
             WHERE (hsnr, anfadr, endadr) IN (
               SELECT hsnr, anfadr, endadr FROM (
@@ -566,18 +456,19 @@ def step6_single (dba, parameters):
               ) AS tmp
             )
             AND suffix2 NOT REGEXP '{regexp}'
-            """.format (**parameters))
+            """, parameters)
 
-        cursor.execute ("""
+        execute (cursor, """
         DELETE FROM {t}
         WHERE (lekt = 'L2' OR korr IN ('C', 'C1', 'C2', 'C3', 'A', 'K'))
-          AND suffix2 NOT LIKE '%C*%'
-        """.format (**parameters))
+          AND suffix2 NOT REGEXP 'C[*]'
+        """, parameters)
 
         fix (cursor, "Bogus Suffixes", """
-        SELECT suffix2
+        SELECT suffix2, count (*) AS Anz
         FROM {t}
         WHERE suffix2 REGEXP 'A|K|L2|T2'
+        GROUP BY suffix2
         """, """
         DELETE FROM {t}
         WHERE suffix2 REGEXP 'A|K|L2|T2'
@@ -630,12 +521,12 @@ def step6b_single (dba, parameters):
     """, None, parameters)
 
     # print some debug info
-    cursor.execute ("""
+    execute (cursor, """
     SELECT lekt, korr, suffix2, count (*) AS anz
     FROM {target}
     GROUP BY lekt, korr, suffix2
     ORDER BY lekt, korr, suffix2
-    """.format (**parameters))
+    """, parameters)
     tools.tabulate (cursor)
 
     # Debug hs where hs and suffix2 still mismatch
@@ -646,11 +537,11 @@ def step6b_single (dba, parameters):
     ORDER BY hs, anfadr
     """, None, parameters)
 
-    # cursor.execute ("""
+    # execute (cursor, """
     # UPDATE {t}
     # SET hs = CONCAT (hs, suffix2)
-    # WHERE hs NOT LIKE CONCAT('%', suffix2)
-    # """.format (**parameters))
+    # WHERE hs NOT REGEXP CONCAT(suffix2, '$')
+    # """, parameters)
 
     fix (cursor, "Hsnr with more than one hs", """
     SELECT hsnr FROM (
@@ -686,21 +577,33 @@ def step6b_single (dba, parameters):
 
 
 def step7_single (dba, parameters):
+    """zw Lesarten
+
+    7. zw-Lesarten der übergeordneten Variante zuordnen, wenn ausschliesslich
+    verschiedene Lesarten derselben Variante infrage kommen (z.B. zw a/ao oder
+    b/bo_f). In diesen Fällen tritt die Buchstabenkennung der übergeordneten
+    Variante in LABEZ an die Stelle von 'zw'.
+
+    """
+
     message (1, "Step  7 : Fix 'zw' ...")
 
     cursor = dba.cursor()
 
-    cursor.execute ("SELECT id, labezsuf FROM {target} WHERE labez = 'zw'"
-                    .format (**parameters))
+    execute (cursor, "SELECT id, labezsuf FROM {target} WHERE labez = 'zw'", parameters)
 
     updated = 0
     for row in cursor.fetchall ():
-        id_ = row[0]
         labezsuf = row[1]
         unique_labez_suffixes = tuple (set ([suf[0] for suf in labezsuf.split ('/')]))
         if len (unique_labez_suffixes) == 1:
-            cursor.execute ("UPDATE {target} SET labez = %(labez)s WHERE id = %(id)s".format (**parameters),
-                            { 'labez': unique_labez_suffixes[0], 'id': id_ } )
+            parameters['id'] = row[0]
+            parameters['labez'] = unique_labez_suffixes[0]
+            execute (cursor, """
+            UPDATE {target}
+            SET labez = %(labez)s, labezsuf = ''
+            WHERE id = %(id)s
+            """, parameters)
             updated += 1
 
     dba.commit()
@@ -708,23 +611,26 @@ def step7_single (dba, parameters):
 
 
 def step9_single (dba, parameters):
-    # Stellenbezogene Lückenliste füllen. Parallel zum Apparat wurde eine
-    # systematische Lückenliste erstellt, die die Lücken aller griechischen
-    # Handschriften enthält. Wir benötigen diese Information jedoch jeweils für
-    # die variierten Stellen.
+    """ Lacunae auffüllen
 
-    # Step 9 (Krueger) builds a lacuna table containing an entry for each
-    # manuscript and passage inside a lacuna. Then, in step 10, it adds 'zz'
-    # readings to the Acts table for each passage inside a lacuna using the
-    # lacuna table of step 9.  We short-circuit the lacuna table.
+    Stellenbezogene Lückenliste füllen. Parallel zum Apparat wurde eine
+    systematische Lückenliste erstellt, die die Lücken aller griechischen
+    Handschriften enthält. Wir benötigen diese Information jedoch jeweils für
+    die variierten Stellen.
 
+    Step 9 (Krueger) builds a lacuna table containing an entry for each
+    manuscript and passage inside a lacuna. Then, in step 10, it adds 'zz'
+    readings to the Acts table for each passage inside a lacuna using the
+    lacuna table of step 9.  We short-circuit the lacuna table.
+
+    """
 
     message (1, "Step  9 : Create Lacunae Table ...")
 
     cursor = dba.cursor()
 
     # First clean up the lacunae table as any errors there will be multiplied by
-    # this step.
+    # this step.  Delete inner lacunae from nested lacunae.
 
     fix (cursor, "nested lacunae", """
     SELECT lac.id, lac.hs, lac.anfadr, lac.endadr
@@ -781,7 +687,7 @@ def step9_single (dba, parameters):
     )
     """, parameters)
 
-    # Create a `lacuna´ for each passage a manuscript does not contain
+    # Create a lacuna entry for each passage in a lacuna.
 
     message (2, "Step  9 : Add 'zz' readings for lacunae ...")
 
@@ -804,34 +710,35 @@ def step9_single (dba, parameters):
     """, parameters)
     dba.commit()
 
-    message (2, "Step  9 : Done")
-
 
 def step10_single (dba, parameters):
+    """Create positive apparatus
+
+    Bezeugung der a-Lesarten auffüllen (d.h. einen positiven Apparat
+    herstellen).  Sie setzt sich zusammen aus allen in der 'ActsMsList' für
+    das jeweilige Kapitel geführten Handschriften, die an der jeweils
+    bearbeiteten Stelle noch nicht bei einer Variante oder in der Lückenliste
+    stehen.
+
+    Besondere Aufmerksamkeit ist bei den Fehlversen notwendig: Im Bereich der
+    Fehlverse darf nicht einfach die a-Bezeugung aufgefüllt werden.  Stattdessen
+    muss, wenn die variierte Stelle zu einer umfassten Einheit gehört und das
+    Feld 'base' den Inhalt 'a' hat, die neue Lesartenbezeichnung 'zu'
+    eingetragen werden.  base = 'b' steht für eine alternative Subvariante (dem
+    Textus receptus).
+
+    Eine variierte Stelle ist eine umfasste Stelle, wenn comp = 'x' ist.
+
+    Insert the lesart of hs = 'A' for each passage that is not yet in the
+    table.  Lacunae are already accounted for.
+
+    QUESTION: why are there multiple 'a' readings for some passages?
+    QUESTION: what is base = 'N'?
+    QUESTION: what is comp = 'N'?
+
+    """
+
     message (1, "Step 10: Add 'a' readings ...")
-
-    # Ausgangspunkt ist der Apparat mit allen für die Druckfassung notwendigen
-    # Informationen.  Diese Datenbasis muss für die CBGM bearbeitet werden.  Die
-    # Ausgangsdaten stellen einen negativen Apparat dar, d.h. die griechischen
-    # handschriftlichen Zeugen, die mit dem rekonstruierten Ausgangstext
-    # übereinstimmen, werden nicht ausdrücklich aufgelistet.  Aufgelistet werden
-    # alle Zeugen, die von diesem Text abweichen bzw. Korrekturen oder
-    # Alternativlesarten haben.  Ziel ist es, einen positiven Apparat zu
-    # erhalten.  Wir benötigen einen Datensatz pro griechischem
-    # handschriftlichen Zeugen erster Hand und variierten Stelle (einschließlich
-    # der Lücken).  D.h. für jede variierte Stelle liegt die explizite
-    # Information vor, ob die Handschrift dem Ausgangstext folgt, einen anderen
-    # Text oder gar keinen Text hat, weil z.B. die Seite beschädigt ist.
-    # Korrekturen oder Alternativlesarten werden für die CBGM ignoriert.
-    #
-    # Bezeugung der a-Lesarten auffüllen (d.h. einen positiven Apparat
-    # herstellen).  Sie setzt sich zusammen aus allen in der 'ActsMsList' für
-    # das jeweilige Kapitel geführten Handschriften, die an der jeweils
-    # bearbeiteten Stelle noch nicht bei einer Variante oder in der Lückenliste
-    # stehen.
-
-    # Insert the lesart of hs = 'A' for each passage that is not yet in the
-    # table.  Lacunae are already accounted for.
 
     cursor = dba.cursor()
 
@@ -890,7 +797,31 @@ def step10_single (dba, parameters):
     """, parameters)
 
     dba.commit()
-    message (2, "Step 10 : Done")
+
+
+def step11_single (dba, parameters):
+    """Create ActsMsList
+
+    Handschriftenliste 'ActsMsList' anlegen. Die Handschrift bekommt in dem
+    entsprechenden Kapitel eine 1, wenn sie dort Text enthält. Mit anderen
+    Worten: Sie bekommt eine 0, wenn das ganze Kapitel fehlt. Es wird hier auf
+    die systematische Lückenliste zurückgegriffen. Kapitel, die keine echte
+    Variante enthalten, muessen ebenfalls eine 0 erhalten.
+
+    Die Handschriftenliste darf erst NACH dem Auffüllen der a-Bezeugung
+    gerechnet werden, daher gehört das Skript hier an den Schluss der
+    Vorbereitungen!
+
+    """
+
+    message (1, "Step 11 : Create ActsMsList ...")
+
+    cursor = dba.cursor ()
+
+
+
+
+    dba.commit ()
 
 
 if __name__ == '__main__':
@@ -924,7 +855,7 @@ if __name__ == '__main__':
     args.range[0] = int (args.range[0] or  1)
     args.range[1] = int (args.range[1] or 99)
 
-    dba = ntg_db.DBA (args.profile)
+    dba = db.DBA (args.profile)
     # Make MySQL more compatible with other SQL databases
     dba.cursor ().execute ("SET sql_mode='ANSI'")
 
@@ -971,6 +902,10 @@ if __name__ == '__main__':
                 step10_single (dba, parameters)
                 if args.verbose >= 1:
                     tools.print_stats(dba, parameters)
+                continue
+            if step == 11:
+                step11_single (dba, parameters)
+                continue
 
     except KeyboardInterrupt:
         dba.rollback()

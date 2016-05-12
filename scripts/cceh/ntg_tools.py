@@ -31,13 +31,16 @@ def init_parameters (parameters):
     return parameters
 
 
-def message (level, s):
+def message (level, s, error = False):
     """
     Print information if needed.
     """
     if args.verbose >= level:
         delta = datetime.datetime.now () - args.start_time
-        print ("[{time}] {msg}".format (time = delta, msg = s))
+        if error:
+            print ("\x1B[1m[{time}] {msg}\x1B[0m".format (time = delta, msg = s))
+        else:
+            print ("[{time}] {msg}".format (time = delta, msg = s))
 
 
 def cursor_get_value (cursor):
@@ -111,7 +114,7 @@ def fix (cursor, msg, sql, sql_fix, parameters):
     if args.verbose >= 3:
         execute (cursor, sql, parameters)
         if cursor.rowcount > 0:
-            message (3, "*** WARNING: {msg} ***".format (msg = msg))
+            message (3, "*** WARNING: {msg} ***".format (msg = msg), True)
             tabulate (cursor)
     # apply fix
     if sql_fix:
@@ -119,7 +122,7 @@ def fix (cursor, msg, sql, sql_fix, parameters):
         # print fixed values
         execute (cursor, sql, parameters)
         if cursor.rowcount > 0:
-            message (0, "*** ERROR: {msg} ***".format (msg = msg))
+            message (0, "*** ERROR: {msg} ***".format (msg = msg), True)
             tabulate (cursor)
 
 
