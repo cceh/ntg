@@ -279,6 +279,9 @@ labez
     While at least one letter is extant in the manuscript(s) cited, the
     reading is too lacunose to be identified.
 
+    Alle Lesarten, die aus der Tabelle der Lacunae erzeugt wurden,
+    erhalten labez = 'zz'.
+
   Caveat: die Lesart 'a' kann für dieselbe Passage mehrmals vergeben
   worden sein, immer dann wenn im Nestle-Aland ein positiver Apparat
   benutzt wurde.
@@ -352,4 +355,4 @@ Literatur
 
 .. [LOJ] Aland, Barbara.  1998.  *Novum Testamentum Graecum Editio
    Critica Maior: Presentation of the First Part: The Letter of James.*
-   Münster http://rosetta.reltech.org/TC/v03/Aland1998.html
+   Münster.  http://rosetta.reltech.org/TC/v03/Aland1998.html

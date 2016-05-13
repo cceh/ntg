@@ -113,6 +113,72 @@ CREATE_TABLE_LAC = """
 )
 """
 
+CREATE_TABLE_VP = """
+(
+  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
+  "anfadr"    INTEGER       NOT NULL,
+  "endadr"    INTEGER       NOT NULL,
+  "bzdef"     INTEGER       NOT NULL DEFAULT 0,
+  "check"     VARCHAR(1)    NULL
+)
+"""
+
+CREATE_TABLE_RDG = """
+(
+  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
+  "anfadr"    INTEGER       NOT NULL,
+  "endadr"    INTEGER       NOT NULL,
+  "labez"     VARCHAR(32)   NOT NULL,
+  "labezsuf"  VARCHAR(32)   NOT NULL,
+  "lesart"    VARCHAR(1024) NOT NULL,
+  "bz"        INTEGER       NOT NULL DEFAULT 0,
+  "bzdef"     INTEGER       NOT NULL DEFAULT 0,
+  "byz"       VARCHAR(1)    NOT NULL DEFAULT '',
+  "check"     VARCHAR(1)    NULL
+)
+"""
+
+CREATE_TABLE_WITN = """
+(
+  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
+  "anfadr"    INTEGER       NOT NULL,
+  "endadr"    INTEGER       NOT NULL,
+  "labez"     VARCHAR(32)   NOT NULL,
+  "labezsuf"  VARCHAR(32)   NOT NULL,
+  "hsnr"      INTEGER       NOT NULL,
+  "hs"        VARCHAR(32)   NOT NULL
+)
+"""
+
+CREATE_TABLE_MSLISTVAL = """
+(
+  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
+  "hsnr"      INTEGER       NOT NULL,
+  "hs"        VARCHAR(32)   NOT NULL,
+  "chapter"   INTEGER       NOT NULL,
+  "sumtxt"    INTEGER       NOT NULL DEFAULT 0,
+  "summt"     INTEGER       NOT NULL DEFAULT 0,
+  "uemt"      INTEGER       NOT NULL DEFAULT 0,
+  "qmt"       FLOAT         NOT NULL DEFAULT 0.0,
+  "check"     VARCHAR(1)    NULL
+)
+"""
+
+CREATE_TABLE_VG = """
+(
+  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
+  "hsnr"      INTEGER       NOT NULL,
+  "hsnr2"     INTEGER       NOT NULL,
+  "chapter"   INTEGER       NOT NULL,
+  "sumtxt"    INTEGER       NOT NULL DEFAULT 0,
+  "summt"     INTEGER       NOT NULL DEFAULT 0,
+  "uemt"      INTEGER       NOT NULL DEFAULT 0,
+  "qmt"       FLOAT         NOT NULL DEFAULT 0.0,
+  "check"     VARCHAR(1)    NULL
+)
+"""
+
+BYZ_HSNR = "(300010, 300180, 300350, 303300, 303980, 304240, 312410)"
 
 class DBA (object):
     def __init__ (self, s):

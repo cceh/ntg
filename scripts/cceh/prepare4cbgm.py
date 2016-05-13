@@ -27,6 +27,8 @@ See also: https://github.com/cceh/ntg
 
 Author: Marcello Perathoner <marcello.perathoner@uni-koeln.de>
 
+QUESTION: which license for the scripts?
+
 """
 
 from __future__ import unicode_literals
@@ -46,14 +48,20 @@ from ntg_tools import message, execute, fix
 
 
 DEFAULTS = {
-    #'target_table'        : 'ActsAtt_3',
-    #'target_table_lac'    : 'ActsLac_3',
-    #'target_table_attlac' : 'ActsAttLac_3',
-    #'target_table_tmp'    : 'ActsTmp_3',
-    'target_table'        : 'Att',
-    'target_table_lac'    : 'Lac',
-    'target_table_attlac' : 'AttLac',
-    'target_table_tmp'    : 'Tmp',
+    #'att'    : 'ActsAtt_3',
+    #'lac'    : 'ActsLac_3',
+    #'attlac' : 'ActsAttLac_3',
+    #'tmp'    : 'ActsTmp_3',
+
+    'att'     : 'Att',
+    'lac'     : 'Lac',
+    'attlac'  : 'AttLac',
+    'vp'      : 'VP',
+    'rdg'     : 'Rdg',
+    'witn'    : 'Witn',
+    'listval' : 'MsListVal',
+    'vg'      : 'VG',
+    'tmp'     : 'Tmp',
 }
 
 def fehlverse ():
@@ -71,26 +79,26 @@ def fehlverse ():
 def create_indices (cursor):
     message (2, "          Creating indices ...")
 
-    cursor.execute ('CREATE INDEX Hs     ON {target} (hs)'.format (**parameters))
-    cursor.execute ('CREATE INDEX Hsnr   ON {target} (hsnr)'.format (**parameters))
-    cursor.execute ('CREATE INDEX Anfadr ON {target} (anfadr)'.format (**parameters))
-    cursor.execute ('CREATE INDEX Endadr ON {target} (endadr)'.format (**parameters))
+    cursor.execute ('CREATE INDEX Hs     ON {att} (hs)'.format (**parameters))
+    cursor.execute ('CREATE INDEX Hsnr   ON {att} (hsnr)'.format (**parameters))
+    cursor.execute ('CREATE INDEX Anfadr ON {att} (anfadr)'.format (**parameters))
+    cursor.execute ('CREATE INDEX Endadr ON {att} (endadr)'.format (**parameters))
 
-    cursor.execute ('CREATE INDEX HsAdr  ON {target} (hs, anfadr, endadr)'.format (**parameters))
+    cursor.execute ('CREATE INDEX HsAdr  ON {att} (hs, anfadr, endadr)'.format (**parameters))
 
 
 def drop_indices (cursor):
     message (2, "          Dropping indices ...")
 
-    cursor.execute ('DROP INDEX IF EXISTS Hs     ON {target}'.format (**parameters))
-    cursor.execute ('DROP INDEX IF EXISTS Hsnr   ON {target}'.format (**parameters))
-    cursor.execute ('DROP INDEX IF EXISTS Anfadr ON {target}'.format (**parameters))
-    cursor.execute ('DROP INDEX IF EXISTS Endadr ON {target}'.format (**parameters))
+    cursor.execute ('DROP INDEX IF EXISTS Hs     ON {att}'.format (**parameters))
+    cursor.execute ('DROP INDEX IF EXISTS Hsnr   ON {att}'.format (**parameters))
+    cursor.execute ('DROP INDEX IF EXISTS Anfadr ON {att}'.format (**parameters))
+    cursor.execute ('DROP INDEX IF EXISTS Endadr ON {att}'.format (**parameters))
 
-    cursor.execute ('DROP INDEX IF EXISTS HsAdr  ON {target}'.format (**parameters))
+    cursor.execute ('DROP INDEX IF EXISTS HsAdr  ON {att}'.format (**parameters))
 
 
-def step1_single(dba, parameters):
+def step1(dba, parameters):
     """ Copy tables to new database
 
     Copy the (28 * 2) tables to 2 tables in a new database.
@@ -102,20 +110,22 @@ def step1_single(dba, parameters):
     cursor = dba.cursor()
 
     # Eventually create the database and table
+    cursor.execute ('DROP DATABASE IF EXISTS {target_db}'.format (**parameters))
     cursor.execute ('CREATE DATABASE IF NOT EXISTS {target_db}'.format (**parameters))
     # drop_indices (cursor)
-    cursor.execute ('DROP TABLE IF EXISTS {target}'.format (**parameters))
-    cursor.execute ('DROP TABLE IF EXISTS {target_lac}'.format (**parameters))
-    cursor.execute ('DROP TABLE IF EXISTS {target_attlac}'.format (**parameters))
-    cursor.execute ('DROP TABLE IF EXISTS {target_tmp}'.format (**parameters))
 
-    cursor.execute ('CREATE TABLE {target} '       .format (**parameters) + db.CREATE_TABLE_ATT)
-    cursor.execute ('CREATE TABLE {target_lac} '   .format (**parameters) + db.CREATE_TABLE_LAC)
-    cursor.execute ('CREATE TABLE {target_attlac} '.format (**parameters) + db.CREATE_TABLE_ATT)
+    cursor.execute ('CREATE OR REPLACE TABLE {att} '    .format (**parameters) + db.CREATE_TABLE_ATT)
+    cursor.execute ('CREATE OR REPLACE TABLE {lac} '    .format (**parameters) + db.CREATE_TABLE_LAC)
+    cursor.execute ('CREATE OR REPLACE TABLE {attlac} ' .format (**parameters) + db.CREATE_TABLE_ATT)
+    cursor.execute ('CREATE OR REPLACE TABLE {vp} '     .format (**parameters) + db.CREATE_TABLE_VP)
+    cursor.execute ('CREATE OR REPLACE TABLE {rdg} '    .format (**parameters) + db.CREATE_TABLE_RDG)
+    cursor.execute ('CREATE OR REPLACE TABLE {witn} '   .format (**parameters) + db.CREATE_TABLE_WITN)
+    cursor.execute ('CREATE OR REPLACE TABLE {listval} '.format (**parameters) + db.CREATE_TABLE_MSLISTVAL)
+    cursor.execute ('CREATE OR REPLACE TABLE {vg} '     .format (**parameters) + db.CREATE_TABLE_VG)
 
-    cursor.execute ('SHOW COLUMNS IN {target}'.format (**parameters))
+    cursor.execute ('SHOW COLUMNS IN {att}'.format (**parameters))
     target_columns_att = set ([row[0].lower() for row in cursor.fetchall()])
-    cursor.execute ('SHOW COLUMNS IN {target_lac}'.format (**parameters))
+    cursor.execute ('SHOW COLUMNS IN {lac}'.format (**parameters))
     target_columns_lac = set ([row[0].lower() for row in cursor.fetchall()])
 
     # these columns get special treatment
@@ -132,7 +142,7 @@ def step1_single(dba, parameters):
         parameters['source'] = '{source_db}."{source_table}"'.format (**parameters)
 
         is_lac_table = parameters['source_table'].endswith('lac')
-        parameters['t'] = parameters['target_lac'] if is_lac_table else parameters['target']
+        parameters['t'] = parameters['lac'] if is_lac_table else parameters['att']
         target_columns = target_columns_lac if is_lac_table else target_columns_att
 
         cursor.execute ('SHOW COLUMNS IN {source}'.format (**parameters))
@@ -159,14 +169,14 @@ def step1_single(dba, parameters):
     execute (cursor, """
     CREATE OR REPLACE VIEW {target_db}.Passages AS
     SELECT DISTINCT buch, kapanf, versanf, wortanf, kapend, versend, wortend, anfadr, endadr
-    FROM {target}
+    FROM {att}
     """, parameters)
 
     execute (cursor, """
     CREATE OR REPLACE VIEW {target_db}.NestedPassages AS
     SELECT a.anfadr AS ianfadr, a.endadr AS iendadr, b.anfadr AS oanfadr, b.endadr AS oendadr
-    FROM Passages a
-    JOIN Passages b
+    FROM {target_db}.Passages a
+    JOIN {target_db}.Passages b
     WHERE a.anfadr >= b.anfadr AND a.endadr <= b.endadr AND
       NOT (a.anfadr = b.anfadr AND a.endadr = b.endadr)
     ORDER BY a.anfadr, a.endadr DESC
@@ -175,12 +185,12 @@ def step1_single(dba, parameters):
     dba.commit()
 
 
-def step1b_single (dba, parameters):
+def step1b (dba, parameters):
     """ No need to delete translations because we didn't copy them in the
     first place. """
 
 
-def step1c_single (dba, parameters):
+def step1c (dba, parameters):
     """ Fix data entry errors.
 
     Fix a bogus hsnr.
@@ -194,10 +204,10 @@ def step1c_single (dba, parameters):
 
     fix (cursor, "Wrong hsnr", """
     SELECT DISTINCT hs, hsnr, kapanf
-    FROM {target}
+    FROM {att}
     WHERE hs REGEXP 'L1188s2.*' AND hsnr = 411881
     """, """
-    UPDATE {target}
+    UPDATE {att}
     SET hsnr = 411882
     WHERE hs REGEXP 'L1188s2.*'
     """, parameters)
@@ -205,7 +215,7 @@ def step1c_single (dba, parameters):
     dba.commit()
 
 
-def step2_single (dba, parameters):
+def step2 (dba, parameters):
     """Data cleanup
 
     Delete spurious '\r' characters in suffix2 field.
@@ -223,7 +233,7 @@ def step2_single (dba, parameters):
     message (1, "Step  2 : Generic cleanup ...")
     cursor = dba.cursor()
 
-    for parameters['t'] in (parameters['target'], parameters['target_lac']):
+    for parameters['t'] in (parameters['att'], parameters['lac']):
         # Delete spurious '\r' characters in suffix2 field.
         execute (cursor, """
         UPDATE {t}
@@ -240,34 +250,34 @@ def step2_single (dba, parameters):
     message (1, "Step  2 : Fix korr and lekt ...")
 
     execute (cursor, """
-    UPDATE {target} SET lekt = korr, korr = '' WHERE korr REGEXP '^L'
+    UPDATE {att} SET lekt = korr, korr = '' WHERE korr REGEXP '^L'
     """, parameters)
 
     execute (cursor, """
-    UPDATE {target} SET korr = lekt, lekt = '' WHERE lekt REGEXP '[C*]'
+    UPDATE {att} SET korr = lekt, lekt = '' WHERE lekt REGEXP '[C*]'
     """, parameters)
 
     execute (cursor, """
-    UPDATE {target} SET korr = '*'  WHERE korr = '' AND suffix2 REGEXP '[*]'
+    UPDATE {att} SET korr = '*'  WHERE korr = '' AND suffix2 REGEXP '[*]'
     """, parameters)
 
     execute (cursor, """
-    UPDATE {target} SET lekt = REGEXP_SUBSTR (suffix2, 'L[1-9]')
+    UPDATE {att} SET lekt = REGEXP_SUBSTR (suffix2, 'L[1-9]')
     WHERE lekt IN ('', 'L') AND suffix2 REGEXP 'L[1-9]'
     """, parameters)
 
     execute (cursor, """
-    UPDATE {target} SET korr = REGEXP_SUBSTR (suffix2, 'C[1-9*]')
+    UPDATE {att} SET korr = REGEXP_SUBSTR (suffix2, 'C[1-9*]')
     WHERE korr IN ('', 'C') AND suffix2 REGEXP 'C[1-9*]'
     """, parameters)
 
     fix (cursor, "Wrong labez", """
-    SELECT labez, labezsuf, kapanf, count (*) AS anz FROM {target}
+    SELECT labez, labezsuf, kapanf, count (*) AS anz FROM {att}
     WHERE labez REGEXP '.[fo]'
     GROUP BY labez, labezsuf, kapanf
     ORDER BY labez, labezsuf, kapanf
     """, """
-    UPDATE {target}
+    UPDATE {att}
     SET labez = SUBSTRING (labez, 1, 1),
         labezsuf = SUBSTRING (labez, 2, 1)
     WHERE labez REGEXP '.[fo]'
@@ -276,17 +286,17 @@ def step2_single (dba, parameters):
     dba.commit()
 
 
-def step3_single (dba, parameters):
+def step3 (dba, parameters):
     # No need to drop fields because we didn't copy them in the first place
     pass
 
 
-def step4_single (dba, parameters):
+def step4 (dba, parameters):
     # No need to copy the table because we already created it in the right place
     pass
 
 
-def step5_single (dba, parameters):
+def step5 (dba, parameters):
     """ Delete passages without variants
 
     5. Stellen löschen, an denen nur eine oder mehrere f- oder o-Lesarten vom
@@ -312,9 +322,9 @@ def step5_single (dba, parameters):
     # We need a nested subquery to avoid MySQL limitations. See:
     # https://dev.mysql.com/doc/refman/5.7/en/subquery-restrictions.html
     execute (cursor, """
-    DELETE FROM {target} WHERE (anfadr, endadr) IN (
+    DELETE FROM {att} WHERE (anfadr, endadr) IN (
       SELECT anfadr, endadr FROM (
-        SELECT anfadr, endadr FROM {target}
+        SELECT anfadr, endadr FROM {att}
         WHERE labez NOT REGEXP '^z' OR labezsuf NOT REGEXP 'f|o'
         GROUP BY anfadr, endadr, labez
         HAVING count(*) = 1
@@ -324,7 +334,7 @@ def step5_single (dba, parameters):
     dba.commit()
 
 
-def step5b_single (dba, parameters):
+def step5b (dba, parameters):
     """Process Commentaries
 
     Wenn bei Wiederholung des Lemmatextes in Kommentarhandschriften Varianten
@@ -352,10 +362,10 @@ def step5b_single (dba, parameters):
 
     fix (cursor, "Incompatible lekt and suffix2 for T reading", """
     SELECT hs, anfadr, lekt, suffix2
-    FROM {target}
+    FROM {att}
     WHERE hs REGEXP 'T[1-9]' AND hs NOT REGEXP suffix2
     """, """
-    UPDATE {target}
+    UPDATE {att}
     SET lekt    = REPLACE (REGEXP_SUBSTR (hs, 'T[1-9]'), 'T', 'L'),
         suffix2 = REGEXP_SUBSTR (hs, 'T[1-9]')
     WHERE hs REGEXP 'T[1-9]'
@@ -364,10 +374,10 @@ def step5b_single (dba, parameters):
     # T1 or T2 but not both
     # promote to 'non-commentary' status by stripping T[1-9] from hs
     execute (cursor, """
-    UPDATE {target} u
+    UPDATE {att} u
     JOIN (
       SELECT id
-      FROM {target}
+      FROM {att}
       WHERE hs REGEXP 'T[1-9]'
       GROUP BY hsnr, anfadr, endadr
       HAVING COUNT(*) = 1
@@ -381,10 +391,10 @@ def step5b_single (dba, parameters):
     # group both T readings into one variant and set labez = 'zw'
     execute (cursor, """
     SELECT id, labez, labezsuf, CONCAT (hsnr, anfadr, endadr) AS k
-    FROM {target}
+    FROM {att}
     WHERE (hsnr, anfadr, endadr) IN (
       SELECT DISTINCT hsnr, anfadr, endadr
-      FROM {target}
+      FROM {att}
       WHERE hs REGEXP 'T[1-9]'
     )
     ORDER BY k  /* key for itertools.groupby */
@@ -403,14 +413,14 @@ def step5b_single (dba, parameters):
 
             parameters['ids'] = ', '.join (ids[1:])
             execute (cursor, """
-            DELETE FROM {target}
+            DELETE FROM {att}
             WHERE id IN ({ids})
             """, parameters)
 
             parameters['id'] = ids[0]
             parameters['labezsuf'] = '/'.join (sorted (labez))
             execute (cursor, """
-            UPDATE {target}
+            UPDATE {att}
             SET labez = 'zw',
                 labezsuf = '{labezsuf}',
                 hs = REGEXP_REPLACE (hs, 'T[1-9]', ''),
@@ -421,7 +431,7 @@ def step5b_single (dba, parameters):
     dba.commit()
 
 
-def step6_single (dba, parameters):
+def step6 (dba, parameters):
     """ Delete later hands
 
     6. Lesarten, die nicht von der ersten Hand stammen, loeschen.  Bei
@@ -443,7 +453,7 @@ def step6_single (dba, parameters):
 
     cursor = dba.cursor()
 
-    for parameters['t'] in (parameters['target'], parameters['target_lac']):
+    for parameters['t'] in (parameters['att'], parameters['lac']):
         # Delete all other readings if there is a C* reading.
         for parameters['regexp'] in ('C[*]', ):
             execute (cursor, """
@@ -477,7 +487,7 @@ def step6_single (dba, parameters):
         dba.commit()
 
 
-def step6b_single (dba, parameters):
+def step6b (dba, parameters):
     """Process Sigla
 
     Handschriften, die mit einem "V" für videtur gekennzeichnet sind, werden
@@ -498,7 +508,7 @@ def step6b_single (dba, parameters):
 
     cursor = dba.cursor()
 
-    for parameters['t'] in (parameters['target'], parameters['target_lac']):
+    for parameters['t'] in (parameters['att'], parameters['lac']):
         parameters['regexp'] = '[CLTV*]+[0-9]*$'
         # FIXME: MariaDB specific function REGEXP_REPLACE
         execute (cursor, """
@@ -514,7 +524,7 @@ def step6b_single (dba, parameters):
 
     fix (cursor, "Hs with more than one hsnr", """
     SELECT hs FROM (
-      SELECT DISTINCT hs, hsnr FROM {target}
+      SELECT DISTINCT hs, hsnr FROM {att}
     ) AS tmp
     GROUP BY hs
     HAVING count(*) > 1
@@ -523,7 +533,7 @@ def step6b_single (dba, parameters):
     # print some debug info
     execute (cursor, """
     SELECT lekt, korr, suffix2, count (*) AS anz
-    FROM {target}
+    FROM {att}
     GROUP BY lekt, korr, suffix2
     ORDER BY lekt, korr, suffix2
     """, parameters)
@@ -532,7 +542,7 @@ def step6b_single (dba, parameters):
     # Debug hs where hs and suffix2 still mismatch
     fix (cursor, "hs and suffix2 mismatch", """
     SELECT hs, suffix2, anfadr, endadr, lemma
-    FROM {target}
+    FROM {att}
     WHERE hs NOT REGEXP suffix2
     ORDER BY hs, anfadr
     """, None, parameters)
@@ -545,15 +555,15 @@ def step6b_single (dba, parameters):
 
     fix (cursor, "Hsnr with more than one hs", """
     SELECT hsnr FROM (
-      SELECT DISTINCT hs, hsnr FROM {target}
+      SELECT DISTINCT hs, hsnr FROM {att}
     ) AS tmp
     GROUP BY hsnr
     HAVING count(*) > 1
     """, """
     UPDATE
-        {target} t
+        {att} t
     JOIN
-      (SELECT min(hs) AS minhs, hsnr FROM {target} GROUP BY hsnr ORDER BY hs) AS g
+      (SELECT min(hs) AS minhs, hsnr FROM {att} GROUP BY hsnr ORDER BY hs) AS g
     ON
       t.hsnr = g.hsnr
     SET t.hs = g.minhs
@@ -561,22 +571,22 @@ def step6b_single (dba, parameters):
 
     fix (cursor, "Hs with lacunae but w/o text", """
     SELECT DISTINCT hsnr
-    FROM {target_lac}
+    FROM {lac}
     WHERE hsnr NOT IN (
-      SELECT DISTINCT hsnr FROM {target}
+      SELECT DISTINCT hsnr FROM {att}
     )
     """, """
     DELETE
-    FROM {target_lac}
+    FROM {lac}
     WHERE hsnr NOT IN (
-      SELECT DISTINCT hsnr FROM {target}
+      SELECT DISTINCT hsnr FROM {att}
     )
     """, parameters)
 
     dba.commit()
 
 
-def step7_single (dba, parameters):
+def step7 (dba, parameters):
     """zw Lesarten
 
     7. zw-Lesarten der übergeordneten Variante zuordnen, wenn ausschliesslich
@@ -590,7 +600,7 @@ def step7_single (dba, parameters):
 
     cursor = dba.cursor()
 
-    execute (cursor, "SELECT id, labezsuf FROM {target} WHERE labez = 'zw'", parameters)
+    execute (cursor, "SELECT id, labezsuf FROM {att} WHERE labez = 'zw'", parameters)
 
     updated = 0
     for row in cursor.fetchall ():
@@ -600,7 +610,7 @@ def step7_single (dba, parameters):
             parameters['id'] = row[0]
             parameters['labez'] = unique_labez_suffixes[0]
             execute (cursor, """
-            UPDATE {target}
+            UPDATE {att}
             SET labez = %(labez)s, labezsuf = ''
             WHERE id = %(id)s
             """, parameters)
@@ -610,7 +620,7 @@ def step7_single (dba, parameters):
     message (2, "          %d zw labez updated" % updated)
 
 
-def step9_single (dba, parameters):
+def step9 (dba, parameters):
     """ Lacunae auffüllen
 
     Stellenbezogene Lückenliste füllen. Parallel zum Apparat wurde eine
@@ -634,11 +644,11 @@ def step9_single (dba, parameters):
 
     fix (cursor, "nested lacunae", """
     SELECT lac.id, lac.hs, lac.anfadr, lac.endadr
-    FROM {target_lac} AS lac
+    FROM {lac} AS lac
     JOIN (
       SELECT MIN (a.id) as id, a.hs, a.anfadr, a.endadr
-      FROM {target_lac} a
-      JOIN {target_lac} b
+      FROM {lac} a
+      JOIN {lac} b
       WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
       GROUP BY a.hs, a.anfadr, a.endadr
       HAVING count(*) > 1
@@ -649,11 +659,11 @@ def step9_single (dba, parameters):
       AND lac.endadr <= t.endadr
     """, """
     DELETE lac
-    FROM {target_lac} lac
+    FROM {lac} lac
     JOIN (
       SELECT MIN (a.id) as id, a.hs, a.anfadr, a.endadr
-      FROM {target_lac} a
-      JOIN {target_lac} b
+      FROM {lac} a
+      JOIN {lac} b
       WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
       GROUP BY a.hs, a.anfadr, a.endadr
       HAVING count(*) > 1
@@ -671,17 +681,17 @@ def step9_single (dba, parameters):
     # cleans up the tables.
     fix (cursor, "text in lacunae", """
     SELECT t.hs, t.hsnr, t.anfadr, t.endadr, lac.anfadr as lacanfadr, lac.endadr as lacendadr, t.labez, t.lemma, t.lesart
-    FROM {target} t
-    JOIN {target_lac} lac
+    FROM {att} t
+    JOIN {lac} lac
     ON t.hs = lac.hs AND t.anfadr > lac.anfadr AND t.endadr < lac.endadr
     ORDER BY t.hsnr, t.hs, t.anfadr
     """, """
-    DELETE FROM {target}
+    DELETE FROM {att}
     WHERE id IN (
       SELECT id FROM (
         SELECT t.id
-        FROM {target} t
-        JOIN {target_lac} lac
+        FROM {att} t
+        JOIN {lac} lac
         ON t.hs = lac.hs AND t.anfadr > lac.anfadr AND t.endadr < lac.endadr
       ) AS tmp
     )
@@ -692,7 +702,7 @@ def step9_single (dba, parameters):
     message (2, "Step  9 : Add 'zz' readings for lacunae ...")
 
     execute (cursor, """
-    INSERT INTO {target} (buch, kapanf, versanf, wortanf, kapend, versend, wortend,
+    INSERT INTO {att} (buch, kapanf, versanf, wortanf, kapend, versend, wortend,
                           anfadr, endadr, hs, hsnr, anfalt, endalt, labez, labezsuf,
                           lemma, lesart)
     SELECT t.buch, t.kapanf, t.versanf, t.wortanf, t.kapend, t.versend, t.wortend,
@@ -700,18 +710,17 @@ def step9_single (dba, parameters):
            '', 'lac'
       FROM
         /* all passages */
-        Passages t /* (SELECT DISTINCT buch, kapanf, versanf, wortanf, kapend, versend, wortend,
-           anfadr, endadr FROM {target}) AS t */
+        {target_db}.Passages t
       JOIN
         /* all lacunae */
-        {target_lac} lac
+        {lac} lac
       ON t.anfadr > lac.anfadr AND t.endadr < lac.endadr
 
     """, parameters)
     dba.commit()
 
 
-def step10_single (dba, parameters):
+def step10 (dba, parameters):
     """Create positive apparatus
 
     Bezeugung der a-Lesarten auffüllen (d.h. einen positiven Apparat
@@ -743,7 +752,7 @@ def step10_single (dba, parameters):
     cursor = dba.cursor()
 
     execute (cursor, """
-    INSERT INTO {target} (hsnr, hs, anfadr, endadr, buch, kapanf, versanf, wortanf,
+    INSERT INTO {att} (hsnr, hs, anfadr, endadr, buch, kapanf, versanf, wortanf,
                           kapend, versend, wortend, labez, labezsuf, anfalt, endalt,
                           lesart, base)
     SELECT hs.hsnr, hs.hs, a.anfadr, a.endadr, a.buch, a.kapanf, a.versanf, a.wortanf,
@@ -751,15 +760,15 @@ def step10_single (dba, parameters):
            a.lesart, a.base
     FROM
       /* all passages from A */
-      (SELECT * FROM {target} WHERE hs = 'A') AS a
+      (SELECT * FROM {att} WHERE hs = 'A') AS a
 
     JOIN
       /* all manuscripts */
-      (SELECT DISTINCT hs, hsnr FROM {target} WHERE hs <> 'A') AS hs
+      (SELECT DISTINCT hs, hsnr FROM {att} WHERE hs <> 'A') AS hs
 
     LEFT JOIN
       /* negated join on all witnessed passages */
-      {target} t
+      {att} t
 
     ON t.hs = hs.hs AND t.anfadr = a.anfadr AND t.endadr = a.endadr
 
@@ -769,15 +778,15 @@ def step10_single (dba, parameters):
     dba.commit()
 
     fix (cursor, "Manuscripts with duplicated passages", """
-    SELECT hs, anfadr, endadr FROM {target} GROUP BY hs, anfadr, endadr HAVING COUNT (*) > 1
+    SELECT hs, anfadr, endadr FROM {att} GROUP BY hs, anfadr, endadr HAVING COUNT (*) > 1
     """, None, parameters)
 
     execute (cursor, """
     /* Set comp = 'x' on nested variants. */
-    UPDATE {target} t
+    UPDATE {att} t
     JOIN (
       /* this subquery materializes the view: huge performance gain */
-      SELECT ianfadr, iendadr FROM NestedPassages
+      SELECT ianfadr, iendadr FROM {target_db}.NestedPassages
     ) as n
     ON t.anfadr = n.ianfadr AND t.endadr = n.iendadr
     SET comp = 'x'
@@ -785,13 +794,13 @@ def step10_single (dba, parameters):
 
     parameters['fehlverse'] = fehlverse ()
     execute (cursor, """
-    UPDATE {target}
+    UPDATE {att}
     SET labez = 'zu', lesart = ''
     WHERE comp = 'x' AND base = 'a' AND {fehlverse}
     """, parameters)
 
     execute (cursor, """
-    UPDATE {target}
+    UPDATE {att}
     SET lesart = 'lac'
     WHERE labez = 'zz'
     """, parameters)
@@ -799,7 +808,7 @@ def step10_single (dba, parameters):
     dba.commit()
 
 
-def step11_single (dba, parameters):
+def step11 (dba, parameters):
     """Create ActsMsList
 
     Handschriftenliste 'ActsMsList' anlegen. Die Handschrift bekommt in dem
@@ -817,9 +826,438 @@ def step11_single (dba, parameters):
     message (1, "Step 11 : Create ActsMsList ...")
 
     cursor = dba.cursor ()
+    dba.commit ()
 
 
+def step20 (dba, parameters):
+    """Kopiert Daten in die erzeugten Tabellen.
 
+    Aus: PreCo/PreCoActs/Acts_Base.pl
+
+    Die VP-Tabellen (Variant Passages) enthalten alle variierten Stellen.
+
+    Die Rdg-Tabellen (Readings) enthalten die Lesarten.  Eine variierte Stelle
+    hat mindestens zwei Lesarten.  Eine Lesart hat eine eindeutige Adresse, eine
+    Lesartenbezeichnung (Labez), das Suffix einer Lesartenbezeichnung (Labezsuf)
+    und natürlich den Text der Lesart selbst.  Das Suffix kennzeichnet z.B. eine
+    Fehlerlesart oder ein Orthographicum.
+
+    Die Witn-Tabellen ordnen die einzelnen Handschriften jeweils den Lesarten
+    zu.
+
+    In den WitGen-Tabellen werden jetzt noch die genealogischen Informationen
+    hinzugefügt.  D.h. für eine Lesart wird eingetragen, ob sie als ursprünglich
+    gilt (*) oder ob sie aus einer anderen Lesart entstanden ist.  Mit einem
+    Fragezeichen kann man diese Entscheidung auch offen lassen.  In der Spalte
+    Labneu kann festgehalten werden, ob eine Lesart aus verschiedenen Quellen
+    gleich entstanden ist.
+
+    """
+
+    message (1, "Step 20 : Fill PreCo Tables ...")
+
+    cursor = dba.cursor ()
+
+    execute (cursor, """
+    TRUNCATE {vp}
+    """, parameters)
+
+    execute (cursor, """
+    INSERT INTO {vp} (anfadr, endadr)
+    SELECT DISTINCT anfadr, endadr
+    FROM {att}
+    """, parameters)
+
+    dba.commit ()
+
+    execute (cursor, """
+    TRUNCATE {rdg}
+    """, parameters)
+
+    execute (cursor, """
+    INSERT INTO {rdg} (anfadr, endadr, labez, labezsuf, lesart)
+    SELECT DISTINCT anfadr, endadr, labez, labezsuf, lesart
+    FROM {att}
+    WHERE labez NOT REGEXP '^z[u-z]'
+    """, parameters)
+
+    dba.commit ()
+
+    # delete all readings with labezsuf if there is an equivalent reading
+    # without labezsuf
+
+    execute (cursor, """
+    DELETE FROM {rdg}
+    WHERE (anfadr, endadr, labez) IN (
+      SELECT anfadr, endadr, labez FROM (
+        SELECT DISTINCT anfadr, endadr, labez
+        FROM {rdg}
+        WHERE labezsuf = ''
+      ) AS tmp
+    ) AND labezsuf <> ''
+    """, parameters)
+
+    dba.commit ()
+
+    # Delete duplicate readings.
+    # Examples:
+    # | anfadr   | endadr   | labez | labezsuf | lesart
+    # +----------+----------+-------+----------+-------------
+    # | 52333010 | 52333010 | a     |          | καισαρειαν
+    # | 52333010 | 52333010 | a     |          | om
+    # | 52621002 | 52621002 | a     |          | ενεκα
+    # | 52621002 | 52621002 | a     |          | om
+    # | 52816006 | 52816006 | a     |          | εισηλθομεν
+    # | 52816006 | 52816006 | a     |          | εισηλ[θομεν]
+    # | 52816006 | 52816006 | a     |          | εισ̣[ηλθομεν]
+
+    execute (cursor, """
+    DELETE d
+    FROM {rdg} d
+    JOIN (
+      SELECT id, anfadr, endadr, labez FROM (
+        SELECT min (id) as id, anfadr, endadr, labez
+        FROM {rdg}
+        GROUP BY anfadr, endadr, labez
+        HAVING count (*) > 1
+      ) AS tmp
+    ) t
+    ON d.anfadr = t.anfadr
+      AND d.endadr = t.endadr
+      AND d.labez = t.labez
+      AND d.id <> t.id
+    """, parameters)
+
+    dba.commit ()
+
+    # FIXME: the witn table is superfluous as it contains the same rows as att
+
+    execute (cursor, """
+    TRUNCATE {witn}
+    """, parameters)
+
+    execute (cursor, """
+    INSERT INTO {witn} (anfadr, endadr, labez, labezsuf, hsnr, hs)
+    SELECT DISTINCT anfadr, endadr, labez, labezsuf, hsnr, hs
+    FROM {att}
+    """, parameters)
+
+    dba.commit ()
+
+
+def step21 (dba, parameters):
+    """Byzantinische Handschriften markieren
+
+    Aus: PreCo/PreCoActs/ActsMT2.pl
+
+    Update der Tabellen, byzantinische Handschriften werden markiert und
+    gezählt.
+
+    Im Laufe der Textgeschichte hat sich eine Textform durchgesetzt, der
+    sogenannte Mehrheitstext, der auch Byzantinischer Text genannt wird.  Diese
+    Textform wird exemplarisch durch die sieben Handschriften 1, 18, 35, 330,
+    398, 424 und 1241 repräsentiert.  Für jede variierte Stelle wird nun gezählt
+    und festgehalten, wieviele dieser sieben Handschriften bei einer Lesart
+    vertreten sind.  Eine Lesart gilt als Mehrheitslesart, wenn sie
+
+      (a) von mindestens sechs der oben genannten repräsentativen Handschriften
+          bezeugt wird und höchstens eine Handschrift abweicht, oder
+
+      (b) von fünf Repräsentanten bezeugt wird und zwei mit unterschiedlichen
+          Lesarten abweichen.
+
+    Diese Funktion
+
+    - schreibt die Anzahl der Byz-Hss., die an einer variierten Stelle einer
+      Variante eindeutig zugeordnet werden können, in ein Feld bzdef in vp
+
+    - schreibt die Anzahl der Byz-Repräsentanten in das Feld bz in rdg
+
+    - ermittelt an jeder variierten Stelle die Byz-Lesart und markiert sie mit
+      byz = 'B' in der Rdg-Tabelle, wenn sie nach den og. Kriterien bestimmt
+      werden kann.
+
+    - Fügt schließlich ein Manuskript 'MT' mit dem errechneten Mehrheitstext in
+      die Att-Tabelle ein.
+
+    Felder:
+
+    bzdef in vp
+      Anzahl der Byz-Repräsentanten, die an der jeweiligen variierten Stelle
+      Text haben.
+
+    bz in rdg
+      Anzahl der Byz-Repräsentanten, die die jeweilige Variante bezeugen.
+
+    byz in rdg
+      Markiert die nach unseren Regeln identifizierte Mehrheitslesart.
+
+    """
+
+    message (1, "Step 21 : Find Byzantine Text ...")
+
+    cursor = dba.cursor ()
+
+    parameters['byzlist'] = db.BYZ_HSNR
+
+    # FIXME: we don't really need this table
+    execute (cursor, """
+    UPDATE {vp} AS u
+    JOIN (
+      SELECT anfadr, endadr, count (*) as anz
+      FROM {witn}
+      WHERE hsnr IN {byzlist}
+        AND labez NOT REGEXP '^z[u-z]'
+      GROUP BY anfadr, endadr
+    ) AS s
+    ON (u.anfadr, u.endadr) = (s.anfadr, s.endadr)
+    SET u.bzdef = s.anz
+    """, parameters)
+
+    dba.commit ()
+
+    execute (cursor, """
+    UPDATE {rdg} AS u
+    JOIN (
+      SELECT anfadr, endadr, count (*) as anz
+      FROM {witn}
+      WHERE hsnr IN {byzlist}
+        AND labez NOT REGEXP '^z[u-z]'
+      GROUP BY anfadr, endadr
+    ) AS s
+    ON (u.anfadr, u.endadr) = (s.anfadr, s.endadr)
+    SET u.bzdef = s.anz
+    """, parameters)
+
+    execute (cursor, """
+    UPDATE {rdg} AS u
+    JOIN (
+      SELECT anfadr, endadr, labez, count (*) as anz
+      FROM {witn}
+      WHERE hsnr IN {byzlist}
+        AND labez NOT REGEXP '^z[u-z]'
+      GROUP BY anfadr, endadr, labez
+    ) AS s
+    ON (u.anfadr, u.endadr, u.labez) = (s.anfadr, s.endadr, s.labez)
+    SET u.bz = s.anz
+    """, parameters)
+
+    dba.commit ()
+
+    # debug info
+
+    fix (cursor, "Byzantine Variant Passages", """
+    SELECT bzdef, count(*) AS anz FROM {vp} GROUP BY bzdef
+    """, None, parameters)
+
+    fix (cursor, "Byzantine Variant Passages", """
+    SELECT bzdef, count(*) AS anz FROM {rdg} GROUP BY bzdef
+    """, None, parameters)
+
+    fix (cursor, "Byzantine Readings", """
+    SELECT bz, count(*) AS anz FROM {rdg} GROUP BY bz
+    """, None, parameters)
+
+    # mindestens 6
+    execute (cursor, """
+    UPDATE {rdg}
+    SET byz = 'B'
+    WHERE bzdef = 7 AND bz >= 6
+    """, parameters)
+
+    # 5 und 2 unterschiedliche
+    execute (cursor, """
+    UPDATE {rdg}
+    SET byz = 'B'
+    WHERE (anfadr, endadr, bz) IN (
+      SELECT anfadr, endadr, 5 FROM (
+        SELECT anfadr, endadr
+        FROM {rdg}
+        WHERE bzdef = 7 AND bz IN (5, 1)
+        GROUP BY anfadr, endadr
+        HAVING count (*) = 3
+      ) AS t
+    )
+    """, parameters)
+
+    dba.commit ()
+
+    # build the fake manuscript 'MT'
+
+    execute (cursor, """
+    DELETE FROM {att} WHERE hs = 'MT'
+    """, parameters)
+
+    execute (cursor, """
+    INSERT INTO {att} (hsnr, hs, anfadr, endadr, buch, kapanf, versanf, wortanf,
+                       kapend, versend, wortend, labez, labezsuf, lesart)
+    SELECT 1, 'MT', a.anfadr, a.endadr, a.buch, a.kapanf, a.versanf, a.wortanf,
+           a.kapend, a.versend, a.wortend, r.labez, r.labezsuf, r.lesart
+    FROM {target_db}.Passages a
+    JOIN {rdg} r
+    ON (a.anfadr, a.endadr, 'B') = (r.anfadr, r.endadr, r.byz)
+    """, parameters)
+
+    execute (cursor, """
+    INSERT INTO {att} (hsnr, hs, anfadr, endadr, buch, kapanf, versanf, wortanf,
+                       kapend, versend, wortend, labez, labezsuf, lesart)
+    SELECT 1, 'MT', a.anfadr, a.endadr, a.buch, a.kapanf, a.versanf, a.wortanf,
+           a.kapend, a.versend, a.wortend, 'zz', '', 'lac'
+    FROM {target_db}.Passages a
+    LEFT JOIN {rdg} r
+    ON (a.anfadr, a.endadr, 'B') = (r.anfadr, r.endadr, r.byz)
+    WHERE r.byz IS NULL
+    """, parameters)
+
+    dba.commit()
+
+
+def step22 (dba, parameters):
+    """Füllt die MsListVal Tabelle.
+
+    Aus: PreCo/PreCoActs/ActsMsListVal.pl
+
+    Es wurden bereits die byzantinischen Lesarten markiert.  In diesem
+    Arbeitsschritt wird für jede Handschrift die Übereinstimmung mit dem
+    byzantinischen Mehrheitstext ermittelt.  Dies geschieht sowohl auf der Basis
+    der ganzen Apostelgeschichte als auch für jedes einzelne Kapitel.
+
+    sumtxt
+      Count of passages in which the ms has any text.
+
+    uemt
+      Count of passages in which the ms has the byzantine text.
+
+    summt
+      Count of passages in which we could establish a byzantine text.
+
+    """
+
+    message (1, "Step 22 : Filling MsListVal ...")
+
+    cursor = dba.cursor ()
+
+    # fill with hs, hsnr, chapter
+
+    execute (cursor, """
+    TRUNCATE {listval}
+    """, parameters)
+
+    execute (cursor, """
+    INSERT INTO {listval} (hs, hsnr, chapter)
+    SELECT DISTINCT hs, hsnr, 0
+    FROM {att}
+    WHERE labez NOT REGEXP '^z[u-z]'
+    """, parameters)
+
+    execute (cursor, """
+    INSERT INTO {listval} (hs, hsnr, chapter)
+    SELECT DISTINCT hs, hsnr, kapanf
+    FROM {att}
+    WHERE labez NOT REGEXP '^z[u-z]'
+    """, parameters)
+
+    dba.commit ()
+
+    # sumtxt
+
+    execute (cursor, """
+    UPDATE {listval} u
+    JOIN (
+      SELECT hsnr, count (*) as sumtxt
+      FROM {att}
+      WHERE labez NOT REGEXP '^z[u-z]'
+      GROUP BY hsnr
+    ) AS t
+    ON (u.hsnr, u.chapter) = (t.hsnr, 0)
+    SET u.sumtxt = t.sumtxt
+    """, parameters)
+
+    execute (cursor, """
+    UPDATE {listval} u
+    JOIN (
+      SELECT hsnr, kapanf, count (*) as sumtxt
+      FROM {att}
+      WHERE labez NOT REGEXP '^z[u-z]'
+      GROUP BY hsnr, kapanf
+    ) AS t
+    ON (u.hsnr, u.chapter) = (t.hsnr, t.kapanf)
+    SET u.sumtxt = t.sumtxt
+    """, parameters)
+
+    # summt
+
+    execute (cursor, """
+    UPDATE {listval} u
+    JOIN (
+      SELECT hsnr, count (*) as summt
+      FROM {att} a
+      JOIN {rdg} r
+      ON (a.anfadr, a.endadr, a.labez) = (r.anfadr, r.endadr, r.labez)
+      WHERE (a.anfadr, a.endadr) IN (
+        SELECT anfadr, endadr
+        FROM {rdg}
+        WHERE byz = 'B'
+      )
+      GROUP BY a.hsnr
+    ) AS t
+    ON (u.hsnr, u.chapter) = (t.hsnr, 0)
+    SET u.summt = t.summt
+    """, parameters)
+
+    execute (cursor, """
+    UPDATE {listval} u
+    JOIN (
+      SELECT hsnr, kapanf, count (*) as summt
+      FROM {att} a
+      JOIN {rdg} r
+      ON (a.anfadr, a.endadr, a.labez) = (r.anfadr, r.endadr, r.labez)
+      WHERE (a.anfadr, a.endadr) IN (
+        SELECT anfadr, endadr
+        FROM {rdg}
+        WHERE byz = 'B'
+      )
+      GROUP BY a.hsnr, a.kapanf
+    ) AS t
+    ON (u.hsnr, u.chapter) = (t.hsnr, t.kapanf)
+    SET u.summt = t.summt
+    """, parameters)
+
+    # uemt
+
+    execute (cursor, """
+    UPDATE {listval} u
+    JOIN (
+      SELECT hsnr, count (*) as uemt
+      FROM {att} a
+      JOIN {rdg} r
+      ON (a.anfadr, a.endadr, a.labez, 'B') = (r.anfadr, r.endadr, r.labez, r.byz)
+      GROUP BY a.hsnr
+    ) AS t
+    ON (u.hsnr, u.chapter) = (t.hsnr, 0)
+    SET u.uemt = t.uemt
+    """, parameters)
+
+    execute (cursor, """
+    UPDATE {listval} u
+    JOIN (
+      SELECT hsnr, kapanf, count (*) as uemt
+      FROM {att} a
+      JOIN {rdg} r
+      ON (a.anfadr, a.endadr, a.labez, 'B') = (r.anfadr, r.endadr, r.labez, r.byz)
+      GROUP BY a.hsnr, a.kapanf
+    ) AS t
+    ON (u.hsnr, u.chapter) = (t.hsnr, t.kapanf)
+    SET u.uemt = t.uemt
+    """, parameters)
+
+    # qmt
+
+    execute (cursor, """
+    UPDATE {listval}
+    SET qmt = (uemt * 100.0) / sumtxt
+    WHERE sumtxt > 0
+    """, parameters)
 
     dba.commit ()
 
@@ -866,45 +1304,54 @@ if __name__ == '__main__':
     try:
         for step in range(args.range[0], args.range[1] + 1):
             if step == 1:
-                step1_single  (dba, parameters)
-                step1b_single (dba, parameters)
-                step1c_single (dba, parameters)
+                step1  (dba, parameters)
+                step1b (dba, parameters)
+                step1c (dba, parameters)
                 continue
             if step == 2:
-                step2_single  (dba, parameters)
+                step2  (dba, parameters)
                 continue
             if step == 3:
-                step3_single  (dba, parameters)
+                step3  (dba, parameters)
                 continue
             if step == 4:
-                step4_single  (dba, parameters)
+                step4  (dba, parameters)
                 continue
             if step == 5:
-                step5_single  (dba, parameters)
-                step5b_single (dba, parameters)
+                step5  (dba, parameters)
+                step5b (dba, parameters)
                 continue
             if step == 6:
-                step6_single  (dba, parameters)
-                step6b_single (dba, parameters)
+                step6  (dba, parameters)
+                step6b (dba, parameters)
                 continue
             if step == 7:
-                step5_single  (dba, parameters) # again
-                step7_single  (dba, parameters)
+                step5  (dba, parameters) # again
+                step7  (dba, parameters)
                 if args.verbose >= 1:
                     tools.print_stats(dba, parameters)
                 continue
             if step == 9:
-                step9_single  (dba, parameters)
+                step9  (dba, parameters)
                 if args.verbose >= 1:
                     tools.print_stats(dba, parameters)
                 continue
             if step == 10:
-                step10_single (dba, parameters)
+                step10 (dba, parameters)
                 if args.verbose >= 1:
                     tools.print_stats(dba, parameters)
                 continue
             if step == 11:
-                step11_single (dba, parameters)
+                step11 (dba, parameters)
+                continue
+            if step == 20:
+                step20 (dba, parameters)
+                continue
+            if step == 21:
+                step21 (dba, parameters)
+                continue
+            if step == 22:
+                step22 (dba, parameters)
                 continue
 
     except KeyboardInterrupt:
