@@ -178,7 +178,19 @@ CREATE_TABLE_VG = """
 )
 """
 
+# Für den byzantinischen Text typische Hss
 BYZ_HSNR = "(300010, 300180, 300350, 303300, 303980, 304240, 312410)"
+
+# Dem NT untergeschobene Kuckucks-Verse
+FEHLVERSE = """
+    (
+      anfadr >= 50837002 and endadr <= 50837046 or
+      anfadr >= 51534002 and endadr <= 51534012 or
+      anfadr >= 52406020 and endadr <= 52408014 or
+      anfadr >= 52829002 and endadr <= 52829024
+    )
+    """
+
 
 class DBA (object):
     def __init__ (self, s):

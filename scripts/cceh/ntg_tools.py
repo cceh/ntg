@@ -13,7 +13,9 @@ import MySQLdb
 def init_parameters (defaults):
 
     def quote (s):
-        return '"' + s + '"'
+        if ' ' in s:
+            return '"' + s + '"'
+        return s
 
     parameters = dict ()
 
@@ -30,14 +32,14 @@ def init_parameters (defaults):
     return parameters
 
 
-def message (level, s, error = False):
+def message (level, s, hilite = False):
     """
     Print information if needed.
     """
     if args.verbose >= level:
         delta = six.text_type (datetime.datetime.now () - args.start_time)
         print ('[' + delta + ']', end = " ")
-        if error:
+        if hilite:
             print ("\x1B[1m" + s + "\x1B[0m");
         else:
             print (s);
@@ -48,11 +50,11 @@ def cursor_get_value (cursor):
         return row[0]
 
 
-def execute (cursor, sql, parameters):
+def execute (cursor, sql, parameters, debug_level = 3):
     sql = sql.format (**parameters)
-    message (3, sql.rstrip () + ';')
+    message (debug_level, sql.rstrip () + ';')
     cursor.execute (sql, parameters)
-    message (3, "%d rows" % cursor.rowcount)
+    message (debug_level, "%d rows" % cursor.rowcount)
 
 
 def tabulate (cursor, stream = sys.stdout):
@@ -107,6 +109,15 @@ def tabulate (cursor, stream = sys.stdout):
         stream.write ("|\n")
     line ()
     stream.write ("%d rows\n" % len (rows))
+
+
+def debug (cursor, msg, sql, parameters):
+    # print values
+    if args.verbose >= 3:
+        execute (cursor, sql, parameters)
+        if cursor.rowcount > 0:
+            message (3, "*** DEBUG: {msg} ***".format (msg = msg), True)
+            tabulate (cursor)
 
 
 def fix (cursor, msg, sql, sql_fix, parameters):

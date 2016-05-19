@@ -44,7 +44,7 @@ import six
 
 import ntg_db as db
 import ntg_tools as tools
-from ntg_tools import message, execute, fix
+from ntg_tools import message, execute, debug, fix
 
 
 DEFAULTS = {
@@ -63,18 +63,6 @@ DEFAULTS = {
     'vg'      : 'VG',
     'tmp'     : 'Tmp',
 }
-
-def fehlverse ():
-    """ Untergeschobene Verse """
-    return """
-    (
-      anfadr >= 50837002 and endadr <= 50837046 or
-      anfadr >= 51534002 and endadr <= 51534012 or
-      anfadr >= 52406020 and endadr <= 52408014 or
-      anfadr >= 52829002 and endadr <= 52829024
-    )
-    """
-
 
 def create_indices (cursor):
     message (2, "          Creating indices ...")
@@ -99,11 +87,10 @@ def drop_indices (cursor):
 
 
 def step1(dba, parameters):
-    """ Copy tables to new database
+    """Copy tables to new database
 
-    Copy the (28 * 2) tables to 2 tables in a new database.
-    Do NOT copy versions and patristic manuscripts.
-    Create indices and some views.
+    Copy the (28 * 2) tables to 2 tables in a new database.  Do *not* copy
+    versions and patristic manuscripts.  Create indices and some views.
 
     """
 
@@ -186,8 +173,12 @@ def step1(dba, parameters):
 
 
 def step1b (dba, parameters):
-    """ No need to delete translations because we didn't copy them in the
-    first place. """
+    """Delete Versions
+
+    No need to delete translations because we didn't copy them in the first
+    place.
+
+    """
 
 
 def step1c (dba, parameters):
@@ -218,15 +209,16 @@ def step1c (dba, parameters):
 def step2 (dba, parameters):
     """Data cleanup
 
-    Delete spurious '\r' characters in suffix2 field.
-    Replace NULL entries with ''.
+    Delete spurious carriage return characters in suffix2 field.  Replace NULL
+    entries with empty strings.
 
-    2. Korrekturen in den Acts-Tabellen: L-Notierungen nur im Feld LEKT,
-    *- u. C-Notierungen nur im Feld KORR.
+        Korrekturen in den Acts-Tabellen: L-Notierungen nur im Feld LEKT, \*-
+        u. C-Notierungen nur im Feld KORR.
 
-    Gelegentlich steht an Stellen, an denen mehrere Lektionen desselben
-    Lektionars zu verzeichnen sind, in KORR ein ueberfluessiges 'L' ohne Nummer.
-    Es kommt auch vor, dass L1 und L2 in KORR stehen oder C-Notierungen in LEKT.
+        Gelegentlich steht an Stellen, an denen mehrere Lektionen desselben
+        Lektionars zu verzeichnen sind, in KORR ein überflüssiges 'L' ohne
+        Nummer.  Es kommt auch vor, dass L1 und L2 in KORR stehen oder
+        C-Notierungen in LEKT.
 
     """
 
@@ -272,7 +264,7 @@ def step2 (dba, parameters):
     """, parameters)
 
     fix (cursor, "Wrong labez", """
-    SELECT labez, labezsuf, kapanf, count (*) AS anz FROM {att}
+    SELECT labez, labezsuf, kapanf, count (*) AS anzahl FROM {att}
     WHERE labez REGEXP '.[fo]'
     GROUP BY labez, labezsuf, kapanf
     ORDER BY labez, labezsuf, kapanf
@@ -287,32 +279,40 @@ def step2 (dba, parameters):
 
 
 def step3 (dba, parameters):
-    # No need to drop fields because we didn't copy them in the first place
+    """Drop fields
+
+    No need to drop fields because we didn't copy them in the first place.
+
+    """
     pass
 
 
 def step4 (dba, parameters):
-    # No need to copy the table because we already created it in the right place
+    """Copy tables
+
+    No need to copy the table because we already created it in the right place.
+
+    """
     pass
 
 
 def step5 (dba, parameters):
-    """ Delete passages without variants
+    """Delete passages without variants
 
-    5. Stellen löschen, an denen nur eine oder mehrere f- oder o-Lesarten vom
-    A-Text abweichen. Hier gibt es also keine Variante.
+        Stellen löschen, an denen nur eine oder mehrere f- oder o-Lesarten vom
+        A-Text abweichen. Hier gibt es also keine Variante.
+
+        Nicht löschen, wenn an dieser variierten Stelle eine Variante 'b' - 'y'
+        erscheint.
+
+        Änderung 2014-12-16: Act 28,29/22 gehört zu einem Fehlvers.  Dort gibt
+        es u.U. keine Variante neben b, sondern nur ein Orthographicum.  Wir
+        suchen also nicht mehr nach einer Variante 'b' bis 'y', sondern zählen
+        die Varianten.  Liefert getReadings nur 1 zurück, gibt es keine
+        Varianten.
 
     Stellen ohne Varianten sind für die CBGM irrelevant.  Stellen mit
     ausschließlich 'z%' Lesearten ebenso.
-
-    Nicht löschen, wenn an dieser variierten Stelle eine
-    Variante 'b' - 'y' erscheint.
-
-    Änderung 2014-12-16:
-    Act 28,29/22 gehört zu einem Fehlvers. Dort gibt es u.U. keine Variante neben
-    b, sondern nur ein Orthographicum. Wir suchen also nicht mehr nach einer
-    Variante 'b' bis 'y', sondern zählen die Varianten. Liefert getReadings nur 1
-    zurück, gibt es keine Varianten.
 
     """
 
@@ -327,7 +327,7 @@ def step5 (dba, parameters):
         SELECT anfadr, endadr FROM {att}
         WHERE labez NOT REGEXP '^z' OR labezsuf NOT REGEXP 'f|o'
         GROUP BY anfadr, endadr, labez
-        HAVING count(*) = 1
+        HAVING count (*) = 1
       ) AS tmp
     )
     """, parameters)
@@ -337,18 +337,19 @@ def step5 (dba, parameters):
 def step5b (dba, parameters):
     """Process Commentaries
 
-    Wenn bei Wiederholung des Lemmatextes in Kommentarhandschriften Varianten
-    entstanden sind, wird mit zw (=zweifelhaft) verzeichnet.
+        Wenn bei Wiederholung des Lemmatextes in Kommentarhandschriften
+        Varianten entstanden sind, wird mit zw (=zweifelhaft) verzeichnet.
 
-    5b. 20. Mai 2015
-    Commentary manuscripts like 307 cannot be treated like lectionaries where we
-    choose the first text. If a T1 or T2 reading is found they have to be
-    deleted. A new zw reading is created containing the old readings as suffix.
+        20. Mai 2015.  Commentary manuscripts like 307 cannot be treated like
+        lectionaries where we choose the first text.  If a T1 or T2 reading is
+        found they have to be deleted.  A new zw reading is created containing
+        the old readings as suffix.
 
-    This has to be done as long as both witnesses are present.
+        This has to be done as long as both witnesses are present.
 
-    If the counterpart of one entry belongs to the list of lacunae
-    the witness will be treated as normal witness. The T notation can be deleted.
+        If the counterpart of one entry belongs to the list of lacunae the
+        witness will be treated as normal witness. The T notation can be
+        deleted.
 
     DIVINATIO: If there is only one T1 or T2 reading for that passage and
     manuscript, unset the 'T' suffix.  If there are both T1 and T2 readings, merge
@@ -380,7 +381,7 @@ def step5b (dba, parameters):
       FROM {att}
       WHERE hs REGEXP 'T[1-9]'
       GROUP BY hsnr, anfadr, endadr
-      HAVING COUNT(*) = 1
+      HAVING COUNT (*) = 1
     ) AS t
     ON u.id = t.id
     SET hs = REGEXP_REPLACE (hs, 'T[1-9]', ''),
@@ -432,21 +433,21 @@ def step5b (dba, parameters):
 
 
 def step6 (dba, parameters):
-    """ Delete later hands
+    """Delete later hands
 
-    6. Lesarten, die nicht von der ersten Hand stammen, loeschen.  Bei
-    mehreren Lektionslesarten gilt die L1-Lesart.  Ausnahme: Bei
-    Selbstkorrekturen wird die *-Lesart geloescht und die C*-Lesart
-    beibehalten.
+        Lesarten löschen, die nicht von der ersten Hand stammen.  Bei mehreren
+        Lektionslesarten gilt die L1-Lesart.  Ausnahme: Bei Selbstkorrekturen
+        wird die *-Lesart gelöscht und die C*-Lesart beibehalten.
 
-    Erweiterung vom 15.02.2013: Wenn die einzige Variante an einer Stelle nur
-    von einem oder mehreren Korrektoren bezeugt ist (z.B. 26:8/17), gehoert
-    die Stelle nicht in die Tabelle.  Es muss also noch eine Pruefung
-    stattfinden, ob nach diesem Vorgang eine Stelle noch immer eine variierte
-    Stelle ist. Wenn nicht, kann der Datensatz geloescht werden.
+        Erweiterung vom 15.02.2013: Wenn die einzige Variante an einer Stelle
+        nur von einem oder mehreren Korrektoren bezeugt ist (z.B. 26:8/17),
+        gehört die Stelle nicht in die Tabelle.  Es muss also noch eine Prüfung
+        stattfinden, ob nach diesem Vorgang eine Stelle noch immer eine
+        variierte Stelle ist. Wenn nicht, kann der Datensatz gelöscht werden.
 
-    QUESTION: what is lekt = 'N'?
     QUESTION: what is suffix2 = 'A'?
+    QUESTION: what is suffix2 = 'K'?
+    QUESTION: what is lekt = 'N'?
 
     """
     message (1, "Step  6 : Delete later hands ...")
@@ -474,8 +475,8 @@ def step6 (dba, parameters):
           AND suffix2 NOT REGEXP 'C[*]'
         """, parameters)
 
-        fix (cursor, "Bogus Suffixes", """
-        SELECT suffix2, count (*) AS Anz
+        fix (cursor, "Unknown Suffixes", """
+        SELECT suffix2, count (*) AS anzahl
         FROM {t}
         WHERE suffix2 REGEXP 'A|K|L2|T2'
         GROUP BY suffix2
@@ -490,17 +491,17 @@ def step6 (dba, parameters):
 def step6b (dba, parameters):
     """Process Sigla
 
-    Handschriften, die mit einem "V" für videtur gekennzeichnet sind, werden
-    ebenso wie alle anderen behandelt. Das "V" kann also getilgt werden. Die
-    Eintragungen für "ursprünglich (*)" und "C*" werden ebenfalls
-    gelöscht. Schließlich auch die Zusätze zur Handschriftennummer wie
-    „T1“. Diese Eintragungen werden (bisher) einfach an die
-    Handschriftenbezeichnung angehängt.
+        Handschriften, die mit einem "V" für videtur gekennzeichnet sind, werden
+        ebenso wie alle anderen behandelt.  Das "V" kann also getilgt werden.
+        Die Eintragungen für "ursprünglich (*)" und "C*" werden ebenfalls
+        gelöscht.  Schließlich auch die Zusätze zur Handschriftennummer wie
+        „T1“.  Diese Eintragungen werden (bisher) einfach an die
+        Handschriftenbezeichnung angehängt.
 
-    Der Eintrag 'videtur', gekennzeichnet durch ein 'V' hinter der
-    Handschriftennummer, spielt fuer die CBGM keine Rolle. Ein eventuell
-    vorhandenes 'V' muss getilgt werden. Gleiches gilt fuer die Eintraege '*'
-    und 'C*'.
+        Der Eintrag 'videtur', gekennzeichnet durch ein 'V' hinter der
+        Handschriftennummer, spielt für die CBGM keine Rolle.  Ein eventuell
+        vorhandenes 'V' muss getilgt werden.  Gleiches gilt für die Einträge '*'
+        und 'C*'.
 
     """
 
@@ -522,17 +523,17 @@ def step6b (dba, parameters):
         WHERE suffix2 REGEXP '{regexp}'
         """, parameters)
 
-    fix (cursor, "Hs with more than one hsnr", """
+    debug (cursor, "Hs with more than one hsnr", """
     SELECT hs FROM (
       SELECT DISTINCT hs, hsnr FROM {att}
     ) AS tmp
     GROUP BY hs
-    HAVING count(*) > 1
-    """, None, parameters)
+    HAVING count (*) > 1
+    """, parameters)
 
     # print some debug info
     execute (cursor, """
-    SELECT lekt, korr, suffix2, count (*) AS anz
+    SELECT lekt, korr, suffix2, count (*) AS anzahl
     FROM {att}
     GROUP BY lekt, korr, suffix2
     ORDER BY lekt, korr, suffix2
@@ -540,12 +541,12 @@ def step6b (dba, parameters):
     tools.tabulate (cursor)
 
     # Debug hs where hs and suffix2 still mismatch
-    fix (cursor, "hs and suffix2 mismatch", """
+    debug (cursor, "hs and suffix2 mismatch", """
     SELECT hs, suffix2, anfadr, endadr, lemma
     FROM {att}
     WHERE hs NOT REGEXP suffix2
     ORDER BY hs, anfadr
-    """, None, parameters)
+    """, parameters)
 
     # execute (cursor, """
     # UPDATE {t}
@@ -558,7 +559,7 @@ def step6b (dba, parameters):
       SELECT DISTINCT hs, hsnr FROM {att}
     ) AS tmp
     GROUP BY hsnr
-    HAVING count(*) > 1
+    HAVING count (*) > 1
     """, """
     UPDATE
         {att} t
@@ -589,10 +590,10 @@ def step6b (dba, parameters):
 def step7 (dba, parameters):
     """zw Lesarten
 
-    7. zw-Lesarten der übergeordneten Variante zuordnen, wenn ausschliesslich
-    verschiedene Lesarten derselben Variante infrage kommen (z.B. zw a/ao oder
-    b/bo_f). In diesen Fällen tritt die Buchstabenkennung der übergeordneten
-    Variante in LABEZ an die Stelle von 'zw'.
+        zw-Lesarten der übergeordneten Variante zuordnen, wenn ausschliesslich
+        verschiedene Lesarten derselben Variante infrage kommen (z.B. zw a/ao
+        oder b/bo_f).  In diesen Fällen tritt die Buchstabenkennung der
+        übergeordneten Variante in labez an die Stelle von 'zw'.
 
     """
 
@@ -613,7 +614,7 @@ def step7 (dba, parameters):
             UPDATE {att}
             SET labez = %(labez)s, labezsuf = ''
             WHERE id = %(id)s
-            """, parameters)
+            """, parameters, 4)
             updated += 1
 
     dba.commit()
@@ -621,17 +622,17 @@ def step7 (dba, parameters):
 
 
 def step9 (dba, parameters):
-    """ Lacunae auffüllen
+    """Lacunae auffüllen
 
-    Stellenbezogene Lückenliste füllen. Parallel zum Apparat wurde eine
-    systematische Lückenliste erstellt, die die Lücken aller griechischen
-    Handschriften enthält. Wir benötigen diese Information jedoch jeweils für
-    die variierten Stellen.
+        Stellenbezogene Lückenliste füllen.  Parallel zum Apparat wurde eine
+        systematische Lückenliste erstellt, die die Lücken aller griechischen
+        Handschriften enthält.  Wir benötigen diese Information jedoch jeweils
+        für die variierten Stellen.
 
-    Step 9 (Krueger) builds a lacuna table containing an entry for each
-    manuscript and passage inside a lacuna. Then, in step 10, it adds 'zz'
-    readings to the Acts table for each passage inside a lacuna using the
-    lacuna table of step 9.  We short-circuit the lacuna table.
+    In Step 9 Mr. Krüger builds a lacuna table containing an entry for each
+    manuscript and passage inside a lacuna.  Then, in step 10, he adds 'zz'
+    readings to the Acts table for each passage inside a lacuna using the lacuna
+    table of step 9.  We short-circuit the creation of the lacuna table.
 
     """
 
@@ -651,7 +652,7 @@ def step9 (dba, parameters):
       JOIN {lac} b
       WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
       GROUP BY a.hs, a.anfadr, a.endadr
-      HAVING count(*) > 1
+      HAVING count (*) > 1
       ORDER BY hs, anfadr, endadr DESC
     ) AS t
     WHERE lac.hs = t.hs
@@ -666,7 +667,7 @@ def step9 (dba, parameters):
       JOIN {lac} b
       WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
       GROUP BY a.hs, a.anfadr, a.endadr
-      HAVING count(*) > 1
+      HAVING count (*) > 1
       ORDER BY hs, anfadr, endadr DESC
     ) AS t
     WHERE lac.hs = t.hs
@@ -723,25 +724,24 @@ def step9 (dba, parameters):
 def step10 (dba, parameters):
     """Create positive apparatus
 
-    Bezeugung der a-Lesarten auffüllen (d.h. einen positiven Apparat
-    herstellen).  Sie setzt sich zusammen aus allen in der 'ActsMsList' für
-    das jeweilige Kapitel geführten Handschriften, die an der jeweils
-    bearbeiteten Stelle noch nicht bei einer Variante oder in der Lückenliste
-    stehen.
+        Bezeugung der a-Lesarten auffüllen (d.h. einen positiven Apparat
+        herstellen).  Sie setzt sich zusammen aus allen in der 'ActsMsList' für
+        das jeweilige Kapitel geführten Handschriften, die an der jeweils
+        bearbeiteten Stelle noch nicht bei einer Variante oder in der
+        Lückenliste stehen.
 
-    Besondere Aufmerksamkeit ist bei den Fehlversen notwendig: Im Bereich der
-    Fehlverse darf nicht einfach die a-Bezeugung aufgefüllt werden.  Stattdessen
-    muss, wenn die variierte Stelle zu einer umfassten Einheit gehört und das
-    Feld 'base' den Inhalt 'a' hat, die neue Lesartenbezeichnung 'zu'
-    eingetragen werden.  base = 'b' steht für eine alternative Subvariante (dem
-    Textus receptus).
+        Besondere Aufmerksamkeit ist bei den Fehlversen notwendig: Im Bereich
+        der Fehlverse darf nicht einfach die a-Bezeugung aufgefüllt werden.
+        Stattdessen muss, wenn die variierte Stelle zu einer umfassten Einheit
+        gehört und das Feld 'base' den Inhalt 'a' hat, die neue
+        Lesartenbezeichnung 'zu' eingetragen werden.  base = 'b' steht für eine
+        alternative Subvariante (dem Textus receptus).
 
-    Eine variierte Stelle ist eine umfasste Stelle, wenn comp = 'x' ist.
+        Eine variierte Stelle ist eine umfasste Stelle, wenn comp = 'x' ist.
 
     Insert the lesart of hs = 'A' for each passage that is not yet in the
     table.  Lacunae are already accounted for.
 
-    QUESTION: why are there multiple 'a' readings for some passages?
     QUESTION: what is base = 'N'?
     QUESTION: what is comp = 'N'?
 
@@ -777,9 +777,9 @@ def step10 (dba, parameters):
     """, parameters)
     dba.commit()
 
-    fix (cursor, "Manuscripts with duplicated passages", """
+    debug (cursor, "Manuscripts with duplicated passages", """
     SELECT hs, anfadr, endadr FROM {att} GROUP BY hs, anfadr, endadr HAVING COUNT (*) > 1
-    """, None, parameters)
+    """, parameters)
 
     execute (cursor, """
     /* Set comp = 'x' on nested variants. */
@@ -792,7 +792,7 @@ def step10 (dba, parameters):
     SET comp = 'x'
     """, parameters)
 
-    parameters['fehlverse'] = fehlverse ()
+    parameters['fehlverse'] = db.FEHLVERSE
     execute (cursor, """
     UPDATE {att}
     SET labez = 'zu', lesart = ''
@@ -811,15 +811,15 @@ def step10 (dba, parameters):
 def step11 (dba, parameters):
     """Create ActsMsList
 
-    Handschriftenliste 'ActsMsList' anlegen. Die Handschrift bekommt in dem
-    entsprechenden Kapitel eine 1, wenn sie dort Text enthält. Mit anderen
-    Worten: Sie bekommt eine 0, wenn das ganze Kapitel fehlt. Es wird hier auf
-    die systematische Lückenliste zurückgegriffen. Kapitel, die keine echte
-    Variante enthalten, muessen ebenfalls eine 0 erhalten.
+        Handschriftenliste 'ActsMsList' anlegen. Die Handschrift bekommt in dem
+        entsprechenden Kapitel eine 1, wenn sie dort Text enthält. Mit anderen
+        Worten: Sie bekommt eine 0, wenn das ganze Kapitel fehlt. Es wird hier
+        auf die systematische Lückenliste zurückgegriffen. Kapitel, die keine
+        echte Variante enthalten, müssen ebenfalls eine 0 erhalten.
 
-    Die Handschriftenliste darf erst NACH dem Auffüllen der a-Bezeugung
-    gerechnet werden, daher gehört das Skript hier an den Schluss der
-    Vorbereitungen!
+        Die Handschriftenliste darf erst NACH dem Auffüllen der a-Bezeugung
+        gerechnet werden, daher gehört das Skript hier an den Schluss der
+        Vorbereitungen!
 
     """
 
@@ -834,23 +834,23 @@ def step20 (dba, parameters):
 
     Aus: PreCo/PreCoActs/Acts_Base.pl
 
-    Die VP-Tabellen (Variant Passages) enthalten alle variierten Stellen.
+        Die VP-Tabellen (Variant Passages) enthalten alle variierten Stellen.
 
-    Die Rdg-Tabellen (Readings) enthalten die Lesarten.  Eine variierte Stelle
-    hat mindestens zwei Lesarten.  Eine Lesart hat eine eindeutige Adresse, eine
-    Lesartenbezeichnung (Labez), das Suffix einer Lesartenbezeichnung (Labezsuf)
-    und natürlich den Text der Lesart selbst.  Das Suffix kennzeichnet z.B. eine
-    Fehlerlesart oder ein Orthographicum.
+        Die Rdg-Tabellen (Readings) enthalten die Lesarten.  Eine variierte
+        Stelle hat mindestens zwei Lesarten.  Eine Lesart hat eine eindeutige
+        Adresse, eine Lesartenbezeichnung (Labez), das Suffix einer
+        Lesartenbezeichnung (Labezsuf) und natürlich den Text der Lesart selbst.
+        Das Suffix kennzeichnet z.B. eine Fehlerlesart oder ein Orthographicum.
 
-    Die Witn-Tabellen ordnen die einzelnen Handschriften jeweils den Lesarten
-    zu.
+        Die Witn-Tabellen ordnen die einzelnen Handschriften jeweils den
+        Lesarten zu.
 
-    In den WitGen-Tabellen werden jetzt noch die genealogischen Informationen
-    hinzugefügt.  D.h. für eine Lesart wird eingetragen, ob sie als ursprünglich
-    gilt (*) oder ob sie aus einer anderen Lesart entstanden ist.  Mit einem
-    Fragezeichen kann man diese Entscheidung auch offen lassen.  In der Spalte
-    Labneu kann festgehalten werden, ob eine Lesart aus verschiedenen Quellen
-    gleich entstanden ist.
+        In den WitGen-Tabellen werden jetzt noch die genealogischen
+        Informationen hinzugefügt.  D.h. für eine Lesart wird eingetragen, ob
+        sie als ursprünglich gilt (*) oder ob sie aus einer anderen Lesart
+        entstanden ist.  Mit einem Fragezeichen kann man diese Entscheidung auch
+        offen lassen.  In der Spalte Labneu kann festgehalten werden, ob eine
+        Lesart aus verschiedenen Quellen gleich entstanden ist.
 
     """
 
@@ -899,6 +899,8 @@ def step20 (dba, parameters):
 
     dba.commit ()
 
+    # QUESTION: why are there multiple 'a' readings for some passages?
+    #
     # Delete duplicate readings.
     # Examples:
     # | anfadr   | endadr   | labez | labezsuf | lesart
@@ -946,25 +948,26 @@ def step20 (dba, parameters):
 
 
 def step21 (dba, parameters):
-    """Byzantinische Handschriften markieren
+    """Errechnet den Mehrheitstext
 
     Aus: PreCo/PreCoActs/ActsMT2.pl
 
-    Update der Tabellen, byzantinische Handschriften werden markiert und
-    gezählt.
+        Update der Tabellen, byzantinische Handschriften werden markiert und
+        gezählt.
 
-    Im Laufe der Textgeschichte hat sich eine Textform durchgesetzt, der
-    sogenannte Mehrheitstext, der auch Byzantinischer Text genannt wird.  Diese
-    Textform wird exemplarisch durch die sieben Handschriften 1, 18, 35, 330,
-    398, 424 und 1241 repräsentiert.  Für jede variierte Stelle wird nun gezählt
-    und festgehalten, wieviele dieser sieben Handschriften bei einer Lesart
-    vertreten sind.  Eine Lesart gilt als Mehrheitslesart, wenn sie
+        Im Laufe der Textgeschichte hat sich eine Textform durchgesetzt, der
+        sogenannte Mehrheitstext, der auch Byzantinischer Text genannt wird.
+        Diese Textform wird exemplarisch durch die sieben Handschriften 1, 18,
+        35, 330, 398, 424 und 1241 repräsentiert.  Für jede variierte Stelle
+        wird nun gezählt und festgehalten, wieviele dieser sieben Handschriften
+        bei einer Lesart vertreten sind.  Eine Lesart gilt als Mehrheitslesart,
+        wenn sie
 
-      (a) von mindestens sechs der oben genannten repräsentativen Handschriften
-          bezeugt wird und höchstens eine Handschrift abweicht, oder
+        a) von mindestens sechs der oben genannten repräsentativen Handschriften
+           bezeugt wird und höchstens eine Handschrift abweicht, oder
 
-      (b) von fünf Repräsentanten bezeugt wird und zwei mit unterschiedlichen
-          Lesarten abweichen.
+        b) von fünf Repräsentanten bezeugt wird und zwei mit unterschiedlichen
+           Lesarten abweichen.
 
     Diese Funktion
 
@@ -983,11 +986,18 @@ def step21 (dba, parameters):
     Felder:
 
     bzdef in vp
-      Anzahl der Byz-Repräsentanten, die an der jeweiligen variierten Stelle
-      Text haben.
+      Anzahl der Byz-Hss, die an der jeweiligen variierten Stelle eindeutig
+      einer Lesart zugeordnet werden können.  vp enthält genau eine Zeile pro
+      variierter Stelle.
+
+    bzdef in rdg
+      Anzahl der Byz-Hss, die an der jeweiligen variierten Stelle eindeutig
+      einer Lesart zugeordnet werden können.  rdg kann mehrere Zeilen pro
+      variierter Stelle enthalten, mit jeweils unterschiedlichen Lesarten.
 
     bz in rdg
-      Anzahl der Byz-Repräsentanten, die die jeweilige Variante bezeugen.
+      Anzahl der Byz-Hss, die die jeweilige Variante (= variierte Stelle *
+      Lesart) bezeugen.
 
     byz in rdg
       Markiert die nach unseren Regeln identifizierte Mehrheitslesart.
@@ -1004,14 +1014,14 @@ def step21 (dba, parameters):
     execute (cursor, """
     UPDATE {vp} AS u
     JOIN (
-      SELECT anfadr, endadr, count (*) as anz
+      SELECT anfadr, endadr, count (*) as anzahl
       FROM {witn}
       WHERE hsnr IN {byzlist}
         AND labez NOT REGEXP '^z[u-z]'
       GROUP BY anfadr, endadr
     ) AS s
     ON (u.anfadr, u.endadr) = (s.anfadr, s.endadr)
-    SET u.bzdef = s.anz
+    SET u.bzdef = s.anzahl
     """, parameters)
 
     dba.commit ()
@@ -1019,44 +1029,40 @@ def step21 (dba, parameters):
     execute (cursor, """
     UPDATE {rdg} AS u
     JOIN (
-      SELECT anfadr, endadr, count (*) as anz
+      SELECT anfadr, endadr, count (*) as anzahl
       FROM {witn}
       WHERE hsnr IN {byzlist}
         AND labez NOT REGEXP '^z[u-z]'
       GROUP BY anfadr, endadr
     ) AS s
     ON (u.anfadr, u.endadr) = (s.anfadr, s.endadr)
-    SET u.bzdef = s.anz
+    SET u.bzdef = s.anzahl
     """, parameters)
 
     execute (cursor, """
     UPDATE {rdg} AS u
     JOIN (
-      SELECT anfadr, endadr, labez, count (*) as anz
+      SELECT anfadr, endadr, labez, count (*) as anzahl
       FROM {witn}
       WHERE hsnr IN {byzlist}
         AND labez NOT REGEXP '^z[u-z]'
       GROUP BY anfadr, endadr, labez
     ) AS s
     ON (u.anfadr, u.endadr, u.labez) = (s.anfadr, s.endadr, s.labez)
-    SET u.bz = s.anz
+    SET u.bz = s.anzahl
     """, parameters)
 
     dba.commit ()
 
     # debug info
 
-    fix (cursor, "Byzantine Variant Passages", """
-    SELECT bzdef, count(*) AS anz FROM {vp} GROUP BY bzdef
-    """, None, parameters)
+    debug (cursor, "Byzantine Variant Passages", """
+    SELECT bzdef, count (*) AS anzahl FROM {vp} GROUP BY bzdef
+    """, parameters)
 
-    fix (cursor, "Byzantine Variant Passages", """
-    SELECT bzdef, count(*) AS anz FROM {rdg} GROUP BY bzdef
-    """, None, parameters)
-
-    fix (cursor, "Byzantine Readings", """
-    SELECT bz, count(*) AS anz FROM {rdg} GROUP BY bz
-    """, None, parameters)
+    debug (cursor, "Byzantine Readings", """
+    SELECT bz, count (*) AS anzahl FROM {rdg} GROUP BY bz
+    """, parameters)
 
     # mindestens 6
     execute (cursor, """
@@ -1117,10 +1123,10 @@ def step22 (dba, parameters):
 
     Aus: PreCo/PreCoActs/ActsMsListVal.pl
 
-    Es wurden bereits die byzantinischen Lesarten markiert.  In diesem
-    Arbeitsschritt wird für jede Handschrift die Übereinstimmung mit dem
-    byzantinischen Mehrheitstext ermittelt.  Dies geschieht sowohl auf der Basis
-    der ganzen Apostelgeschichte als auch für jedes einzelne Kapitel.
+        Es wurden bereits die byzantinischen Lesarten markiert.  In diesem
+        Arbeitsschritt wird für jede Handschrift die Übereinstimmung mit dem
+        byzantinischen Mehrheitstext ermittelt.  Dies geschieht sowohl auf der
+        Basis der ganzen Apostelgeschichte als auch für jedes einzelne Kapitel.
 
     sumtxt
       Count of passages in which the ms has any text.

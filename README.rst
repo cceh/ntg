@@ -127,6 +127,10 @@ Wichtige Majuskeln:
 
 - 05 (D) Codex Bezae Cantabrigiensis ea†
 
+Im 7. und 8. Jahrhundert verschlechtert sich das Pergament.  Das Format
+wird verkleinert.  Alte Handschriften werden überschrieben (Palimpsest,
+codex rescriptus).  ([NES1923]_ §36)
+
 
 Minuskeln
 ~~~~~~~~~
@@ -138,12 +142,15 @@ wenige sind dem Originaltext sehr nahe.  Es sind 2800 Minuskeln bekannt.
 
 Bezeichnung: Zahl (z.B. 33)
 
+Ab dem 13. Jhd. wird Papier für Bibelhandschriften verwendet.
+Im 15. Jhd. beginnt das Papier zu überwiegen.  ([NES1923]_ §36)
+
 
 Lektionare
 ~~~~~~~~~~
 
-Lektionare bringen die Texte des NT in der Reihenfolge, die durch die
-Leseordnung der Kirche vorgegeben ist.  Es sind 2300 Lektionare bekannt.
+Lektionare (kirchliche Lesebücher) bringen nur ausgewählte Perikopen des
+NT, geordnet nach dem Kirchenjahr.  Es sind 2300 Lektionare bekannt.
 Das Sytem der Lektionare entstand geschätzt im 4 Jhd.  (Kuriosum: da das
 Kirchenjahr Ostern anfängt, hat es bis zu 57 Wochen.) ([TNT]_ S. 172ff)
 
@@ -298,6 +305,20 @@ labezsuf
   durch "/" getrennte Liste
     z.B. "a/b_o/c_f"
 
+base
+  Basistext ???
+
+  a
+    Urtext
+
+  b
+    Textus receptus
+
+comp
+
+  x
+    Umfaßte Stelle
+
 
 Abkürzungen, Suffixe
 --------------------
@@ -356,3 +377,8 @@ Literatur
 .. [LOJ] Aland, Barbara.  1998.  *Novum Testamentum Graecum Editio
    Critica Maior: Presentation of the First Part: The Letter of James.*
    Münster.  http://rosetta.reltech.org/TC/v03/Aland1998.html
+
+.. [NESTLE1923] Nestle, Eberhard.  1923.  *Eberhard Nestle's Einführung
+   in das Griechische Neue Testament.* Vierte Auflage.  Völlig
+   umgearbeitet von Ernst von Dobschütz.  Göttingen: Vandenhoeck &
+   Ruprecht.
