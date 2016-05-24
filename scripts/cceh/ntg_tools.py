@@ -82,7 +82,10 @@ def tabulate (cursor, stream = sys.stdout):
                 newrow.append ('NULL')
             else:
                 if cursor.description[i][1] == MySQLdb.STRING:
-                    newrow.append (row[i].decode ('utf-8'))
+                    if isinstance (row[i], six.text_type):
+                        newrow.append (row[i])
+                    else:
+                        newrow.append (row[i].decode ('utf-8'))
                 else:
                     newrow.append (six.text_type (row[i]))
         rows.append (newrow)

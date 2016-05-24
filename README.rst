@@ -334,7 +334,6 @@ base
     Fehlverse: Textus Receptus
 
 comp
-
   x
     Umfaßte Variante
 
@@ -443,6 +442,6 @@ Literatur
    Münster.  http://rosetta.reltech.org/TC/v03/Aland1998.html
 
 .. [NESTLE1923] Nestle, Eberhard.  1923.  *Eberhard Nestle's Einführung
-   in das Griechische Neue Testament.* Vierte Auflage.  Völlig
-   umgearbeitet von Ernst von Dobschütz.  Göttingen: Vandenhoeck &
+   in das Griechische Neue Testament. Vierte Auflage.  Völlig
+   umgearbeitet von Ernst von Dobschütz.*  Göttingen: Vandenhoeck &
    Ruprecht.
