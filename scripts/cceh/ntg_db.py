@@ -1,27 +1,28 @@
 # -*- encoding: utf-8 -*-
 
-"""
-Database interface
+"""Database Interface Module
 
-HOW TO CONFIGURE DATABASE ACCESS:
+How To Configure Database Access
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Edit ~/.my.cnf and add sections:
+Edit your ~/.my.cnf and add these sections: ::
 
-[ntg-local]
-host="localhost"
-database="apparat"
-user="username"
-password="password"
-default-character-set="utf8"
+    [ntg-local]
+    host="localhost"
+    database="apparat"
+    user="username"
+    password="password"
+    default-character-set="utf8"
 
-[ntg-remote]
-host="remote"
-database="apparat"
-user="username"
-password="password"
-default-character-set="utf8"
+    [ntg-remote]
+    host="remote"
+    database="apparat"
+    user="username"
+    password="password"
+    default-character-set="utf8"
 
-!!! Make sure ~/.my.cnf is readable only by you !!!
+Replace *username* and *password* with your own username and password.
+**Make sure ~/.my.cnf is readable only by yourself!**
 
 """
 
@@ -178,10 +179,13 @@ CREATE_TABLE_VG = """
 )
 """
 
-# Für den byzantinischen Text typische Hss
 BYZ_HSNR = "(300010, 300180, 300350, 303300, 303980, 304240, 312410)"
+"""Manuscripts that contain the Byzantine Text.
 
-# Dem NT untergeschobene Kuckucks-Verse
+We use these manuscripts to establish the Byzantine Text according to our rules.
+
+"""
+
 FEHLVERSE = """
     (
       anfadr >= 50837002 and endadr <= 50837046 or
@@ -190,9 +194,17 @@ FEHLVERSE = """
       anfadr >= 52829002 and endadr <= 52829024
     )
     """
+"""Verses added in later times.
+
+These verses were added to the NT in later times. Because they are not original
+they are not included in the text of manuscript 'A'.
+
+"""
 
 
 class DBA (object):
+    """ Database Interface """
+
     def __init__ (self, s):
         if s not in ("local", "remote"):
             s = "local"

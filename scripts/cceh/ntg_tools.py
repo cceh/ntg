@@ -1,5 +1,7 @@
 # -*- encoding: utf-8 -*-
 
+""" This module contains some useful functions. """
+
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -123,21 +125,31 @@ def debug (cursor, msg, sql, parameters):
             tabulate (cursor)
 
 
-def fix (cursor, msg, sql, sql_fix, parameters):
+def fix (cursor, msg, check_sql, fix_sql, parameters):
+    """Check and eventually fix errors.
+
+    Executes the check_sql statement to check for error conditions and, if rows
+    emerge, executes the fix_sql statement.  The fix_sql statement should be
+    written as to fix the errors reported by the check_sql statement.  Finally
+    it executes the check_sql statement again and reports an error if the
+    condition still exists.
+
+    """
+
     # print unfixed values
-    if args.verbose >= 3:
-        execute (cursor, sql, parameters)
-        if cursor.rowcount > 0:
+    execute (cursor, check_sql, parameters)
+    if cursor.rowcount > 0:
+        # apply fix
+        if args.verbose >= 3:
             message (3, "*** WARNING: {msg} ***".format (msg = msg), True)
             tabulate (cursor)
-    # apply fix
-    if sql_fix:
-        execute (cursor, sql_fix, parameters)
-        # print fixed values
-        execute (cursor, sql, parameters)
-        if cursor.rowcount > 0:
-            message (0, "*** ERROR: {msg} ***".format (msg = msg), True)
-            tabulate (cursor)
+        if fix_sql:
+            execute (cursor, fix_sql, parameters)
+            # print fixed values
+            execute (cursor, check_sql, parameters)
+            if cursor.rowcount > 0:
+                message (0, "*** ERROR: {msg} ***".format (msg = msg), True)
+                tabulate (cursor)
 
 
 def print_stats (dba, parameters):

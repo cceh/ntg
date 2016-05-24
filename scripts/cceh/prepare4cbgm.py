@@ -29,6 +29,7 @@ Author: Marcello Perathoner <marcello.perathoner@uni-koeln.de>
 
 """
 
+from __future__ import print_function
 from __future__ import unicode_literals
 
 import argparse
@@ -252,7 +253,7 @@ def step01c (dba, parameters):
 
     # Check consistency between Att and Lac tables
     fix (cursor, "Manuscript found in lac table but not in att table", """
-    SELECT DISTINCT hsnr
+    SELECT DISTINCT hsnr, kapanf
     FROM {lac}
     WHERE hsnr NOT IN (
       SELECT DISTINCT hsnr FROM {att}
@@ -478,6 +479,8 @@ def step05 (dba, parameters):
 def step06 (dba, parameters):
     """Delete later hands
 
+    Aus: prepare4cbgm_6.py
+
         Lesarten löschen, die nicht von der ersten Hand stammen.  Bei mehreren
         Lektionslesarten gilt die L1-Lesart.  Ausnahme: Bei Selbstkorrekturen
         wird die *-Lesart gelöscht und die C*-Lesart beibehalten.
@@ -525,11 +528,13 @@ def step06 (dba, parameters):
 def step06b (dba, parameters):
     """Process Sigla
 
+    Aus: prepare4cbgm_6b.py
+
         Handschriften, die mit einem "V" für videtur gekennzeichnet sind, werden
         ebenso wie alle anderen behandelt.  Das "V" kann also getilgt werden.
         Die Eintragungen für "ursprünglich (*)" und "C*" werden ebenfalls
         gelöscht.  Schließlich auch die Zusätze zur Handschriftennummer wie
-        „T1“.  Diese Eintragungen werden (bisher) einfach an die
+        "T1".  Diese Eintragungen werden (bisher) einfach an die
         Handschriftenbezeichnung angehängt.
 
         Der Eintrag 'videtur', gekennzeichnet durch ein 'V' hinter der
@@ -609,6 +614,8 @@ def step06b (dba, parameters):
 def step07 (dba, parameters):
     """zw Lesarten
 
+    Aus: prepare4cbgm_7.py
+
         zw-Lesarten der übergeordneten Variante zuordnen, wenn ausschliesslich
         verschiedene Lesarten derselben Variante infrage kommen (z.B. zw a/ao
         oder b/bo_f).  In diesen Fällen tritt die Buchstabenkennung der
@@ -685,6 +692,8 @@ def step08 (dba, parameters):
 def step09 (dba, parameters):
     """Lacunae auffüllen
 
+    Aus: prepare4cbgm_9.py
+
         Stellenbezogene Lückenliste füllen.  Parallel zum Apparat wurde eine
         systematische Lückenliste erstellt, die die Lücken aller griechischen
         Handschriften enthält.  Wir benötigen diese Information jedoch jeweils
@@ -739,29 +748,8 @@ def step09 (dba, parameters):
 
     dba.commit()
 
-    # FIXME: Bei Text in lacuna muß der Text stehen bleiben. Allerdings dürfen
-    # wir dann nicht mit zz auffüllen.
-
-    # Delete all texts in lacunae.
-    fix (cursor, "text in lacunae", """
-    SELECT t.hs, t.hsnr, t.anfadr, t.endadr, lac.anfadr as lacanfadr, lac.endadr as lacendadr, t.labez, t.lemma, t.lesart
-    FROM {att} t
-    JOIN {lac} lac
-    ON t.hs = lac.hs AND t.anfadr > lac.anfadr AND t.endadr < lac.endadr
-    ORDER BY t.hsnr, t.hs, t.anfadr
-    """, """
-    DELETE FROM {att}
-    WHERE id IN (
-      SELECT id FROM (
-        SELECT t.id
-        FROM {att} t
-        JOIN {lac} lac
-        ON t.hs = lac.hs AND t.anfadr > lac.anfadr AND t.endadr < lac.endadr
-      ) AS tmp
-    )
-    """, parameters)
-
-    # Create a lacuna entry for each passage in a lacuna.
+    # Create a 'zz' reading in att for each passage in a lacuna that doesn't
+    # alrady have a text reading in att.
 
     message (2, "Step  9 : Add 'zz' readings for lacunae ...")
 
@@ -769,16 +757,26 @@ def step09 (dba, parameters):
     INSERT INTO {att} (buch, kapanf, versanf, wortanf, kapend, versend, wortend,
                           anfadr, endadr, hs, hsnr, anfalt, endalt, labez, labezsuf,
                           lemma, lesart)
-    SELECT t.buch, t.kapanf, t.versanf, t.wortanf, t.kapend, t.versend, t.wortend,
-           t.anfadr, t.endadr, lac.hs, lac.hsnr, t.anfadr, t.endadr, 'zz', '',
+    SELECT p.buch, p.kapanf, p.versanf, p.wortanf, p.kapend, p.versend, p.wortend,
+           p.anfadr, p.endadr, lac.hs, lac.hsnr, p.anfadr, p.endadr, 'zz', '',
            '', 'lac'
       FROM
         /* all passages */
-        {target_db}.Passages t
+        {target_db}.Passages p
+
       JOIN
         /* all lacunae */
         {lac} lac
-      ON t.anfadr > lac.anfadr AND t.endadr < lac.endadr
+
+      ON p.anfadr > lac.anfadr AND p.endadr < lac.endadr
+
+      LEFT JOIN
+        /* negated join on all witnessed passages */
+        {att} t
+
+      ON lac.hs = t.hs AND p.anfadr = t.anfadr AND p.endadr = t.endadr
+
+      WHERE t.id IS NULL
 
     """, parameters)
     dba.commit()
@@ -786,6 +784,8 @@ def step09 (dba, parameters):
 
 def step10 (dba, parameters):
     """Create positive apparatus
+
+    Aus: prepare4cbgm_10.py
 
         Bezeugung der a-Lesarten auffüllen (d.h. einen positiven Apparat
         herstellen).  Sie setzt sich zusammen aus allen in der 'ActsMsList' für
@@ -871,13 +871,15 @@ def step10 (dba, parameters):
 def step11 (dba, parameters):
     """Create ActsMsList
 
-        Handschriftenliste 'ActsMsList' anlegen. Die Handschrift bekommt in dem
-        entsprechenden Kapitel eine 1, wenn sie dort Text enthält. Mit anderen
-        Worten: Sie bekommt eine 0, wenn das ganze Kapitel fehlt. Es wird hier
-        auf die systematische Lückenliste zurückgegriffen. Kapitel, die keine
+    Aus: prepare4cbgm_11.py
+
+        Handschriftenliste 'ActsMsList' anlegen.  Die Handschrift bekommt in dem
+        entsprechenden Kapitel eine 1, wenn sie dort Text enthält.  Mit anderen
+        Worten: Sie bekommt eine 0, wenn das ganze Kapitel fehlt.  Es wird hier
+        auf die systematische Lückenliste zurückgegriffen.  Kapitel, die keine
         echte Variante enthalten, müssen ebenfalls eine 0 erhalten.
 
-        Die Handschriftenliste darf erst NACH dem Auffüllen der a-Bezeugung
+        Die Handschriftenliste darf erst *nach* dem Auffüllen der a-Bezeugung
         gerechnet werden, daher gehört das Skript hier an den Schluss der
         Vorbereitungen!
 

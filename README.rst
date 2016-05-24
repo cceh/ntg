@@ -151,7 +151,7 @@ Lektionare
 
 Lektionare (kirchliche Lesebücher) bringen nur ausgewählte Perikopen des
 NT, geordnet nach dem Kirchenjahr.  Es sind 2300 Lektionare bekannt.
-Das Sytem der Lektionare entstand geschätzt im 4 Jhd.  (Kuriosum: da das
+Das System der Lektionare entstand geschätzt im 4 Jhd.  (Kuriosum: da das
 Kirchenjahr Ostern anfängt, hat es bis zu 57 Wochen.)
 ([ALAND1989]_ S. 172ff)
 

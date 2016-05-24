@@ -21,5 +21,22 @@ Indices and tables
 * :ref:`search`
 
 
+prepare4cbgm.py
+---------------
+
 .. automodule:: prepare4cbgm
+   :members:
+
+
+ntg_tools.py
+------------
+
+.. automodule:: ntg_tools
+   :members:
+
+
+ntg_db.py
+---------
+
+.. automodule:: ntg_db
    :members:

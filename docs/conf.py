@@ -54,7 +54,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'NTG'
-copyright = '2016, Marcello Perathoner'
+copyright = '2016 CCeH - Licensed under the GNU GPL v3 or later'
 author = 'Marcello Perathoner'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -71,7 +71,7 @@ release = '0.1.1'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = 'de'
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -116,7 +116,13 @@ todo_include_todos = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'alabaster'
+
+html_theme = "classic"
+html_theme_options = {
+    # "rightsidebar": "false",
+    # "relbarbgcolor": "black"
+}
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
