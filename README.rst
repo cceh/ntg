@@ -74,19 +74,19 @@ ab 98€
 Demnächst erscheint: Apostelgeschichte.  Hierfür ist unsere Mithilfe
 erwünscht.
 
-.. figure:: http://rosetta.reltech.org/TC/v03/Aland1998-fig1.jpeg
+.. figure:: Aland1998-fig1.jpeg
 
    Beispielseite: Jak 2,3
 
 Die katholischen Briefe wurden ausgewählt, da sie eine größere Variation
 besitzen als das übrige NT und sich daher gut für die Entwicklung der
-CBGM eignen. ([LOJ]_ §22)
+CBGM eignen. ([ALAND1998]_ §22)
 
 
 Die Textzeugen
 --------------
 
-Etwa 6000 Handschriften.
+Etwa 5000 Handschriften.
 Handschriften des NT verwenden fast ausschließlich das Codex-Format.
 
 Folgende Arten von Textzeugen werden herangezogen:
@@ -129,21 +129,21 @@ Wichtige Majuskeln:
 
 Im 7. und 8. Jahrhundert verschlechtert sich das Pergament.  Das Format
 wird verkleinert.  Alte Handschriften werden überschrieben (Palimpsest,
-codex rescriptus).  ([NES1923]_ §36)
+codex rescriptus).  ([NESTLE1923]_ § 36)
 
 
 Minuskeln
 ~~~~~~~~~
 
-Ab dem 9. Jahrhundert.  Auf Pergament oder Papier.  Die allermeisten davon
-enthalten den byzantinischen Text und sind für uns uninteressant, aber einige
-wenige sind dem Originaltext sehr nahe.  Es sind 2800 Minuskeln bekannt.
-([TNT]_ S. 140)
+Ab dem 9. Jahrhundert.  Auf Pergament oder Papier.  Die allermeisten
+davon enthalten den byzantinischen Text und sind für uns uninteressant,
+aber einige wenige sind dem Originaltext sehr nahe.  Es sind 2800
+Minuskeln bekannt.  ([ALAND1989]_ S. 140)
 
 Bezeichnung: Zahl (z.B. 33)
 
 Ab dem 13. Jhd. wird Papier für Bibelhandschriften verwendet.
-Im 15. Jhd. beginnt das Papier zu überwiegen.  ([NES1923]_ §36)
+Im 15. Jhd. beginnt das Papier zu überwiegen.  ([NESTLE1923]_ § 36)
 
 
 Lektionare
@@ -152,7 +152,8 @@ Lektionare
 Lektionare (kirchliche Lesebücher) bringen nur ausgewählte Perikopen des
 NT, geordnet nach dem Kirchenjahr.  Es sind 2300 Lektionare bekannt.
 Das Sytem der Lektionare entstand geschätzt im 4 Jhd.  (Kuriosum: da das
-Kirchenjahr Ostern anfängt, hat es bis zu 57 Wochen.) ([TNT]_ S. 172ff)
+Kirchenjahr Ostern anfängt, hat es bis zu 57 Wochen.)
+([ALAND1989]_ S. 172ff)
 
 Lektionare können den gleichen Text mehrmals enthalten, die
 unterschiedlichen Lesungen werden in den Datenbank mit L1, L2
@@ -184,7 +185,8 @@ eigentlichen Zitat im laufenden Text des Kommentars ist oft der
 vollständige Text des Lemmas vorangestellt.
 
 Das eigentliche Zitat genießt eine höheren Wert.  Der Lemma-Text wurde
-hingegegen oft durch einen geläufigeren Text ersetzt.  ([TNT]_ S. 179)
+hingegegen oft durch einen geläufigeren Text ersetzt.
+([ALAND1989]_ S. 179)
 
 Die unterschiedlichen Lesungen werden in der Datenbank mit T1, T2
 bezeichnet.
@@ -210,6 +212,16 @@ entstanden ist.
 Textus Receptus: der von Erasmus von Rotterdam im Jahre 1516 gedruckte
 Text.  Er gilt als besonders minderwertig, da Erasmus überstürzt
 gearbeitet hat und nur wenige Textzeugen verwendet hat.
+
+
+Textkritik
+==========
+
+Ob die Vorlage eine Minuskel oder eine Maiuskel war, ist oft an
+Schreibfehlern festzustellen. ([NESTLE1923]_ § 103)
+
+Bei Auslassungen läßt sich durch Zählung der Buchstaben auch ein Bild
+von der Zeilenbreite der Vorlage gewinnen. ([NESTLE1923]_ § 103)
 
 
 Die Datenbank
@@ -269,7 +281,10 @@ labez
   besondere Bedeutung:
 
   zu
-    ??? Umfaßte Stellen, Fehlverse (Kuckucksverse)
+    Hier nicht zitierbar aufgrund einer übergreifenden Variante.  Diese
+    umfaßte Variante wurde schon in der umfassenden Variante
+    verzeichnet.  Entspricht in der ECM einem Pfeil nach oben.  In der
+    CBGM ist 'zu' wie 'zz' zu behandeln.
 
   zv
     There is an illegible addition in the manuscript(s) cited which
@@ -278,16 +293,20 @@ labez
   zw
     What remains of the text of the manuscript(s) cited would allow
     reconstruction in agreement with two or more different variants.
+    Entspricht in der ECM einem Doppelpfeil nach links-rechts.
 
     In diesm Fall enthält das Feld labezsuf eine durch "/" getrennte
     Liste der LesartBezeichnungen, die in Frage kommen.
 
   zz
-    While at least one letter is extant in the manuscript(s) cited, the
-    reading is too lacunose to be identified.
+    The reading is too lacunose to be identified.
 
-    Alle Lesarten, die aus der Tabelle der Lacunae erzeugt wurden,
+    Alle Verzeichnungen, die aus der Tabelle der Lacunae erzeugt wurden,
     erhalten labez = 'zz'.
+
+    Ein Wort steht nicht in der systematischen Lückenliste wenn
+    mindestens ein Buchstabe vorhanden ist.  In diesem Fall steht es in
+    der stellenbezogenen Lückenliste.
 
   Caveat: die Lesart 'a' kann für dieselbe Passage mehrmals vergeben
   worden sein, immer dann wenn im Nestle-Aland ein positiver Apparat
@@ -306,18 +325,49 @@ labezsuf
     z.B. "a/b_o/c_f"
 
 base
-  Basistext ???
+  Basistext. Nur relevant bei Fehlversen.
 
   a
     Urtext
 
   b
-    Textus receptus
+    Fehlverse: Textus Receptus
 
 comp
 
   x
-    Umfaßte Stelle
+    Umfaßte Variante
+
+lekt
+  Lektionen in einem Lektionar.
+
+
+Umfaßte Varianten
+-----------------
+
+    Beim Herantreten an die Einzelarbeit ist das erste Erfordernis, die
+    zu untersuchende Lesart als solche richtig abzugrenzen.  Die
+    Apparate sind in dieser Hinsicht sehr verschieden angelegt: manche
+    buchen ganze Satzvarianten, die man zerlegen muß; andere geben jedes
+    Wort für sich, sodaß man, um ein klares Bild zu bekommen,
+    zusammenfassen muß.  ([NESTLE1923]_ § 108)
+
+Wenn variierte Wörter, die durch andere Satzteile voneinander getrennt
+sind, sinngemäß zu einer Einheit gehören, so verzeichnet unsere
+Datenbank sie als eine einzelne Lesart.  Sind in diesen anderen
+Satzteilen ebenso Varianten entstanden, sprechen wir von umfaßten
+Varianten.
+
+Umfassende Varianten können Lesarten beitragen, die gewisse umfaßte
+Varianten nicht zulassen.  In diesem Fall wird die umfaßte Lesart mit
+'zu' gekennzeichent.
+
+
+Fehlverse
+---------
+
+Fehlverse sind später hinzugefügte Verse.  Bei einem Fehlvers muß
+anstatt der HS A der Textus Receptus als Basis verwendet werden.
 
 
 Abkürzungen, Suffixe
@@ -343,17 +393,30 @@ C
 
 L1, L2
   Unterschiedliche Lesungen in einem Lektionar.
+  L2 ist für die CBGM nicht relevant.
 
 T1, T2
-  Unterschiedliche Lesungen in einer Kommentarhandschrift.
+  Unterschiedliche Lesungen des Textes der ersten Hand.  Die erste Hand
+  hat diese Passagen mehrmals abgeschrieben, vielleicht aus
+  unterschiedlicher Quelle.  T2 ist für die CBGM nicht relevant.
+
+A
+  Vom Schreiber selbst gekennzeichnete alternative Lesart.
+  Für die CBGM nicht relevant.
+
+K
+  Varianten im Kommentar einer Handschrift.
+  Für die CBGM nicht relevant.
 
 s, s1, s2
-  (supplement) Nachträgliche Ergänzung verlorener Stellen.
-  Sie können nicht die Authorität der jeweiligen Hs beanspruchen.
+  (supplement) Nachträgliche Ergänzung verlorener Stellen.  Bei nur
+  einer Ergänzung wird 's' verwendet.  Bei mehreren Ergänzungen werden
+  's1', 's2', etc. für jeweils einen Abschnitt verwendet.  Ergänzungen
+  können nicht die Authorität der jeweiligen Hs beanspruchen.
 
 V, vid
   (ut videtur) augenscheinlich.  Unsichere aber höchst wahrscheinliche
-  Lesung.
+  Lesung.  Ist für die CBGM als sichere Lesart zu akzeptieren.
 
 In variants:
 
@@ -370,11 +433,12 @@ om
 Literatur
 =========
 
-.. [TNT] Aland, Kurt, and Barbara Aland.  2006.  *Der Text des Neuen
-   Testaments: Einführung in die wissenschaftlichen Ausgaben sowie in
-   Theorie und Praxis der modernen Textkritik.*  Stuttgart: Dt. Bibelges.
+.. [ALAND1989] Aland, Kurt, und Barbara Aland.  1989.  *Der Text des
+   Neuen Testaments: Einführung in die wissenschaftlichen Ausgaben und
+   in Theorie wie Praxis der modernen Textkritik. 2. Auflage.* Stuttgart:
+   Deutsche Bibelgesellschaft.
 
-.. [LOJ] Aland, Barbara.  1998.  *Novum Testamentum Graecum Editio
+.. [ALAND1998] Aland, Barbara.  1998.  *Novum Testamentum Graecum Editio
    Critica Maior: Presentation of the First Part: The Letter of James.*
    Münster.  http://rosetta.reltech.org/TC/v03/Aland1998.html
 

@@ -27,8 +27,6 @@ See also: https://github.com/cceh/ntg
 
 Author: Marcello Perathoner <marcello.perathoner@uni-koeln.de>
 
-QUESTION: which license for the scripts?
-
 """
 
 from __future__ import unicode_literals
@@ -64,6 +62,12 @@ DEFAULTS = {
     'tmp'     : 'Tmp',
 }
 
+N_FIELDS = 'base comp comp1 komm kontrolle korr lekt over over1 suff suffix2 vid vl'.split ()
+""" Field to look for 'N' and NULL """
+
+NULL_FIELDS = 'lemma lesart'.split ()
+""" Fields to look for NULL """
+
 def create_indices (cursor):
     message (2, "          Creating indices ...")
 
@@ -86,7 +90,7 @@ def drop_indices (cursor):
     cursor.execute ('DROP INDEX IF EXISTS HsAdr  ON {att}'.format (**parameters))
 
 
-def step1(dba, parameters):
+def step01(dba, parameters):
     """Copy tables to new database
 
     Copy the (28 * 2) tables to 2 tables in a new database.  Do *not* copy
@@ -172,7 +176,7 @@ def step1(dba, parameters):
     dba.commit()
 
 
-def step1b (dba, parameters):
+def step01b (dba, parameters):
     """Delete Versions
 
     No need to delete translations because we didn't copy them in the first
@@ -181,7 +185,7 @@ def step1b (dba, parameters):
     """
 
 
-def step1c (dba, parameters):
+def step01c (dba, parameters):
     """ Fix data entry errors.
 
     Fix a bogus hsnr.
@@ -193,6 +197,17 @@ def step1c (dba, parameters):
     message (1, "Step  1c: Data entry fixes ...")
     cursor = dba.cursor()
 
+    fix (cursor, "Wrong hs", """
+    SELECT DISTINCT hs, hsnr, kapanf
+    FROM {att}
+    WHERE hs = 'L156s1'
+    """, """
+    UPDATE {att}
+    SET hs = 'L156s',
+        suffix2 = 's'
+    WHERE hs = 'L156s1'
+    """, parameters)
+
     fix (cursor, "Wrong hsnr", """
     SELECT DISTINCT hs, hsnr, kapanf
     FROM {att}
@@ -203,10 +218,57 @@ def step1c (dba, parameters):
     WHERE hs REGEXP 'L1188s2.*'
     """, parameters)
 
+    # Some fields contain 'N' (only in chapter 5)
+    # A typo for NULL? NULL will be replaced with '' later.
+    for parameters['col'] in N_FIELDS:
+        fix (cursor, "{col} = N".format (**parameters), """
+        SELECT hs, anfadr, labez, labezsuf, lesart, {col}
+        FROM {att}
+        WHERE {col} IN ('N', 'NULL')
+        LIMIT 10
+        """, """
+        UPDATE {att}
+        SET {col} = NULL
+        WHERE {col} IN ('N', 'NULL')
+        """, parameters)
+
+    # Normalize NULL to ''
+    # suffix2 sometimes contains a carriage return character
+    for parameters['t'] in (parameters['att'], parameters['lac']):
+        # Delete spurious '\r' characters in suffix2 field.
+        execute (cursor, """
+        UPDATE {t}
+        SET suffix2 = REGEXP_REPLACE (suffix2, '\r', '')
+        WHERE suffix2 REGEXP '\r'
+        """, parameters)
+
+        # replace NULL fields with ''
+        for parameters['col'] in N_FIELDS + NULL_FIELDS:
+            execute (cursor, """
+            UPDATE {t}
+            SET {col} = ''
+            WHERE {col} IS NULL
+            """, parameters)
+
+    # Check consistency between Att and Lac tables
+    fix (cursor, "Manuscript found in lac table but not in att table", """
+    SELECT DISTINCT hsnr
+    FROM {lac}
+    WHERE hsnr NOT IN (
+      SELECT DISTINCT hsnr FROM {att}
+    )
+    """, """
+    DELETE
+    FROM {lac}
+    WHERE hsnr NOT IN (
+      SELECT DISTINCT hsnr FROM {att}
+    )
+    """, parameters)
+
     dba.commit()
 
 
-def step2 (dba, parameters):
+def step02 (dba, parameters):
     """Data cleanup
 
     Delete spurious carriage return characters in suffix2 field.  Replace NULL
@@ -222,45 +284,62 @@ def step2 (dba, parameters):
 
     """
 
-    message (1, "Step  2 : Generic cleanup ...")
+    message (1, "Step  2 : Cleanup korr and lekt ...")
+
     cursor = dba.cursor()
 
-    for parameters['t'] in (parameters['att'], parameters['lac']):
-        # Delete spurious '\r' characters in suffix2 field.
-        execute (cursor, """
-        UPDATE {t}
-        SET suffix2 = REGEXP_REPLACE (suffix2, '\r', '')
-        WHERE suffix2 REGEXP '\r'
-        """, parameters)
-
-        # replace NULL fields with ''
-        for parameters['col'] in ('lekt', 'korr', 'suffix2', 'komm', 'lemma', 'comp', 'base'):
-            execute (cursor, """
-            UPDATE {t} SET {col} = '' WHERE {col} IS NULL
-            """, parameters)
-
-    message (1, "Step  2 : Fix korr and lekt ...")
-
     execute (cursor, """
-    UPDATE {att} SET lekt = korr, korr = '' WHERE korr REGEXP '^L'
+    UPDATE {att}
+    SET lekt = korr, korr = ''
+    WHERE korr REGEXP '^L'
     """, parameters)
 
     execute (cursor, """
-    UPDATE {att} SET korr = lekt, lekt = '' WHERE lekt REGEXP '[C*]'
+    UPDATE {att}
+    SET korr = lekt, lekt = ''
+    WHERE lekt REGEXP '[C*]'
     """, parameters)
 
     execute (cursor, """
-    UPDATE {att} SET korr = '*'  WHERE korr = '' AND suffix2 REGEXP '[*]'
+    UPDATE {att}
+    SET korr = '*'
+    WHERE korr = '' AND suffix2 REGEXP '[*]'
     """, parameters)
 
     execute (cursor, """
-    UPDATE {att} SET lekt = REGEXP_SUBSTR (suffix2, 'L[1-9]')
+    UPDATE {att}
+    SET suff = 'S'
+    WHERE suff = '' AND suffix2 REGEXP 's'
+    """, parameters)
+
+    execute (cursor, """
+    UPDATE {att}
+    SET lekt = REGEXP_SUBSTR (suffix2, 'L[1-9]')
     WHERE lekt IN ('', 'L') AND suffix2 REGEXP 'L[1-9]'
     """, parameters)
 
     execute (cursor, """
-    UPDATE {att} SET korr = REGEXP_SUBSTR (suffix2, 'C[1-9*]')
+    UPDATE {att}
+    SET korr = REGEXP_SUBSTR (suffix2, 'C[1-9*]')
     WHERE korr IN ('', 'C') AND suffix2 REGEXP 'C[1-9*]'
+    """, parameters)
+
+    execute (cursor, """
+    UPDATE {att}
+    SET vl = REGEXP_SUBSTR (suffix2, 'T[1-9]')
+    WHERE vl IN ('', 'T') AND suffix2 REGEXP 'T[1-9]'
+    """, parameters)
+
+    fix (cursor, "Incompatible hs and suffix2 for T reading", """
+    SELECT hs, anfadr, lekt, vl, suffix2
+    FROM {att}
+    WHERE hs REGEXP 'T[1-9]' AND hs NOT REGEXP suffix2
+    """, """
+    UPDATE {att}
+    SET lekt    = '',
+        vl      = REGEXP_SUBSTR (hs, 'T[1-9]'),
+        suffix2 = REGEXP_SUBSTR (hs, 'T[1-9]')
+    WHERE hs REGEXP 'T[1-9]'
     """, parameters)
 
     fix (cursor, "Wrong labez", """
@@ -277,8 +356,16 @@ def step2 (dba, parameters):
 
     dba.commit()
 
+    # Debug print domain of fields
+    for parameters['col'] in N_FIELDS:
+        debug (cursor, "Domain of {col}".format (**parameters), """
+        SELECT {col}, count (*) as Anzahl
+        FROM {att}
+        GROUP BY {col}
+        """, parameters)
 
-def step3 (dba, parameters):
+
+def step03 (dba, parameters):
     """Drop fields
 
     No need to drop fields because we didn't copy them in the first place.
@@ -287,7 +374,7 @@ def step3 (dba, parameters):
     pass
 
 
-def step4 (dba, parameters):
+def step04 (dba, parameters):
     """Copy tables
 
     No need to copy the table because we already created it in the right place.
@@ -296,46 +383,10 @@ def step4 (dba, parameters):
     pass
 
 
-def step5 (dba, parameters):
-    """Delete passages without variants
+def step05 (dba, parameters):
+    """Process Duplicated Readings (T1, T2)
 
-        Stellen löschen, an denen nur eine oder mehrere f- oder o-Lesarten vom
-        A-Text abweichen. Hier gibt es also keine Variante.
-
-        Nicht löschen, wenn an dieser variierten Stelle eine Variante 'b' - 'y'
-        erscheint.
-
-        Änderung 2014-12-16: Act 28,29/22 gehört zu einem Fehlvers.  Dort gibt
-        es u.U. keine Variante neben b, sondern nur ein Orthographicum.  Wir
-        suchen also nicht mehr nach einer Variante 'b' bis 'y', sondern zählen
-        die Varianten.  Liefert getReadings nur 1 zurück, gibt es keine
-        Varianten.
-
-    Stellen ohne Varianten sind für die CBGM irrelevant.  Stellen mit
-    ausschließlich 'z%' Lesearten ebenso.
-
-    """
-
-    message (1, "Step  5 : Delete passages without variants ...")
-
-    cursor = dba.cursor()
-    # We need a nested subquery to avoid MySQL limitations. See:
-    # https://dev.mysql.com/doc/refman/5.7/en/subquery-restrictions.html
-    execute (cursor, """
-    DELETE FROM {att} WHERE (anfadr, endadr) IN (
-      SELECT anfadr, endadr FROM (
-        SELECT anfadr, endadr FROM {att}
-        WHERE labez NOT REGEXP '^z' OR labezsuf NOT REGEXP 'f|o'
-        GROUP BY anfadr, endadr, labez
-        HAVING count (*) = 1
-      ) AS tmp
-    )
-    """, parameters)
-    dba.commit()
-
-
-def step5b (dba, parameters):
-    """Process Commentaries
+    Aus: prepare4cbgm_5b.py
 
         Wenn bei Wiederholung des Lemmatextes in Kommentarhandschriften
         Varianten entstanden sind, wird mit zw (=zweifelhaft) verzeichnet.
@@ -357,23 +408,12 @@ def step5b (dba, parameters):
 
     """
 
-    message (1, "Step  5b: Processing Commentaries ...")
+    message (1, "Step  5: Processing Duplicated Readings (T1, T2) ...")
 
     cursor = dba.cursor()
 
-    fix (cursor, "Incompatible lekt and suffix2 for T reading", """
-    SELECT hs, anfadr, lekt, suffix2
-    FROM {att}
-    WHERE hs REGEXP 'T[1-9]' AND hs NOT REGEXP suffix2
-    """, """
-    UPDATE {att}
-    SET lekt    = REPLACE (REGEXP_SUBSTR (hs, 'T[1-9]'), 'T', 'L'),
-        suffix2 = REGEXP_SUBSTR (hs, 'T[1-9]')
-    WHERE hs REGEXP 'T[1-9]'
-    """, parameters)
-
     # T1 or T2 but not both
-    # promote to 'non-commentary' status by stripping T[1-9] from hs
+    # promote to normal status by stripping T[1-9] from hs
     execute (cursor, """
     UPDATE {att} u
     JOIN (
@@ -385,11 +425,13 @@ def step5b (dba, parameters):
     ) AS t
     ON u.id = t.id
     SET hs = REGEXP_REPLACE (hs, 'T[1-9]', ''),
+        vl = '',
         suffix2 = REGEXP_REPLACE (suffix2, 'T[1-9]', '')
     """, parameters)
 
     # T1 and T2
-    # group both T readings into one variant and set labez = 'zw'
+    # Original hand wrote both readings.
+    # Group both T readings into one and set labez = 'zw'.
     execute (cursor, """
     SELECT id, labez, labezsuf, CONCAT (hsnr, anfadr, endadr) AS k
     FROM {att}
@@ -410,7 +452,7 @@ def step5b (dba, parameters):
                 ids.append (six.text_type (row[0]))
                 labez.add (row[1] + ('_' + row[2] if row[2] else ''))
 
-            assert len (ids) > 1, "Programming error in commentary processing."
+            assert len (ids) > 1, "Programming error in T1, T2 processing."
 
             parameters['ids'] = ', '.join (ids[1:])
             execute (cursor, """
@@ -425,14 +467,15 @@ def step5b (dba, parameters):
             SET labez = 'zw',
                 labezsuf = '{labezsuf}',
                 hs = REGEXP_REPLACE (hs, 'T[1-9]', ''),
-                suffix2 = REGEXP_REPLACE (suffix2, 'T[1-9]', '')
+                suffix2 = REGEXP_REPLACE (suffix2, 'T[1-9]', ''),
+                vl = ''
             WHERE id = {id}
             """, parameters)
 
     dba.commit()
 
 
-def step6 (dba, parameters):
+def step06 (dba, parameters):
     """Delete later hands
 
         Lesarten löschen, die nicht von der ersten Hand stammen.  Bei mehreren
@@ -444,10 +487,6 @@ def step6 (dba, parameters):
         gehört die Stelle nicht in die Tabelle.  Es muss also noch eine Prüfung
         stattfinden, ob nach diesem Vorgang eine Stelle noch immer eine
         variierte Stelle ist. Wenn nicht, kann der Datensatz gelöscht werden.
-
-    QUESTION: what is suffix2 = 'A'?
-    QUESTION: what is suffix2 = 'K'?
-    QUESTION: what is lekt = 'N'?
 
     """
     message (1, "Step  6 : Delete later hands ...")
@@ -475,20 +514,15 @@ def step6 (dba, parameters):
           AND suffix2 NOT REGEXP 'C[*]'
         """, parameters)
 
-        fix (cursor, "Unknown Suffixes", """
-        SELECT suffix2, count (*) AS anzahl
-        FROM {t}
-        WHERE suffix2 REGEXP 'A|K|L2|T2'
-        GROUP BY suffix2
-        """, """
+        execute (cursor, """
         DELETE FROM {t}
-        WHERE suffix2 REGEXP 'A|K|L2|T2'
+        WHERE suffix2 REGEXP 'A|K|L2'
         """, parameters)
 
         dba.commit()
 
 
-def step6b (dba, parameters):
+def step06b (dba, parameters):
     """Process Sigla
 
         Handschriften, die mit einem "V" für videtur gekennzeichnet sind, werden
@@ -510,18 +544,18 @@ def step6b (dba, parameters):
     cursor = dba.cursor()
 
     for parameters['t'] in (parameters['att'], parameters['lac']):
-        parameters['regexp'] = '[CLTV*]+[0-9]*$'
-        # FIXME: MariaDB specific function REGEXP_REPLACE
-        execute (cursor, """
-        UPDATE {t}
-        SET hs = REGEXP_REPLACE (hs,'{regexp}', '')
-        WHERE hs REGEXP '[0-9]+s?{regexp}'
-        """, parameters)
-        execute (cursor, """
-        UPDATE {t}
-        SET suffix2 = REGEXP_REPLACE (suffix2, '{regexp}', '')
-        WHERE suffix2 REGEXP '{regexp}'
-        """, parameters)
+        for parameters['regexp'] in ('C[1-9*]?', '[*]', '[LT][1-9]', 'V'):
+            # FIXME: MariaDB specific function REGEXP_REPLACE
+            execute (cursor, """
+            UPDATE {t}
+            SET hs = REGEXP_REPLACE (hs, '(?<=[0-9s]){regexp}', '')
+            WHERE hs REGEXP '(?<=[0-9s]){regexp}'
+            """, parameters)
+            execute (cursor, """
+            UPDATE {t}
+            SET suffix2 = REGEXP_REPLACE (suffix2, '{regexp}', '')
+            WHERE suffix2 REGEXP '{regexp}'
+            """, parameters)
 
     debug (cursor, "Hs with more than one hsnr", """
     SELECT hs FROM (
@@ -532,17 +566,16 @@ def step6b (dba, parameters):
     """, parameters)
 
     # print some debug info
-    execute (cursor, """
+    debug (cursor, "Suffix2 debug info", """
     SELECT lekt, korr, suffix2, count (*) AS anzahl
     FROM {att}
     GROUP BY lekt, korr, suffix2
     ORDER BY lekt, korr, suffix2
     """, parameters)
-    tools.tabulate (cursor)
 
     # Debug hs where hs and suffix2 still mismatch
     debug (cursor, "hs and suffix2 mismatch", """
-    SELECT hs, suffix2, anfadr, endadr, lemma
+    SELECT hs, suffix2, anfadr, endadr, lesart
     FROM {att}
     WHERE hs NOT REGEXP suffix2
     ORDER BY hs, anfadr
@@ -570,24 +603,10 @@ def step6b (dba, parameters):
     SET t.hs = g.minhs
     """, parameters)
 
-    fix (cursor, "Hs with lacunae but w/o text", """
-    SELECT DISTINCT hsnr
-    FROM {lac}
-    WHERE hsnr NOT IN (
-      SELECT DISTINCT hsnr FROM {att}
-    )
-    """, """
-    DELETE
-    FROM {lac}
-    WHERE hsnr NOT IN (
-      SELECT DISTINCT hsnr FROM {att}
-    )
-    """, parameters)
-
     dba.commit()
 
 
-def step7 (dba, parameters):
+def step07 (dba, parameters):
     """zw Lesarten
 
         zw-Lesarten der übergeordneten Variante zuordnen, wenn ausschliesslich
@@ -621,7 +640,49 @@ def step7 (dba, parameters):
     message (2, "          %d zw labez updated" % updated)
 
 
-def step9 (dba, parameters):
+def step08 (dba, parameters):
+    """Delete passages without variants
+
+    Aus: prepare4cbgm_5.py
+
+    An diese Stelle versetzt damit sie nur einmal aufgerufen werden muß.
+
+        Stellen löschen, an denen nur eine oder mehrere f- oder o-Lesarten vom
+        A-Text abweichen. Hier gibt es also keine Variante.
+
+        Nicht löschen, wenn an dieser variierten Stelle eine Variante 'b' - 'y'
+        erscheint.
+
+        Änderung 2014-12-16: Act 28,29/22 gehört zu einem Fehlvers.  Dort gibt
+        es u.U. keine Variante neben b, sondern nur ein Orthographicum.  Wir
+        suchen also nicht mehr nach einer Variante 'b' bis 'y', sondern zählen
+        die Varianten.  Liefert getReadings nur 1 zurück, gibt es keine
+        Varianten.
+
+    Stellen ohne Varianten sind für die CBGM irrelevant.  Stellen mit
+    ausschließlich 'z[u-z]' Lesearten ebenso.
+
+    """
+
+    message (1, "Step  5 : Delete passages without variants ...")
+
+    cursor = dba.cursor()
+    # We need a nested subquery to avoid MySQL limitations. See:
+    # https://dev.mysql.com/doc/refman/5.7/en/subquery-restrictions.html
+    execute (cursor, """
+    DELETE FROM {att} WHERE (anfadr, endadr) IN (
+      SELECT anfadr, endadr FROM (
+        SELECT anfadr, endadr FROM {att}
+        WHERE labez NOT REGEXP '^z' OR labezsuf NOT REGEXP 'f|o'
+        GROUP BY anfadr, endadr, labez
+        HAVING count (*) = 1
+      ) AS tmp
+    )
+    """, parameters)
+    dba.commit()
+
+
+def step09 (dba, parameters):
     """Lacunae auffüllen
 
         Stellenbezogene Lückenliste füllen.  Parallel zum Apparat wurde eine
@@ -678,8 +739,10 @@ def step9 (dba, parameters):
 
     dba.commit()
 
-    # Delete all texts in lacunae.  This is a stopgap measure until Münster
-    # cleans up the tables.
+    # FIXME: Bei Text in lacuna muß der Text stehen bleiben. Allerdings dürfen
+    # wir dann nicht mit zz auffüllen.
+
+    # Delete all texts in lacunae.
     fix (cursor, "text in lacunae", """
     SELECT t.hs, t.hsnr, t.anfadr, t.endadr, lac.anfadr as lacanfadr, lac.endadr as lacendadr, t.labez, t.lemma, t.lesart
     FROM {att} t
@@ -741,9 +804,6 @@ def step10 (dba, parameters):
 
     Insert the lesart of hs = 'A' for each passage that is not yet in the
     table.  Lacunae are already accounted for.
-
-    QUESTION: what is base = 'N'?
-    QUESTION: what is comp = 'N'?
 
     """
 
@@ -899,7 +959,11 @@ def step20 (dba, parameters):
 
     dba.commit ()
 
-    # QUESTION: why are there multiple 'a' readings for some passages?
+    # FIXME: why are there multiple 'a' readings for some passages?
+    #
+    # According to Münster these are legitimate entries.  They still have to
+    # figure out how to handle these.  For the time being we keep only one
+    # reading and delete the rest.
     #
     # Delete duplicate readings.
     # Examples:
@@ -918,6 +982,7 @@ def step20 (dba, parameters):
     FROM {rdg} d
     JOIN (
       SELECT id, anfadr, endadr, labez FROM (
+        /* min makes sure we keep the entry with the lowest id */
         SELECT min (id) as id, anfadr, endadr, labez
         FROM {rdg}
         GROUP BY anfadr, endadr, labez
@@ -1310,35 +1375,36 @@ if __name__ == '__main__':
     try:
         for step in range(args.range[0], args.range[1] + 1):
             if step == 1:
-                step1  (dba, parameters)
-                step1b (dba, parameters)
-                step1c (dba, parameters)
+                step01 (dba, parameters)
+                step01b (dba, parameters)
+                step01c (dba, parameters)
                 continue
             if step == 2:
-                step2  (dba, parameters)
+                step02 (dba, parameters)
                 continue
             if step == 3:
-                step3  (dba, parameters)
+                step03 (dba, parameters)
                 continue
             if step == 4:
-                step4  (dba, parameters)
+                step04 (dba, parameters)
                 continue
             if step == 5:
-                step5  (dba, parameters)
-                step5b (dba, parameters)
+                step05 (dba, parameters)
                 continue
             if step == 6:
-                step6  (dba, parameters)
-                step6b (dba, parameters)
+                step06 (dba, parameters)
+                step06b (dba, parameters)
                 continue
             if step == 7:
-                step5  (dba, parameters) # again
-                step7  (dba, parameters)
+                step07 (dba, parameters)
                 if args.verbose >= 1:
                     tools.print_stats(dba, parameters)
                 continue
+            if step == 8:
+                step08 (dba, parameters)
+                continue
             if step == 9:
-                step9  (dba, parameters)
+                step09 (dba, parameters)
                 if args.verbose >= 1:
                     tools.print_stats(dba, parameters)
                 continue
