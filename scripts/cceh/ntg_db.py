@@ -114,6 +114,15 @@ CREATE_TABLE_LAC = """
 )
 """
 
+CREATE_TABLE_LABEZ = """
+(
+  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
+  "ms_id"     INTEGER       NOT NULL,
+  "pass_id"   INTEGER       NOT NULL,
+  "labez"     INTEGER       NOT NULL DEFAULT 0
+)
+"""
+
 CREATE_TABLE_VP = """
 (
   "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
@@ -176,6 +185,31 @@ CREATE_TABLE_VG = """
   "uemt"      INTEGER       NOT NULL DEFAULT 0,
   "qmt"       FLOAT         NOT NULL DEFAULT 0.0,
   "check"     VARCHAR(1)    NULL
+)
+"""
+
+CREATE_TABLE_GEPHI_NODES = """
+(
+  "id"        VARCHAR(32)   NOT NULL,
+  "label"     VARCHAR(32)   ,
+  "color"     VARCHAR(32)   ,
+  "nodecolor" VARCHAR(32)   ,
+  "nodesize"  FLOAT         ,
+  "x"         FLOAT         ,
+  "y"         FLOAT         ,
+  "size"      FLOAT         ,
+  PRIMARY KEY (id)
+)
+"""
+
+CREATE_TABLE_GEPHI_EDGES = """
+(
+  "id"        VARCHAR(65)   NOT NULL,
+  "label"     VARCHAR(32)   ,
+  "source"    VARCHAR(32)   NOT NULL,
+  "target"    VARCHAR(32)   NOT NULL,
+  "weight"    FLOAT         NOT NULL DEFAULT 1.0,
+  PRIMARY KEY (source, target)
 )
 """
 

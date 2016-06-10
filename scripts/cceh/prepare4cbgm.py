@@ -35,14 +35,17 @@ from __future__ import unicode_literals
 import argparse
 import datetime
 import itertools
+import math
 import operator
 import re
 import sys
 
+import numpy as np
 import six
 
 import ntg_db as db
 import ntg_tools as tools
+import ntg_plot as plot
 from ntg_tools import message, execute, debug, fix
 
 
@@ -54,13 +57,18 @@ DEFAULTS = {
 
     'att'     : 'Att',
     'lac'     : 'Lac',
-    'attlac'  : 'AttLac',
+    'lab'     : 'Labez',
+    'ms'      : 'Manuscripts',  # ???
+    'pass'    : 'Passages',     # ???
+    'npass'   : 'NestedPassages',     # ???
     'vp'      : 'VP',
     'rdg'     : 'Rdg',
     'witn'    : 'Witn',
     'listval' : 'MsListVal',
     'vg'      : 'VG',
     'tmp'     : 'Tmp',
+    'g_nodes' : 'nodes',
+    'g_edges' : 'edges',
 }
 
 N_FIELDS = 'base comp comp1 komm kontrolle korr lekt over over1 suff suffix2 vid vl'.split ()
@@ -79,16 +87,7 @@ def create_indices (cursor):
 
     cursor.execute ('CREATE INDEX HsAdr  ON {att} (hs, anfadr, endadr)'.format (**parameters))
 
-
-def drop_indices (cursor):
-    message (2, "          Dropping indices ...")
-
-    cursor.execute ('DROP INDEX IF EXISTS Hs     ON {att}'.format (**parameters))
-    cursor.execute ('DROP INDEX IF EXISTS Hsnr   ON {att}'.format (**parameters))
-    cursor.execute ('DROP INDEX IF EXISTS Anfadr ON {att}'.format (**parameters))
-    cursor.execute ('DROP INDEX IF EXISTS Endadr ON {att}'.format (**parameters))
-
-    cursor.execute ('DROP INDEX IF EXISTS HsAdr  ON {att}'.format (**parameters))
+    cursor.execute ('CREATE UNIQUE INDEX Labez ON {lab} (ms_id, pass_id)'.format (**parameters))
 
 
 def step01(dba, parameters):
@@ -104,16 +103,18 @@ def step01(dba, parameters):
     # Eventually create the database and table
     cursor.execute ('DROP DATABASE IF EXISTS {target_db}'.format (**parameters))
     cursor.execute ('CREATE DATABASE IF NOT EXISTS {target_db}'.format (**parameters))
-    # drop_indices (cursor)
 
     cursor.execute ('CREATE OR REPLACE TABLE {att} '    .format (**parameters) + db.CREATE_TABLE_ATT)
     cursor.execute ('CREATE OR REPLACE TABLE {lac} '    .format (**parameters) + db.CREATE_TABLE_LAC)
-    cursor.execute ('CREATE OR REPLACE TABLE {attlac} ' .format (**parameters) + db.CREATE_TABLE_ATT)
+    cursor.execute ('CREATE OR REPLACE TABLE {lab} '    .format (**parameters) + db.CREATE_TABLE_LABEZ)
     cursor.execute ('CREATE OR REPLACE TABLE {vp} '     .format (**parameters) + db.CREATE_TABLE_VP)
     cursor.execute ('CREATE OR REPLACE TABLE {rdg} '    .format (**parameters) + db.CREATE_TABLE_RDG)
     cursor.execute ('CREATE OR REPLACE TABLE {witn} '   .format (**parameters) + db.CREATE_TABLE_WITN)
     cursor.execute ('CREATE OR REPLACE TABLE {listval} '.format (**parameters) + db.CREATE_TABLE_MSLISTVAL)
     cursor.execute ('CREATE OR REPLACE TABLE {vg} '     .format (**parameters) + db.CREATE_TABLE_VG)
+    cursor.execute ('CREATE OR REPLACE TABLE {g_nodes} '.format (**parameters) + db.CREATE_TABLE_GEPHI_NODES)
+    cursor.execute ('CREATE OR REPLACE TABLE {g_edges} '.format (**parameters) + db.CREATE_TABLE_GEPHI_EDGES)
+
 
     cursor.execute ('SHOW COLUMNS IN {att}'.format (**parameters))
     target_columns_att = set ([row[0].lower() for row in cursor.fetchall()])
@@ -158,23 +159,85 @@ def step01(dba, parameters):
     message (1, "Step  1 : Creating indices ...")
     create_indices(cursor)
 
+    dba.commit()
+
+
+def create_ms_pass_tables (dba, parameters):
+    cursor = dba.cursor ()
+
+    # The Passages Table
+
     execute (cursor, """
-    CREATE OR REPLACE VIEW {target_db}.Passages AS
+    CREATE OR REPLACE TABLE {pass} (id INTEGER AUTO_INCREMENT PRIMARY KEY)
     SELECT DISTINCT buch, kapanf, versanf, wortanf, kapend, versend, wortend, anfadr, endadr
     FROM {att}
+    ORDER BY anfadr, endadr DESC
     """, parameters)
 
     execute (cursor, """
-    CREATE OR REPLACE VIEW {target_db}.NestedPassages AS
-    SELECT a.anfadr AS ianfadr, a.endadr AS iendadr, b.anfadr AS oanfadr, b.endadr AS oendadr
-    FROM {target_db}.Passages a
-    JOIN {target_db}.Passages b
-    WHERE a.anfadr >= b.anfadr AND a.endadr <= b.endadr AND
-      NOT (a.anfadr = b.anfadr AND a.endadr = b.endadr)
-    ORDER BY a.anfadr, a.endadr DESC
+    CREATE INDEX Pass ON {pass} (anfadr, endadr)
     """, parameters)
 
     dba.commit()
+
+    execute (cursor, """
+    CREATE OR REPLACE TABLE {npass}
+    SELECT a.anfadr AS ianfadr, a.endadr AS iendadr, b.anfadr AS oanfadr, b.endadr AS oendadr
+    FROM {pass} a
+    JOIN {pass} b
+    WHERE a.anfadr >= b.anfadr AND a.endadr <= b.endadr AND
+      NOT (a.anfadr = b.anfadr AND a.endadr = b.endadr)
+    """, parameters)
+
+    dba.commit()
+
+    # Set comp on nested variants.
+    # We need this later when we insert the 'Fehlverse'.
+    execute (cursor, """
+    ALTER TABLE {pass}
+    ADD COLUMN comp BOOLEAN DEFAULT False,
+    ADD COLUMN fehlvers BOOLEAN DEFAULT False
+    """, parameters)
+
+    execute (cursor, """
+    UPDATE {pass} p
+    JOIN {npass} n
+    ON p.anfadr = n.ianfadr AND p.endadr = n.iendadr
+    SET comp = True
+    """, parameters)
+
+    parameters['fehlverse'] = db.FEHLVERSE
+    execute (cursor, """
+    UPDATE {pass} p
+    SET fehlvers = True
+    WHERE {fehlverse}
+    """, parameters)
+
+    dba.commit ()
+
+    # Insert a dummy manuscript for MT to the database
+    # execute (cursor, """
+    # INSERT INTO {att} (hs, hsnr, labez, lesart, buch, kapanf, versanf, wortanf, kapend, versend, wortend, anfadr, endadr)
+    #   SELECT 'MT', 1, 'zz', 'lac', buch, kapanf, versanf, wortanf, kapend, versend, wortend, anfadr, endadr
+    #   FROM {pass}
+    # """, parameters)
+
+    # dba.commit()
+
+    # The Manuscripts Table
+
+    execute (cursor, """
+    CREATE OR REPLACE TABLE {ms} (id INTEGER AUTO_INCREMENT PRIMARY KEY)
+    SELECT DISTINCT hs, hsnr
+    FROM {att}
+    ORDER BY hsnr, hs
+    """, parameters)
+
+    execute (cursor, """
+    CREATE INDEX MsHsnr ON {ms} (hsnr)
+    """, parameters)
+
+    dba.commit ()
 
 
 def step01b (dba, parameters):
@@ -251,6 +314,28 @@ def step01c (dba, parameters):
             WHERE {col} IS NULL
             """, parameters)
 
+    # Fix inconsistencies in endadr between Att and Lac
+    fix (cursor, "Inconsistent chapter ends in Att and Lac", """
+    SELECT kapanf, max (endadr) AS maxend
+    FROM {att} AS a
+    GROUP BY kapanf
+    HAVING maxend NOT IN (
+      SELECT max (endadr)
+      FROM {lac} GROUP
+      BY kapanf
+    )
+    """, """
+    UPDATE {lac}
+    SET endadr = 50760037
+    WHERE endadr = 50760036;
+    UPDATE {lac}
+    SET endadr = 50301004
+    WHERE endadr IN (50247036, 50247042);
+    UPDATE {lac}
+    SET anfadr = 51201001
+    WHERE anfadr = 51201002;
+    """, parameters)
+
     # Check consistency between Att and Lac tables
     fix (cursor, "Manuscript found in lac table but not in att table", """
     SELECT DISTINCT hsnr, kapanf
@@ -264,6 +349,13 @@ def step01c (dba, parameters):
     WHERE hsnr NOT IN (
       SELECT DISTINCT hsnr FROM {att}
     )
+    """, parameters)
+
+    # Set lesart 'lac' for lacunae
+    execute (cursor, """
+    UPDATE {att}
+    SET lesart = 'lac'
+    WHERE labez = 'zz'
     """, parameters)
 
     dba.commit()
@@ -674,16 +766,34 @@ def step08 (dba, parameters):
     message (1, "Step  5 : Delete passages without variants ...")
 
     cursor = dba.cursor()
+
+    # Save number of invariants per manuscript
+    # execute (cursor, """
+    # INSERT INTO {inv} (hs, hsnr, n)
+    #   SELECT hs, hsnr, count (*) as n
+    #   FROM {att}
+    #   WHERE (anfadr, endadr) IN (
+    #     SELECT anfadr, endadr
+    #     FROM {att}
+    #     WHERE labez NOT REGEXP '^z' OR labezsuf NOT REGEXP 'f|o'
+    #     GROUP BY anfadr, endadr, labez
+    #     HAVING count (*) = 1
+    #   )
+    #   GROUP BY hs, hsnr
+    # """, parameters)
+
+
     # We need a nested subquery to avoid MySQL limitations. See:
     # https://dev.mysql.com/doc/refman/5.7/en/subquery-restrictions.html
     execute (cursor, """
     DELETE FROM {att} WHERE (anfadr, endadr) IN (
       SELECT anfadr, endadr FROM (
-        SELECT anfadr, endadr FROM {att}
-        WHERE labez NOT REGEXP '^z' OR labezsuf NOT REGEXP 'f|o'
-        GROUP BY anfadr, endadr, labez
-        HAVING count (*) = 1
-      ) AS tmp
+        SELECT DISTINCT anfadr, endadr, labez
+        FROM {att} AS att
+        WHERE labez NOT REGEXP '^z' AND labezsuf NOT REGEXP 'f|o'
+      ) AS a
+      GROUP BY anfadr, endadr
+      HAVING count (*) > 1;
     )
     """, parameters)
     dba.commit()
@@ -758,17 +868,17 @@ def step09 (dba, parameters):
                           anfadr, endadr, hs, hsnr, anfalt, endalt, labez, labezsuf,
                           lemma, lesart)
     SELECT p.buch, p.kapanf, p.versanf, p.wortanf, p.kapend, p.versend, p.wortend,
-           p.anfadr, p.endadr, lac.hs, lac.hsnr, p.anfadr, p.endadr, 'zz', '',
+           p.anfadr, p.endadr, lac.hs, lac.hsnr, p.anfadr, p.endadr, 'zz', 'lac',
            '', 'lac'
       FROM
         /* all passages */
-        {target_db}.Passages p
+        {pass} p
 
       JOIN
         /* all lacunae */
         {lac} lac
 
-      ON p.anfadr > lac.anfadr AND p.endadr < lac.endadr
+      ON p.anfadr >= lac.anfadr AND p.endadr <= lac.endadr
 
       LEFT JOIN
         /* negated join on all witnessed passages */
@@ -779,6 +889,134 @@ def step09 (dba, parameters):
       WHERE t.id IS NULL
 
     """, parameters)
+
+    dba.commit()
+
+
+def step09_numpy (dba, parameters):
+    """Labez-Tabelle erstellen
+
+    Aus: prepare4cbgm_9.py
+
+        Stellenbezogene Lückenliste füllen.  Parallel zum Apparat wurde eine
+        systematische Lückenliste erstellt, die die Lücken aller griechischen
+        Handschriften enthält.  Wir benötigen diese Information jedoch jeweils
+        für die variierten Stellen.
+
+    Build a table containing only the information we need for CBGM, that is:
+    manuscript id, passage id, and labez.
+
+    """
+
+    message (1, "Step  9 : Create Labez Table ...")
+
+    cursor = dba.cursor ()
+
+    # First clean up the lacunae table as any errors there will be multiplied by
+    # this step.  Delete inner lacunae from nested lacunae.
+
+    fix (cursor, "nested lacunae", """
+    SELECT lac.id, lac.hs, lac.anfadr, lac.endadr
+    FROM {lac} AS lac
+    JOIN (
+      SELECT MIN (a.id) as id, a.hs, a.anfadr, a.endadr
+      FROM {lac} a
+      JOIN {lac} b
+      WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
+      GROUP BY a.hs, a.anfadr, a.endadr
+      HAVING count (*) > 1
+      ORDER BY hs, anfadr, endadr DESC
+    ) AS t
+    WHERE lac.hs = t.hs
+      AND lac.anfadr >= t.anfadr
+      AND lac.endadr <= t.endadr
+    """, """
+    DELETE lac
+    FROM {lac} lac
+    JOIN (
+      SELECT MIN (a.id) as id, a.hs, a.anfadr, a.endadr
+      FROM {lac} a
+      JOIN {lac} b
+      WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
+      GROUP BY a.hs, a.anfadr, a.endadr
+      HAVING count (*) > 1
+      ORDER BY hs, anfadr, endadr DESC
+    ) AS t
+    WHERE lac.hs = t.hs
+      AND lac.anfadr >= t.anfadr
+      AND lac.endadr <= t.endadr
+      AND lac.id <> t.id
+    """, parameters)
+
+    dba.commit()
+
+    execute (cursor, """
+    TRUNCATE {lab}
+    """, parameters)
+
+    # unroll lacunae
+    execute (cursor, """
+    INSERT INTO {lab} (ms_id, pass_id, labez)
+    SELECT ms.id, p.id, 0
+      FROM
+        {lac} lac
+      JOIN
+        {pass} p
+      JOIN
+        {ms} ms
+
+      ON p.anfadr >= lac.anfadr AND p.endadr <= lac.endadr
+         AND ms.hsnr = lac.hsnr
+    """, parameters)
+
+    # copy labez eventually overwriting lacunae
+    execute (cursor, """
+    REPLACE INTO {lab} (ms_id, pass_id, labez)
+    SELECT ms.id, p.id, ord (att.labez) - 96
+      FROM
+        {att} att
+      JOIN
+        {pass} p
+      JOIN
+        {ms} ms
+
+      ON p.anfadr = att.anfadr AND p.endadr = att.endadr
+         AND ms.hsnr = att.hsnr
+    """, parameters)
+
+
+    # finally fix the 'Fehlverse'
+    #
+    # As of here all Fehlverse are marked with the labez of manuscript 'A' which
+    # may be incorrect.  Actually all Fehlverse are correctly marked 'zu' in
+    # 'A', so we might get away with doing nothing.
+
+    # FIXME: I don't really understand what is wanted here.
+
+    # execute (cursor, """
+    # UPDATE {lab} lab
+    # JOIN
+    #   {att} att
+    # JOIN
+    #   (SELECT * FROM {pass} WHERE comp AND fehlvers)
+    #   AS p
+    # JOIN
+    #   {ms} ms
+    # ON lab.ms_id = ms.id AND
+    #    lab.pass_id = p.id AND
+    #    p.anfadr = att.anfadr AND p.endadr = att.endadr
+    #    AND ms.hsnr = att.hsnr
+    #    AND att.base = 'a'
+    # SET lab.labez = 0
+    # """, parameters)
+
+    # fix 'z' readings
+    execute (cursor, """
+    UPDATE {lab}
+    SET labez = 0
+    WHERE labez = 26
+    """, parameters)
+
     dba.commit()
 
 
@@ -814,10 +1052,10 @@ def step10 (dba, parameters):
     execute (cursor, """
     INSERT INTO {att} (hsnr, hs, anfadr, endadr, buch, kapanf, versanf, wortanf,
                           kapend, versend, wortend, labez, labezsuf, anfalt, endalt,
-                          lesart, base)
+                          lesart, base, comp)
     SELECT hs.hsnr, hs.hs, a.anfadr, a.endadr, a.buch, a.kapanf, a.versanf, a.wortanf,
            a.kapend, a.versend, a.wortend, a.labez, a.labezsuf, a.anfalt, a.endalt,
-           a.lesart, a.base
+           a.lesart, a.base, a.comp
     FROM
       /* all passages from A */
       (SELECT * FROM {att} WHERE hs = 'A') AS a
@@ -841,28 +1079,11 @@ def step10 (dba, parameters):
     SELECT hs, anfadr, endadr FROM {att} GROUP BY hs, anfadr, endadr HAVING COUNT (*) > 1
     """, parameters)
 
-    execute (cursor, """
-    /* Set comp = 'x' on nested variants. */
-    UPDATE {att} t
-    JOIN (
-      /* this subquery materializes the view: huge performance gain */
-      SELECT ianfadr, iendadr FROM {target_db}.NestedPassages
-    ) as n
-    ON t.anfadr = n.ianfadr AND t.endadr = n.iendadr
-    SET comp = 'x'
-    """, parameters)
-
     parameters['fehlverse'] = db.FEHLVERSE
     execute (cursor, """
     UPDATE {att}
     SET labez = 'zu', lesart = ''
     WHERE comp = 'x' AND base = 'a' AND {fehlverse}
-    """, parameters)
-
-    execute (cursor, """
-    UPDATE {att}
-    SET lesart = 'lac'
-    WHERE labez = 'zz'
     """, parameters)
 
     dba.commit()
@@ -1155,7 +1376,8 @@ def step21 (dba, parameters):
 
     dba.commit ()
 
-    # build the fake manuscript 'MT'
+    # Build the fake manuscript 'MT' that contains our reconstructed Byzantine
+    # text
 
     execute (cursor, """
     DELETE FROM {att} WHERE hs = 'MT'
@@ -1335,6 +1557,309 @@ def step22 (dba, parameters):
     dba.commit ()
 
 
+class Bag:
+    """ Holds some values for us. """
+
+    n_hs = 0                # No. of manuscripts
+    n_passages = 0          # No. of passages
+    n_var_passages = 0      # No. of variant passages
+    hss = None              # list of hs
+    hsnrs = None            # list of hsnr
+    passages = None         # list of passages
+    var_passages = None     # list of indices of variant passages only
+    labez_matrix = None     # hs x passages matrix of labez
+    var_labez_matrix = None # hs x variant passages matrix of labez
+    affinity_matrix = None  # hs x hs matrix of similarity measure
+
+
+def step10_numpy (dba, parameters, val):
+    """Create the labez matrix.
+
+    Create a matrix of manuscripts x passages.  Each entry represents one
+    reading: 0 = lacuna, 1 = 'a', 2 = 'b', ...
+
+    """
+
+    message (1, "Step 10 : Loading labez matrix ...")
+
+    cursor = dba.cursor ()
+    np.set_printoptions (threshold = 30)
+
+    # get no. of passages
+    execute (cursor, "SELECT anfadr, endadr FROM {pass} ORDER BY anfadr, endadr DESC", parameters)
+    rows = cursor.fetchall ()
+    val.n_passages  = cursor.rowcount
+    val.passages   = ["%s-%s" % x for x in rows]
+
+    # get manuscript names and numbers
+    execute (cursor, "SELECT hs, hsnr FROM {ms} ORDER BY hsnr", parameters)
+    rows = cursor.fetchall ()
+    val.n_hs  = cursor.rowcount
+    val.hss   = [x[0] for x in rows]
+    val.hsnrs = [x[1] for x in rows]
+
+    # Matrix ms x pass
+
+    # First initialize all manuscripts in the matrix to the labezs of Manuscript
+    # A ...
+    labez_matrix = np.ones ((val.n_hs, val.n_passages), dtype = int)
+
+    execute (cursor, """
+    SELECT pass_id - 1 as pass, labez
+    FROM {lab}
+    WHERE ms_id = 1 AND labez <> 1
+    """, parameters)
+
+    for row in cursor.fetchall ():
+        labez_matrix[:, row[0]] = row[1]
+
+    # ... then overwrite the matrix with the labezs from actual manuscripts
+    execute (cursor, """
+    SELECT ms_id - 1 as ms, pass_id - 1 as pass, labez
+    FROM {lab}
+    """, parameters)
+
+    for row in cursor.fetchall ():
+        labez_matrix[row[0], row[1]] = row[2]
+
+    # Get ids of variant passages
+    execute (cursor, """
+    SELECT a.id - 1
+    FROM (
+      SELECT DISTINCT p.id, labez
+      FROM {att} AS att
+      JOIN {pass} AS p
+      ON p.anfadr = att.anfadr AND p.endadr = att.endadr
+      WHERE labez NOT REGEXP '^z' AND labezsuf NOT REGEXP 'f|o'
+    ) AS a
+    GROUP BY a.id
+    HAVING count (*) > 1
+    """, parameters)
+
+    val.var_pass = np.fromiter ((x[0] for x in cursor.fetchall ()), np.int)
+    val.n_var_passages = len (val.var_pass)
+    val.var_labez_matrix = labez_matrix.take (val.var_pass, 1)
+    val.labez_matrix = labez_matrix
+
+    print (val.n_hs)
+    print (val.n_passages)
+    print (val.labez_matrix.shape)
+    print (val.n_var_passages)
+    print (val.var_labez_matrix.shape)
+
+    dba.commit ()
+
+    message (1, "Step 10 : Building Byzantine text ...")
+
+    # Get the labez of some typical Byzantine texts
+    parameters['byzlist'] = db.BYZ_HSNR
+    execute (cursor, """
+    SELECT id - 1 AS id
+    FROM {ms}
+    WHERE hsnr IN {byzlist}
+    """, parameters)
+    assert cursor.rowcount == 7, "The list of Byzantine texts must contain exactly 7 manuscripts."
+    byz_ids = np.fromiter ((x[0] for x in cursor.fetchall ()), np.int)
+    print ("Byz Ids: ", byz_ids)
+    byz_labez_matrix = labez_matrix.take (byz_ids, 0)
+    # np.set_printoptions (threshold = 100000)
+    # print (byz_labez_matrix)
+    # np.set_printoptions (threshold = 1000)
+
+    # Group the labez at each passage
+    byz_bincount = np.apply_along_axis (np.bincount, 0, byz_labez_matrix, minlength = 27)
+    print (byz_bincount)
+
+    # Calculate the Byzantine labez for each passage
+    byz_text = np.zeros (val.n_passages, dtype = int)
+    for i, bc in enumerate (byz_bincount.T):
+        # test if all mss are defined
+        if bc[0] > 0:
+            continue
+        # test for patterns 7, 6+0, 6+1, 5+1+1
+        for j, b in enumerate (bc):
+            if b >= 6:
+                # must be 7 or 6+1
+                byz_text[i] = j
+                continue
+            if b == 5 and 2 not in bc:
+                # must be 5+1+1
+                byz_text[i] = j
+                continue
+
+    # print ("Byz: ", byz_text)
+
+    # Insert the Byz text into the matrix
+    val.labez_matrix = np.insert (val.labez_matrix, 1, byz_text, axis = 0)
+    val.hss.insert (1, 'MT')
+    val.hsnrs.insert (1, 1)
+    val.n_hs += 1
+
+    # Boolean matrix ms x pass set where passage is defined
+    val.def_matrix = np.asmatrix (np.zeros_like (val.labez_matrix, dtype = int))
+    val.def_matrix[val.labez_matrix != 0] = 1
+
+    # Length of manuscripts (no. of defined passages)
+    val.ms_length = val.def_matrix * np.ones ((val.n_passages, 1), dtype = int)
+    val.ms_length = val.ms_length.A[:, 0]
+    print ("Manuscript Length Array: ", val.ms_length)
+
+    # debug plot the matrix
+    ticks_labels_x = plot.passages_labels (val.passages)
+    ticks_labels_y = plot.mss_labels (val.hss, val.hsnrs)
+
+    plot.heat_matrix (val.def_matrix, "Manuscript Definition Matrix",
+                      ticks_labels_x, ticks_labels_y, plot.colormap_bw ())
+
+    dba.commit ()
+
+
+def step24 (dba, parameters, val):
+    """Calculate mss similarity
+
+    Aus: VGA/VG05_all3.pl
+
+        Kapitelweise füllen auf Basis von Vergleichen einzelner
+        Variantenspektren in ECM_Acts_Sp.  Vergleich von je zwei Handschriften:
+        An wieviel Stellen haben sie gemeinsam Text, an wieviel Stellen stimmen
+        sie überein bzw. unterscheiden sie sich (inklusive Quotient)?  Die
+        Informationen werden sowohl auf Kapitel- wie auch Buchebene
+        festgehalten.
+
+    """
+
+    message (1, "Step 24 : Calculating mss similarity ...")
+
+    cursor = dba.cursor ()
+
+    # Matrix ms x ms with count of the passages that are defined in both mss
+    val.and_matrix = np.zeros ((val.n_hs, val.n_hs), dtype = int)
+
+    # Matrix ms x ms with count of the passages that are defined in either ms
+    val.or_matrix  = np.zeros ((val.n_hs, val.n_hs), dtype = int)
+
+    # Matrix ms x ms with count of the passages that are equal in both mss
+    val.eq_matrix  = np.zeros ((val.n_hs, val.n_hs), dtype = int)
+
+    # loop over all mss O(n_hs² * n_passages)
+    for i in range (0, val.n_hs):
+        labezi = val.labez_matrix[i]
+        defi   = val.def_matrix[i]
+        for j in range (0, val.n_hs):
+            def_and = np.logical_and (defi, val.def_matrix[j])
+            val.and_matrix[i,j]  = np.sum (def_and)
+
+            def_or  = np.logical_or  (defi, val.def_matrix[j])
+            val.or_matrix[i,j]   = np.sum (def_or)
+
+            val.eq_matrix[i,j]   = np.sum (np.logical_and (def_and, labezi == val.labez_matrix[j]))
+
+    # Matrix ms x ms with count of the passages that are different in both mss
+    val.diff_matrix = val.and_matrix - val.eq_matrix
+
+    # calculate
+    with np.errstate (divide = 'ignore', invalid = 'ignore'):
+        val.quotient_matrix = val.eq_matrix / val.and_matrix
+        val.quotient_matrix[val.and_matrix == 0] = 0.0
+
+    # debug
+    #plot.heat_matrix (eq_matrix,  "No. of Equal Passages", val.hss, val.hsnrs)
+    #plot.heat_matrix (and_matrix, "No. of Passages Defined in Both Manuscripts", val.hss, val.hsnrs)
+    ticks_labels = plot.mss_labels (val.hss, val.hsnrs)
+    plot.heat_matrix (val.quotient_matrix, "Similarity of Manuscripts",
+                      ticks_labels, ticks_labels, plot.colormap_affinity ())
+
+    np.fill_diagonal (val.quotient_matrix, 0.0) # remove affinity to self
+
+    print ("eq\n",   val.eq_matrix)
+    print ("diff\n", val.diff_matrix)
+    print ("and\n",  val.and_matrix)
+    print ("or\n",   val.or_matrix)
+    print ("quot\n", val.quotient_matrix)
+
+
+def affinity_clustering (dba, parameters, val):
+    import sklearn.cluster
+
+    labels = sklearn.cluster.spectral_clustering (
+        val.quotient_matrix, n_clusters = 20, eigen_solver = 'arpack', random_state = 123)
+
+    data = zip (labels, val.hss)
+
+    data = sorted (data, key = operator.itemgetter (0))
+    for label, group in itertools.groupby (data, operator.itemgetter (0)):
+        for g in group:
+            print (g[1], end = ' ')
+        print ("\n")
+
+
+def affinity_to_gephi (dba, parameters, val):
+    """Export the affinity matrix to Gephi.
+
+    Gephi wants 2 tables: a table of nodes and a table of edges.
+
+    """
+
+    message (1, "        : Exporting to Gephi ...")
+
+    cursor = dba.cursor ()
+
+    execute (cursor, "TRUNCATE {g_nodes}", parameters)
+    execute (cursor, "TRUNCATE {g_edges}", parameters)
+
+    # Build Gephi nodes table.  Every ms gets to be a node.  Simple.
+    param_array = []
+    for i in range (0, val.n_hs):
+        hs = val.hss[i]
+        hsnr = val.hsnrs[i]
+        size = val.ms_length[i]
+        color = '128,128,128'
+        if hsnr < 400000:
+            color = '0,255,0'
+        if hsnr < 300000:
+            color = '128,128,255'
+        if hsnr < 200000:
+            color = '255,255,128'
+        if hsnr < 100000:
+            color = '255,0,0'
+        param_array.append ( ( hsnr, hs, color, color, size ) )
+
+    cursor.executemany ("""
+    INSERT INTO {g_nodes} (id, label, color, nodecolor, nodesize)
+    VALUES (%s, %s, %s, %s, %s)
+    """.format (**parameters), param_array)
+
+    # Build Gephi edges table.  Needs brains.  Creating an edge between every 2
+    # mss will not give a very meaningful graph.  We have to keep only the most
+    # significant edges.  But what is significant?
+
+    # We rank the neighbors of each ms by similarity and keep only the X most
+    # similar ones.
+    keep = 20
+    rank_matrix = np.argsort (val.quotient_matrix, axis = 1)
+    rank_matrix = rank_matrix[0:, -keep:]  # keep 10
+    # Now we have the indices of the X most similar mss.
+
+    param_array = []
+    qq = math.log (val.n_passages)
+    for i in range (0, val.n_hs):
+        hs_src = val.hsnrs[i]
+        for j in range (0, keep):
+            k = rank_matrix[i, j]
+            hs_dest = val.hsnrs[k]
+            q = val.quotient_matrix[i, k] * math.log (max (1.0, val.and_matrix[i, k])) / qq
+            param_array.append ( ( "%s-%s" % (hs_src, hs_dest), hs_src, hs_dest, q) )
+
+    cursor.executemany ("""
+    INSERT INTO {g_edges} (id, source, target, weight)
+    VALUES (%s, %s, %s, %s)
+    """.format (**parameters), param_array)
+
+    dba.commit ()
+
+    # np.savetxt ('affinity.csv', val.quotient_matrix)
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Prepare a new database for CBGM')
@@ -1373,6 +1898,7 @@ if __name__ == '__main__':
     args.start_time = datetime.datetime.now ()
     tools.args = args
     parameters = tools.init_parameters (DEFAULTS)
+    v = Bag ()
 
     try:
         for step in range(args.range[0], args.range[1] + 1):
@@ -1403,29 +1929,36 @@ if __name__ == '__main__':
                     tools.print_stats(dba, parameters)
                 continue
             if step == 8:
-                step08 (dba, parameters)
+                #step08 (dba, parameters)
                 continue
             if step == 9:
-                step09 (dba, parameters)
+                create_ms_pass_tables (dba, parameters)
+                #step09 (dba, parameters)
+                step09_numpy (dba, parameters)
                 if args.verbose >= 1:
                     tools.print_stats(dba, parameters)
                 continue
             if step == 10:
-                step10 (dba, parameters)
+                #step10 (dba, parameters)
+                step10_numpy (dba, parameters, v)
                 if args.verbose >= 1:
                     tools.print_stats(dba, parameters)
                 continue
             if step == 11:
-                step11 (dba, parameters)
+                #step11 (dba, parameters)
                 continue
             if step == 20:
-                step20 (dba, parameters)
+                #step20 (dba, parameters)
                 continue
             if step == 21:
-                step21 (dba, parameters)
+                #step21 (dba, parameters)
                 continue
             if step == 22:
-                step22 (dba, parameters)
+                #step22 (dba, parameters)
+                continue
+            if step == 24:
+                step24 (dba, parameters, v)
+                affinity_to_gephi (dba, parameters, v)
                 continue
 
     except KeyboardInterrupt:

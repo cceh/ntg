@@ -102,6 +102,13 @@ erhalten.
 
 Bezeichnung: '𝔓' gefolgt von hochgestellter Zahl (z.B. 𝔓\ :sup:`52`)
 
+Papyri haben eine gute Seite (mit horizontal verlaufenden Fasern) und
+eine schlechte Seite (mit vertikal verlaufenden Fasern.)  Bei
+Schriftrollen wurde zunächst nur die gute Seite beschrieben.  Die
+schlechte Seite wurde oft später aus Gründen der Sparsamkeit
+beschrieben.  Diese Sitte ermöglicht eine Datierung eines undatierten
+Dokuments wenn das Dokumnet auf der anderen Seite datiert ist.
+
 
 Majuskeln
 ~~~~~~~~~
@@ -222,6 +229,15 @@ Schreibfehlern festzustellen. ([NESTLE1923]_ § 103)
 
 Bei Auslassungen läßt sich durch Zählung der Buchstaben auch ein Bild
 von der Zeilenbreite der Vorlage gewinnen. ([NESTLE1923]_ § 103)
+
+Brevior lectio potior: die kürzere Lesart ist die stärkere.  Schreiber
+haben lieber hinzugefügt als weggelassen.
+
+Difficilior lectio potior: die schwerere Lesart ist die Stärkere.
+Schreiber haben schwer verständliche Passagen oft vereinfacht.
+
+*Den Vorzug verdient die Lesart,* aus der sich die Entstehung der
+anderen Lesarten am leichtesten erklären läßt.  ([NESTLE1923]_ § 115)
 
 
 Die Datenbank
@@ -429,6 +445,19 @@ om
   Fehlender Text (omissio)
 
 
+Interaktive Oberfläche
+======================
+
+Es wird eine oberfläche Entwickelt, die im Browser läuft.
+
+Zielgruppe: Editoren der ECM, Philologen, interessierte Laien
+
+Zweck: Visuelle Exploration der Datenbasis des ECM.  Spielwiese (was ist
+wenn?)
+
+
+
+
 Literatur
 =========
 
@@ -440,6 +469,10 @@ Literatur
 .. [ALAND1998] Aland, Barbara.  1998.  *Novum Testamentum Graecum Editio
    Critica Maior: Presentation of the First Part: The Letter of James.*
    Münster.  http://rosetta.reltech.org/TC/v03/Aland1998.html
+
+.. [MINK2008] Mink, Gerd.  *The Coherence-Based Genealogical Method (CBGM)
+   — Introductory Presentation by Gerd Mink.*
+   http://www.uni-muenster.de/INTF/cbgm_presentation/download.html
 
 .. [NESTLE1923] Nestle, Eberhard.  1923.  *Eberhard Nestle's Einführung
    in das Griechische Neue Testament. Vierte Auflage.  Völlig

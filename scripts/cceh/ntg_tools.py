@@ -169,14 +169,13 @@ def print_stats (dba, parameters):
     att = cursor_get_value (cursor)
     cursor.execute ("SELECT count(*) FROM {lac}".format (**parameters))
     lac = cursor_get_value (cursor)
-    cursor.execute ("SELECT count(*) FROM {attlac}".format (**parameters))
-    attlac = cursor_get_value (cursor)
+    cursor.execute ("SELECT count(*) FROM {lab}".format (**parameters))
+    lab = cursor_get_value (cursor)
 
     message (1, "rows in att        = {cnt}".format (cnt = att))
     message (1, "rows in lac        = {cnt}".format (cnt = lac))
-    message (1, "rows in attlac     = {cnt}".format (cnt = attlac))
-    message (1, "rows in att+attlac = {cnt}".format (cnt = att + attlac))
-    message (1, "delta              = {cnt}".format (cnt = (att + attlac) - (hs * passages)))
+    message (1, "rows in labez      = {cnt}".format (cnt = lab))
+    message (1, "delta              = {cnt}".format (cnt = lab - (hs * passages)))
 
     # sum (passages in chapter * mss with chapter)
 
