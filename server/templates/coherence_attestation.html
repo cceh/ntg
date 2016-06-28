@@ -1,0 +1,101 @@
+{% extends "site.html" %}
+
+  {% block head %}
+  <title>{{_('Attestation for %(passage)s', passage = values.hr_pass)}}</title>
+  <script src="//d3js.org/d3.v3.js"></script>
+  <script src="/static/d3-force-layout.js"></script>
+  <style>
+    #attestations th {
+        vertical-align: top;
+    }
+
+    span.attesting-mss {
+        color: black;
+        font-size: smaller;
+    }
+
+    .link {
+        stroke: #999;
+        stroke-opacity: .6;
+    }
+
+    .link.hover {
+        stroke: #0f0;
+        stroke-opacity: 1.0;
+        stroke-width: 3px;
+    }
+
+    .node {
+        cursor: move;
+        fill: #ccc;
+    }
+
+    circle {
+        fill: #fff;
+        stroke: #fff;
+        stroke-width: 1.5px;
+    }
+
+    circle.hsnr_0 {
+        stroke: #f00;
+        stroke-width: 3px;
+    }
+
+    circle.hsnr_1 {
+        stroke: #f00;
+        stroke-width: 3px;
+    }
+
+    .hover circle {
+        stroke: #0f0;
+        stroke-width: 3px;
+    }
+
+    text {
+        font-size: 11px;
+        dominant-baseline: middle;
+        fill: #000;
+        stroke: #fff;
+        stroke-width: 3px;
+        stroke-linejoin: round;
+        text-anchor: middle;
+        pointer-events: none;
+        paint-order: stroke;
+    }
+    .hover text {
+        stroke: #0f0;
+    }
+
+    #svg-wrapper {
+        width: 100%;
+    }
+    a.labez {
+      color: inherit;
+    }
+  </style>
+  {% endblock %}
+
+  {% block content %}
+      <h1>{{_('Attestation for %(passage)s', passage = values.hr_pass)}}</h1>
+      <table id="attestations">
+        {% for r in values.readings %}
+        <tr data-labez="{{r.ord_labez}}">
+          <th>{{r.labez|e}}{{r.labezsuf|e}}</th>
+          <td><a class="labez" href="/ms_attesting/{{values.pass_id}}/{{r.labez|e}}">{{r.lesart|e}}</a> <span class="attesting-mss">{{r.manuscripts|e}}</span></td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <div id="svg-wrapper">
+    </div>
+  {% endblock %}
+
+  {% block footer %}
+    <script>
+      jQuery (document).ready (function () {
+        d3_init ();
+        d3_set_attestation ({{values.pass_id}});
+      });
+    </script>
+  {% endblock %}

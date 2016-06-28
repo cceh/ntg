@@ -231,13 +231,18 @@ Bei Auslassungen läßt sich durch Zählung der Buchstaben auch ein Bild
 von der Zeilenbreite der Vorlage gewinnen. ([NESTLE1923]_ § 103)
 
 Brevior lectio potior: die kürzere Lesart ist die stärkere.  Schreiber
-haben lieber hinzugefügt als weggelassen.
+haben öfter hinzugefügt als weggelassen.  (Einige Wissenschaftler
+glauben hingegen, daß die ausgelassen Zeile der häufigste
+Schreiberfehler ist. Siehe: [METZGER2005]_ S. 213f)
 
 Difficilior lectio potior: die schwerere Lesart ist die Stärkere.
 Schreiber haben schwer verständliche Passagen oft vereinfacht.
 
 *Den Vorzug verdient die Lesart,* aus der sich die Entstehung der
 anderen Lesarten am leichtesten erklären läßt.  ([NESTLE1923]_ § 115)
+
+*Knowledge of documents should precede final judgement upon readings.*
+([WESTCOTT1881]_  S. 31)
 
 
 Die Datenbank
@@ -470,6 +475,12 @@ Literatur
    Critica Maior: Presentation of the First Part: The Letter of James.*
    Münster.  http://rosetta.reltech.org/TC/v03/Aland1998.html
 
+.. [CLARK1918] Clark, Albert C. 1918. *The Descent of Manuscripts*.
+   Oxford
+
+.. [METZGER2005] Metzger, Bruce Manning.  2005.  The Text of the New
+   Testament.  4th Edition.
+
 .. [MINK2008] Mink, Gerd.  *The Coherence-Based Genealogical Method (CBGM)
    — Introductory Presentation by Gerd Mink.*
    http://www.uni-muenster.de/INTF/cbgm_presentation/download.html
@@ -478,3 +489,8 @@ Literatur
    in das Griechische Neue Testament. Vierte Auflage.  Völlig
    umgearbeitet von Ernst von Dobschütz.*  Göttingen: Vandenhoeck &
    Ruprecht.
+
+.. [WESTCOTT1881] Westcott, Brooke Foss and Hort, Fenton John Anthony.
+   *The New Testament in the Original Greek.  Volume 2.  Introduction
+   and Appendix by the Editors*
+   https://archive.org/details/newtestamentinor82west

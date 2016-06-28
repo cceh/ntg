@@ -11,21 +11,21 @@ import matplotlib.colors as colors
 import six
 
 
-def mss_labels (hss, hsnrs):
+def mss_labels (mss):
     """Build ticks and labels for manuscript axis.
 
     Use one tick at the start of each range (papyri, maiuscles, ...) and then
     one every 5 mss.
 
-    """
+    Parameter must be a list of named tuples of class Mss.
 
-    hsnrs = np.array (hsnrs)
+    """
 
     range_ = -1
     c = 0
     ticks = []
-    for n, hsnr in enumerate (hsnrs):
-        i = hsnr // 100000
+    for n, ms in enumerate (mss):
+        i = ms.hsnr // 100000
         if i > range_:
             ticks.append (n)
             range_ = i
@@ -35,7 +35,7 @@ def mss_labels (hss, hsnrs):
         if (c % 5) == 0:
             ticks.append (n)
 
-    labels = [hss[i] for i in ticks]
+    labels = [mss[i].hs for i in ticks]
     return ticks, labels
 
 
@@ -80,7 +80,7 @@ def colormap_affinity ():
 def heat_matrix (m, caption, ticks_labels_x, ticks_labels_y, colormap):
     """ Plot a heat map of the matrix. """
 
-    plt.matshow (m, aspect = 'auto', cmap = colormap[0], norm = colormap[1])
+    plt.matshow (m, fignum = 0, aspect = 'auto', cmap = colormap[0], norm = colormap[1])
     plt.colorbar ()
 
     plt.xticks (ticks_labels_x[0], ticks_labels_x[1], rotation='vertical')
@@ -88,5 +88,4 @@ def heat_matrix (m, caption, ticks_labels_x, ticks_labels_y, colormap):
     axes = plt.gca ()
     axes.tick_params (direction = 'out', pad = 5)
 
-    plt.title (caption)
-    plt.show ()
+    plt.title (caption, y = 20.0)

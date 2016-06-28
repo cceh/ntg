@@ -33,43 +33,27 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import argparse
+import collections
 import datetime
 import itertools
 import math
 import operator
+import os
 import re
 import sys
 
 import numpy as np
 import six
 
-import ntg_db as db
-import ntg_tools as tools
-import ntg_plot as plot
-from ntg_tools import message, execute, debug, fix
+sys.path.append (os.path.dirname (os.path.abspath (__file__)) + "/../..")
 
+from ntg_common import db
+from ntg_common import tools
+from ntg_common import plot
+from ntg_common.db import execute, executemany, debug, fix
+from ntg_common.tools import message
+from ntg_common.config import args
 
-DEFAULTS = {
-    #'att'    : 'ActsAtt_3',
-    #'lac'    : 'ActsLac_3',
-    #'attlac' : 'ActsAttLac_3',
-    #'tmp'    : 'ActsTmp_3',
-
-    'att'     : 'Att',
-    'lac'     : 'Lac',
-    'lab'     : 'Labez',
-    'ms'      : 'Manuscripts',  # ???
-    'pass'    : 'Passages',     # ???
-    'npass'   : 'NestedPassages',     # ???
-    'vp'      : 'VP',
-    'rdg'     : 'Rdg',
-    'witn'    : 'Witn',
-    'listval' : 'MsListVal',
-    'vg'      : 'VG',
-    'tmp'     : 'Tmp',
-    'g_nodes' : 'nodes',
-    'g_edges' : 'edges',
-}
 
 N_FIELDS = 'base comp comp1 komm kontrolle korr lekt over over1 suff suffix2 vid vl'.split ()
 """ Field to look for 'N' and NULL """
@@ -77,20 +61,20 @@ N_FIELDS = 'base comp comp1 komm kontrolle korr lekt over over1 suff suffix2 vid
 NULL_FIELDS = 'lemma lesart'.split ()
 """ Fields to look for NULL """
 
-def create_indices (cursor):
+def create_indices (conn):
     message (2, "          Creating indices ...")
 
-    cursor.execute ('CREATE INDEX Hs     ON {att} (hs)'.format (**parameters))
-    cursor.execute ('CREATE INDEX Hsnr   ON {att} (hsnr)'.format (**parameters))
-    cursor.execute ('CREATE INDEX Anfadr ON {att} (anfadr)'.format (**parameters))
-    cursor.execute ('CREATE INDEX Endadr ON {att} (endadr)'.format (**parameters))
+    execute (conn, 'CREATE INDEX Hs     ON {att} (hs)', parameters)
+    execute (conn, 'CREATE INDEX Hsnr   ON {att} (hsnr)', parameters)
+    execute (conn, 'CREATE INDEX Anfadr ON {att} (anfadr)', parameters)
+    execute (conn, 'CREATE INDEX Endadr ON {att} (endadr)', parameters)
 
-    cursor.execute ('CREATE INDEX HsAdr  ON {att} (hs, anfadr, endadr)'.format (**parameters))
+    execute (conn, 'CREATE INDEX HsAdr  ON {att} (hs, anfadr, endadr)', parameters)
 
-    cursor.execute ('CREATE UNIQUE INDEX Labez ON {lab} (ms_id, pass_id)'.format (**parameters))
+    execute (conn, 'CREATE UNIQUE INDEX Labez ON {labez} (ms_id, pass_id)', parameters)
 
 
-def step01(dba, parameters):
+def step01 (dba, parameters):
     """Copy tables to new database
 
     Copy the (28 * 2) tables to 2 tables in a new database.  Do *not* copy
@@ -98,146 +82,156 @@ def step01(dba, parameters):
 
     """
 
-    cursor = dba.cursor()
+    message (1, "Step  1 : Creating tables ...")
 
-    # Eventually create the database and table
-    cursor.execute ('DROP DATABASE IF EXISTS {target_db}'.format (**parameters))
-    cursor.execute ('CREATE DATABASE IF NOT EXISTS {target_db}'.format (**parameters))
+    with dba.engine.begin () as conn:
 
-    cursor.execute ('CREATE OR REPLACE TABLE {att} '    .format (**parameters) + db.CREATE_TABLE_ATT)
-    cursor.execute ('CREATE OR REPLACE TABLE {lac} '    .format (**parameters) + db.CREATE_TABLE_LAC)
-    cursor.execute ('CREATE OR REPLACE TABLE {lab} '    .format (**parameters) + db.CREATE_TABLE_LABEZ)
-    cursor.execute ('CREATE OR REPLACE TABLE {vp} '     .format (**parameters) + db.CREATE_TABLE_VP)
-    cursor.execute ('CREATE OR REPLACE TABLE {rdg} '    .format (**parameters) + db.CREATE_TABLE_RDG)
-    cursor.execute ('CREATE OR REPLACE TABLE {witn} '   .format (**parameters) + db.CREATE_TABLE_WITN)
-    cursor.execute ('CREATE OR REPLACE TABLE {listval} '.format (**parameters) + db.CREATE_TABLE_MSLISTVAL)
-    cursor.execute ('CREATE OR REPLACE TABLE {vg} '     .format (**parameters) + db.CREATE_TABLE_VG)
-    cursor.execute ('CREATE OR REPLACE TABLE {g_nodes} '.format (**parameters) + db.CREATE_TABLE_GEPHI_NODES)
-    cursor.execute ('CREATE OR REPLACE TABLE {g_edges} '.format (**parameters) + db.CREATE_TABLE_GEPHI_EDGES)
+        # Eventually create the database and table
+        execute (conn, 'DROP DATABASE IF EXISTS {target_db}', parameters)
+        execute (conn, 'CREATE DATABASE IF NOT EXISTS {target_db}', parameters)
 
+        parameters['fields'] = db.CREATE_TABLE_ATT;
+        execute (conn, 'CREATE OR REPLACE TABLE {att} {fields}'    , parameters)
+        parameters['fields'] = db.CREATE_TABLE_LAC;
+        execute (conn, 'CREATE OR REPLACE TABLE {lac} {fields}'    , parameters)
+        parameters['fields'] = db.CREATE_TABLE_LABEZ;
+        execute (conn, 'CREATE OR REPLACE TABLE {labez} {fields}'  , parameters)
+        parameters['fields'] = db.CREATE_TABLE_VP;
+        execute (conn, 'CREATE OR REPLACE TABLE {vp} {fields}'     , parameters)
+        parameters['fields'] = db.CREATE_TABLE_RDG;
+        execute (conn, 'CREATE OR REPLACE TABLE {rdg} {fields}'    , parameters)
+        parameters['fields'] = db.CREATE_TABLE_WITN;
+        execute (conn, 'CREATE OR REPLACE TABLE {witn} {fields}'   , parameters)
+        parameters['fields'] = db.CREATE_TABLE_MSLISTVAL;
+        execute (conn, 'CREATE OR REPLACE TABLE {listval} {fields}', parameters)
+        parameters['fields'] = db.CREATE_TABLE_VG;
+        execute (conn, 'CREATE OR REPLACE TABLE {vg} {fields}'     , parameters)
+        parameters['fields'] = db.CREATE_TABLE_MANUSCRIPTS;
+        execute (conn, 'CREATE OR REPLACE TABLE {ms} {fields}'     , parameters)
+        parameters['fields'] = db.CREATE_TABLE_AFFINITY;
+        execute (conn, 'CREATE OR REPLACE TABLE {aff} {fields}'    , parameters)
+        parameters['fields'] = db.CREATE_TABLE_GEPHI_NODES;
+        execute (conn, 'CREATE OR REPLACE TABLE {g_nodes} {fields}', parameters)
+        parameters['fields'] = db.CREATE_TABLE_GEPHI_EDGES;
+        execute (conn, 'CREATE OR REPLACE TABLE {g_edges} {fields}', parameters)
 
-    cursor.execute ('SHOW COLUMNS IN {att}'.format (**parameters))
-    target_columns_att = set ([row[0].lower() for row in cursor.fetchall()])
-    cursor.execute ('SHOW COLUMNS IN {lac}'.format (**parameters))
-    target_columns_lac = set ([row[0].lower() for row in cursor.fetchall()])
+        res = execute (conn, 'SHOW COLUMNS IN {att}', parameters)
+        target_columns_att = set ([row[0].lower () for row in res])
+        res = execute (conn, 'SHOW COLUMNS IN {lac}', parameters)
+        target_columns_lac = set ([row[0].lower () for row in res])
 
-    # these columns get special treatment
-    target_columns_att -= set (('id', 'created'))
-    target_columns_lac -= set (('id', 'created'))
+        # these columns get special treatment
+        target_columns_att -= set (('id', 'created'))
+        target_columns_lac -= set (('id', 'created'))
 
-    # Get a list of tables (there are two tables per chapter)
-    cursor.execute ('SHOW TABLES FROM {source_db} LIKE %(table_mask)s'.format (**parameters), parameters)
+        # Get a list of tables (there are two tables per chapter)
+        res = execute (conn, 'SHOW TABLES FROM {source_db} LIKE :table_mask', parameters)
 
-    message (1, "Step  1 : Copying tables ...")
+        message (1, "Step  1 : Copying tables ...")
 
-    for row in cursor.fetchall():
-        parameters['source_table'] = row[0]
-        parameters['source'] = '{source_db}."{source_table}"'.format (**parameters)
+        for row in res:
+            parameters['source_table'] = row[0]
+            parameters['source'] = '{source_db}."{source_table}"'.format (**parameters)
 
-        is_lac_table = parameters['source_table'].endswith('lac')
-        parameters['t'] = parameters['lac'] if is_lac_table else parameters['att']
-        target_columns = target_columns_lac if is_lac_table else target_columns_att
+            is_lac_table = parameters['source_table'].endswith('lac')
+            parameters['t'] = parameters['lac'] if is_lac_table else parameters['att']
+            target_columns = target_columns_lac if is_lac_table else target_columns_att
 
-        cursor.execute ('SHOW COLUMNS IN {source}'.format (**parameters))
-        source_columns = [row[0].lower() for row in cursor.fetchall()]
-        common_columns = [column for column in source_columns if column in target_columns]
+            res = execute (conn, 'SHOW COLUMNS IN {source}', parameters)
+            source_columns = [row[0].lower() for row in res]
+            common_columns = [column for column in source_columns if column in target_columns]
 
-        parameters['fields']  = ', '.join (common_columns)
-        parameters['created'] = datetime.date.today().strftime ("%Y-%m-%d")
+            parameters['fields']  = ', '.join (common_columns)
+            parameters['created'] = datetime.date.today().strftime ("%Y-%m-%d")
 
-        message (2, 'Step  1 : Copying table {source_table}'.format (**parameters))
+            message (2, 'Step  1 : Copying table {source_table}'.format (**parameters))
 
-        cursor.execute ("""
-        INSERT INTO {t} ({fields}, created)
-        SELECT {fields}, '{created}'
-        FROM {source}
-        WHERE hsnr < 500000
-        """.format (**parameters))
+            execute (conn, """
+            INSERT INTO {t} ({fields}, created)
+            SELECT {fields}, '{created}'
+            FROM {source}
+            WHERE hsnr < 500000
+            """, parameters)
 
-        dba.commit()
-
-    message (1, "Step  1 : Creating indices ...")
-    create_indices(cursor)
-
-    dba.commit()
+        message (1, "Step  1 : Creating indices ...")
+        create_indices (conn)
 
 
 def create_ms_pass_tables (dba, parameters):
-    cursor = dba.cursor ()
+    """ Create the Manuscripts, Passages and Nested Passages tables. """
 
-    # The Passages Table
+    with dba.engine.begin () as conn:
 
-    execute (cursor, """
-    CREATE OR REPLACE TABLE {pass} (id INTEGER AUTO_INCREMENT PRIMARY KEY)
-    SELECT DISTINCT buch, kapanf, versanf, wortanf, kapend, versend, wortend, anfadr, endadr
-    FROM {att}
-    ORDER BY anfadr, endadr DESC
-    """, parameters)
+        # The Manuscripts Table
 
-    execute (cursor, """
-    CREATE INDEX Pass ON {pass} (anfadr, endadr)
-    """, parameters)
+        execute (conn, """
+        TRUNCATE {ms}
+        """, parameters)
 
-    dba.commit()
+        # ms_id = 1
+        execute (conn, """
+        INSERT INTO {ms} (hs, hsnr) VALUES ('A', 0)
+        """, parameters)
 
-    execute (cursor, """
-    CREATE OR REPLACE TABLE {npass}
-    SELECT a.anfadr AS ianfadr, a.endadr AS iendadr, b.anfadr AS oanfadr, b.endadr AS oendadr
-    FROM {pass} a
-    JOIN {pass} b
-    WHERE a.anfadr >= b.anfadr AND a.endadr <= b.endadr AND
-      NOT (a.anfadr = b.anfadr AND a.endadr = b.endadr)
-    """, parameters)
+        # ms_id = 2
+        execute (conn, """
+        INSERT INTO {ms} (hs, hsnr) VALUES ('MT', 1)
+        """, parameters)
 
-    dba.commit()
+        # ms_id = 3, ...
+        execute (conn, """
+        INSERT INTO {ms} (hs, hsnr)
+        SELECT DISTINCT hs, hsnr
+        FROM {att}
+        WHERE hsnr >= 100000
+        ORDER BY hsnr
+        """, parameters)
 
-    # Set comp on nested variants.
-    # We need this later when we insert the 'Fehlverse'.
-    execute (cursor, """
-    ALTER TABLE {pass}
-    ADD COLUMN comp BOOLEAN DEFAULT False,
-    ADD COLUMN fehlvers BOOLEAN DEFAULT False
-    """, parameters)
+        # The Passages Table
 
-    execute (cursor, """
-    UPDATE {pass} p
-    JOIN {npass} n
-    ON p.anfadr = n.ianfadr AND p.endadr = n.iendadr
-    SET comp = True
-    """, parameters)
+        execute (conn, """
+        CREATE OR REPLACE TABLE {pass} (id INTEGER AUTO_INCREMENT PRIMARY KEY)
+        SELECT DISTINCT buch, kapanf, versanf, wortanf, kapend, versend, wortend, anfadr, endadr
+        FROM {att}
+        ORDER BY anfadr, endadr DESC
+        """, parameters)
 
-    parameters['fehlverse'] = db.FEHLVERSE
-    execute (cursor, """
-    UPDATE {pass} p
-    SET fehlvers = True
-    WHERE {fehlverse}
-    """, parameters)
+        execute (conn, """
+        CREATE INDEX Pass ON {pass} (anfadr, endadr)
+        """, parameters)
 
-    dba.commit ()
+        # The Nested Passages Table
 
-    # Insert a dummy manuscript for MT to the database
-    # execute (cursor, """
-    # INSERT INTO {att} (hs, hsnr, labez, lesart, buch, kapanf, versanf, wortanf, kapend, versend, wortend, anfadr, endadr)
-    #   SELECT 'MT', 1, 'zz', 'lac', buch, kapanf, versanf, wortanf, kapend, versend, wortend, anfadr, endadr
-    #   FROM {pass}
-    # """, parameters)
+        execute (conn, """
+        CREATE OR REPLACE TABLE {npass}
+        SELECT a.anfadr AS ianfadr, a.endadr AS iendadr, b.anfadr AS oanfadr, b.endadr AS oendadr
+        FROM {pass} a
+        JOIN {pass} b
+        WHERE a.anfadr >= b.anfadr AND a.endadr <= b.endadr AND
+          NOT (a.anfadr = b.anfadr AND a.endadr = b.endadr)
+        """, parameters)
 
-    # dba.commit()
+        # Set comp on nested variants.
+        # We need this later when we insert the 'Fehlverse'.
+        execute (conn, """
+        ALTER TABLE {pass}
+        ADD COLUMN comp BOOLEAN DEFAULT False,
+        ADD COLUMN fehlvers BOOLEAN DEFAULT False
+        """, parameters)
 
-    # The Manuscripts Table
+        execute (conn, """
+        UPDATE {pass} p
+        JOIN {npass} n
+        ON p.anfadr = n.ianfadr AND p.endadr = n.iendadr
+        SET comp = True
+        """, parameters)
 
-    execute (cursor, """
-    CREATE OR REPLACE TABLE {ms} (id INTEGER AUTO_INCREMENT PRIMARY KEY)
-    SELECT DISTINCT hs, hsnr
-    FROM {att}
-    ORDER BY hsnr, hs
-    """, parameters)
-
-    execute (cursor, """
-    CREATE INDEX MsHsnr ON {ms} (hsnr)
-    """, parameters)
-
-    dba.commit ()
+        parameters['fehlverse'] = db.FEHLVERSE
+        execute (conn, """
+        UPDATE {pass} p
+        SET fehlvers = True
+        WHERE {fehlverse}
+        """, parameters)
 
 
 def step01b (dba, parameters):
@@ -259,106 +253,105 @@ def step01c (dba, parameters):
     """
 
     message (1, "Step  1c: Data entry fixes ...")
-    cursor = dba.cursor()
 
-    fix (cursor, "Wrong hs", """
-    SELECT DISTINCT hs, hsnr, kapanf
-    FROM {att}
-    WHERE hs = 'L156s1'
-    """, """
-    UPDATE {att}
-    SET hs = 'L156s',
-        suffix2 = 's'
-    WHERE hs = 'L156s1'
-    """, parameters)
+    with dba.engine.begin () as conn:
 
-    fix (cursor, "Wrong hsnr", """
-    SELECT DISTINCT hs, hsnr, kapanf
-    FROM {att}
-    WHERE hs REGEXP 'L1188s2.*' AND hsnr = 411881
-    """, """
-    UPDATE {att}
-    SET hsnr = 411882
-    WHERE hs REGEXP 'L1188s2.*'
-    """, parameters)
-
-    # Some fields contain 'N' (only in chapter 5)
-    # A typo for NULL? NULL will be replaced with '' later.
-    for parameters['col'] in N_FIELDS:
-        fix (cursor, "{col} = N".format (**parameters), """
-        SELECT hs, anfadr, labez, labezsuf, lesart, {col}
+        fix (conn, "Wrong hs", """
+        SELECT DISTINCT hs, hsnr, kapanf
         FROM {att}
-        WHERE {col} IN ('N', 'NULL')
-        LIMIT 10
+        WHERE hs = 'L156s1'
         """, """
         UPDATE {att}
-        SET {col} = NULL
-        WHERE {col} IN ('N', 'NULL')
+        SET hs = 'L156s',
+            suffix2 = 's'
+        WHERE hs = 'L156s1'
         """, parameters)
 
-    # Normalize NULL to ''
-    # suffix2 sometimes contains a carriage return character
-    for parameters['t'] in (parameters['att'], parameters['lac']):
-        # Delete spurious '\r' characters in suffix2 field.
-        execute (cursor, """
-        UPDATE {t}
-        SET suffix2 = REGEXP_REPLACE (suffix2, '\r', '')
-        WHERE suffix2 REGEXP '\r'
+        fix (conn, "Wrong hsnr", """
+        SELECT DISTINCT hs, hsnr, kapanf
+        FROM {att}
+        WHERE hs REGEXP 'L1188s2.*' AND hsnr = 411881
+        """, """
+        UPDATE {att}
+        SET hsnr = 411882
+        WHERE hs REGEXP 'L1188s2.*'
         """, parameters)
 
-        # replace NULL fields with ''
-        for parameters['col'] in N_FIELDS + NULL_FIELDS:
-            execute (cursor, """
+        # Some fields contain 'N' (only in chapter 5)
+        # A typo for NULL? NULL will be replaced with '' later.
+        for col in N_FIELDS:
+            fix (conn, "{col} = N".format (col = col), """
+            SELECT hs, anfadr, labez, labezsuf, lesart, {col}
+            FROM {att}
+            WHERE {col} IN ('N', 'NULL')
+            LIMIT 10
+            """, """
+            UPDATE {att}
+            SET {col} = NULL
+            WHERE {col} IN ('N', 'NULL')
+            """, dict (parameters, col = col))
+
+        # Normalize NULL to ''
+        # suffix2 sometimes contains a carriage return character
+        for t in (parameters['att'], parameters['lac']):
+            # Delete spurious '\r' characters in suffix2 field.
+            execute (conn, """
             UPDATE {t}
-            SET {col} = ''
-            WHERE {col} IS NULL
-            """, parameters)
+            SET suffix2 = REGEXP_REPLACE (suffix2, '\r', '')
+            WHERE suffix2 REGEXP '\r'
+            """, dict (parameters, t = t))
 
-    # Fix inconsistencies in endadr between Att and Lac
-    fix (cursor, "Inconsistent chapter ends in Att and Lac", """
-    SELECT kapanf, max (endadr) AS maxend
-    FROM {att} AS a
-    GROUP BY kapanf
-    HAVING maxend NOT IN (
-      SELECT max (endadr)
-      FROM {lac} GROUP
-      BY kapanf
-    )
-    """, """
-    UPDATE {lac}
-    SET endadr = 50760037
-    WHERE endadr = 50760036;
-    UPDATE {lac}
-    SET endadr = 50301004
-    WHERE endadr IN (50247036, 50247042);
-    UPDATE {lac}
-    SET anfadr = 51201001
-    WHERE anfadr = 51201002;
-    """, parameters)
+            # replace NULL fields with ''
+            for col in N_FIELDS + NULL_FIELDS:
+                execute (conn, """
+                UPDATE {t}
+                SET {col} = ''
+                WHERE {col} IS NULL
+                """, dict (parameters, t = t, col = col))
 
-    # Check consistency between Att and Lac tables
-    fix (cursor, "Manuscript found in lac table but not in att table", """
-    SELECT DISTINCT hsnr, kapanf
-    FROM {lac}
-    WHERE hsnr NOT IN (
-      SELECT DISTINCT hsnr FROM {att}
-    )
-    """, """
-    DELETE
-    FROM {lac}
-    WHERE hsnr NOT IN (
-      SELECT DISTINCT hsnr FROM {att}
-    )
-    """, parameters)
+        # Fix inconsistencies in endadr between Att and Lac
+        fix (conn, "Inconsistent chapter ends in Att and Lac", """
+        SELECT kapanf, max (endadr) AS maxend
+        FROM {att} AS a
+        GROUP BY kapanf
+        HAVING maxend NOT IN (
+          SELECT max (endadr)
+          FROM {lac} GROUP
+          BY kapanf
+        )
+        """, """
+        UPDATE {lac}
+        SET endadr = 50760037
+        WHERE endadr = 50760036;
+        UPDATE {lac}
+        SET endadr = 50301004
+        WHERE endadr IN (50247036, 50247042);
+        UPDATE {lac}
+        SET anfadr = 51201001
+        WHERE anfadr = 51201002;
+        """, parameters)
 
-    # Set lesart 'lac' for lacunae
-    execute (cursor, """
-    UPDATE {att}
-    SET lesart = 'lac'
-    WHERE labez = 'zz'
-    """, parameters)
+        # Check consistency between Att and Lac tables
+        fix (conn, "Manuscript found in lac table but not in att table", """
+        SELECT DISTINCT hsnr, kapanf
+        FROM {lac}
+        WHERE hsnr NOT IN (
+          SELECT DISTINCT hsnr FROM {att}
+        )
+        """, """
+        DELETE
+        FROM {lac}
+        WHERE hsnr NOT IN (
+          SELECT DISTINCT hsnr FROM {att}
+        )
+        """, parameters)
 
-    dba.commit()
+        # Set lesart 'lac' for lacunae
+        execute (conn, """
+        UPDATE {att}
+        SET lesart = 'lac'
+        WHERE labez = 'zz'
+        """, parameters)
 
 
 def step02 (dba, parameters):
@@ -379,83 +372,81 @@ def step02 (dba, parameters):
 
     message (1, "Step  2 : Cleanup korr and lekt ...")
 
-    cursor = dba.cursor()
+    with dba.engine.begin () as conn:
 
-    execute (cursor, """
-    UPDATE {att}
-    SET lekt = korr, korr = ''
-    WHERE korr REGEXP '^L'
-    """, parameters)
-
-    execute (cursor, """
-    UPDATE {att}
-    SET korr = lekt, lekt = ''
-    WHERE lekt REGEXP '[C*]'
-    """, parameters)
-
-    execute (cursor, """
-    UPDATE {att}
-    SET korr = '*'
-    WHERE korr = '' AND suffix2 REGEXP '[*]'
-    """, parameters)
-
-    execute (cursor, """
-    UPDATE {att}
-    SET suff = 'S'
-    WHERE suff = '' AND suffix2 REGEXP 's'
-    """, parameters)
-
-    execute (cursor, """
-    UPDATE {att}
-    SET lekt = REGEXP_SUBSTR (suffix2, 'L[1-9]')
-    WHERE lekt IN ('', 'L') AND suffix2 REGEXP 'L[1-9]'
-    """, parameters)
-
-    execute (cursor, """
-    UPDATE {att}
-    SET korr = REGEXP_SUBSTR (suffix2, 'C[1-9*]')
-    WHERE korr IN ('', 'C') AND suffix2 REGEXP 'C[1-9*]'
-    """, parameters)
-
-    execute (cursor, """
-    UPDATE {att}
-    SET vl = REGEXP_SUBSTR (suffix2, 'T[1-9]')
-    WHERE vl IN ('', 'T') AND suffix2 REGEXP 'T[1-9]'
-    """, parameters)
-
-    fix (cursor, "Incompatible hs and suffix2 for T reading", """
-    SELECT hs, anfadr, lekt, vl, suffix2
-    FROM {att}
-    WHERE hs REGEXP 'T[1-9]' AND hs NOT REGEXP suffix2
-    """, """
-    UPDATE {att}
-    SET lekt    = '',
-        vl      = REGEXP_SUBSTR (hs, 'T[1-9]'),
-        suffix2 = REGEXP_SUBSTR (hs, 'T[1-9]')
-    WHERE hs REGEXP 'T[1-9]'
-    """, parameters)
-
-    fix (cursor, "Wrong labez", """
-    SELECT labez, labezsuf, kapanf, count (*) AS anzahl FROM {att}
-    WHERE labez REGEXP '.[fo]'
-    GROUP BY labez, labezsuf, kapanf
-    ORDER BY labez, labezsuf, kapanf
-    """, """
-    UPDATE {att}
-    SET labez = SUBSTRING (labez, 1, 1),
-        labezsuf = SUBSTRING (labez, 2, 1)
-    WHERE labez REGEXP '.[fo]'
-    """, parameters)
-
-    dba.commit()
-
-    # Debug print domain of fields
-    for parameters['col'] in N_FIELDS:
-        debug (cursor, "Domain of {col}".format (**parameters), """
-        SELECT {col}, count (*) as Anzahl
-        FROM {att}
-        GROUP BY {col}
+        execute (conn, """
+        UPDATE {att}
+        SET lekt = korr, korr = ''
+        WHERE korr REGEXP '^L'
         """, parameters)
+
+        execute (conn, """
+        UPDATE {att}
+        SET korr = lekt, lekt = ''
+        WHERE lekt REGEXP '[C*]'
+        """, parameters)
+
+        execute (conn, """
+        UPDATE {att}
+        SET korr = '*'
+        WHERE korr = '' AND suffix2 REGEXP '[*]'
+        """, parameters)
+
+        execute (conn, """
+        UPDATE {att}
+        SET suff = 'S'
+        WHERE suff = '' AND suffix2 REGEXP 's'
+        """, parameters)
+
+        execute (conn, """
+        UPDATE {att}
+        SET lekt = REGEXP_SUBSTR (suffix2, 'L[1-9]')
+        WHERE lekt IN ('', 'L') AND suffix2 REGEXP 'L[1-9]'
+        """, parameters)
+
+        execute (conn, """
+        UPDATE {att}
+        SET korr = REGEXP_SUBSTR (suffix2, 'C[1-9*]')
+        WHERE korr IN ('', 'C') AND suffix2 REGEXP 'C[1-9*]'
+        """, parameters)
+
+        execute (conn, """
+        UPDATE {att}
+        SET vl = REGEXP_SUBSTR (suffix2, 'T[1-9]')
+        WHERE vl IN ('', 'T') AND suffix2 REGEXP 'T[1-9]'
+        """, parameters)
+
+        fix (conn, "Incompatible hs and suffix2 for T reading", """
+        SELECT hs, anfadr, lekt, vl, suffix2
+        FROM {att}
+        WHERE hs REGEXP 'T[1-9]' AND hs NOT REGEXP suffix2
+        """, """
+        UPDATE {att}
+        SET lekt    = '',
+            vl      = REGEXP_SUBSTR (hs, 'T[1-9]'),
+            suffix2 = REGEXP_SUBSTR (hs, 'T[1-9]')
+        WHERE hs REGEXP 'T[1-9]'
+        """, parameters)
+
+        fix (conn, "Wrong labez", """
+        SELECT labez, labezsuf, kapanf, count (*) AS anzahl FROM {att}
+        WHERE labez REGEXP '.[fo]'
+        GROUP BY labez, labezsuf, kapanf
+        ORDER BY labez, labezsuf, kapanf
+        """, """
+        UPDATE {att}
+        SET labez = SUBSTRING (labez, 1, 1),
+            labezsuf = SUBSTRING (labez, 2, 1)
+        WHERE labez REGEXP '.[fo]'
+        """, parameters)
+
+        # Debug print domain of fields
+        for col in N_FIELDS:
+            debug (conn, "Domain of {col}".format (col = col), """
+            SELECT {col}, count (*) as Anzahl
+            FROM {att}
+            GROUP BY {col}
+            """, dict (parameters, col = col))
 
 
 def step03 (dba, parameters):
@@ -503,69 +494,64 @@ def step05 (dba, parameters):
 
     message (1, "Step  5: Processing Duplicated Readings (T1, T2) ...")
 
-    cursor = dba.cursor()
+    with dba.engine.begin () as conn:
 
-    # T1 or T2 but not both
-    # promote to normal status by stripping T[1-9] from hs
-    execute (cursor, """
-    UPDATE {att} u
-    JOIN (
-      SELECT id
-      FROM {att}
-      WHERE hs REGEXP 'T[1-9]'
-      GROUP BY hsnr, anfadr, endadr
-      HAVING COUNT (*) = 1
-    ) AS t
-    ON u.id = t.id
-    SET hs = REGEXP_REPLACE (hs, 'T[1-9]', ''),
-        vl = '',
-        suffix2 = REGEXP_REPLACE (suffix2, 'T[1-9]', '')
-    """, parameters)
+        # T1 or T2 but not both
+        # promote to normal status by stripping T[1-9] from hs
+        execute (conn, """
+        UPDATE {att} u
+        JOIN (
+          SELECT id
+          FROM {att}
+          WHERE hs REGEXP 'T[1-9]'
+          GROUP BY hsnr, anfadr, endadr
+          HAVING COUNT (*) = 1
+        ) AS t
+        ON u.id = t.id
+        SET hs = REGEXP_REPLACE (hs, 'T[1-9]', ''),
+            vl = '',
+            suffix2 = REGEXP_REPLACE (suffix2, 'T[1-9]', '')
+        """, parameters)
 
-    # T1 and T2
-    # Original hand wrote both readings.
-    # Group both T readings into one and set labez = 'zw'.
-    execute (cursor, """
-    SELECT id, labez, labezsuf, CONCAT (hsnr, anfadr, endadr) AS k
-    FROM {att}
-    WHERE (hsnr, anfadr, endadr) IN (
-      SELECT DISTINCT hsnr, anfadr, endadr
-      FROM {att}
-      WHERE hs REGEXP 'T[1-9]'
-    )
-    ORDER BY k  /* key for itertools.groupby */
-    """, parameters)
+        # T1 and T2
+        # Original hand wrote both readings.
+        # Group both T readings into one and set labez = 'zw'.
+        res = execute (conn, """
+        SELECT id, labez, labezsuf, CONCAT (hsnr, anfadr, endadr) AS k
+        FROM {att}
+        WHERE (hsnr, anfadr, endadr) IN (
+          SELECT DISTINCT hsnr, anfadr, endadr
+          FROM {att}
+          WHERE hs REGEXP 'T[1-9]'
+        )
+        ORDER BY k  /* key for itertools.groupby */
+        """, parameters)
 
-    rows = cursor.fetchall ()
-    if len (rows):
-        for k, group in itertools.groupby (rows, operator.itemgetter (3)):
-            ids = []
-            labez = set ()
-            for row in group:
-                ids.append (six.text_type (row[0]))
-                labez.add (row[1] + ('_' + row[2] if row[2] else ''))
+        rows = res.fetchall ()
+        if len (rows):
+            for k, group in itertools.groupby (rows, operator.itemgetter (3)):
+                ids = []
+                labez = set ()
+                for row in group:
+                    ids.append (six.text_type (row[0]))
+                    labez.add (row[1] + ('_' + row[2] if row[2] else ''))
 
-            assert len (ids) > 1, "Programming error in T1, T2 processing."
+                assert len (ids) > 1, "Programming error in T1, T2 processing."
 
-            parameters['ids'] = ', '.join (ids[1:])
-            execute (cursor, """
-            DELETE FROM {att}
-            WHERE id IN ({ids})
-            """, parameters)
+                execute (conn, """
+                DELETE FROM {att}
+                WHERE id IN ({ids})
+                """, dict (parameters, ids = ', '.join (ids[1:])))
 
-            parameters['id'] = ids[0]
-            parameters['labezsuf'] = '/'.join (sorted (labez))
-            execute (cursor, """
-            UPDATE {att}
-            SET labez = 'zw',
-                labezsuf = '{labezsuf}',
-                hs = REGEXP_REPLACE (hs, 'T[1-9]', ''),
-                suffix2 = REGEXP_REPLACE (suffix2, 'T[1-9]', ''),
-                vl = ''
-            WHERE id = {id}
-            """, parameters)
-
-    dba.commit()
+                execute (conn, """
+                UPDATE {att}
+                SET labez = 'zw',
+                    labezsuf = '{labezsuf}',
+                    hs = REGEXP_REPLACE (hs, 'T[1-9]', ''),
+                    suffix2 = REGEXP_REPLACE (suffix2, 'T[1-9]', ''),
+                    vl = ''
+                WHERE id = {id}
+                """, dict (parameters, id = ids[0], labezsuf = '/'.join (sorted (labez))))
 
 
 def step06 (dba, parameters):
@@ -584,37 +570,36 @@ def step06 (dba, parameters):
         variierte Stelle ist. Wenn nicht, kann der Datensatz gelöscht werden.
 
     """
+
     message (1, "Step  6 : Delete later hands ...")
 
-    cursor = dba.cursor()
+    with dba.engine.begin () as conn:
 
-    for parameters['t'] in (parameters['att'], parameters['lac']):
-        # Delete all other readings if there is a C* reading.
-        for parameters['regexp'] in ('C[*]', ):
-            execute (cursor, """
+        for t in (parameters['att'], parameters['lac']):
+            # Delete all other readings if there is a C* reading.
+            for regexp in ('C[*]', ):
+                execute (conn, """
+                DELETE FROM {t}
+                WHERE (hsnr, anfadr, endadr) IN (
+                  SELECT hsnr, anfadr, endadr FROM (
+                    SELECT hsnr, anfadr, endadr
+                    FROM {t}
+                    WHERE suffix2 REGEXP '{regexp}'
+                  ) AS tmp
+                )
+                AND suffix2 NOT REGEXP '{regexp}'
+                """, dict (parameters, t = t, regexp = regexp))
+
+            execute (conn, """
             DELETE FROM {t}
-            WHERE (hsnr, anfadr, endadr) IN (
-              SELECT hsnr, anfadr, endadr FROM (
-                SELECT hsnr, anfadr, endadr
-                FROM {t}
-                WHERE suffix2 REGEXP '{regexp}'
-              ) AS tmp
-            )
-            AND suffix2 NOT REGEXP '{regexp}'
-            """, parameters)
+            WHERE (lekt = 'L2' OR korr IN ('C', 'C1', 'C2', 'C3', 'A', 'K'))
+              AND suffix2 NOT REGEXP 'C[*]'
+            """, dict (parameters, t = t))
 
-        execute (cursor, """
-        DELETE FROM {t}
-        WHERE (lekt = 'L2' OR korr IN ('C', 'C1', 'C2', 'C3', 'A', 'K'))
-          AND suffix2 NOT REGEXP 'C[*]'
-        """, parameters)
-
-        execute (cursor, """
-        DELETE FROM {t}
-        WHERE suffix2 REGEXP 'A|K|L2'
-        """, parameters)
-
-        dba.commit()
+            execute (conn, """
+            DELETE FROM {t}
+            WHERE suffix2 REGEXP 'A|K|L2'
+            """, dict (parameters, t = t))
 
 
 def step06b (dba, parameters):
@@ -638,69 +623,68 @@ def step06b (dba, parameters):
 
     message (1, "Step  6b: Delete [CLTV*] from HS ...")
 
-    cursor = dba.cursor()
+    with dba.engine.begin () as conn:
 
-    for parameters['t'] in (parameters['att'], parameters['lac']):
-        for parameters['regexp'] in ('C[1-9*]?', '[*]', '[LT][1-9]', 'V'):
-            # FIXME: MariaDB specific function REGEXP_REPLACE
-            execute (cursor, """
-            UPDATE {t}
-            SET hs = REGEXP_REPLACE (hs, '(?<=[0-9s]){regexp}', '')
-            WHERE hs REGEXP '(?<=[0-9s]){regexp}'
-            """, parameters)
-            execute (cursor, """
-            UPDATE {t}
-            SET suffix2 = REGEXP_REPLACE (suffix2, '{regexp}', '')
-            WHERE suffix2 REGEXP '{regexp}'
-            """, parameters)
+        for t in (parameters['att'], parameters['lac']):
+            for regexp in ('C[1-9*]?', '[*]', '[LT][1-9]', 'V'):
+                # FIXME: MariaDB specific function REGEXP_REPLACE
+                execute (conn, """
+                UPDATE {t}
+                SET hs = REGEXP_REPLACE (hs, '(?<=[0-9s]){regexp}', '')
+                WHERE hs REGEXP '(?<=[0-9s]){regexp}'
+                """, dict (parameters, t = t, regexp = regexp))
 
-    debug (cursor, "Hs with more than one hsnr", """
-    SELECT hs FROM (
-      SELECT DISTINCT hs, hsnr FROM {att}
-    ) AS tmp
-    GROUP BY hs
-    HAVING count (*) > 1
-    """, parameters)
+                execute (conn, """
+                UPDATE {t}
+                SET suffix2 = REGEXP_REPLACE (suffix2, '{regexp}', '')
+                WHERE suffix2 REGEXP '{regexp}'
+                """, dict (parameters, t = t, regexp = regexp))
 
-    # print some debug info
-    debug (cursor, "Suffix2 debug info", """
-    SELECT lekt, korr, suffix2, count (*) AS anzahl
-    FROM {att}
-    GROUP BY lekt, korr, suffix2
-    ORDER BY lekt, korr, suffix2
-    """, parameters)
+        debug (conn, "Hs with more than one hsnr", """
+        SELECT hs FROM (
+          SELECT DISTINCT hs, hsnr FROM {att}
+        ) AS tmp
+        GROUP BY hs
+        HAVING count (*) > 1
+        """, parameters)
 
-    # Debug hs where hs and suffix2 still mismatch
-    debug (cursor, "hs and suffix2 mismatch", """
-    SELECT hs, suffix2, anfadr, endadr, lesart
-    FROM {att}
-    WHERE hs NOT REGEXP suffix2
-    ORDER BY hs, anfadr
-    """, parameters)
+        # print some debug info
+        debug (conn, "Suffix2 debug info", """
+        SELECT lekt, korr, suffix2, count (*) AS anzahl
+        FROM {att}
+        GROUP BY lekt, korr, suffix2
+        ORDER BY lekt, korr, suffix2
+        """, parameters)
 
-    # execute (cursor, """
-    # UPDATE {t}
-    # SET hs = CONCAT (hs, suffix2)
-    # WHERE hs NOT REGEXP CONCAT(suffix2, '$')
-    # """, parameters)
+        # Debug hs where hs and suffix2 still mismatch
+        debug (conn, "hs and suffix2 mismatch", """
+        SELECT hs, suffix2, anfadr, endadr, lesart
+        FROM {att}
+        WHERE hs NOT REGEXP suffix2
+        ORDER BY hs, anfadr
+        """, parameters)
 
-    fix (cursor, "Hsnr with more than one hs", """
-    SELECT hsnr FROM (
-      SELECT DISTINCT hs, hsnr FROM {att}
-    ) AS tmp
-    GROUP BY hsnr
-    HAVING count (*) > 1
-    """, """
-    UPDATE
-        {att} t
-    JOIN
-      (SELECT min(hs) AS minhs, hsnr FROM {att} GROUP BY hsnr ORDER BY hs) AS g
-    ON
-      t.hsnr = g.hsnr
-    SET t.hs = g.minhs
-    """, parameters)
+        # execute (conn, """
+        # UPDATE {t}
+        # SET hs = CONCAT (hs, suffix2)
+        # WHERE hs NOT REGEXP CONCAT(suffix2, '$')
+        # """, parameters)
 
-    dba.commit()
+        fix (conn, "Hsnr with more than one hs", """
+        SELECT hsnr FROM (
+          SELECT DISTINCT hs, hsnr FROM {att}
+        ) AS tmp
+        GROUP BY hsnr
+        HAVING count (*) > 1
+        """, """
+        UPDATE
+            {att} t
+        JOIN
+          (SELECT min(hs) AS minhs, hsnr FROM {att} GROUP BY hsnr ORDER BY hs) AS g
+        ON
+          t.hsnr = g.hsnr
+        SET t.hs = g.minhs
+        """, parameters)
 
 
 def step07 (dba, parameters):
@@ -717,25 +701,22 @@ def step07 (dba, parameters):
 
     message (1, "Step  7 : Fix 'zw' ...")
 
-    cursor = dba.cursor()
+    with dba.engine.begin () as conn:
 
-    execute (cursor, "SELECT id, labezsuf FROM {att} WHERE labez = 'zw'", parameters)
+        res = execute (conn, "SELECT id, labezsuf FROM {att} WHERE labez = 'zw'", parameters)
 
-    updated = 0
-    for row in cursor.fetchall ():
-        labezsuf = row[1]
-        unique_labez_suffixes = tuple (set ([suf[0] for suf in labezsuf.split ('/')]))
-        if len (unique_labez_suffixes) == 1:
-            parameters['id'] = row[0]
-            parameters['labez'] = unique_labez_suffixes[0]
-            execute (cursor, """
-            UPDATE {att}
-            SET labez = %(labez)s, labezsuf = ''
-            WHERE id = %(id)s
-            """, parameters, 4)
-            updated += 1
+        updated = 0
+        for row in res:
+            labezsuf = row[1]
+            unique_labez_suffixes = tuple (set ([suf[0] for suf in labezsuf.split ('/')]))
+            if len (unique_labez_suffixes) == 1:
+                execute (conn, """
+                UPDATE {att}
+                SET labez = :labez, labezsuf = ''
+                WHERE id = :id
+                """, dict (parameters, id = row[0], labez = unique_labez_suffixes[0]), 4)
+                updated += 1
 
-    dba.commit()
     message (2, "          %d zw labez updated" % updated)
 
 
@@ -765,38 +746,37 @@ def step08 (dba, parameters):
 
     message (1, "Step  5 : Delete passages without variants ...")
 
-    cursor = dba.cursor()
+    with dba.engine.begin () as conn:
 
-    # Save number of invariants per manuscript
-    # execute (cursor, """
-    # INSERT INTO {inv} (hs, hsnr, n)
-    #   SELECT hs, hsnr, count (*) as n
-    #   FROM {att}
-    #   WHERE (anfadr, endadr) IN (
-    #     SELECT anfadr, endadr
-    #     FROM {att}
-    #     WHERE labez NOT REGEXP '^z' OR labezsuf NOT REGEXP 'f|o'
-    #     GROUP BY anfadr, endadr, labez
-    #     HAVING count (*) = 1
-    #   )
-    #   GROUP BY hs, hsnr
-    # """, parameters)
+        # Save number of invariants per manuscript
+        # execute (conn, """
+        # INSERT INTO {inv} (hs, hsnr, n)
+        #   SELECT hs, hsnr, count (*) as n
+        #   FROM {att}
+        #   WHERE (anfadr, endadr) IN (
+        #     SELECT anfadr, endadr
+        #     FROM {att}
+        #     WHERE labez NOT REGEXP '^z' OR labezsuf NOT REGEXP 'f|o'
+        #     GROUP BY anfadr, endadr, labez
+        #     HAVING count (*) = 1
+        #   )
+        #   GROUP BY hs, hsnr
+        # """, parameters)
 
 
-    # We need a nested subquery to avoid MySQL limitations. See:
-    # https://dev.mysql.com/doc/refman/5.7/en/subquery-restrictions.html
-    execute (cursor, """
-    DELETE FROM {att} WHERE (anfadr, endadr) IN (
-      SELECT anfadr, endadr FROM (
-        SELECT DISTINCT anfadr, endadr, labez
-        FROM {att} AS att
-        WHERE labez NOT REGEXP '^z' AND labezsuf NOT REGEXP 'f|o'
-      ) AS a
-      GROUP BY anfadr, endadr
-      HAVING count (*) > 1;
-    )
-    """, parameters)
-    dba.commit()
+        # We need a nested subquery to avoid MySQL limitations. See:
+        # https://dev.mysql.com/doc/refman/5.7/en/subquery-restrictions.html
+        execute (conn, """
+        DELETE FROM {att} WHERE (anfadr, endadr) IN (
+          SELECT anfadr, endadr FROM (
+            SELECT DISTINCT anfadr, endadr, labez
+            FROM {att} AS att
+            WHERE labez NOT REGEXP '^z' AND labezsuf NOT REGEXP 'f|o'
+          ) AS a
+          GROUP BY anfadr, endadr
+          HAVING count (*) > 1;
+        )
+        """, parameters)
 
 
 def step09 (dba, parameters):
@@ -818,79 +798,75 @@ def step09 (dba, parameters):
 
     message (1, "Step  9 : Create Lacunae Table ...")
 
-    cursor = dba.cursor()
+    with dba.engine.begin () as conn:
 
-    # First clean up the lacunae table as any errors there will be multiplied by
-    # this step.  Delete inner lacunae from nested lacunae.
+        # First clean up the lacunae table as any errors there will be multiplied by
+        # this step.  Delete inner lacunae from nested lacunae.
 
-    fix (cursor, "nested lacunae", """
-    SELECT lac.id, lac.hs, lac.anfadr, lac.endadr
-    FROM {lac} AS lac
-    JOIN (
-      SELECT MIN (a.id) as id, a.hs, a.anfadr, a.endadr
-      FROM {lac} a
-      JOIN {lac} b
-      WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
-      GROUP BY a.hs, a.anfadr, a.endadr
-      HAVING count (*) > 1
-      ORDER BY hs, anfadr, endadr DESC
-    ) AS t
-    WHERE lac.hs = t.hs
-      AND lac.anfadr >= t.anfadr
-      AND lac.endadr <= t.endadr
-    """, """
-    DELETE lac
-    FROM {lac} lac
-    JOIN (
-      SELECT MIN (a.id) as id, a.hs, a.anfadr, a.endadr
-      FROM {lac} a
-      JOIN {lac} b
-      WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
-      GROUP BY a.hs, a.anfadr, a.endadr
-      HAVING count (*) > 1
-      ORDER BY hs, anfadr, endadr DESC
-    ) AS t
-    WHERE lac.hs = t.hs
-      AND lac.anfadr >= t.anfadr
-      AND lac.endadr <= t.endadr
-      AND lac.id <> t.id
-    """, parameters)
+        fix (conn, "nested lacunae", """
+        SELECT lac.id, lac.hs, lac.anfadr, lac.endadr
+        FROM {lac} AS lac
+        JOIN (
+          SELECT MIN (a.id) as id, a.hs, a.anfadr, a.endadr
+          FROM {lac} a
+          JOIN {lac} b
+          WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
+          GROUP BY a.hs, a.anfadr, a.endadr
+          HAVING count (*) > 1
+          ORDER BY hs, anfadr, endadr DESC
+        ) AS t
+        WHERE lac.hs = t.hs
+          AND lac.anfadr >= t.anfadr
+          AND lac.endadr <= t.endadr
+        """, """
+        DELETE lac
+        FROM {lac} lac
+        JOIN (
+          SELECT MIN (a.id) as id, a.hs, a.anfadr, a.endadr
+          FROM {lac} a
+          JOIN {lac} b
+          WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
+          GROUP BY a.hs, a.anfadr, a.endadr
+          HAVING count (*) > 1
+          ORDER BY hs, anfadr, endadr DESC
+        ) AS t
+        WHERE lac.hs = t.hs
+          AND lac.anfadr >= t.anfadr
+          AND lac.endadr <= t.endadr
+          AND lac.id <> t.id
+        """, parameters)
 
-    dba.commit()
+        # Create a 'zz' reading in att for each passage in a lacuna that doesn't
+        # alrady have a text reading in att.
 
-    # Create a 'zz' reading in att for each passage in a lacuna that doesn't
-    # alrady have a text reading in att.
+        message (2, "Step  9 : Add 'zz' readings for lacunae ...")
 
-    message (2, "Step  9 : Add 'zz' readings for lacunae ...")
+        execute (conn, """
+        INSERT INTO {att} (buch, kapanf, versanf, wortanf, kapend, versend, wortend,
+                              anfadr, endadr, hs, hsnr, anfalt, endalt, labez, labezsuf,
+                              lemma, lesart)
+        SELECT p.buch, p.kapanf, p.versanf, p.wortanf, p.kapend, p.versend, p.wortend,
+               p.anfadr, p.endadr, lac.hs, lac.hsnr, p.anfadr, p.endadr, 'zz', 'lac',
+               '', 'lac'
+          FROM
+            /* all passages */
+            {pass} p
 
-    execute (cursor, """
-    INSERT INTO {att} (buch, kapanf, versanf, wortanf, kapend, versend, wortend,
-                          anfadr, endadr, hs, hsnr, anfalt, endalt, labez, labezsuf,
-                          lemma, lesart)
-    SELECT p.buch, p.kapanf, p.versanf, p.wortanf, p.kapend, p.versend, p.wortend,
-           p.anfadr, p.endadr, lac.hs, lac.hsnr, p.anfadr, p.endadr, 'zz', 'lac',
-           '', 'lac'
-      FROM
-        /* all passages */
-        {pass} p
+          JOIN
+            /* all lacunae */
+            {lac} lac
 
-      JOIN
-        /* all lacunae */
-        {lac} lac
+          ON p.anfadr >= lac.anfadr AND p.endadr <= lac.endadr
 
-      ON p.anfadr >= lac.anfadr AND p.endadr <= lac.endadr
+          LEFT JOIN
+            /* negated join on all witnessed passages */
+            {att} t
 
-      LEFT JOIN
-        /* negated join on all witnessed passages */
-        {att} t
+          ON lac.hs = t.hs AND p.anfadr = t.anfadr AND p.endadr = t.endadr
 
-      ON lac.hs = t.hs AND p.anfadr = t.anfadr AND p.endadr = t.endadr
+          WHERE t.id IS NULL
 
-      WHERE t.id IS NULL
-
-    """, parameters)
-
-    dba.commit()
+        """, parameters)
 
 
 def step09_numpy (dba, parameters):
@@ -910,114 +886,125 @@ def step09_numpy (dba, parameters):
 
     message (1, "Step  9 : Create Labez Table ...")
 
-    cursor = dba.cursor ()
+    with dba.engine.begin () as conn:
 
-    # First clean up the lacunae table as any errors there will be multiplied by
-    # this step.  Delete inner lacunae from nested lacunae.
+        # First clean up the lacunae table as any errors there will be multiplied by
+        # this step.  Delete inner lacunae from nested lacunae.
 
-    fix (cursor, "nested lacunae", """
-    SELECT lac.id, lac.hs, lac.anfadr, lac.endadr
-    FROM {lac} AS lac
-    JOIN (
-      SELECT MIN (a.id) as id, a.hs, a.anfadr, a.endadr
-      FROM {lac} a
-      JOIN {lac} b
-      WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
-      GROUP BY a.hs, a.anfadr, a.endadr
-      HAVING count (*) > 1
-      ORDER BY hs, anfadr, endadr DESC
-    ) AS t
-    WHERE lac.hs = t.hs
-      AND lac.anfadr >= t.anfadr
-      AND lac.endadr <= t.endadr
-    """, """
-    DELETE lac
-    FROM {lac} lac
-    JOIN (
-      SELECT MIN (a.id) as id, a.hs, a.anfadr, a.endadr
-      FROM {lac} a
-      JOIN {lac} b
-      WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
-      GROUP BY a.hs, a.anfadr, a.endadr
-      HAVING count (*) > 1
-      ORDER BY hs, anfadr, endadr DESC
-    ) AS t
-    WHERE lac.hs = t.hs
-      AND lac.anfadr >= t.anfadr
-      AND lac.endadr <= t.endadr
-      AND lac.id <> t.id
-    """, parameters)
+        fix (conn, "nested lacunae", """
+        SELECT lac.id, lac.hs, lac.anfadr, lac.endadr
+        FROM {lac} AS lac
+        JOIN (
+          SELECT MIN (a.id) as id, a.hs, a.anfadr, a.endadr
+          FROM {lac} a
+          JOIN {lac} b
+          WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
+          GROUP BY a.hs, a.anfadr, a.endadr
+          HAVING count (*) > 1
+          ORDER BY hs, anfadr, endadr DESC
+        ) AS t
+        WHERE lac.hs = t.hs
+          AND lac.anfadr >= t.anfadr
+          AND lac.endadr <= t.endadr
+        """, """
+        DELETE lac
+        FROM {lac} lac
+        JOIN (
+          SELECT MIN (a.id) as id, a.hs, a.anfadr, a.endadr
+          FROM {lac} a
+          JOIN {lac} b
+          WHERE a.hs = b.hs AND a.anfadr <= b.anfadr AND a.endadr >= b.endadr
+          GROUP BY a.hs, a.anfadr, a.endadr
+          HAVING count (*) > 1
+          ORDER BY hs, anfadr, endadr DESC
+        ) AS t
+        WHERE lac.hs = t.hs
+          AND lac.anfadr >= t.anfadr
+          AND lac.endadr <= t.endadr
+          AND lac.id <> t.id
+        """, parameters)
 
-    dba.commit()
+        execute (conn, """
+        TRUNCATE {labez}
+        """, parameters)
 
-    execute (cursor, """
-    TRUNCATE {lab}
-    """, parameters)
+        # unroll lacunae.  All lacunae get a labez of 0.
+        execute (conn, """
+        INSERT INTO {labez} (ms_id, pass_id, labez)
+        SELECT ms.id, p.id, 0
+          FROM
+            {lac} lac
+          JOIN
+            {pass} p
+          JOIN
+            {ms} ms
 
-    # unroll lacunae
-    execute (cursor, """
-    INSERT INTO {lab} (ms_id, pass_id, labez)
-    SELECT ms.id, p.id, 0
-      FROM
-        {lac} lac
-      JOIN
-        {pass} p
-      JOIN
-        {ms} ms
+          ON p.anfadr >= lac.anfadr AND p.endadr <= lac.endadr
+             AND ms.hsnr = lac.hsnr
+        """, parameters)
 
-      ON p.anfadr >= lac.anfadr AND p.endadr <= lac.endadr
-         AND ms.hsnr = lac.hsnr
-    """, parameters)
+        # copy labez eventually overwriting lacunae
+        execute (conn, """
+        REPLACE INTO {labez} (ms_id, pass_id, labez, labezsuf)
+        SELECT ms.id, p.id, ord (att.labez) - 96, labezsuf
+          FROM
+            {att} att
+          JOIN
+            {pass} p
+          JOIN
+            {ms} ms
 
-    # copy labez eventually overwriting lacunae
-    execute (cursor, """
-    REPLACE INTO {lab} (ms_id, pass_id, labez)
-    SELECT ms.id, p.id, ord (att.labez) - 96
-      FROM
-        {att} att
-      JOIN
-        {pass} p
-      JOIN
-        {ms} ms
-
-      ON p.anfadr = att.anfadr AND p.endadr = att.endadr
-         AND ms.hsnr = att.hsnr
-    """, parameters)
+          ON p.anfadr = att.anfadr AND p.endadr = att.endadr
+             AND ms.hsnr = att.hsnr
+        """, parameters)
 
 
-    # finally fix the 'Fehlverse'
-    #
-    # As of here all Fehlverse are marked with the labez of manuscript 'A' which
-    # may be incorrect.  Actually all Fehlverse are correctly marked 'zu' in
-    # 'A', so we might get away with doing nothing.
+        # fill with the labez of A
+        execute (conn, """
+        INSERT IGNORE INTO {labez} (ms_id, pass_id, labez, labezsuf)
+        SELECT ms.id, p.id, ord (att.labez) - 96, labezsuf
+          FROM
+            {att} att
+          JOIN
+            {pass} p
+          JOIN
+            {ms} ms
 
-    # FIXME: I don't really understand what is wanted here.
+          ON p.anfadr = att.anfadr AND p.endadr = att.endadr
+             AND att.hsnr = 0
+        """, parameters)
 
-    # execute (cursor, """
-    # UPDATE {lab} lab
-    # JOIN
-    #   {att} att
-    # JOIN
-    #   (SELECT * FROM {pass} WHERE comp AND fehlvers)
-    #   AS p
-    # JOIN
-    #   {ms} ms
-    # ON lab.ms_id = ms.id AND
-    #    lab.pass_id = p.id AND
-    #    p.anfadr = att.anfadr AND p.endadr = att.endadr
-    #    AND ms.hsnr = att.hsnr
-    #    AND att.base = 'a'
-    # SET lab.labez = 0
-    # """, parameters)
+        # finally fix the 'Fehlverse'
+        #
+        # As of here all Fehlverse are marked with the labez of manuscript 'A' which
+        # may be incorrect.  Actually all Fehlverse are correctly marked 'zu' in
+        # 'A', so we might get away with doing nothing.
 
-    # fix 'z' readings
-    execute (cursor, """
-    UPDATE {lab}
-    SET labez = 0
-    WHERE labez = 26
-    """, parameters)
+        # FIXME: I don't really understand what is wanted here.
 
-    dba.commit()
+        # execute (conn, """
+        # UPDATE {labez} lab
+        # JOIN
+        #   {att} att
+        # JOIN
+        #   (SELECT * FROM {pass} WHERE comp AND fehlvers)
+        #   AS p
+        # JOIN
+        #   {ms} ms
+        # ON lab.ms_id = ms.id AND
+        #    lab.pass_id = p.id AND
+        #    p.anfadr = att.anfadr AND p.endadr = att.endadr
+        #    AND ms.hsnr = att.hsnr
+        #    AND att.base = 'a'
+        # SET lab.labez = 0
+        # """, parameters)
+
+        # fix 'z' readings
+        execute (conn, """
+        UPDATE {labez}
+        SET labez = 0
+        WHERE labez = 26
+        """, parameters)
 
 
 def step10 (dba, parameters):
@@ -1047,46 +1034,43 @@ def step10 (dba, parameters):
 
     message (1, "Step 10: Add 'a' readings ...")
 
-    cursor = dba.cursor()
+    with dba.engine.begin () as conn:
 
-    execute (cursor, """
-    INSERT INTO {att} (hsnr, hs, anfadr, endadr, buch, kapanf, versanf, wortanf,
-                          kapend, versend, wortend, labez, labezsuf, anfalt, endalt,
-                          lesart, base, comp)
-    SELECT hs.hsnr, hs.hs, a.anfadr, a.endadr, a.buch, a.kapanf, a.versanf, a.wortanf,
-           a.kapend, a.versend, a.wortend, a.labez, a.labezsuf, a.anfalt, a.endalt,
-           a.lesart, a.base, a.comp
-    FROM
-      /* all passages from A */
-      (SELECT * FROM {att} WHERE hs = 'A') AS a
+        execute (conn, """
+        INSERT INTO {att} (hsnr, hs, anfadr, endadr, buch, kapanf, versanf, wortanf,
+                              kapend, versend, wortend, labez, labezsuf, anfalt, endalt,
+                              lesart, base, comp)
+        SELECT hs.hsnr, hs.hs, a.anfadr, a.endadr, a.buch, a.kapanf, a.versanf, a.wortanf,
+               a.kapend, a.versend, a.wortend, a.labez, a.labezsuf, a.anfalt, a.endalt,
+               a.lesart, a.base, a.comp
+        FROM
+          /* all passages from A */
+          (SELECT * FROM {att} WHERE hs = 'A') AS a
 
-    JOIN
-      /* all manuscripts */
-      (SELECT DISTINCT hs, hsnr FROM {att} WHERE hs <> 'A') AS hs
+        JOIN
+          /* all manuscripts */
+          (SELECT DISTINCT hs, hsnr FROM {att} WHERE hs <> 'A') AS hs
 
-    LEFT JOIN
-      /* negated join on all witnessed passages */
-      {att} t
+        LEFT JOIN
+          /* negated join on all witnessed passages */
+          {att} t
 
-    ON t.hs = hs.hs AND t.anfadr = a.anfadr AND t.endadr = a.endadr
+        ON t.hs = hs.hs AND t.anfadr = a.anfadr AND t.endadr = a.endadr
 
-    WHERE t.id IS NULL
+        WHERE t.id IS NULL
 
-    """, parameters)
-    dba.commit()
+        """, parameters)
 
-    debug (cursor, "Manuscripts with duplicated passages", """
-    SELECT hs, anfadr, endadr FROM {att} GROUP BY hs, anfadr, endadr HAVING COUNT (*) > 1
-    """, parameters)
+        debug (conn, "Manuscripts with duplicated passages", """
+        SELECT hs, anfadr, endadr FROM {att} GROUP BY hs, anfadr, endadr HAVING COUNT (*) > 1
+        """, parameters)
 
-    parameters['fehlverse'] = db.FEHLVERSE
-    execute (cursor, """
-    UPDATE {att}
-    SET labez = 'zu', lesart = ''
-    WHERE comp = 'x' AND base = 'a' AND {fehlverse}
-    """, parameters)
-
-    dba.commit()
+        parameters['fehlverse'] = db.FEHLVERSE
+        execute (conn, """
+        UPDATE {att}
+        SET labez = 'zu', lesart = ''
+        WHERE comp = 'x' AND base = 'a' AND {fehlverse}
+        """, parameters)
 
 
 def step11 (dba, parameters):
@@ -1108,8 +1092,6 @@ def step11 (dba, parameters):
 
     message (1, "Step 11 : Create ActsMsList ...")
 
-    cursor = dba.cursor ()
-    dba.commit ()
 
 
 def step20 (dba, parameters):
@@ -1139,100 +1121,91 @@ def step20 (dba, parameters):
 
     message (1, "Step 20 : Fill PreCo Tables ...")
 
-    cursor = dba.cursor ()
+    with dba.engine.begin () as conn:
 
-    execute (cursor, """
-    TRUNCATE {vp}
-    """, parameters)
+        execute (conn, """
+        TRUNCATE {vp}
+        """, parameters)
 
-    execute (cursor, """
-    INSERT INTO {vp} (anfadr, endadr)
-    SELECT DISTINCT anfadr, endadr
-    FROM {att}
-    """, parameters)
+        execute (conn, """
+        INSERT INTO {vp} (anfadr, endadr)
+        SELECT DISTINCT anfadr, endadr
+        FROM {att}
+        """, parameters)
 
-    dba.commit ()
+        execute (conn, """
+        TRUNCATE {rdg}
+        """, parameters)
 
-    execute (cursor, """
-    TRUNCATE {rdg}
-    """, parameters)
+        execute (conn, """
+        INSERT INTO {rdg} (anfadr, endadr, labez, labezsuf, lesart)
+        SELECT DISTINCT anfadr, endadr, labez, labezsuf, lesart
+        FROM {att}
+        WHERE labez NOT REGEXP '^z[u-z]'
+        """, parameters)
 
-    execute (cursor, """
-    INSERT INTO {rdg} (anfadr, endadr, labez, labezsuf, lesart)
-    SELECT DISTINCT anfadr, endadr, labez, labezsuf, lesart
-    FROM {att}
-    WHERE labez NOT REGEXP '^z[u-z]'
-    """, parameters)
+        # delete all readings with labezsuf if there is an equivalent reading
+        # without labezsuf
 
-    dba.commit ()
+        execute (conn, """
+        DELETE FROM {rdg}
+        WHERE (anfadr, endadr, labez) IN (
+          SELECT anfadr, endadr, labez FROM (
+            SELECT DISTINCT anfadr, endadr, labez
+            FROM {rdg}
+            WHERE labezsuf = ''
+          ) AS tmp
+        ) AND labezsuf <> ''
+        """, parameters)
 
-    # delete all readings with labezsuf if there is an equivalent reading
-    # without labezsuf
+        # FIXME: why are there multiple 'a' readings for some passages?
+        #
+        # According to Münster these are legitimate entries.  They still have to
+        # figure out how to handle these.  For the time being we keep only one
+        # reading and delete the rest.
+        #
+        # Delete duplicate readings.
+        # Examples:
+        # | anfadr   | endadr   | labez | labezsuf | lesart
+        # +----------+----------+-------+----------+-------------
+        # | 52333010 | 52333010 | a     |          | καισαρειαν
+        # | 52333010 | 52333010 | a     |          | om
+        # | 52621002 | 52621002 | a     |          | ενεκα
+        # | 52621002 | 52621002 | a     |          | om
+        # | 52816006 | 52816006 | a     |          | εισηλθομεν
+        # | 52816006 | 52816006 | a     |          | εισηλ[θομεν]
+        # | 52816006 | 52816006 | a     |          | εισ̣[ηλθομεν]
 
-    execute (cursor, """
-    DELETE FROM {rdg}
-    WHERE (anfadr, endadr, labez) IN (
-      SELECT anfadr, endadr, labez FROM (
-        SELECT DISTINCT anfadr, endadr, labez
-        FROM {rdg}
-        WHERE labezsuf = ''
-      ) AS tmp
-    ) AND labezsuf <> ''
-    """, parameters)
+        execute (conn, """
+        DELETE d
+        FROM {rdg} d
+        JOIN (
+          SELECT id, anfadr, endadr, labez FROM (
+            /* min makes sure we keep the entry with the lowest id */
+            SELECT min (id) as id, anfadr, endadr, labez
+            FROM {rdg}
+            GROUP BY anfadr, endadr, labez
+            HAVING count (*) > 1
+          ) AS tmp
+        ) t
+        ON d.anfadr = t.anfadr
+          AND d.endadr = t.endadr
+          AND d.labez = t.labez
+          AND d.id <> t.id
+        """, parameters)
 
-    dba.commit ()
+        # FIXME: the witn table is superfluous as it contains the same rows as att
 
-    # FIXME: why are there multiple 'a' readings for some passages?
-    #
-    # According to Münster these are legitimate entries.  They still have to
-    # figure out how to handle these.  For the time being we keep only one
-    # reading and delete the rest.
-    #
-    # Delete duplicate readings.
-    # Examples:
-    # | anfadr   | endadr   | labez | labezsuf | lesart
-    # +----------+----------+-------+----------+-------------
-    # | 52333010 | 52333010 | a     |          | καισαρειαν
-    # | 52333010 | 52333010 | a     |          | om
-    # | 52621002 | 52621002 | a     |          | ενεκα
-    # | 52621002 | 52621002 | a     |          | om
-    # | 52816006 | 52816006 | a     |          | εισηλθομεν
-    # | 52816006 | 52816006 | a     |          | εισηλ[θομεν]
-    # | 52816006 | 52816006 | a     |          | εισ̣[ηλθομεν]
+        execute (conn, """
+        TRUNCATE {witn}
+        """, parameters)
 
-    execute (cursor, """
-    DELETE d
-    FROM {rdg} d
-    JOIN (
-      SELECT id, anfadr, endadr, labez FROM (
-        /* min makes sure we keep the entry with the lowest id */
-        SELECT min (id) as id, anfadr, endadr, labez
-        FROM {rdg}
-        GROUP BY anfadr, endadr, labez
-        HAVING count (*) > 1
-      ) AS tmp
-    ) t
-    ON d.anfadr = t.anfadr
-      AND d.endadr = t.endadr
-      AND d.labez = t.labez
-      AND d.id <> t.id
-    """, parameters)
+        execute (conn, """
+        INSERT INTO {witn} (anfadr, endadr, labez, labezsuf, hsnr, hs)
+        SELECT DISTINCT anfadr, endadr, labez, labezsuf, hsnr, hs
+        FROM {att}
+        """, parameters)
 
-    dba.commit ()
-
-    # FIXME: the witn table is superfluous as it contains the same rows as att
-
-    execute (cursor, """
-    TRUNCATE {witn}
-    """, parameters)
-
-    execute (cursor, """
-    INSERT INTO {witn} (anfadr, endadr, labez, labezsuf, hsnr, hs)
-    SELECT DISTINCT anfadr, endadr, labez, labezsuf, hsnr, hs
-    FROM {att}
-    """, parameters)
-
-    dba.commit ()
 
 
 def step21 (dba, parameters):
@@ -1294,117 +1267,110 @@ def step21 (dba, parameters):
 
     message (1, "Step 21 : Find Byzantine Text ...")
 
-    cursor = dba.cursor ()
+    with dba.engine.begin () as conn:
 
-    parameters['byzlist'] = db.BYZ_HSNR
+        parameters['byzlist'] = db.BYZ_HSNR
 
-    # FIXME: we don't really need this table
-    execute (cursor, """
-    UPDATE {vp} AS u
-    JOIN (
-      SELECT anfadr, endadr, count (*) as anzahl
-      FROM {witn}
-      WHERE hsnr IN {byzlist}
-        AND labez NOT REGEXP '^z[u-z]'
-      GROUP BY anfadr, endadr
-    ) AS s
-    ON (u.anfadr, u.endadr) = (s.anfadr, s.endadr)
-    SET u.bzdef = s.anzahl
-    """, parameters)
+        # FIXME: we don't really need this table
+        execute (conn, """
+        UPDATE {vp} AS u
+        JOIN (
+          SELECT anfadr, endadr, count (*) as anzahl
+          FROM {witn}
+          WHERE hsnr IN {byzlist}
+            AND labez NOT REGEXP '^z[u-z]'
+          GROUP BY anfadr, endadr
+        ) AS s
+        ON (u.anfadr, u.endadr) = (s.anfadr, s.endadr)
+        SET u.bzdef = s.anzahl
+        """, parameters)
 
-    dba.commit ()
+        execute (conn, """
+        UPDATE {rdg} AS u
+        JOIN (
+          SELECT anfadr, endadr, count (*) as anzahl
+          FROM {witn}
+          WHERE hsnr IN {byzlist}
+            AND labez NOT REGEXP '^z[u-z]'
+          GROUP BY anfadr, endadr
+        ) AS s
+        ON (u.anfadr, u.endadr) = (s.anfadr, s.endadr)
+        SET u.bzdef = s.anzahl
+        """, parameters)
 
-    execute (cursor, """
-    UPDATE {rdg} AS u
-    JOIN (
-      SELECT anfadr, endadr, count (*) as anzahl
-      FROM {witn}
-      WHERE hsnr IN {byzlist}
-        AND labez NOT REGEXP '^z[u-z]'
-      GROUP BY anfadr, endadr
-    ) AS s
-    ON (u.anfadr, u.endadr) = (s.anfadr, s.endadr)
-    SET u.bzdef = s.anzahl
-    """, parameters)
+        execute (conn, """
+        UPDATE {rdg} AS u
+        JOIN (
+          SELECT anfadr, endadr, labez, count (*) as anzahl
+          FROM {witn}
+          WHERE hsnr IN {byzlist}
+            AND labez NOT REGEXP '^z[u-z]'
+          GROUP BY anfadr, endadr, labez
+        ) AS s
+        ON (u.anfadr, u.endadr, u.labez) = (s.anfadr, s.endadr, s.labez)
+        SET u.bz = s.anzahl
+        """, parameters)
 
-    execute (cursor, """
-    UPDATE {rdg} AS u
-    JOIN (
-      SELECT anfadr, endadr, labez, count (*) as anzahl
-      FROM {witn}
-      WHERE hsnr IN {byzlist}
-        AND labez NOT REGEXP '^z[u-z]'
-      GROUP BY anfadr, endadr, labez
-    ) AS s
-    ON (u.anfadr, u.endadr, u.labez) = (s.anfadr, s.endadr, s.labez)
-    SET u.bz = s.anzahl
-    """, parameters)
+        # debug info
 
-    dba.commit ()
+        debug (conn, "Byzantine Variant Passages", """
+        SELECT bzdef, count (*) AS anzahl FROM {vp} GROUP BY bzdef
+        """, parameters)
 
-    # debug info
+        debug (conn, "Byzantine Readings", """
+        SELECT bz, count (*) AS anzahl FROM {rdg} GROUP BY bz
+        """, parameters)
 
-    debug (cursor, "Byzantine Variant Passages", """
-    SELECT bzdef, count (*) AS anzahl FROM {vp} GROUP BY bzdef
-    """, parameters)
+        # mindestens 6
+        execute (conn, """
+        UPDATE {rdg}
+        SET byz = 'B'
+        WHERE bzdef = 7 AND bz >= 6
+        """, parameters)
 
-    debug (cursor, "Byzantine Readings", """
-    SELECT bz, count (*) AS anzahl FROM {rdg} GROUP BY bz
-    """, parameters)
+        # 5 und 2 unterschiedliche
+        execute (conn, """
+        UPDATE {rdg}
+        SET byz = 'B'
+        WHERE (anfadr, endadr, bz) IN (
+          SELECT anfadr, endadr, 5 FROM (
+            SELECT anfadr, endadr
+            FROM {rdg}
+            WHERE bzdef = 7 AND bz IN (5, 1)
+            GROUP BY anfadr, endadr
+            HAVING count (*) = 3
+          ) AS t
+        )
+        """, parameters)
 
-    # mindestens 6
-    execute (cursor, """
-    UPDATE {rdg}
-    SET byz = 'B'
-    WHERE bzdef = 7 AND bz >= 6
-    """, parameters)
+        # Build the fake manuscript 'MT' that contains our reconstructed Byzantine
+        # text
 
-    # 5 und 2 unterschiedliche
-    execute (cursor, """
-    UPDATE {rdg}
-    SET byz = 'B'
-    WHERE (anfadr, endadr, bz) IN (
-      SELECT anfadr, endadr, 5 FROM (
-        SELECT anfadr, endadr
-        FROM {rdg}
-        WHERE bzdef = 7 AND bz IN (5, 1)
-        GROUP BY anfadr, endadr
-        HAVING count (*) = 3
-      ) AS t
-    )
-    """, parameters)
+        execute (conn, """
+        DELETE FROM {att} WHERE hs = 'MT'
+        """, parameters)
 
-    dba.commit ()
+        execute (conn, """
+        INSERT INTO {att} (hsnr, hs, anfadr, endadr, buch, kapanf, versanf, wortanf,
+                           kapend, versend, wortend, labez, labezsuf, lesart)
+        SELECT 1, 'MT', a.anfadr, a.endadr, a.buch, a.kapanf, a.versanf, a.wortanf,
+               a.kapend, a.versend, a.wortend, r.labez, r.labezsuf, r.lesart
+        FROM {target_db}.Passages a
+        JOIN {rdg} r
+        ON (a.anfadr, a.endadr, 'B') = (r.anfadr, r.endadr, r.byz)
+        """, parameters)
 
-    # Build the fake manuscript 'MT' that contains our reconstructed Byzantine
-    # text
+        execute (conn, """
+        INSERT INTO {att} (hsnr, hs, anfadr, endadr, buch, kapanf, versanf, wortanf,
+                           kapend, versend, wortend, labez, labezsuf, lesart)
+        SELECT 1, 'MT', a.anfadr, a.endadr, a.buch, a.kapanf, a.versanf, a.wortanf,
+               a.kapend, a.versend, a.wortend, 'zz', '', 'lac'
+        FROM {target_db}.Passages a
+        LEFT JOIN {rdg} r
+        ON (a.anfadr, a.endadr, 'B') = (r.anfadr, r.endadr, r.byz)
+        WHERE r.byz IS NULL
+        """, parameters)
 
-    execute (cursor, """
-    DELETE FROM {att} WHERE hs = 'MT'
-    """, parameters)
-
-    execute (cursor, """
-    INSERT INTO {att} (hsnr, hs, anfadr, endadr, buch, kapanf, versanf, wortanf,
-                       kapend, versend, wortend, labez, labezsuf, lesart)
-    SELECT 1, 'MT', a.anfadr, a.endadr, a.buch, a.kapanf, a.versanf, a.wortanf,
-           a.kapend, a.versend, a.wortend, r.labez, r.labezsuf, r.lesart
-    FROM {target_db}.Passages a
-    JOIN {rdg} r
-    ON (a.anfadr, a.endadr, 'B') = (r.anfadr, r.endadr, r.byz)
-    """, parameters)
-
-    execute (cursor, """
-    INSERT INTO {att} (hsnr, hs, anfadr, endadr, buch, kapanf, versanf, wortanf,
-                       kapend, versend, wortend, labez, labezsuf, lesart)
-    SELECT 1, 'MT', a.anfadr, a.endadr, a.buch, a.kapanf, a.versanf, a.wortanf,
-           a.kapend, a.versend, a.wortend, 'zz', '', 'lac'
-    FROM {target_db}.Passages a
-    LEFT JOIN {rdg} r
-    ON (a.anfadr, a.endadr, 'B') = (r.anfadr, r.endadr, r.byz)
-    WHERE r.byz IS NULL
-    """, parameters)
-
-    dba.commit()
 
 
 def step22 (dba, parameters):
@@ -1430,142 +1396,142 @@ def step22 (dba, parameters):
 
     message (1, "Step 22 : Filling MsListVal ...")
 
-    cursor = dba.cursor ()
+    with dba.engine.begin () as conn:
 
-    # fill with hs, hsnr, chapter
+        # fill with hs, hsnr, chapter
 
-    execute (cursor, """
-    TRUNCATE {listval}
-    """, parameters)
+        execute (conn, """
+        TRUNCATE {listval}
+        """, parameters)
 
-    execute (cursor, """
-    INSERT INTO {listval} (hs, hsnr, chapter)
-    SELECT DISTINCT hs, hsnr, 0
-    FROM {att}
-    WHERE labez NOT REGEXP '^z[u-z]'
-    """, parameters)
+        execute (conn, """
+        INSERT INTO {listval} (hs, hsnr, chapter)
+        SELECT DISTINCT hs, hsnr, 0
+        FROM {att}
+        WHERE labez NOT REGEXP '^z[u-z]'
+        """, parameters)
 
-    execute (cursor, """
-    INSERT INTO {listval} (hs, hsnr, chapter)
-    SELECT DISTINCT hs, hsnr, kapanf
-    FROM {att}
-    WHERE labez NOT REGEXP '^z[u-z]'
-    """, parameters)
+        execute (conn, """
+        INSERT INTO {listval} (hs, hsnr, chapter)
+        SELECT DISTINCT hs, hsnr, kapanf
+        FROM {att}
+        WHERE labez NOT REGEXP '^z[u-z]'
+        """, parameters)
 
-    dba.commit ()
+        # sumtxt
 
-    # sumtxt
+        execute (conn, """
+        UPDATE {listval} u
+        JOIN (
+          SELECT hsnr, count (*) as sumtxt
+          FROM {att}
+          WHERE labez NOT REGEXP '^z[u-z]'
+          GROUP BY hsnr
+        ) AS t
+        ON (u.hsnr, u.chapter) = (t.hsnr, 0)
+        SET u.sumtxt = t.sumtxt
+        """, parameters)
 
-    execute (cursor, """
-    UPDATE {listval} u
-    JOIN (
-      SELECT hsnr, count (*) as sumtxt
-      FROM {att}
-      WHERE labez NOT REGEXP '^z[u-z]'
-      GROUP BY hsnr
-    ) AS t
-    ON (u.hsnr, u.chapter) = (t.hsnr, 0)
-    SET u.sumtxt = t.sumtxt
-    """, parameters)
+        execute (conn, """
+        UPDATE {listval} u
+        JOIN (
+          SELECT hsnr, kapanf, count (*) as sumtxt
+          FROM {att}
+          WHERE labez NOT REGEXP '^z[u-z]'
+          GROUP BY hsnr, kapanf
+        ) AS t
+        ON (u.hsnr, u.chapter) = (t.hsnr, t.kapanf)
+        SET u.sumtxt = t.sumtxt
+        """, parameters)
 
-    execute (cursor, """
-    UPDATE {listval} u
-    JOIN (
-      SELECT hsnr, kapanf, count (*) as sumtxt
-      FROM {att}
-      WHERE labez NOT REGEXP '^z[u-z]'
-      GROUP BY hsnr, kapanf
-    ) AS t
-    ON (u.hsnr, u.chapter) = (t.hsnr, t.kapanf)
-    SET u.sumtxt = t.sumtxt
-    """, parameters)
+        # summt
 
-    # summt
+        execute (conn, """
+        UPDATE {listval} u
+        JOIN (
+          SELECT hsnr, count (*) as summt
+          FROM {att} a
+          JOIN {rdg} r
+          ON (a.anfadr, a.endadr, a.labez) = (r.anfadr, r.endadr, r.labez)
+          WHERE (a.anfadr, a.endadr) IN (
+            SELECT anfadr, endadr
+            FROM {rdg}
+            WHERE byz = 'B'
+          )
+          GROUP BY a.hsnr
+        ) AS t
+        ON (u.hsnr, u.chapter) = (t.hsnr, 0)
+        SET u.summt = t.summt
+        """, parameters)
 
-    execute (cursor, """
-    UPDATE {listval} u
-    JOIN (
-      SELECT hsnr, count (*) as summt
-      FROM {att} a
-      JOIN {rdg} r
-      ON (a.anfadr, a.endadr, a.labez) = (r.anfadr, r.endadr, r.labez)
-      WHERE (a.anfadr, a.endadr) IN (
-        SELECT anfadr, endadr
-        FROM {rdg}
-        WHERE byz = 'B'
-      )
-      GROUP BY a.hsnr
-    ) AS t
-    ON (u.hsnr, u.chapter) = (t.hsnr, 0)
-    SET u.summt = t.summt
-    """, parameters)
+        execute (conn, """
+        UPDATE {listval} u
+        JOIN (
+          SELECT hsnr, kapanf, count (*) as summt
+          FROM {att} a
+          JOIN {rdg} r
+          ON (a.anfadr, a.endadr, a.labez) = (r.anfadr, r.endadr, r.labez)
+          WHERE (a.anfadr, a.endadr) IN (
+            SELECT anfadr, endadr
+            FROM {rdg}
+            WHERE byz = 'B'
+          )
+          GROUP BY a.hsnr, a.kapanf
+        ) AS t
+        ON (u.hsnr, u.chapter) = (t.hsnr, t.kapanf)
+        SET u.summt = t.summt
+        """, parameters)
 
-    execute (cursor, """
-    UPDATE {listval} u
-    JOIN (
-      SELECT hsnr, kapanf, count (*) as summt
-      FROM {att} a
-      JOIN {rdg} r
-      ON (a.anfadr, a.endadr, a.labez) = (r.anfadr, r.endadr, r.labez)
-      WHERE (a.anfadr, a.endadr) IN (
-        SELECT anfadr, endadr
-        FROM {rdg}
-        WHERE byz = 'B'
-      )
-      GROUP BY a.hsnr, a.kapanf
-    ) AS t
-    ON (u.hsnr, u.chapter) = (t.hsnr, t.kapanf)
-    SET u.summt = t.summt
-    """, parameters)
+        # uemt
 
-    # uemt
+        execute (conn, """
+        UPDATE {listval} u
+        JOIN (
+          SELECT hsnr, count (*) as uemt
+          FROM {att} a
+          JOIN {rdg} r
+          ON (a.anfadr, a.endadr, a.labez, 'B') = (r.anfadr, r.endadr, r.labez, r.byz)
+          GROUP BY a.hsnr
+        ) AS t
+        ON (u.hsnr, u.chapter) = (t.hsnr, 0)
+        SET u.uemt = t.uemt
+        """, parameters)
 
-    execute (cursor, """
-    UPDATE {listval} u
-    JOIN (
-      SELECT hsnr, count (*) as uemt
-      FROM {att} a
-      JOIN {rdg} r
-      ON (a.anfadr, a.endadr, a.labez, 'B') = (r.anfadr, r.endadr, r.labez, r.byz)
-      GROUP BY a.hsnr
-    ) AS t
-    ON (u.hsnr, u.chapter) = (t.hsnr, 0)
-    SET u.uemt = t.uemt
-    """, parameters)
+        execute (conn, """
+        UPDATE {listval} u
+        JOIN (
+          SELECT hsnr, kapanf, count (*) as uemt
+          FROM {att} a
+          JOIN {rdg} r
+          ON (a.anfadr, a.endadr, a.labez, 'B') = (r.anfadr, r.endadr, r.labez, r.byz)
+          GROUP BY a.hsnr, a.kapanf
+        ) AS t
+        ON (u.hsnr, u.chapter) = (t.hsnr, t.kapanf)
+        SET u.uemt = t.uemt
+        """, parameters)
 
-    execute (cursor, """
-    UPDATE {listval} u
-    JOIN (
-      SELECT hsnr, kapanf, count (*) as uemt
-      FROM {att} a
-      JOIN {rdg} r
-      ON (a.anfadr, a.endadr, a.labez, 'B') = (r.anfadr, r.endadr, r.labez, r.byz)
-      GROUP BY a.hsnr, a.kapanf
-    ) AS t
-    ON (u.hsnr, u.chapter) = (t.hsnr, t.kapanf)
-    SET u.uemt = t.uemt
-    """, parameters)
+        # qmt
 
-    # qmt
+        execute (conn, """
+        UPDATE {listval}
+        SET qmt = (uemt * 100.0) / sumtxt
+        WHERE sumtxt > 0
+        """, parameters)
 
-    execute (cursor, """
-    UPDATE {listval}
-    SET qmt = (uemt * 100.0) / sumtxt
-    WHERE sumtxt > 0
-    """, parameters)
 
-    dba.commit ()
-
+Manuscript = collections.namedtuple ('Manuscript', 'hs hsnr')
+Chapter    = collections.namedtuple ('Chapter',    'n start end')
 
 class Bag:
     """ Holds some values for us. """
 
-    n_hs = 0                # No. of manuscripts
+    n_mss = 0               # No. of manuscripts
     n_passages = 0          # No. of passages
     n_var_passages = 0      # No. of variant passages
-    hss = None              # list of hs
-    hsnrs = None            # list of hsnr
+    n_chapters = 0          # No. of chapters
+    mss = None              # list of named tuple Manuscript
     passages = None         # list of passages
+    chapters = None         # list of named tuple Chapter
     var_passages = None     # list of indices of variant passages only
     labez_matrix = None     # hs x passages matrix of labez
     var_labez_matrix = None # hs x variant passages matrix of labez
@@ -1582,136 +1548,159 @@ def step10_numpy (dba, parameters, val):
 
     message (1, "Step 10 : Loading labez matrix ...")
 
-    cursor = dba.cursor ()
-    np.set_printoptions (threshold = 30)
+    with dba.engine.begin () as conn:
 
-    # get no. of passages
-    execute (cursor, "SELECT anfadr, endadr FROM {pass} ORDER BY anfadr, endadr DESC", parameters)
-    rows = cursor.fetchall ()
-    val.n_passages  = cursor.rowcount
-    val.passages   = ["%s-%s" % x for x in rows]
+        np.set_printoptions (threshold = 30)
 
-    # get manuscript names and numbers
-    execute (cursor, "SELECT hs, hsnr FROM {ms} ORDER BY hsnr", parameters)
-    rows = cursor.fetchall ()
-    val.n_hs  = cursor.rowcount
-    val.hss   = [x[0] for x in rows]
-    val.hsnrs = [x[1] for x in rows]
+        # get no. of passages
+        res = execute (conn, "SELECT anfadr, endadr FROM {pass} ORDER BY anfadr, endadr DESC", parameters)
+        val.n_passages = res.rowcount
+        val.passages   = ["%s-%s" % (x[0], x[1]) for x in res]
 
-    # Matrix ms x pass
+        # get manuscript names and numbers
+        res = execute (conn, "SELECT hs, hsnr FROM {ms} ORDER BY id", parameters)
+        val.n_mss = res.rowcount
+        val.mss = list (map (Manuscript._make, res))
 
-    # First initialize all manuscripts in the matrix to the labezs of Manuscript
-    # A ...
-    labez_matrix = np.ones ((val.n_hs, val.n_passages), dtype = int)
+        # get no. of chapters
+        res = execute (conn, """
+        SELECT kapanf, MIN (id) - 1 AS first_id, MAX (id) AS last_id
+        FROM {pass}
+        GROUP BY kapanf
+        ORDER BY kapanf
+        """, parameters)
+        val.n_chapters = res.rowcount
+        val.chapters = list (map (Chapter._make, res))
+        # add a virtual 'whole book' chapter
+        val.chapters.insert (0, Chapter (0, val.chapters[0].start, val.chapters[-1].end))
+        val.n_chapters += 1
 
-    execute (cursor, """
-    SELECT pass_id - 1 as pass, labez
-    FROM {lab}
-    WHERE ms_id = 1 AND labez <> 1
-    """, parameters)
+        # DEBUG FIXME
+        #val.chapters = val.chapters[:5]
+        #val.n_chapters = 5
 
-    for row in cursor.fetchall ():
-        labez_matrix[:, row[0]] = row[1]
+        # Matrix ms x pass
 
-    # ... then overwrite the matrix with the labezs from actual manuscripts
-    execute (cursor, """
-    SELECT ms_id - 1 as ms, pass_id - 1 as pass, labez
-    FROM {lab}
-    """, parameters)
+        # First initialize all manuscripts in the matrix to the labezs of Manuscript
+        # A ...
+        labez_matrix = np.ones ((val.n_mss, val.n_passages), dtype = int)
 
-    for row in cursor.fetchall ():
-        labez_matrix[row[0], row[1]] = row[2]
+        res = execute (conn, """
+        SELECT pass_id - 1 as pass, labez
+        FROM {labez}
+        WHERE ms_id = 1 AND labez <> 1
+        """, parameters)
 
-    # Get ids of variant passages
-    execute (cursor, """
-    SELECT a.id - 1
-    FROM (
-      SELECT DISTINCT p.id, labez
-      FROM {att} AS att
-      JOIN {pass} AS p
-      ON p.anfadr = att.anfadr AND p.endadr = att.endadr
-      WHERE labez NOT REGEXP '^z' AND labezsuf NOT REGEXP 'f|o'
-    ) AS a
-    GROUP BY a.id
-    HAVING count (*) > 1
-    """, parameters)
+        for row in res:
+            labez_matrix[:, row[0]] = row[1]
 
-    val.var_pass = np.fromiter ((x[0] for x in cursor.fetchall ()), np.int)
-    val.n_var_passages = len (val.var_pass)
-    val.var_labez_matrix = labez_matrix.take (val.var_pass, 1)
-    val.labez_matrix = labez_matrix
+        # ... then overwrite the matrix with the labezs from actual manuscripts
+        res = execute (conn, """
+        SELECT ms_id - 1 as ms, pass_id - 1 as pass, labez
+        FROM {labez}
+        """, parameters)
 
-    print (val.n_hs)
-    print (val.n_passages)
-    print (val.labez_matrix.shape)
-    print (val.n_var_passages)
-    print (val.var_labez_matrix.shape)
+        for row in res:
+            labez_matrix[row[0], row[1]] = row[2]
 
-    dba.commit ()
+        # Get ids of variant passages
+        res = execute (conn, """
+        SELECT a.id - 1
+        FROM (
+          SELECT DISTINCT p.id, labez
+          FROM {att} AS att
+          JOIN {pass} AS p
+          ON p.anfadr = att.anfadr AND p.endadr = att.endadr
+          WHERE labez NOT REGEXP '^z' AND labezsuf NOT REGEXP 'f|o'
+        ) AS a
+        GROUP BY a.id
+        HAVING count (*) > 1
+        """, parameters)
 
-    message (1, "Step 10 : Building Byzantine text ...")
+        val.var_pass = np.fromiter ((row[0] for row in res), np.int)
+        val.n_var_passages = len (val.var_pass)
+        val.var_labez_matrix = labez_matrix.take (val.var_pass, 1)
+        val.labez_matrix = labez_matrix
 
-    # Get the labez of some typical Byzantine texts
-    parameters['byzlist'] = db.BYZ_HSNR
-    execute (cursor, """
-    SELECT id - 1 AS id
-    FROM {ms}
-    WHERE hsnr IN {byzlist}
-    """, parameters)
-    assert cursor.rowcount == 7, "The list of Byzantine texts must contain exactly 7 manuscripts."
-    byz_ids = np.fromiter ((x[0] for x in cursor.fetchall ()), np.int)
-    print ("Byz Ids: ", byz_ids)
-    byz_labez_matrix = labez_matrix.take (byz_ids, 0)
-    # np.set_printoptions (threshold = 100000)
-    # print (byz_labez_matrix)
-    # np.set_printoptions (threshold = 1000)
+        print (val.n_mss)
+        print (val.n_passages)
+        print (val.labez_matrix.shape)
+        print (val.n_var_passages)
+        print (val.var_labez_matrix.shape)
 
-    # Group the labez at each passage
-    byz_bincount = np.apply_along_axis (np.bincount, 0, byz_labez_matrix, minlength = 27)
-    print (byz_bincount)
+        message (1, "Step 10 : Building Byzantine text ...")
 
-    # Calculate the Byzantine labez for each passage
-    byz_text = np.zeros (val.n_passages, dtype = int)
-    for i, bc in enumerate (byz_bincount.T):
-        # test if all mss are defined
-        if bc[0] > 0:
-            continue
-        # test for patterns 7, 6+0, 6+1, 5+1+1
-        for j, b in enumerate (bc):
-            if b >= 6:
-                # must be 7 or 6+1
-                byz_text[i] = j
+        # Get the labez of some typical Byzantine texts
+        parameters['byzlist'] = db.BYZ_HSNR
+        res = execute (conn, """
+        SELECT id - 1 AS id
+        FROM {ms}
+        WHERE hsnr IN {byzlist}
+        """, parameters)
+        assert res.rowcount == 7, "The list of Byzantine texts must contain exactly 7 manuscripts."
+        byz_ids = np.fromiter ((row[0] for row in res), np.int)
+        print ("Byz Ids: ", byz_ids)
+        byz_labez_matrix = labez_matrix.take (byz_ids, 0)
+        # np.set_printoptions (threshold = 100000)
+        # print (byz_labez_matrix)
+        # np.set_printoptions (threshold = 1000)
+
+        # Group the labez at each passage
+        byz_bincount = np.apply_along_axis (np.bincount, 0, byz_labez_matrix, minlength = 27)
+        print (byz_bincount)
+
+        # Calculate the Byzantine labez for each passage
+        byz_text = np.zeros (val.n_passages, dtype = int)
+        for i, bc in enumerate (byz_bincount.T):
+            # test if all mss are defined
+            if bc[0] > 0:
                 continue
-            if b == 5 and 2 not in bc:
-                # must be 5+1+1
-                byz_text[i] = j
-                continue
+            # test for patterns 7, 6+0, 6+1, 5+1+1
+            for j, b in enumerate (bc):
+                if b >= 6:
+                    # must be 7 or 6+1
+                    byz_text[i] = j
+                    continue
+                if b == 5 and 2 not in bc:
+                    # must be 5+1+1
+                    byz_text[i] = j
+                    continue
 
-    # print ("Byz: ", byz_text)
+        # print ("Byz: ", byz_text)
 
-    # Insert the Byz text into the matrix
-    val.labez_matrix = np.insert (val.labez_matrix, 1, byz_text, axis = 0)
-    val.hss.insert (1, 'MT')
-    val.hsnrs.insert (1, 1)
-    val.n_hs += 1
+        # Insert the Byz text into the matrix
+        val.labez_matrix[1] = byz_text
 
-    # Boolean matrix ms x pass set where passage is defined
-    val.def_matrix = np.asmatrix (np.zeros_like (val.labez_matrix, dtype = int))
-    val.def_matrix[val.labez_matrix != 0] = 1
+        # Insert the Byz text into labez table
+        execute (conn, """
+        DELETE FROM {labez}
+        WHERE ms_id = 2
+        """, parameters)
+        param_array = []
+        for i, labez in enumerate (byz_text):
+            param_array.append ({ 'pass_id' : i + 1, 'labez' : labez })
+        executemany (conn, """
+        INSERT INTO {labez} (ms_id, pass_id, labez, labezsuf)
+        VALUES (2, :pass_id, :labez, '')
+        """, parameters, param_array)
 
-    # Length of manuscripts (no. of defined passages)
-    val.ms_length = val.def_matrix * np.ones ((val.n_passages, 1), dtype = int)
-    val.ms_length = val.ms_length.A[:, 0]
-    print ("Manuscript Length Array: ", val.ms_length)
 
-    # debug plot the matrix
-    ticks_labels_x = plot.passages_labels (val.passages)
-    ticks_labels_y = plot.mss_labels (val.hss, val.hsnrs)
+        # Boolean matrix ms x pass set where passage is defined
+        val.def_matrix = np.asmatrix (np.zeros_like (val.labez_matrix, dtype = int))
+        val.def_matrix[val.labez_matrix != 0] = 1
 
-    plot.heat_matrix (val.def_matrix, "Manuscript Definition Matrix",
-                      ticks_labels_x, ticks_labels_y, plot.colormap_bw ())
+        # Length of manuscripts (no. of defined passages)
+        val.ms_length = val.def_matrix * np.ones ((val.n_passages, 1), dtype = int)
+        val.ms_length = val.ms_length.A[:, 0]
+        print ("Manuscript Length Array: ", val.ms_length)
 
-    dba.commit ()
+        # debug plot the matrix
+        ticks_labels_x = plot.passages_labels (val.passages)
+        ticks_labels_y = plot.mss_labels (val.mss)
+
+        plot.plt.figure (1)
+        plot.heat_matrix (val.def_matrix, "Manuscript Definition Matrix",
+                          ticks_labels_x, ticks_labels_y, plot.colormap_bw ())
 
 
 def step24 (dba, parameters, val):
@@ -1730,52 +1719,99 @@ def step24 (dba, parameters, val):
 
     message (1, "Step 24 : Calculating mss similarity ...")
 
-    cursor = dba.cursor ()
+    with dba.engine.begin () as conn:
 
-    # Matrix ms x ms with count of the passages that are defined in both mss
-    val.and_matrix = np.zeros ((val.n_hs, val.n_hs), dtype = int)
+        # Matrix chapter x ms x ms with count of the passages that are defined in both mss
+        val.and_matrix = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
 
-    # Matrix ms x ms with count of the passages that are defined in either ms
-    val.or_matrix  = np.zeros ((val.n_hs, val.n_hs), dtype = int)
+        # Matrix chapter x ms x ms with count of the passages that are defined in either ms
+        val.or_matrix  = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
 
-    # Matrix ms x ms with count of the passages that are equal in both mss
-    val.eq_matrix  = np.zeros ((val.n_hs, val.n_hs), dtype = int)
+        # Matrix chapter x ms x ms with count of the passages that are equal in both mss
+        val.eq_matrix  = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
 
-    # loop over all mss O(n_hs² * n_passages)
-    for i in range (0, val.n_hs):
-        labezi = val.labez_matrix[i]
-        defi   = val.def_matrix[i]
-        for j in range (0, val.n_hs):
-            def_and = np.logical_and (defi, val.def_matrix[j])
-            val.and_matrix[i,j]  = np.sum (def_and)
+        # loop over all mss O(n_mss² * n_chapters * n_passages)
+        for j in range (0, val.n_mss):
+            labezj = val.labez_matrix[j]
+            defj   = val.def_matrix[j]
 
-            def_or  = np.logical_or  (defi, val.def_matrix[j])
-            val.or_matrix[i,j]   = np.sum (def_or)
+            for k in range (j + 1, val.n_mss):
+                labezk = val.labez_matrix[k]
+                defk   = val.def_matrix[k]
 
-            val.eq_matrix[i,j]   = np.sum (np.logical_and (def_and, labezi == val.labez_matrix[j]))
+                def_and  = np.logical_and (defj, defk)
+                def_or   = np.logical_or  (defj, defk)
+                labez_eq = np.logical_and (def_and, np.equal (labezj, labezk))
 
-    # Matrix ms x ms with count of the passages that are different in both mss
-    val.diff_matrix = val.and_matrix - val.eq_matrix
+                for i, chapter in enumerate (val.chapters):
+                    val.and_matrix[i,j,k] = val.and_matrix[i,k,j] = np.sum (def_and[0, chapter.start:chapter.end])
+                    val.or_matrix[i,j,k]  = val.or_matrix[i,k,j]  = np.sum (def_or[0, chapter.start:chapter.end])
+                    val.eq_matrix[i,j,k]  = val.eq_matrix[i,k,j]  = np.sum (labez_eq[0, chapter.start:chapter.end])
 
-    # calculate
-    with np.errstate (divide = 'ignore', invalid = 'ignore'):
-        val.quotient_matrix = val.eq_matrix / val.and_matrix
-        val.quotient_matrix[val.and_matrix == 0] = 0.0
 
-    # debug
-    #plot.heat_matrix (eq_matrix,  "No. of Equal Passages", val.hss, val.hsnrs)
-    #plot.heat_matrix (and_matrix, "No. of Passages Defined in Both Manuscripts", val.hss, val.hsnrs)
-    ticks_labels = plot.mss_labels (val.hss, val.hsnrs)
-    plot.heat_matrix (val.quotient_matrix, "Similarity of Manuscripts",
-                      ticks_labels, ticks_labels, plot.colormap_affinity ())
+        # Matrix ms x ms with count of the passages that are different in both mss
+        message (2, "          Calculating diff and quotient matrices ...")
+        val.diff_matrix = val.and_matrix - val.eq_matrix
 
-    np.fill_diagonal (val.quotient_matrix, 0.0) # remove affinity to self
+        # calculate
+        with np.errstate (divide = 'ignore', invalid = 'ignore'):
+            val.quotient_matrix = val.eq_matrix / val.and_matrix
+            val.quotient_matrix[val.and_matrix == 0] = 0.0
 
-    print ("eq\n",   val.eq_matrix)
-    print ("diff\n", val.diff_matrix)
-    print ("and\n",  val.and_matrix)
-    print ("or\n",   val.or_matrix)
-    print ("quot\n", val.quotient_matrix)
+        # debug
+        if (0):
+            #plot.heat_matrix (eq_matrix,  "No. of Equal Passages", )
+            #plot.heat_matrix (and_matrix, "No. of Passages Defined in Both Manuscripts", )
+            ticks_labels = plot.mss_labels (val.mss)
+
+            for i, chapter in enumerate (val.chapters):
+                plot.plt.figure (figsize = (15, 10), dpi = 300)
+                message (2, "          Plotting Chapter %d ..." % i)
+                plot.heat_matrix (val.quotient_matrix[i],
+                                  "Similarity of Manuscripts - Chapter %d" % chapter.n,
+                                  ticks_labels, ticks_labels, plot.colormap_affinity ())
+                plot.plt.savefig ('output/affinity-%02d.svg' % i, bbox_inches='tight')
+                plot.plt.close ()
+
+        # np.fill_diagonal (val.quotient_matrix, 0.0) # remove affinity to self
+
+        message (2, "          Updating Manuscripts table ...")
+        param_array = []
+        for i, length in enumerate (val.ms_length):
+            param_array.append ( { 'id' : i + 1, 'length' : length } )
+        executemany (conn, """
+        UPDATE {ms} SET length = :length
+        WHERE id = :id
+        """, parameters, param_array)
+
+        message (2, "          Filling Affinity table ...")
+        execute (conn, "TRUNCATE {aff}", parameters)
+
+        for i, chapter in enumerate (val.chapters):
+            param_array = []
+            for j, ms1 in enumerate (val.mss):
+                for k, ms2 in enumerate (val.mss):
+                    param_array.append (
+                        {
+                            'id1' :      j + 1,
+                            'id2' :      k + 1,
+                            'chapter' :  chapter.n,
+                            'common' :   val.and_matrix[i,j,k],
+                            'equal' :    val.eq_matrix[i,j,k],
+                            'affinity' : val.quotient_matrix[i,j,k]
+                        }
+                    )
+
+            executemany (conn, """
+            INSERT INTO {aff} (id1, id2, chapter, common, equal, affinity)
+            VALUES (:id1, :id2, :chapter, :common, :equal, :affinity)
+            """, parameters, param_array)
+
+        print ("eq\n",   val.eq_matrix)
+        print ("diff\n", val.diff_matrix)
+        print ("and\n",  val.and_matrix)
+        print ("or\n",   val.or_matrix)
+        print ("quot\n", val.quotient_matrix)
 
 
 def affinity_clustering (dba, parameters, val):
@@ -1802,81 +1838,134 @@ def affinity_to_gephi (dba, parameters, val):
 
     message (1, "        : Exporting to Gephi ...")
 
-    cursor = dba.cursor ()
+    with dba.engine.begin () as conn:
 
-    execute (cursor, "TRUNCATE {g_nodes}", parameters)
-    execute (cursor, "TRUNCATE {g_edges}", parameters)
+        execute (conn, "TRUNCATE {g_nodes}", parameters)
+        execute (conn, "TRUNCATE {g_edges}", parameters)
 
-    # Build Gephi nodes table.  Every ms gets to be a node.  Simple.
-    param_array = []
-    for i in range (0, val.n_hs):
-        hs = val.hss[i]
-        hsnr = val.hsnrs[i]
-        size = val.ms_length[i]
-        color = '128,128,128'
-        if hsnr < 400000:
-            color = '0,255,0'
-        if hsnr < 300000:
-            color = '128,128,255'
-        if hsnr < 200000:
-            color = '255,255,128'
-        if hsnr < 100000:
-            color = '255,0,0'
-        param_array.append ( ( hsnr, hs, color, color, size ) )
+        # Build Gephi nodes table.  Every ms gets to be a node.  Simple.
+        param_array = []
+        for i in range (0, val.n_mss):
+            hs = val.mss[i].hs
+            hsnr = val.mss[i].hsnr
+            size = val.ms_length[i]
+            color = '128,128,128'
+            if hsnr < 400000:
+                color = '0,255,0'
+            if hsnr < 300000:
+                color = '128,128,255'
+            if hsnr < 200000:
+                color = '255,255,128'
+            if hsnr < 100000:
+                color = '255,0,0'
+            param_array.append ( {
+                'id'        : hsnr,
+                'label'     : hs,
+                'color'     : color,
+                'nodecolor' : color,
+                'nodesize'  : size
+            } )
 
-    cursor.executemany ("""
-    INSERT INTO {g_nodes} (id, label, color, nodecolor, nodesize)
-    VALUES (%s, %s, %s, %s, %s)
-    """.format (**parameters), param_array)
+        executemany (conn, """
+        INSERT INTO {g_nodes} (id, label, color, nodecolor, nodesize)
+        VALUES (:id, :label, :color, :nodecolor, :nodesize)
+        """, parameters, param_array)
 
-    # Build Gephi edges table.  Needs brains.  Creating an edge between every 2
-    # mss will not give a very meaningful graph.  We have to keep only the most
-    # significant edges.  But what is significant?
+        # Build Gephi edges table.  Needs brains.  Creating an edge between every 2
+        # mss will not give a very meaningful graph.  We have to keep only the most
+        # significant edges.  But what is significant?
 
-    # We rank the neighbors of each ms by similarity and keep only the X most
-    # similar ones.
-    keep = 20
-    rank_matrix = np.argsort (val.quotient_matrix, axis = 1)
-    rank_matrix = rank_matrix[0:, -keep:]  # keep 10
-    # Now we have the indices of the X most similar mss.
+        # We rank the neighbors of each ms by similarity and keep only the X most
+        # similar ones.
+        keep = 20
+        rank_matrix = np.argsort (val.quotient_matrix[0], axis = 1)
+        rank_matrix = rank_matrix[0:, -keep:]  # keep the most similar entries
+        # Now we have the indices of the X most similar mss.
 
-    param_array = []
-    qq = math.log (val.n_passages)
-    for i in range (0, val.n_hs):
-        hs_src = val.hsnrs[i]
-        for j in range (0, keep):
-            k = rank_matrix[i, j]
-            hs_dest = val.hsnrs[k]
-            q = val.quotient_matrix[i, k] * math.log (max (1.0, val.and_matrix[i, k])) / qq
-            param_array.append ( ( "%s-%s" % (hs_src, hs_dest), hs_src, hs_dest, q) )
+        param_array = []
+        qq = math.log (val.n_passages)
+        for i in range (2, val.n_mss): # do not include 'A' and 'MT'
+            hs_src = val.mss[i].hsnr
+            for j in range (0, keep):
+                k = rank_matrix[i, j]
+                hs_dest = val.mss[k].hsnr
+                q = val.quotient_matrix[0, i, k] * math.log (max (1.0, val.and_matrix[0, i, k])) / qq
+                param_array.append ( {
+                    'id'     : "%s-%s" % (hs_src, hs_dest),
+                    'source' : hs_src,
+                    'target' : hs_dest,
+                    'weight' :q
+                } )
 
-    cursor.executemany ("""
-    INSERT INTO {g_edges} (id, source, target, weight)
-    VALUES (%s, %s, %s, %s)
-    """.format (**parameters), param_array)
+        executemany (conn, """
+        INSERT INTO {g_edges} (id, source, target, weight)
+        VALUES (:id, :source, :target, :weight)
+        """, parameters, param_array)
 
-    dba.commit ()
+        # np.savetxt ('affinity.csv', val.quotient_matrix)
 
-    # np.savetxt ('affinity.csv', val.quotient_matrix)
+
+def print_stats (dba, parameters):
+
+    with dba.engine.begin () as conn:
+
+        res = execute (conn, "SELECT count(distinct hs) FROM {att}", parameters)
+        hs = res.scalar ()
+        message (1, "hs       = {cnt}".format (cnt = hs))
+
+        res = execute (conn, "SELECT count(distinct anfadr, endadr) FROM {att}", parameters)
+        passages = res.scalar ()
+        message (1, "passages = {cnt}".format (cnt = passages))
+
+        message (1, "hs * passages      = {cnt}".format (cnt = hs * passages))
+
+        res = execute (conn, "SELECT count(*) FROM {att}", parameters)
+        att = res.scalar ()
+        res = execute (conn, "SELECT count(*) FROM {lac}", parameters)
+        lac = res.scalar ()
+        res = execute (conn, "SELECT count(*) FROM {labez}", parameters)
+        lab = res.scalar ()
+
+        message (1, "rows in att        = {cnt}".format (cnt = att))
+        message (1, "rows in lac        = {cnt}".format (cnt = lac))
+        message (1, "rows in labez      = {cnt}".format (cnt = lab))
+        message (1, "delta              = {cnt}".format (cnt = lab - (hs * passages)))
+
+        # sum (passages in chapter * mss with chapter)
+
+        res = execute (conn, """
+        SELECT sum(pas_cnt * ch.ms_cnt)
+
+        FROM
+          (select kapanf, count(distinct anfadr, endadr) as pas_cnt FROM {att} GROUP BY kapanf) AS pas
+
+        JOIN
+          (select kapanf, count(distinct hs) as ms_cnt FROM {att} GROUP BY kapanf) AS ch
+
+        ON ch.kapanf = pas.kapanf
+
+        """, parameters)
+        pas = res.scalar ()
+
+        message (1, "chap * ms * pas    = {cnt}".format (cnt = pas))
 
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Prepare a new database for CBGM')
+    parser = argparse.ArgumentParser (description='Prepare a new database for CBGM')
 
-    parser.add_argument('source_db', metavar='SOURCE_DB', help='the source database (required)')
-    parser.add_argument('target_db', metavar='TARGET_DB', help='the target database (required)')
-    parser.add_argument('-r', '--range', default='',
-                        help='range of steps (default: all)')
-    parser.add_argument('-v', '--verbose', dest='verbose', action='count',
-                        help='increase output verbosity')
-    parser.add_argument('-c', '--chapter', dest='chapter', type=int, default=0,
-                        help='the chapter number (optional, default=all chapters)')
-    parser.add_argument('-p', '--profile', dest='profile',
-                        choices=['local', 'remote'], default='remote',
-                        metavar='PROFILE', help="the database profile ('local' or 'remote')")
+    parser.add_argument ('source_db', metavar='SOURCE_DB', help='the source database (required)')
+    parser.add_argument ('target_db', metavar='TARGET_DB', help='the target database (required)')
+    parser.add_argument ('-r', '--range', default='',
+                         help='range of steps (default: all)')
+    parser.add_argument ('-v', '--verbose', dest='verbose', action='count',
+                         help='increase output verbosity', default=0)
+    parser.add_argument ('-c', '--chapter', dest='chapter', type=int, default=0,
+                         help='the chapter number (optional, default=all chapters)')
+    parser.add_argument ('-p', '--profile', dest='profile', default='ntg-local',
+                         metavar='PROFILE', help="the database profile (default='ntg-local')")
 
-    args = parser.parse_args ()
+    parser.parse_args (namespace = args)
 
     if not re.match ('^[-0-9]*$', args.range):
         print ("Error in range option")
@@ -1891,17 +1980,14 @@ if __name__ == '__main__':
     args.range[0] = int (args.range[0] or  1)
     args.range[1] = int (args.range[1] or 99)
 
-    dba = db.DBA (args.profile)
-    # Make MySQL more compatible with other SQL databases
-    dba.cursor ().execute ("SET sql_mode='ANSI'")
-
     args.start_time = datetime.datetime.now ()
-    tools.args = args
-    parameters = tools.init_parameters (DEFAULTS)
+    parameters = tools.init_parameters (tools.DEFAULTS)
     v = Bag ()
 
+    dba = db.DBA (args.profile)
+
     try:
-        for step in range(args.range[0], args.range[1] + 1):
+        for step in range (args.range[0], args.range[1] + 1):
             if step == 1:
                 step01 (dba, parameters)
                 step01b (dba, parameters)
@@ -1926,7 +2012,7 @@ if __name__ == '__main__':
             if step == 7:
                 step07 (dba, parameters)
                 if args.verbose >= 1:
-                    tools.print_stats(dba, parameters)
+                    print_stats (dba, parameters)
                 continue
             if step == 8:
                 #step08 (dba, parameters)
@@ -1936,13 +2022,13 @@ if __name__ == '__main__':
                 #step09 (dba, parameters)
                 step09_numpy (dba, parameters)
                 if args.verbose >= 1:
-                    tools.print_stats(dba, parameters)
+                    print_stats (dba, parameters)
                 continue
             if step == 10:
                 #step10 (dba, parameters)
                 step10_numpy (dba, parameters, v)
                 if args.verbose >= 1:
-                    tools.print_stats(dba, parameters)
+                    print_stats (dba, parameters)
                 continue
             if step == 11:
                 #step11 (dba, parameters)
@@ -1962,8 +2048,8 @@ if __name__ == '__main__':
                 continue
 
     except KeyboardInterrupt:
-        dba.rollback()
+        execute (dba.connection ('ROLLBACK'))
 
-    dba.close()
+    dba.connection.close ()
 
     message (1, "          Done")

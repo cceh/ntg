@@ -1,0 +1,49 @@
+  <style>
+    td {
+      padding: 0 0.5em;
+      text-align: right;
+    }
+    td.index {
+      width: 1.5em;
+    }
+    th.ms {
+      width: 3em;
+    }
+    td.equal {
+      width: 6em;
+    }
+    td.labez {
+      width: 3em;
+      text-align: left;
+    }
+    tr.first td, tr.first th {
+      padding-top: 1ex;
+    }
+    th {
+      padding: 0 0.5em;
+      font-weight: normal;
+      text-align: right;
+    }
+    caption {
+      padding: 1ex 1em;
+      font-weight: bold;
+      border-bottom: 1px solid black;
+    }
+    thead {
+      padding-bottom: 1ex;
+    }
+  </style>
+  <table class="relatives">
+    <caption>{{_('Relatives for %(hs)s (MT %(perc)s)', hs = hs, perc = "{:.2%}".format (mt_aff))}}</caption>
+    {% for r in rows %}
+    <tr data-labez="{{r.hsnr}}"{% if loop.first %} class="first"{% endif %}>
+      <td class="index">{{loop.index}}</td>
+      <th class="ms">{{r.hs|e}}</th>
+      <td class="perc">{{ "{:.1%}".format (r.equal / r.common) }}</td>
+      <td class="equal">{{ "(%d/%d)" % (r.equal, r.common) }}</td>
+      <td class="labez">{{ "%s%s"    % (r.labez, r.labezsuf) }}
+        {%- if labez == r.labez and labezsuf == r.labezsuf: %} (MT){% endif -%}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>

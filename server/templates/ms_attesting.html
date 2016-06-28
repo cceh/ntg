@@ -1,0 +1,34 @@
+{% extends "site.html" %}
+
+  {% block head %}
+  <title>{{_('Attestation for %(passage)s %(labez)s', passage = passage, labez = labez)}}</title>
+  <style>
+    div.relatives {
+      display: inline-block;
+      padding: 0 1em;
+      border-right: 1px solid black;
+    }
+  </style>
+  {% endblock %}
+
+  {% block content %}
+  <h1>{{_('Attestation for %(passage)s %(labez)s', passage = passage, labez = labez)}}</h1>
+
+  <div>
+  {% for r in rows %}
+  <div class="relatives" data-href="/relatives/{{pass_id|e}}/{{r.hsnr|e}}"></div>
+  {% endfor %}
+  </div>
+
+  {% endblock %}
+
+  {% block footer %}
+    <script>
+    jQuery (document).ready (function () {
+      jQuery("div.relatives").each (function () {
+        var a = jQuery(this);
+        a.load (a.attr ("data-href"));
+      })
+    });
+    </script>
+  {% endblock %}

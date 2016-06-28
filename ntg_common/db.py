@@ -26,8 +26,97 @@ Replace *username* and *password* with your own username and password.
 
 """
 
+import sqlalchemy
+from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy.sql import text
 
-import MySQLdb
+from .tools import message, tabulate
+from .config import args
+
+MYSQL_DEFAULT_GROUP  = "ntg-local"
+
+
+def execute (conn, sql, parameters, debug_level = 3):
+    sql = sql.format (**parameters)
+    message (debug_level, sql.rstrip () + ';')
+    result = conn.execute (text (sql), parameters)
+    message (debug_level, "%d rows" % result.rowcount)
+    return result
+
+
+def executemany (conn, sql, parameters, param_array, debug_level = 3):
+    sql = sql.format (**parameters)
+    message (debug_level, sql.rstrip () + ';')
+    result = conn.execute (text (sql), param_array)
+    message (debug_level, "%d rows" % result.rowcount)
+    return result
+
+
+def debug (conn, msg, sql, parameters):
+    # print values
+    if args.verbose >= 3:
+        result = execute (conn, sql, parameters)
+        if result.rowcount > 0:
+            message (3, "*** DEBUG: {msg} ***".format (msg = msg), True)
+            tabulate (result)
+
+
+def fix (conn, msg, check_sql, fix_sql, parameters):
+    """Check and eventually fix errors.
+
+    Executes the check_sql statement to check for error conditions and, if rows
+    emerge, executes the fix_sql statement.  The fix_sql statement should be
+    written as to fix the errors reported by the check_sql statement.  Finally
+    it executes the check_sql statement again and reports an error if the
+    condition still exists.
+
+    """
+
+    # print unfixed values
+    result = execute (conn, check_sql, parameters)
+    if result.rowcount > 0:
+        # apply fix
+        if args.verbose >= 3:
+            message (3, "*** WARNING: {msg} ***".format (msg = msg), True)
+            tabulate (result)
+        if fix_sql:
+            execute (conn, fix_sql, parameters)
+            # print fixed values
+            result = execute (conn, check_sql, parameters)
+            if result.rowcount > 0:
+                message (0, "*** ERROR: {msg} ***".format (msg = msg), True)
+                tabulate (result)
+
+
+
+class DBA (object):
+    """ Database Interface """
+
+    def __init__ (self, group = None):
+        if group is None:
+            group = MYSQL_DEFAULT_GROUP
+
+        message (3, "Connecting to db and reading init group: {group}".format (group = group), True)
+
+        self.engine = create_engine (
+            "mysql:///?read_default_group={group}".format (group = group))
+
+        sqlalchemy.event.listen (self.engine, 'connect', on_connect)
+
+        self.connection = self.connect ()
+
+    def connect (self):
+        connection = self.engine.connect ()
+        # Make MySQL more compatible with other SQL databases
+        connection.execute ("SET sql_mode='ANSI'")
+        return connection
+
+
+#@event.listens_for(eng, "first_connect", insert=True)  # make sure we're the very first thing
+#@event.listens_for(eng, "connect")
+def on_connect (dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor ()
+    cursor.execute ("SET sql_mode = 'ANSI'")
 
 
 CREATE_TABLE_ATT = """
@@ -119,7 +208,9 @@ CREATE_TABLE_LABEZ = """
   "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
   "ms_id"     INTEGER       NOT NULL,
   "pass_id"   INTEGER       NOT NULL,
-  "labez"     INTEGER       NOT NULL DEFAULT 0
+  "labez"     INTEGER       NOT NULL DEFAULT 0,
+  "labezsuf"  VARCHAR(32)   DEFAULT NULL,
+  UNIQUE KEY (ms_id, pass_id, labez, labezsuf)
 )
 """
 
@@ -144,7 +235,8 @@ CREATE_TABLE_RDG = """
   "bz"        INTEGER       NOT NULL DEFAULT 0,
   "bzdef"     INTEGER       NOT NULL DEFAULT 0,
   "byz"       VARCHAR(1)    NOT NULL DEFAULT '',
-  "check"     VARCHAR(1)    NULL
+  "check"     VARCHAR(1)    NULL,
+  UNIQUE KEY (anfadr, endadr, labez)
 )
 """
 
@@ -185,6 +277,29 @@ CREATE_TABLE_VG = """
   "uemt"      INTEGER       NOT NULL DEFAULT 0,
   "qmt"       FLOAT         NOT NULL DEFAULT 0.0,
   "check"     VARCHAR(1)    NULL
+)
+"""
+
+CREATE_TABLE_MANUSCRIPTS = """
+(
+  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
+  "hsnr"      INTEGER       NOT NULL,
+  "hs"        VARCHAR(32)   NOT NULL,
+  "length"    INTEGER       ,
+  UNIQUE KEY (hsnr),
+  UNIQUE KEY (hs)
+)
+"""
+
+CREATE_TABLE_AFFINITY = """
+(
+  "chapter"   INTEGER       NOT NULL,
+  "id1"       INTEGER       NOT NULL,
+  "id2"       INTEGER       NOT NULL,
+  "common"    INTEGER       NOT NULL,
+  "equal"     INTEGER       NOT NULL,
+  "affinity"  FLOAT         NOT NULL,
+  PRIMARY KEY (chapter, id1, id2)
 )
 """
 
@@ -234,24 +349,3 @@ These verses were added to the NT in later times. Because they are not original
 they are not included in the text of manuscript 'A'.
 
 """
-
-
-class DBA (object):
-    """ Database Interface """
-
-    def __init__ (self, s):
-        if s not in ("local", "remote"):
-            s = "local"
-        self.connection = MySQLdb.connect (read_default_group = "ntg-" + s)
-
-    def cursor (self):
-        return self.connection.cursor ()
-
-    def commit (self):
-        self.connection.commit ()
-
-    def rollback (self):
-        self.connection.rollback ()
-
-    def close (self):
-        self.connection.close ()
