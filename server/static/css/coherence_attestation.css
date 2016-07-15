@@ -1,0 +1,84 @@
+/* Generated file. Do not edit. */
+div.ui-tooltip.tooltip-relatives {
+  padding: 0;
+  border: none;
+  max-width: 100%;
+  font-size: 1em;
+}
+div.ui-tooltip.tooltip-relatives div.panel {
+  margin: 0;
+}
+.popover {
+  max-width: 100%;
+}
+div.popover-relatives div.popover-content {
+  padding: 0;
+}
+div.popover-relatives table.table {
+  margin-bottom: 1px;
+}
+#attestations {
+  font-size: smaller;
+}
+#attestations h4.list-group-item-heading {
+  display: inline;
+}
+#attestations ul.list-group-item-text {
+  display: inline;
+  padding-left: 2em;
+}
+.ms[data-id]:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+a.highlight,
+span.highlight {
+  background-color: #ff0;
+}
+a.selected,
+span.selected {
+  outline: 2px solid #f00;
+}
+line.link {
+  stroke: #ccc;
+  stroke-width: 2px;
+  stroke-opacity: .6;
+}
+circle.node {
+  stroke: #fff;
+  stroke-width: 2px;
+  transition: fill 2s linear;
+  cursor: pointer;
+}
+circle.node.hsnr_0 {
+  stroke: #000;
+}
+circle.node.hsnr_1 {
+  stroke: #000;
+}
+line.link.highlight,
+g.highlight circle.node {
+  stroke: #ff0;
+  stroke-width: 3px;
+  stroke-opacity: 1.0;
+}
+g.selected circle.node {
+  stroke: #f00;
+}
+text.node {
+  font-size: 11px;
+  dominant-baseline: middle;
+  fill: #000;
+  stroke: #fff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  text-anchor: middle;
+  pointer-events: none;
+  paint-order: stroke;
+}
+text.node:hover {
+  text-decoration: underline;
+}
+#svg-wrapper {
+  width: 100%;
+}

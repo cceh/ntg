@@ -1,0 +1,23 @@
+{
+  "name": "cceh-ntg",
+  "version": "0.1.0",
+  "authors": [
+    "CCeH - Cologne Center for eHumanities"
+  ],
+  "license": "GPL3",
+  "private": false,
+  "ignore": [
+    "**/.*",
+    "**/*~",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "requirejs": "~2.2.0",
+    "bootstrap": "^3.3.6",
+    "jquery-ui": "^1.12.0"
+  },
+  "devDependencies": {}
+}

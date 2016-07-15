@@ -18,21 +18,23 @@ DEFAULTS = {
     #'attlac' : 'ActsAttLac_3',
     #'tmp'    : 'ActsTmp_3',
 
-    'att'     : 'Att',
-    'lac'     : 'Lac',
-    'labez'   : 'Labez',
-    'ms'      : 'Manuscripts',  # ???
-    'pass'    : 'Passages',     # ???
-    'npass'   : 'NestedPassages',     # ???
-    'aff'     : 'Affinity',
-    'vp'      : 'VP',
-    'rdg'     : 'Rdg',
-    'witn'    : 'Witn',
-    'listval' : 'MsListVal',
-    'vg'      : 'VG',
-    'tmp'     : 'Tmp',
-    'g_nodes' : 'nodes',
-    'g_edges' : 'edges',
+    'att'       : 'Att',
+    'lac'       : 'Lac',
+    'labez'     : 'Labez',
+    'ms'        : 'Manuscripts',  # ???
+    'pass'      : 'Passages',     # ???
+    'npass'     : 'NestedPassages',     # ???
+    'aff'       : 'Affinity',
+    'vp'        : 'VP',
+    'rdg'       : 'Rdg',
+    'witn'      : 'Witn',
+    'listval'   : 'MsListVal',
+    'vg'        : 'VG',
+    'tmp'       : 'Tmp',
+    'g_nodes'   : 'nodes',
+    'g_edges'   : 'edges',
+    'locstemed' : 'LocStemEd',
+    'locstemedtmp' : 'LocStemEdTmp',
 }
 """ Defaults for init_parameters () """
 
@@ -85,6 +87,7 @@ def init_parameters (defaults):
 
     parameters['source_db']  = quote (args.source_db)
     parameters['target_db']  = quote (args.target_db)
+    parameters['src_vg_db']  = quote (args.src_vg_db)
     parameters['table_mask'] = "Acts%02d%%" % args.chapter if args.chapter else "Acts%"
 
     return parameters

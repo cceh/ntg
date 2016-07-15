@@ -450,6 +450,46 @@ om
   Fehlender Text (omissio)
 
 
+Tabellen für Genealogische Kohärenz
+-----------------------------------
+
+Splitt
+
+  Ein Splitt wird benötigt wenn eine Lesart mehrmals unabhängig
+  entstanden ist, damit die Abhängigkeiten der Handschriften
+  untereinander nicht verfälscht werden.
+
+  Bei einem Splitt erhalten die Felder varnew, s1, s2 in LocStemEd*
+  durch die Bearbeitung die Form [a-y][1-9].
+
+Zusammenlegung
+  Eine Zusammenlegung wird benötigt um einen Splitt rückgängig zu
+  machen???
+
+  Bei einer Zusammenlegung hast das Feld varnew die Form: [a-y]!.
+
+
+Kritik
+------
+
+    Once we have tabulated these numbers for all the witnesses included,
+    an overall structure emerges which shows the relationships between
+    them in terms of ancestry and descent, their *genealogical
+    coherence.* ([WACHTEL2015]_)
+
+Kann aus lokalen Stemmata wirklich auf die Genealogie der Zeugen
+geschlossen werden oder ist das nur Wunschdenken?  Dieses Vorgehen
+scheint auf den ersten Blick plausibel, hält einer näheren Überprüfung
+aber nicht statt.
+
+Wenn Lesart b aus Lesart a abstammt, so kann über ein Manuskript, das b
+enthält, nur ausgesagt werden, daß es jünger ist als das *älteste*
+Manuskript, das a enthält.  Über das relative Alter zweier beliebiger
+Manuskripte, die jeweils a und b enthalten, kann nichts ausgesagt
+werden.
+
+
+
 Interaktive Oberfläche
 ======================
 
@@ -489,6 +529,10 @@ Literatur
    in das Griechische Neue Testament. Vierte Auflage.  Völlig
    umgearbeitet von Ernst von Dobschütz.*  Göttingen: Vandenhoeck &
    Ruprecht.
+
+.. [WACHTEL2015]  Wachtel, Klaus.  *The Coherence Method and History.*
+   Institut für Neutestamentliche Textforschung, University of Münster.
+   http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-history.pdf
 
 .. [WESTCOTT1881] Westcott, Brooke Foss and Hort, Fenton John Anthony.
    *The New Testament in the Original Greek.  Volume 2.  Introduction

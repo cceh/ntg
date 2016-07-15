@@ -92,14 +92,16 @@ def fix (conn, msg, check_sql, fix_sql, parameters):
 class DBA (object):
     """ Database Interface """
 
-    def __init__ (self, group = None):
+    def __init__ (self, group = None, db = None):
         if group is None:
             group = MYSQL_DEFAULT_GROUP
+        if db is None:
+            db = ''
 
         message (3, "Connecting to db and reading init group: {group}".format (group = group), True)
 
         self.engine = create_engine (
-            "mysql:///?read_default_group={group}".format (group = group))
+            "mysql:///{db}?read_default_group={group}".format (db = db, group = group))
 
         sqlalchemy.event.listen (self.engine, 'connect', on_connect)
 
@@ -298,6 +300,7 @@ CREATE_TABLE_AFFINITY = """
   "id2"       INTEGER       NOT NULL,
   "common"    INTEGER       NOT NULL,
   "equal"     INTEGER       NOT NULL,
+  "older"     INTEGER       NOT NULL,
   "affinity"  FLOAT         NOT NULL,
   PRIMARY KEY (chapter, id1, id2)
 )
@@ -327,6 +330,26 @@ CREATE_TABLE_GEPHI_EDGES = """
   PRIMARY KEY (source, target)
 )
 """
+
+CREATE_TABLE_LOCSTEMED = """
+(
+  "id"     INTEGER      NOT NULL AUTO_INCREMENT,
+  "begadr" INTEGER      NOT NULL,
+  "endadr" INTEGER      NOT NULL,
+  "varid"  VARCHAR(2)   NOT NULL,
+  "varnew" VARCHAR(2)   NOT NULL DEFAULT '',
+  "s1"     VARCHAR(2)   NOT NULL DEFAULT '',
+  "s2"     VARCHAR(2)   NOT NULL DEFAULT '',
+  "pred"   VARCHAR(256) NOT NULL DEFAULT '',
+  "prs1"   VARCHAR(2)   NOT NULL DEFAULT '',
+  "prs2"   VARCHAR(2)   NOT NULL DEFAULT '',
+  "check"  VARCHAR(2)   NOT NULL DEFAULT '',
+  "check2" VARCHAR(2)   NOT NULL DEFAULT '',
+  "w"      varchar(1)   NOT NULL DEFAULT '',
+  PRIMARY KEY (id)
+)
+"""
+
 
 BYZ_HSNR = "(300010, 300180, 300350, 303300, 303980, 304240, 312410)"
 """Manuscripts that contain the Byzantine Text.

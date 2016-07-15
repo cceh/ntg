@@ -42,6 +42,7 @@ import os
 import re
 import sys
 
+import networkx as nx
 import numpy as np
 import six
 
@@ -90,30 +91,32 @@ def step01 (dba, parameters):
         execute (conn, 'DROP DATABASE IF EXISTS {target_db}', parameters)
         execute (conn, 'CREATE DATABASE IF NOT EXISTS {target_db}', parameters)
 
-        parameters['fields'] = db.CREATE_TABLE_ATT;
-        execute (conn, 'CREATE OR REPLACE TABLE {att} {fields}'    , parameters)
-        parameters['fields'] = db.CREATE_TABLE_LAC;
-        execute (conn, 'CREATE OR REPLACE TABLE {lac} {fields}'    , parameters)
-        parameters['fields'] = db.CREATE_TABLE_LABEZ;
-        execute (conn, 'CREATE OR REPLACE TABLE {labez} {fields}'  , parameters)
-        parameters['fields'] = db.CREATE_TABLE_VP;
-        execute (conn, 'CREATE OR REPLACE TABLE {vp} {fields}'     , parameters)
-        parameters['fields'] = db.CREATE_TABLE_RDG;
-        execute (conn, 'CREATE OR REPLACE TABLE {rdg} {fields}'    , parameters)
-        parameters['fields'] = db.CREATE_TABLE_WITN;
-        execute (conn, 'CREATE OR REPLACE TABLE {witn} {fields}'   , parameters)
-        parameters['fields'] = db.CREATE_TABLE_MSLISTVAL;
-        execute (conn, 'CREATE OR REPLACE TABLE {listval} {fields}', parameters)
-        parameters['fields'] = db.CREATE_TABLE_VG;
-        execute (conn, 'CREATE OR REPLACE TABLE {vg} {fields}'     , parameters)
-        parameters['fields'] = db.CREATE_TABLE_MANUSCRIPTS;
-        execute (conn, 'CREATE OR REPLACE TABLE {ms} {fields}'     , parameters)
-        parameters['fields'] = db.CREATE_TABLE_AFFINITY;
-        execute (conn, 'CREATE OR REPLACE TABLE {aff} {fields}'    , parameters)
-        parameters['fields'] = db.CREATE_TABLE_GEPHI_NODES;
-        execute (conn, 'CREATE OR REPLACE TABLE {g_nodes} {fields}', parameters)
-        parameters['fields'] = db.CREATE_TABLE_GEPHI_EDGES;
-        execute (conn, 'CREATE OR REPLACE TABLE {g_edges} {fields}', parameters)
+        execute (conn, 'USE {target_db}', parameters)
+
+        parameters['fields'] = db.CREATE_TABLE_ATT
+        execute (conn, 'CREATE OR REPLACE TABLE {att} {fields}'      , parameters)
+        parameters['fields'] = db.CREATE_TABLE_LAC
+        execute (conn, 'CREATE OR REPLACE TABLE {lac} {fields}'      , parameters)
+        parameters['fields'] = db.CREATE_TABLE_LABEZ
+        execute (conn, 'CREATE OR REPLACE TABLE {labez} {fields}'    , parameters)
+        parameters['fields'] = db.CREATE_TABLE_VP
+        execute (conn, 'CREATE OR REPLACE TABLE {vp} {fields}'       , parameters)
+        parameters['fields'] = db.CREATE_TABLE_RDG
+        execute (conn, 'CREATE OR REPLACE TABLE {rdg} {fields}'      , parameters)
+        parameters['fields'] = db.CREATE_TABLE_WITN
+        execute (conn, 'CREATE OR REPLACE TABLE {witn} {fields}'     , parameters)
+        parameters['fields'] = db.CREATE_TABLE_MSLISTVAL
+        execute (conn, 'CREATE OR REPLACE TABLE {listval} {fields}'  , parameters)
+        parameters['fields'] = db.CREATE_TABLE_VG
+        execute (conn, 'CREATE OR REPLACE TABLE {vg} {fields}'       , parameters)
+        parameters['fields'] = db.CREATE_TABLE_MANUSCRIPTS
+        execute (conn, 'CREATE OR REPLACE TABLE {ms} {fields}'       , parameters)
+        parameters['fields'] = db.CREATE_TABLE_AFFINITY
+        execute (conn, 'CREATE OR REPLACE TABLE {aff} {fields}'      , parameters)
+        parameters['fields'] = db.CREATE_TABLE_GEPHI_NODES
+        execute (conn, 'CREATE OR REPLACE TABLE {g_nodes} {fields}'  , parameters)
+        parameters['fields'] = db.CREATE_TABLE_GEPHI_EDGES
+        execute (conn, 'CREATE OR REPLACE TABLE {g_edges} {fields}'  , parameters)
 
         res = execute (conn, 'SHOW COLUMNS IN {att}', parameters)
         target_columns_att = set ([row[0].lower () for row in res])
@@ -155,6 +158,26 @@ def step01 (dba, parameters):
 
         message (1, "Step  1 : Creating indices ...")
         create_indices (conn)
+
+        execute (conn, """
+        DROP FUNCTION IF EXISTS char_labez
+        """, parameters)
+
+        execute (conn, """
+        CREATE FUNCTION char_labez (l INTEGER)
+        RETURNS CHAR(3) DETERMINISTIC
+        RETURN IF (l, CHAR (l + 96 using utf8), 'lac')
+        """, parameters)
+
+        execute (conn, """
+        DROP FUNCTION IF EXISTS ord_labez
+        """, parameters)
+
+        execute (conn, """
+        CREATE FUNCTION ord_labez (l CHAR(2))
+        RETURNS INTEGER DETERMINISTIC
+        RETURN ORD (l) - 96
+        """, parameters)
 
 
 def create_ms_pass_tables (dba, parameters):
@@ -360,7 +383,7 @@ def step02 (dba, parameters):
     Delete spurious carriage return characters in suffix2 field.  Replace NULL
     entries with empty strings.
 
-        Korrekturen in den Acts-Tabellen: L-Notierungen nur im Feld LEKT, \*-
+        Korrekturen in den Acts-Tabellen: L-Notierungen nur im Feld LEKT, \\*-
         u. C-Notierungen nur im Feld KORR.
 
         Gelegentlich steht an Stellen, an denen mehrere Lektionen desselben
@@ -930,8 +953,8 @@ def step09_numpy (dba, parameters):
 
         # unroll lacunae.  All lacunae get a labez of 0.
         execute (conn, """
-        INSERT INTO {labez} (ms_id, pass_id, labez)
-        SELECT ms.id, p.id, 0
+        INSERT INTO {labez} (ms_id, pass_id, labez, labezsuf)
+        SELECT ms.id, p.id, 0, ''
           FROM
             {lac} lac
           JOIN
@@ -946,7 +969,7 @@ def step09_numpy (dba, parameters):
         # copy labez eventually overwriting lacunae
         execute (conn, """
         REPLACE INTO {labez} (ms_id, pass_id, labez, labezsuf)
-        SELECT ms.id, p.id, ord (att.labez) - 96, labezsuf
+        SELECT ms.id, p.id, ord_labez (att.labez), labezsuf
           FROM
             {att} att
           JOIN
@@ -962,7 +985,7 @@ def step09_numpy (dba, parameters):
         # fill with the labez of A
         execute (conn, """
         INSERT IGNORE INTO {labez} (ms_id, pass_id, labez, labezsuf)
-        SELECT ms.id, p.id, ord (att.labez) - 96, labezsuf
+        SELECT ms.id, p.id, ord_labez (att.labez), labezsuf
           FROM
             {att} att
           JOIN
@@ -1338,7 +1361,7 @@ def step21 (dba, parameters):
             FROM {rdg}
             WHERE bzdef = 7 AND bz IN (5, 1)
             GROUP BY anfadr, endadr
-            HAVING count (*) = 3
+            HAVING count (*) <= 3
           ) AS t
         )
         """, parameters)
@@ -1519,10 +1542,126 @@ def step22 (dba, parameters):
         """, parameters)
 
 
+def step31 (dba, parameters):
+    """Copy / update genealogical data
+
+    Aus: VGA/Att2CBGM.pl, VGA/PortCBGMInfo.pl
+
+    """
+
+    message (1, "Step 31 : Copying genealogical data ...")
+
+    with dba.engine.begin () as conn:
+        parameters['fields'] = db.CREATE_TABLE_LOCSTEMED
+        execute (conn, 'CREATE OR REPLACE TABLE {locstemed} {fields}', parameters)
+        execute (conn, 'CREATE OR REPLACE TABLE {locstemedtmp} {fields}', parameters)
+
+        res = execute (conn, """SHOW TABLES FROM {source_db} LIKE 'Acts__GVZ'""", parameters)
+        for row in res:
+            parameters['source_table'] = row[0]
+            parameters['source'] = '{source_db}."{source_table}"'.format (**parameters)
+
+            execute (conn, """
+            INSERT INTO {locstemed} (begadr, endadr, varid, varnew, s1)
+	    SELECT DISTINCT anfadr, endadr, labez, labez, IF (labez = 'a', '*', 'a')
+	    FROM {source}
+            """, parameters)
+
+        res = execute (conn, """SHOW TABLES FROM {src_vg_db} LIKE 'LocStemEdAct__'""", parameters)
+        for row in res:
+            parameters['source_table'] = row[0]
+            parameters['source'] = '{src_vg_db}."{source_table}"'.format (**parameters)
+
+            execute (conn, """
+            INSERT INTO {locstemedtmp} (begadr, endadr, varid, varnew, s1, s2, prs1, prs2, "check", check2, w)
+            SELECT begadr, endadr, varid, varnew, s1, s2, prs1, prs2, "check", check2, w
+            FROM {source}
+            """, parameters)
+
+        fix (conn, "Ambiguous Local Stemmata", """
+        SELECT begadr, endadr, varnew
+        FROM {locstemedtmp}
+        GROUP BY begadr, endadr, varnew HAVING COUNT (*) > 1
+        """, """
+        DELETE FROM {locstemedtmp} WHERE (begadr, endadr, varnew, s1) = (51702028, 51702030, 'c2', 'b');
+        DELETE FROM {locstemedtmp} WHERE (begadr, endadr, varnew, s1) = (52830006, 52830014, 'd', 'a1')
+        """, parameters)
+
+        # delete all passages which do not exist anymore
+        execute (conn, """
+        DELETE d FROM {locstemedtmp} d
+        WHERE NOT EXISTS (
+          SELECT anfadr, endadr FROM Passages p WHERE (d.begadr, d.endadr) = (p.anfadr, p.endadr)
+        )
+        """, parameters)
+
+        # overwrite with changed passages
+        execute (conn, """
+        CREATE UNIQUE INDEX locstemed_varnew ON {locstemed} (begadr, endadr, varnew)
+        """, parameters)
+
+        execute (conn, """
+        INSERT IGNORE INTO {locstemed} (begadr, endadr, varid, varnew, s1, s2, prs1, prs2, "check", check2, w)
+        SELECT begadr, endadr, varid, varnew, s1, s2, prs1, prs2, "check", check2, w FROM {locstemedtmp}
+        """, parameters)
+
+        # preprocess source readings
+        #
+        # We want to quickly retrieve all source readings, ie. to traverse the
+        # graph of readings from any reading back to the a reading.  Since mysql
+        # is the only database that does not implement WITH RECURSIVE we have to
+        # preprocess the data in order to do this.
+
+        parameters['fields'] = 'begadr, endadr, varid, varnew, s1, s2';
+        res = execute (conn, """
+        SELECT {fields} FROM {locstemed}
+        WHERE s1 != '*' AND s1 != '?' AND varnew NOT REGEXP '^z'
+        ORDER BY begadr, endadr DESC, varnew
+        """, parameters)
+
+        Variant = collections.namedtuple ('Variant', parameters['fields'])
+
+        update = []
+        for key, group in itertools.groupby (res, operator.itemgetter (0, 1)):
+            G = nx.DiGraph ()
+            rows = list (map (Variant._make, group))
+
+            for row in rows:
+                G.add_edge (row.varnew, row.s1)
+                if row.s2:
+                    G.add_edge (row.varnew, row.s2)
+
+            if not nx.is_directed_acyclic_graph (G):
+                message (1, "Error: Not a DAG at variant {begadr}/{endadr}".format (row))
+                continue
+
+            for row in rows:
+                succ = sorted (map (operator.itemgetter (1), nx.bfs_edges (G, row.varnew)))
+                if succ:
+                    update.append (
+                        {
+                            'begadr' : row.begadr,
+                            'endadr' : row.endadr,
+                            'varnew' : row.varnew,
+                            'pred'   : ','.join (succ)
+                        }
+                    )
+
+        message (3, "Updating rows {upd}".format (upd = update[:100]))
+
+        # do not use row syntax (a, b) = (:a, :b) here, it is awfully slow
+        res = executemany (conn, """
+        UPDATE {locstemed}
+        SET pred = :pred
+        WHERE begadr = :begadr AND endadr = :endadr AND varnew = :varnew
+        """, parameters, update)
+
+
+
 Manuscript = collections.namedtuple ('Manuscript', 'hs hsnr')
 Chapter    = collections.namedtuple ('Chapter',    'n start end')
 
-class Bag:
+class Bag (object):
     """ Holds some values for us. """
 
     n_mss = 0               # No. of manuscripts
@@ -1538,7 +1677,7 @@ class Bag:
     affinity_matrix = None  # hs x hs matrix of similarity measure
 
 
-def step10_numpy (dba, parameters, val):
+def step32 (dba, parameters, val):
     """Create the labez matrix.
 
     Create a matrix of manuscripts x passages.  Each entry represents one
@@ -1546,7 +1685,7 @@ def step10_numpy (dba, parameters, val):
 
     """
 
-    message (1, "Step 10 : Loading labez matrix ...")
+    message (1, "Step 32 : Loading labez matrix ...")
 
     with dba.engine.begin () as conn:
 
@@ -1628,7 +1767,7 @@ def step10_numpy (dba, parameters, val):
         print (val.n_var_passages)
         print (val.var_labez_matrix.shape)
 
-        message (1, "Step 10 : Building Byzantine text ...")
+        message (1, "Step 32 : Building Byzantine text ...")
 
         # Get the labez of some typical Byzantine texts
         parameters['byzlist'] = db.BYZ_HSNR
@@ -1651,18 +1790,15 @@ def step10_numpy (dba, parameters, val):
 
         # Calculate the Byzantine labez for each passage
         byz_text = np.zeros (val.n_passages, dtype = int)
+
         for i, bc in enumerate (byz_bincount.T):
-            # test if all mss are defined
-            if bc[0] > 0:
-                continue
-            # test for patterns 7, 6+0, 6+1, 5+1+1
             for j, b in enumerate (bc):
                 if b >= 6:
                     # must be 7 or 6+1
                     byz_text[i] = j
                     continue
-                if b == 5 and 2 not in bc:
-                    # must be 5+1+1
+                if b == 5 and 2 not in bc[1:]:
+                    # must be 5+1+1 or 5+1
                     byz_text[i] = j
                     continue
 
@@ -1703,7 +1839,7 @@ def step10_numpy (dba, parameters, val):
                           ticks_labels_x, ticks_labels_y, plot.colormap_bw ())
 
 
-def step24 (dba, parameters, val):
+def step33 (dba, parameters, val):
     """Calculate mss similarity
 
     Aus: VGA/VG05_all3.pl
@@ -1717,9 +1853,25 @@ def step24 (dba, parameters, val):
 
     """
 
-    message (1, "Step 24 : Calculating mss similarity ...")
+    message (1, "Step 33 : Calculating mss similarity ...")
 
     with dba.engine.begin () as conn:
+
+        # load local stem for each passage
+        res = execute (conn, """
+        SELECT p.id - 1 as pass_id, varid, pred
+        FROM {locstemed} l
+        JOIN {pass} p
+          ON (l.begadr, l.endadr) = (p.anfadr, p.endadr)
+        WHERE pred <> ''
+        """, parameters)
+
+        def decode (x):
+            return ord (x[0]) - 96;
+
+        pred = {}
+        for row in res:
+            pred[(row[0], decode (row[1]))] = map (decode, row[2].split (','))
 
         # Matrix chapter x ms x ms with count of the passages that are defined in both mss
         val.and_matrix = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
@@ -1730,7 +1882,13 @@ def step24 (dba, parameters, val):
         # Matrix chapter x ms x ms with count of the passages that are equal in both mss
         val.eq_matrix  = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
 
+        # Matrix chapter x ms x ms with count of the passages that are older in ms1 than in ms2
+        val.older_matrix  = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
+
+        # pre-genealogical coherence (outputs symmetrical matrices)
         # loop over all mss O(n_mss² * n_chapters * n_passages)
+
+        message (1, "          Calculating mss similarity pre-co ...")
         for j in range (0, val.n_mss):
             labezj = val.labez_matrix[j]
             defj   = val.def_matrix[j]
@@ -1739,14 +1897,30 @@ def step24 (dba, parameters, val):
                 labezk = val.labez_matrix[k]
                 defk   = val.def_matrix[k]
 
-                def_and  = np.logical_and (defj, defk)
-                def_or   = np.logical_or  (defj, defk)
-                labez_eq = np.logical_and (def_and, np.equal (labezj, labezk))
+                def_and     = np.logical_and (defj, defk)
+                def_or      = np.logical_or  (defj, defk)
+                labez_eq    = np.logical_and (def_and, np.equal (labezj, labezk))
 
                 for i, chapter in enumerate (val.chapters):
                     val.and_matrix[i,j,k] = val.and_matrix[i,k,j] = np.sum (def_and[0, chapter.start:chapter.end])
                     val.or_matrix[i,j,k]  = val.or_matrix[i,k,j]  = np.sum (def_or[0, chapter.start:chapter.end])
                     val.eq_matrix[i,j,k]  = val.eq_matrix[i,k,j]  = np.sum (labez_eq[0, chapter.start:chapter.end])
+
+        # genealogical coherence (outputs asymmetrical matrices)
+        # loop over all mss O(n_mss² * n_chapters * n_passages)
+        message (1, "          Calculating mss similarity post-co ...")
+        for j in range (0, val.n_mss):
+            labezj = val.labez_matrix[j]
+            for k in range (0, val.n_mss):
+                labezk = val.labez_matrix[k]
+
+                labez_older = np.empty_like (val.def_matrix[0])
+                for pass_id, (labez1, labez2) in enumerate (zip (labezj, labezk)):
+                    labez_older[0,i] = (labez1 and labez2 and (labez1 != labez2)
+                                        and labez1 in pred.get ((pass_id, labez1), []))
+
+                for i, chapter in enumerate (val.chapters):
+                    val.older_matrix[i,j,k] = np.sum (labez_older[0, chapter.start:chapter.end])
 
 
         # Matrix ms x ms with count of the passages that are different in both mss
@@ -1759,7 +1933,7 @@ def step24 (dba, parameters, val):
             val.quotient_matrix[val.and_matrix == 0] = 0.0
 
         # debug
-        if (0):
+        if 0:
             #plot.heat_matrix (eq_matrix,  "No. of Equal Passages", )
             #plot.heat_matrix (and_matrix, "No. of Passages Defined in Both Manuscripts", )
             ticks_labels = plot.mss_labels (val.mss)
@@ -1798,20 +1972,22 @@ def step24 (dba, parameters, val):
                             'chapter' :  chapter.n,
                             'common' :   val.and_matrix[i,j,k],
                             'equal' :    val.eq_matrix[i,j,k],
+                            'older' :    val.older_matrix[i,j,k],
                             'affinity' : val.quotient_matrix[i,j,k]
                         }
                     )
 
             executemany (conn, """
-            INSERT INTO {aff} (id1, id2, chapter, common, equal, affinity)
-            VALUES (:id1, :id2, :chapter, :common, :equal, :affinity)
+            INSERT INTO {aff} (id1, id2, chapter, common, equal, older, affinity)
+            VALUES (:id1, :id2, :chapter, :common, :equal, :older, :affinity)
             """, parameters, param_array)
 
-        print ("eq\n",   val.eq_matrix)
-        print ("diff\n", val.diff_matrix)
-        print ("and\n",  val.and_matrix)
-        print ("or\n",   val.or_matrix)
-        print ("quot\n", val.quotient_matrix)
+        print ("eq\n",    val.eq_matrix)
+        print ("older\n", val.older_matrix)
+        print ("diff\n",  val.diff_matrix)
+        print ("and\n",   val.and_matrix)
+        print ("or\n",    val.or_matrix)
+        print ("quot\n",  val.quotient_matrix)
 
 
 def affinity_clustering (dba, parameters, val):
@@ -1954,8 +2130,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser (description='Prepare a new database for CBGM')
 
-    parser.add_argument ('source_db', metavar='SOURCE_DB', help='the source database (required)')
-    parser.add_argument ('target_db', metavar='TARGET_DB', help='the target database (required)')
+    parser.add_argument ('source_db', metavar='SOURCE_DB',    help='the source ECM database (required)')
+    parser.add_argument ('target_db', metavar='TARGET_DB',    help='the target ECM database (required)')
+    parser.add_argument ('src_vg_db', metavar='SRC_VG_DB', help='the source VarGenAtt database (required)')
+
     parser.add_argument ('-r', '--range', default='',
                          help='range of steps (default: all)')
     parser.add_argument ('-v', '--verbose', dest='verbose', action='count',
@@ -1984,7 +2162,7 @@ if __name__ == '__main__':
     parameters = tools.init_parameters (tools.DEFAULTS)
     v = Bag ()
 
-    dba = db.DBA (args.profile)
+    dba = db.DBA (args.profile, args.target_db)
 
     try:
         for step in range (args.range[0], args.range[1] + 1):
@@ -2042,8 +2220,14 @@ if __name__ == '__main__':
             if step == 22:
                 #step22 (dba, parameters)
                 continue
-            if step == 24:
-                step24 (dba, parameters, v)
+            if step == 31:
+                step31 (dba, parameters)
+                continue
+            if step == 32:
+                step32 (dba, parameters, v)
+                continue
+            if step == 33:
+                step33 (dba, parameters, v)
                 affinity_to_gephi (dba, parameters, v)
                 continue
 

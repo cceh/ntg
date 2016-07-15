@@ -35,7 +35,7 @@ babel = flask_babel.Babel (app)
 def get_locale ():
     return flask.request.accept_languages.best_match (LANGUAGES.keys ())
 
-class Bag:
+class Bag (object):
     """ Class to stick values in. """
     pass
 
@@ -89,6 +89,7 @@ def index ():
 @app.route('/relatives.json/<int:hsnr>/<int:chapter>')
 @app.route('/relatives.json/<int:hsnr>/<int:chapter>/<int:limit>')
 def ms_info (hsnr, chapter = 0, limit = 10):
+    """ Unused """
 
     with dba.engine.begin () as conn:
 
@@ -99,11 +100,13 @@ def ms_info (hsnr, chapter = 0, limit = 10):
 
         res = execute (conn, """
         SELECT hsnr, common, equal, affinity
-        FROM Affinity
-        JOIN Manuscripts
-        ON Affinity.id1 = Manuscripts.id
-        WHERE chapter = :chapter AND Affinity.id1 = :id1 ORDER BY affinity DESC Limit :limit
-        """, { 'id1' : id1, 'chapter' : chapter, 'limit': limit } )
+        FROM {aff} aff
+          JOIN {ms} ms1
+          JOIN {ms} ms2
+        ON aff.id1 = ms1.id AND aff.id2 = ms2.id AND ms2.length >= ms1.length / 2
+        WHERE chapter = :chapter AND aff.id1 = :id1
+        ORDER BY affinity DESC LIMIT :limit
+        """, dict (parameters, id1 = id1, chapter = chapter, limit = limit))
 
         # convert tuples to lists
         return flask.json.jsonify ( [list (row) for row in res] )
@@ -143,52 +146,65 @@ def ms_attesting (pass_id, labez):
 @app.route('/relatives/<int:pass_id>/<int:hsnr>/<int:chapter>')
 @app.route('/relatives/<int:pass_id>/<int:hsnr>/<int:chapter>/<int:limit>')
 def relatives (hsnr, pass_id, chapter = 0, limit = 10):
-    """ Get the nearest relatives of a ms and what they attest. """
+    """Output a table of the nearest relatives of a manuscript.
+
+    Output a table of the nearest relatives of a manuscript and what they
+    attest.
+
+    """
 
     with dba.engine.begin () as conn:
 
-        # Get ms name
+        # Get the manuscript name
+        ms = Bag ()
         res = execute (conn, """
-        SELECT id, hs FROM {ms} WHERE hsnr = :hsnr
+        SELECT id - 1 as id, hs FROM {ms} WHERE hsnr = :hsnr
         """, dict (parameters, hsnr = hsnr))
-        id_, hs = res.fetchone ()
+        ms.id_, ms.hs = res.fetchone ()
 
-        # Get affinity to MT
+        # Get the attestation (labez) of the manuscript
+        res = execute (conn, """
+        SELECT char_labez (labez) as labez, labezsuf
+        FROM {labez}
+        WHERE ms_id = :ms_id AND pass_id = :pass_id
+        """, dict (parameters, ms_id = ms.id_ + 1, pass_id = pass_id))
+        ms.labez, ms.labezsuf = res.fetchone ()
+
+        # Get the affinity of the manuscript to MT
+        mt = Bag ()
         res = execute (conn, """
         SELECT affinity FROM {aff} WHERE id1 = :id1 AND id2 = 2 AND chapter = :chapter
-        """, dict (parameters, id1 = id_, chapter = chapter))
-        mt_aff = res.scalar ()
+        """, dict (parameters, id1 = ms.id_ + 1, chapter = chapter))
+        mt.aff = res.scalar ()
 
-        # Get attestation (labez) of MT
+        # Get the attestation (labez) of MT
         res = execute (conn, """
-        SELECT char (labez + 96 using utf8) as labez, labezsuf
+        SELECT char_labez (labez) as labez, labezsuf
         FROM {labez}
-        WHERE ms_id = 2 AND pass_id = pass_id
+        WHERE ms_id = 2 AND pass_id = :pass_id
         """, dict (parameters, pass_id = pass_id))
-        labez, labezsuf = res.fetchone ()
+        mt.labez, mt.labezsuf = res.fetchone ()
 
-        # Get X most similar Mss
+        # Get the X most similar manuscripts and their attestations
         res = execute (conn, """
-        SELECT ms2.hs, ms2.hsnr, aff.common, aff.equal, aff.affinity,
-               char (labez.labez + 96 using utf8) as labez, labez.labezsuf
-        FROM {ms} ms
-        JOIN {labez} labez
-        JOIN {aff} aff
-        JOIN {ms} ms2
-        ON ms.id = aff.id1 AND aff.id2 = ms2.id AND ms2.id = labez.ms_id
-        AND labez.labez > 0 AND aff.common > 0
-        WHERE ms.hsnr = :hsnr AND labez.pass_id = :pass_id AND chapter = :chapter
+        SELECT ms2.id - 1 as id, ms2.hs, ms2.hsnr, aff.common, aff.equal, aff.affinity,
+               char_labez (labez.labez) as labez, labez.labezsuf
+        FROM {aff} aff
+          JOIN {ms} ms1
+          JOIN {ms} ms2
+            JOIN {labez} labez
+        ON aff.id1 = ms1.id AND aff.id2 = ms2.id AND ms2.length >= ms1.length / 2
+          AND ms2.id = labez.ms_id AND labez.labez > 0 AND aff.common > 0
+        WHERE ms1.hsnr = :hsnr AND labez.pass_id = :pass_id AND chapter = :chapter
         ORDER BY affinity DESC
         LIMIT :limit
         """, dict (parameters, hsnr = hsnr, pass_id = pass_id, chapter = chapter, limit = limit))
 
-        Relatives = collections.namedtuple ('Relatives', 'hs hsnr common equal affinity labez labezsuf')
+        Relatives = collections.namedtuple ('Relatives', 'id hs hsnr common equal affinity labez labezsuf')
         relatives = list (map (Relatives._make, res))
 
         # convert tuples to lists
-        return flask.render_template ("relatives.html",
-                                      hs = hs, mt_aff = mt_aff, labez = labez, labezsuf = labezsuf,
-                                      rows = relatives)
+        return flask.render_template ("relatives.html", ms = ms, mt = mt, rows = relatives)
 
 
 @app.route('/coherence/attestation/<start>')
@@ -210,9 +226,9 @@ def coherence_attestation (start, end = None):
 
         # list of labez
         res = execute (conn, """
-        SELECT DISTINCT labez, labezsuf, ord (labez) - 96 as ord_labez, lesart
+        SELECT DISTINCT labez, labezsuf, ord_labez (labez) as ord_labez, lesart
         FROM {att}
-        WHERE anfadr = :anfadr AND endadr = :endadr
+        WHERE anfadr = :anfadr AND endadr = :endadr AND NOT labez REGEXP '^z'
         ORDER BY labez, labezsuf
         """, dict (parameters, anfadr = values.start, endadr = values.end))
 
@@ -222,10 +238,12 @@ def coherence_attestation (start, end = None):
         values.readings = []
         for r in readings:
             res = execute (conn, """
-            SELECT hs
-            FROM {att}
+            SELECT ms.id - 1 as id, ms.hs
+            FROM {att} att
+            JOIN {ms} ms
+            ON att.hsnr = ms.hsnr
             WHERE anfadr = :anfadr AND endadr = :endadr AND labez = :labez AND labezsuf = :labezsuf
-            ORDER BY hsnr
+            ORDER BY ms.hsnr
             """, dict (parameters, anfadr = values.start, endadr = values.end, labez = r.labez, labezsuf = r.labezsuf))
 
             b = Bag ()
@@ -233,7 +251,7 @@ def coherence_attestation (start, end = None):
             b.labezsuf = r.labezsuf
             b.ord_labez = r.ord_labez
             b.lesart = r.lesart
-            b.manuscripts = ' '.join ([r[0] + '.' for r in res])
+            b.manuscripts = res.fetchall ()
             values.readings.append (b)
 
         # manuscript -> labez
@@ -266,7 +284,7 @@ def coherence_attestation_json (pass_id):
         attestations = {}
         for row in res:
             ms_id, labez = row
-            attestations[str(ms_id - 1)] = labez;
+            attestations[str(ms_id - 1)] = labez
 
         return flask.json.jsonify ({
             'attestations': attestations
@@ -276,7 +294,7 @@ def coherence_attestation_json (pass_id):
 
 @app.route('/affinity.json')
 def affinity_json ():
-    """ Return manuscript affinities
+    """ Return manuscript affinities for D3.
 
     Returns manuscript affinities in a json format suitable for D3.js.
 
@@ -300,33 +318,39 @@ def affinity_json ():
                 'hs'     : hs,
                 'hsnr'   : hsnr,
                 'group'  : hsnr // 100000,
-                'radius' : 5 + math.log (length),
-                'y'      : 500 + (id_ // 10) * 10,
-                'x'      : 500 - (id_ %  10) * 10
+                'radius' : 5 + math.log (length)
             } )
 
             # Build edges table.  Needs brains.  Creating an edge between every
             # two mss will not give a very meaningful graph.  We have to keep only
             # the most significant edges.  But what is significant?
+            #
+            # Currently we `edge´: for each manuscript the X most similar
+            # manuscripts that are at least half as long.
 
             limit = 20
 
             res2 = execute (conn, """
             SELECT id1, id2, common, equal
-            FROM Affinity
+            FROM {aff} aff
+              JOIN {ms} ms1
+              JOIN {ms} ms2
+              ON aff.id1 = ms1.id AND aff.id2 = ms2.id
+                AND common >= ms1.length / 2
             WHERE chapter = 0 AND id1 = :id1
             ORDER BY affinity DESC
             LIMIT :limit
-            """, { 'id1' : id_, 'limit' : limit })
+            """, dict (parameters, id1 = id_, limit = limit))
 
-            for row in res2:
+            for i, row in enumerate (res2):
                 id1, id2, common, equal = row
 
                 edges.append ( {
                     'source' : id1 - 1,
                     'target' : id2 - 1,
                     'common' : common,
-                    'equal'  : equal
+                    'equal'  : equal,
+                    'rank'   : i + 1
                 } )
 
         return flask.json.jsonify ({
@@ -346,6 +370,7 @@ if __name__ == "__main__":
     parser.parse_args (namespace = args)
     args.source_db = 'ECM_Acts_Ph3'
     args.target_db = 'ECM_Acts_UpdatePh3'
+    args.src_vg_db = 'VarGenAtt_ActPh3'
     args.chapter = 0
 
     dba = db.DBA (args.profile)

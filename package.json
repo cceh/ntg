@@ -1,0 +1,39 @@
+{
+  "name": "@cceh/ntg",
+  "description": "The Novum Testamentum Graece Website",
+  "homepage": "http://ntg.uni-koeln.de",
+  "author": "CCeH - Cologne Center for eHumanities",
+  "contributors": [
+    "Marcello Perathoner <marcello.perathoner@uni-koeln.de>"
+  ],
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cceh/ntg"
+  },
+  "bugs": {
+    "url": "https://github.com/cceh/ntg/issues"
+  },
+  "license": "GPL3",
+  "devDependencies": {
+    "bower": "*",
+    "grunt": "*",
+    "grunt-contrib-csslint": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-less": "*",
+    "grunt-contrib-nodeunit": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-pot": "*",
+    "grunt-potomo": "*",
+    "grunt-pylint": "*",
+    "grunt-shell": "*",
+    "less-plugin-autoprefix": "*"
+  },
+  "engines": {
+    "node": ">=0.10.1"
+  },
+  "files": [
+    "Gruntfile.js"
+  ]
+}
