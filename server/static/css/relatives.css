@@ -1,6 +1,6 @@
 /* Generated file. Do not edit. */
 div.panel {
-  width: 22em;
+  width: 25em;
 }
 div.panel span.ms {
   font-weight: bold;
@@ -15,5 +15,8 @@ table.relatives td.perc {
   text-align: right;
 }
 table.relatives td.equal {
+  text-align: right;
+}
+table.relatives td.older {
   text-align: right;
 }

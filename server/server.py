@@ -187,20 +187,23 @@ def relatives (hsnr, pass_id, chapter = 0, limit = 10):
 
         # Get the X most similar manuscripts and their attestations
         res = execute (conn, """
-        SELECT ms2.id - 1 as id, ms2.hs, ms2.hsnr, aff.common, aff.equal, aff.affinity,
+        SELECT ms2.id - 1 as id, ms2.hs, ms2.hsnr,
+               aff.common, aff.equal, aff.older, aff.newer,
+               if (aff.newer < aff.older, '', if (aff.newer = aff.older, '=', '>')) as direction,
+               aff.affinity,
                char_labez (labez.labez) as labez, labez.labezsuf
         FROM {aff} aff
           JOIN {ms} ms1
           JOIN {ms} ms2
             JOIN {labez} labez
-        ON aff.id1 = ms1.id AND aff.id2 = ms2.id AND ms2.length >= ms1.length / 2
+        ON aff.id1 = ms1.id AND aff.id2 = ms2.id AND aff.common >= ms1.length / 2
           AND ms2.id = labez.ms_id AND labez.labez > 0 AND aff.common > 0
         WHERE ms1.hsnr = :hsnr AND labez.pass_id = :pass_id AND chapter = :chapter
         ORDER BY affinity DESC
         LIMIT :limit
         """, dict (parameters, hsnr = hsnr, pass_id = pass_id, chapter = chapter, limit = limit))
 
-        Relatives = collections.namedtuple ('Relatives', 'id hs hsnr common equal affinity labez labezsuf')
+        Relatives = collections.namedtuple ('Relatives', 'id hs hsnr common equal older newer direction affinity labez labezsuf')
         relatives = list (map (Relatives._make, res))
 
         # convert tuples to lists

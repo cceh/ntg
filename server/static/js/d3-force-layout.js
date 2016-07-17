@@ -138,6 +138,7 @@ define (['jquery', 'd3', 'lodash', 'jquery-ui'], function ($, d3, _) {
             } else {
                 $this.d3_tooltip ("close");
             }
+            // d3.event.stopPropagation ();
         });
     }
 
@@ -189,6 +190,7 @@ define (['jquery', 'd3', 'lodash', 'jquery-ui'], function ($, d3, _) {
             } else {
                 $this.popover ('destroy');
             }
+            // d3.event.stopPropagation ();
         });
     }
 

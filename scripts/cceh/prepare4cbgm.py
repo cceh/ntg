@@ -62,6 +62,9 @@ N_FIELDS = 'base comp comp1 komm kontrolle korr lekt over over1 suff suffix2 vid
 NULL_FIELDS = 'lemma lesart'.split ()
 """ Fields to look for NULL """
 
+MAX_LABEZ = ord ('z') - ord ('a') + 1
+""" Max. no. of different labez """
+
 def create_indices (conn):
     message (2, "          Creating indices ...")
 
@@ -298,6 +301,16 @@ def step01c (dba, parameters):
         UPDATE {att}
         SET hsnr = 411882
         WHERE hs REGEXP 'L1188s2.*'
+        """, parameters)
+
+        fix (conn, "Attestation of A != 'a'", """
+        SELECT hs, labez, labezsuf, anfadr, endadr
+        FROM {att}
+        WHERE hs = 'A' AND labez REGEXP '^[b-y]'
+        """, """
+        UPDATE {att}
+        SET labez = 'a'
+        WHERE (hs, anfadr, endadr) = ('A', 50240012, 50240018)
         """, parameters)
 
         # Some fields contain 'N' (only in chapter 5)
@@ -767,7 +780,7 @@ def step08 (dba, parameters):
 
     """
 
-    message (1, "Step  5 : Delete passages without variants ...")
+    message (1, "Step  8 : Delete passages without variants ...")
 
     with dba.engine.begin () as conn:
 
@@ -790,14 +803,16 @@ def step08 (dba, parameters):
         # We need a nested subquery to avoid MySQL limitations. See:
         # https://dev.mysql.com/doc/refman/5.7/en/subquery-restrictions.html
         execute (conn, """
-        DELETE FROM {att} WHERE (anfadr, endadr) IN (
+        DELETE a
+        FROM {att} a
+        WHERE (anfadr, endadr) IN (
           SELECT anfadr, endadr FROM (
             SELECT DISTINCT anfadr, endadr, labez
-            FROM {att} AS att
-            WHERE labez NOT REGEXP '^z' AND labezsuf NOT REGEXP 'f|o'
-          ) AS a
+            FROM {att}
+            WHERE labez NOT REGEXP '^z' AND NOT (labez = 'a' AND labezsuf REGEXP 'f|o')
+          ) AS b
           GROUP BY anfadr, endadr
-          HAVING count (*) > 1;
+          HAVING count (*) <= 1
         )
         """, parameters)
 
@@ -892,7 +907,7 @@ def step09 (dba, parameters):
         """, parameters)
 
 
-def step09_numpy (dba, parameters):
+def create_labez_table (dba, parameters):
     """Labez-Tabelle erstellen
 
     Aus: prepare4cbgm_9.py
@@ -1542,7 +1557,7 @@ def step22 (dba, parameters):
         """, parameters)
 
 
-def step31 (dba, parameters):
+def copy_genealogical_data (dba, parameters):
     """Copy / update genealogical data
 
     Aus: VGA/Att2CBGM.pl, VGA/PortCBGMInfo.pl
@@ -1608,18 +1623,22 @@ def step31 (dba, parameters):
         # preprocess source readings
         #
         # We want to quickly retrieve all source readings, ie. to traverse the
-        # graph of readings from any reading back to the a reading.  Since mysql
+        # graph of readings from any reading back to the 'a' reading.  Since mysql
         # is the only database that does not implement WITH RECURSIVE we have to
-        # preprocess the data in order to do this.
+        # preprocess the data in order to do this:
+        #
+        # We add a 'prior' field to the LocStemEd table, which is a bitmask that
+        # has one bit set for each prior reading, eg. 'lac' => 1, 'a' => 2, 'b'
+        # => 4, ...  If 'd' had a prior reading of 'c' and 'c' had a prior reading
+        # of 'a' then the bitmask for 'd' would be 10 ('c' + 'a').
 
-        parameters['fields'] = 'begadr, endadr, varid, varnew, s1, s2';
         res = execute (conn, """
-        SELECT {fields} FROM {locstemed}
+        SELECT begadr, endadr, varid, varnew, s1, s2 FROM {locstemed}
         WHERE s1 != '*' AND s1 != '?' AND varnew NOT REGEXP '^z'
         ORDER BY begadr, endadr DESC, varnew
         """, parameters)
 
-        Variant = collections.namedtuple ('Variant', parameters['fields'])
+        Variant = collections.namedtuple ('Variant', 'begadr, endadr, varid, varnew, s1, s2')
 
         update = []
         for key, group in itertools.groupby (res, operator.itemgetter (0, 1)):
@@ -1636,14 +1655,17 @@ def step31 (dba, parameters):
                 continue
 
             for row in rows:
-                succ = sorted (map (operator.itemgetter (1), nx.bfs_edges (G, row.varnew)))
-                if succ:
+                prior_mask = 0
+                for (s, d) in nx.bfs_edges (G, row.varnew):
+                    if s[0] != d: # exclude self-loops, which may happen if 'a' reading is prior to 'af'.
+                        prior_mask |= 1 << (ord (d[0]) - 96) # 'a' => 2, 'b' => 4, ...
+                if prior_mask > 0:
                     update.append (
                         {
                             'begadr' : row.begadr,
                             'endadr' : row.endadr,
                             'varnew' : row.varnew,
-                            'pred'   : ','.join (succ)
+                            'prior'  : prior_mask
                         }
                     )
 
@@ -1652,7 +1674,7 @@ def step31 (dba, parameters):
         # do not use row syntax (a, b) = (:a, :b) here, it is awfully slow
         res = executemany (conn, """
         UPDATE {locstemed}
-        SET pred = :pred
+        SET prior = :prior
         WHERE begadr = :begadr AND endadr = :endadr AND varnew = :varnew
         """, parameters, update)
 
@@ -1677,7 +1699,7 @@ class Bag (object):
     affinity_matrix = None  # hs x hs matrix of similarity measure
 
 
-def step32 (dba, parameters, val):
+def create_labez_matrix (dba, parameters, val):
     """Create the labez matrix.
 
     Create a matrix of manuscripts x passages.  Each entry represents one
@@ -1839,7 +1861,7 @@ def step32 (dba, parameters, val):
                           ticks_labels_x, ticks_labels_y, plot.colormap_bw ())
 
 
-def step33 (dba, parameters, val):
+def calculate_mss_similarity (dba, parameters, val):
     """Calculate mss similarity
 
     Aus: VGA/VG05_all3.pl
@@ -1859,19 +1881,17 @@ def step33 (dba, parameters, val):
 
         # load local stem for each passage
         res = execute (conn, """
-        SELECT p.id - 1 as pass_id, varid, pred
+        SELECT p.id - 1 as pass_id, ord_labez (varid) as varid, prior
         FROM {locstemed} l
         JOIN {pass} p
           ON (l.begadr, l.endadr) = (p.anfadr, p.endadr)
-        WHERE pred <> ''
+        WHERE prior > 0
         """, parameters)
 
-        def decode (x):
-            return ord (x[0]) - 96;
-
-        pred = {}
+        # Matrix passage x labez containing bitmask of prior readings, 'a' = 2
+        prior_matrix = np.zeros ((val.n_passages, MAX_LABEZ), dtype = np.uint32)
         for row in res:
-            pred[(row[0], decode (row[1]))] = map (decode, row[2].split (','))
+            prior_matrix[row[0], row[1]] = row[2]
 
         # Matrix chapter x ms x ms with count of the passages that are defined in both mss
         val.and_matrix = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
@@ -1906,23 +1926,6 @@ def step33 (dba, parameters, val):
                     val.or_matrix[i,j,k]  = val.or_matrix[i,k,j]  = np.sum (def_or[0, chapter.start:chapter.end])
                     val.eq_matrix[i,j,k]  = val.eq_matrix[i,k,j]  = np.sum (labez_eq[0, chapter.start:chapter.end])
 
-        # genealogical coherence (outputs asymmetrical matrices)
-        # loop over all mss O(n_mss² * n_chapters * n_passages)
-        message (1, "          Calculating mss similarity post-co ...")
-        for j in range (0, val.n_mss):
-            labezj = val.labez_matrix[j]
-            for k in range (0, val.n_mss):
-                labezk = val.labez_matrix[k]
-
-                labez_older = np.empty_like (val.def_matrix[0])
-                for pass_id, (labez1, labez2) in enumerate (zip (labezj, labezk)):
-                    labez_older[0,i] = (labez1 and labez2 and (labez1 != labez2)
-                                        and labez1 in pred.get ((pass_id, labez1), []))
-
-                for i, chapter in enumerate (val.chapters):
-                    val.older_matrix[i,j,k] = np.sum (labez_older[0, chapter.start:chapter.end])
-
-
         # Matrix ms x ms with count of the passages that are different in both mss
         message (2, "          Calculating diff and quotient matrices ...")
         val.diff_matrix = val.and_matrix - val.eq_matrix
@@ -1931,6 +1934,29 @@ def step33 (dba, parameters, val):
         with np.errstate (divide = 'ignore', invalid = 'ignore'):
             val.quotient_matrix = val.eq_matrix / val.and_matrix
             val.quotient_matrix[val.and_matrix == 0] = 0.0
+
+        # genealogical coherence (outputs asymmetrical matrices)
+        # loop over all mss O(n_mss² * n_chapters * n_passages)
+
+        message (1, "          Calculating mss similarity post-co ...")
+        r = np.arange (0, val.n_passages) # for fancy indexing
+        for j in range (0, val.n_mss):
+            labezj = np.left_shift (1, val.labez_matrix[j]) # 'a' => 2
+            for k in range (0, val.n_mss):
+                labezk = val.labez_matrix[k] # b
+
+                # prior_matrix['b'] == 2
+                # and == 2
+
+                # set bit if the reading of j is prior to the reading of k
+                labez_is_older = np.bitwise_and (labezj, prior_matrix[r, labezk]) > 0
+
+                if k == 0 and np.any (labez_is_older):
+                    message (1, "Error labez older than A in msid %d in passages: %s"
+                             % (j, np.nonzero (labez_is_older)))
+
+                for i, chapter in enumerate (val.chapters):
+                    val.older_matrix[i,j,k] = np.sum (labez_is_older[chapter.start:chapter.end])
 
         # debug
         if 0:
@@ -1973,13 +1999,14 @@ def step33 (dba, parameters, val):
                             'common' :   val.and_matrix[i,j,k],
                             'equal' :    val.eq_matrix[i,j,k],
                             'older' :    val.older_matrix[i,j,k],
+                            'newer' :    val.older_matrix[i,k,j],
                             'affinity' : val.quotient_matrix[i,j,k]
                         }
                     )
 
             executemany (conn, """
-            INSERT INTO {aff} (id1, id2, chapter, common, equal, older, affinity)
-            VALUES (:id1, :id2, :chapter, :common, :equal, :older, :affinity)
+            INSERT INTO {aff} (id1, id2, chapter, common, equal, older, newer, affinity)
+            VALUES (:id1, :id2, :chapter, :common, :equal, :older, :newer, :affinity)
             """, parameters, param_array)
 
         print ("eq\n",    val.eq_matrix)
@@ -2193,20 +2220,12 @@ if __name__ == '__main__':
                     print_stats (dba, parameters)
                 continue
             if step == 8:
-                #step08 (dba, parameters)
-                continue
-            if step == 9:
-                create_ms_pass_tables (dba, parameters)
-                #step09 (dba, parameters)
-                step09_numpy (dba, parameters)
+                step08 (dba, parameters)
                 if args.verbose >= 1:
                     print_stats (dba, parameters)
                 continue
             if step == 10:
                 #step10 (dba, parameters)
-                step10_numpy (dba, parameters, v)
-                if args.verbose >= 1:
-                    print_stats (dba, parameters)
                 continue
             if step == 11:
                 #step11 (dba, parameters)
@@ -2220,14 +2239,21 @@ if __name__ == '__main__':
             if step == 22:
                 #step22 (dba, parameters)
                 continue
+
             if step == 31:
-                step31 (dba, parameters)
+                create_ms_pass_tables (dba, parameters)
+                create_labez_table (dba, parameters)
+                if args.verbose >= 1:
+                    print_stats (dba, parameters)
                 continue
             if step == 32:
-                step32 (dba, parameters, v)
+                copy_genealogical_data (dba, parameters)
                 continue
             if step == 33:
-                step33 (dba, parameters, v)
+                create_labez_matrix (dba, parameters, v)
+                continue
+            if step == 34:
+                calculate_mss_similarity (dba, parameters, v)
                 affinity_to_gephi (dba, parameters, v)
                 continue
 

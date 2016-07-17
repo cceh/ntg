@@ -4,16 +4,19 @@
       <span class="labez labez_{{ms.labez}} ms" data-id="{{ms.id_}}">{{ms.hs}} ({{ms.labez}}{{ms.labezsuf}})</span>
       <span class="labez labez_{{mt.labez}}">{{_('(MT %(perc)s %(labez)s)',
         perc = "{:.2%}".format (mt.aff), labez = mt.labez + mt.labezsuf)}}</span>
-      <a href="#" class="close" data-dismiss="alert">&times;</a>
+      <a class="close" data-dismiss="alert">&times;</a>
     </div>
 
     <table class="relatives table table-condensed">
       {% for r in rows %}
       <tr class="labez labez_{{r.labez}}"{% if loop.first %} class="first"{% endif %}>
         <td class="index">{{loop.index}}</td>
+        <td class="direction">{{r.direction|e}}</td>
         <th class="ms"><span data-id="{{r.id}}">{{r.hs|e}}</span></th>
         <td class="perc">{{ "{:.1%}".format (r.equal / r.common) }}</td>
-        <td class="equal">{{ "(%d/%d)" % (r.equal, r.common) }}</td>
+        <td class="equal">{{ "%d/%d" % (r.equal, r.common) }}</td>
+        {# actually newer, older because the row is associated with the target ms #}
+        <td class="older">{{ "%d:%d" % (r.newer, r.older) }}</td>
         <td class="labez">{{ "%s%s"    % (r.labez, r.labezsuf) }}
           {%- if mt.labez == r.labez and mt.labezsuf == r.labezsuf: %} (MT){% endif -%}
         </td>

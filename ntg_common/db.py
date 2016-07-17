@@ -301,6 +301,7 @@ CREATE_TABLE_AFFINITY = """
   "common"    INTEGER       NOT NULL,
   "equal"     INTEGER       NOT NULL,
   "older"     INTEGER       NOT NULL,
+  "newer"     INTEGER       NOT NULL,
   "affinity"  FLOAT         NOT NULL,
   PRIMARY KEY (chapter, id1, id2)
 )
@@ -340,7 +341,7 @@ CREATE_TABLE_LOCSTEMED = """
   "varnew" VARCHAR(2)   NOT NULL DEFAULT '',
   "s1"     VARCHAR(2)   NOT NULL DEFAULT '',
   "s2"     VARCHAR(2)   NOT NULL DEFAULT '',
-  "pred"   VARCHAR(256) NOT NULL DEFAULT '',
+  "prior"  INTEGER      NOT NULL DEFAULT 0,
   "prs1"   VARCHAR(2)   NOT NULL DEFAULT '',
   "prs2"   VARCHAR(2)   NOT NULL DEFAULT '',
   "check"  VARCHAR(2)   NOT NULL DEFAULT '',
