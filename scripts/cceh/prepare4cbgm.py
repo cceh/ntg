@@ -36,6 +36,7 @@ import argparse
 import collections
 import datetime
 import itertools
+import logging
 import math
 import operator
 import os
@@ -51,7 +52,7 @@ sys.path.append (os.path.dirname (os.path.abspath (__file__)) + "/../..")
 from ntg_common import db
 from ntg_common import tools
 from ntg_common import plot
-from ntg_common.db import execute, executemany, debug, fix
+from ntg_common.db import execute, executemany, executemany_raw, debug, fix
 from ntg_common.tools import message
 from ntg_common.config import args
 
@@ -65,6 +66,10 @@ NULL_FIELDS = 'lemma lesart'.split ()
 MAX_LABEZ = ord ('z') - ord ('a') + 1
 """ Max. no. of different labez """
 
+RANK_MERGE_DUPLICATES = 0
+
+DB_INSERT_CHUNK_SIZE = 100000
+
 def create_indices (conn):
     message (2, "          Creating indices ...")
 
@@ -74,8 +79,6 @@ def create_indices (conn):
     execute (conn, 'CREATE INDEX Endadr ON {att} (endadr)', parameters)
 
     execute (conn, 'CREATE INDEX HsAdr  ON {att} (hs, anfadr, endadr)', parameters)
-
-    execute (conn, 'CREATE UNIQUE INDEX Labez ON {labez} (ms_id, pass_id)', parameters)
 
 
 def step01 (dba, parameters):
@@ -114,6 +117,8 @@ def step01 (dba, parameters):
         execute (conn, 'CREATE OR REPLACE TABLE {vg} {fields}'       , parameters)
         parameters['fields'] = db.CREATE_TABLE_MANUSCRIPTS
         execute (conn, 'CREATE OR REPLACE TABLE {ms} {fields}'       , parameters)
+        parameters['fields'] = db.CREATE_TABLE_CHAPTERS
+        execute (conn, 'CREATE OR REPLACE TABLE {chap} {fields}'     , parameters)
         parameters['fields'] = db.CREATE_TABLE_AFFINITY
         execute (conn, 'CREATE OR REPLACE TABLE {aff} {fields}'      , parameters)
         parameters['fields'] = db.CREATE_TABLE_GEPHI_NODES
@@ -184,7 +189,7 @@ def step01 (dba, parameters):
 
 
 def create_ms_pass_tables (dba, parameters):
-    """ Create the Manuscripts, Passages and Nested Passages tables. """
+    """ Create the Manuscripts, Chapters, Passages and Nested Passages tables. """
 
     with dba.engine.begin () as conn:
 
@@ -211,6 +216,24 @@ def create_ms_pass_tables (dba, parameters):
         FROM {att}
         WHERE hsnr >= 100000
         ORDER BY hsnr
+        """, parameters)
+
+        # The Chapters Table
+
+        execute (conn, """
+        TRUNCATE {chap}
+        """, parameters)
+
+        execute (conn, """
+        INSERT INTO {chap} (ms_id, hs, hsnr, chapter)
+        SELECT ms.id, ms.hs, ms.hsnr, c.chapter
+        FROM {ms} ms
+        JOIN (
+          SELECT 0 AS chapter
+          UNION
+          SELECT DISTINCT kapanf AS chapter
+          FROM {att}
+        ) AS c
         """, parameters)
 
         # The Passages Table
@@ -313,6 +336,28 @@ def step01c (dba, parameters):
         WHERE (hs, anfadr, endadr) = ('A', 50240012, 50240018)
         """, parameters)
 
+        # Passages not in A
+        fix (conn, "Passages not in A", """
+        SELECT DISTINCT anfadr, endadr
+        FROM {att}
+        WHERE (anfadr, endadr) NOT IN (
+          SELECT anfadr, endadr
+          FROM {att}
+          WHERE hs = 'A'
+        )
+        """, """
+        INSERT INTO {att} (buch, kapanf, versanf, wortanf, kapend, versend, wortend, hsnr, hs, anfadr, endadr, labez)
+        VALUES (5, 15, 28, 17, 15, 28, 17, 0, 'A', 51528017, 51528017, 'zu')
+        """, parameters)
+
+        # Alle Fehlverse in A mit labez 'zu'?
+        parameters['fehlverse'] = db.FEHLVERSE
+        fix (conn, "Fehlverse in A with labez <> 'zu'", """
+        SELECT anfadr, endadr, labez
+        FROM {att}
+        WHERE {fehlverse} AND hs = 'A' AND labez <> 'zu'
+        """, "", parameters)
+
         # Some fields contain 'N' (only in chapter 5)
         # A typo for NULL? NULL will be replaced with '' later.
         for col in N_FIELDS:
@@ -344,6 +389,17 @@ def step01c (dba, parameters):
                 SET {col} = ''
                 WHERE {col} IS NULL
                 """, dict (parameters, t = t, col = col))
+
+        # Lac with anfadr > endadr
+        fix (conn, "Lac with anfadr > endadr", """
+        SELECT *
+        FROM Lac
+        WHERE anfadr > endadr
+        """, """
+        UPDATE Lac
+        SET anfadr = endadr, endadr = anfadr
+        WHERE anfadr > endadr
+        """, parameters)
 
         # Fix inconsistencies in endadr between Att and Lac
         fix (conn, "Inconsistent chapter ends in Att and Lac", """
@@ -809,7 +865,9 @@ def step08 (dba, parameters):
           SELECT anfadr, endadr FROM (
             SELECT DISTINCT anfadr, endadr, labez
             FROM {att}
-            WHERE labez NOT REGEXP '^z' AND NOT (labez = 'a' AND labezsuf REGEXP 'f|o')
+            WHERE labez NOT REGEXP '^z'
+            /* WHERE labez NOT REGEXP '^z' AND labezsuf NOT REGEXP 'f|o' */
+            /* WHERE labez NOT REGEXP '^z' AND NOT (labez = 'a' AND labezsuf REGEXP 'f|o') */
           ) AS b
           GROUP BY anfadr, endadr
           HAVING count (*) <= 1
@@ -919,6 +977,8 @@ def create_labez_table (dba, parameters):
 
     Build a table containing only the information we need for CBGM, that is:
     manuscript id, passage id, and labez.
+
+    Duration: 1'20
 
     """
 
@@ -1628,27 +1688,28 @@ def copy_genealogical_data (dba, parameters):
         # preprocess the data in order to do this:
         #
         # We add a 'prior' field to the LocStemEd table, which is a bitmask that
-        # has one bit set for each prior reading, eg. 'lac' => 1, 'a' => 2, 'b'
+        # has one bit set for each prior reading, eg. '?' => 1, 'a' => 2, 'b'
         # => 4, ...  If 'd' had a prior reading of 'c' and 'c' had a prior reading
         # of 'a' then the bitmask for 'd' would be 10 ('c' + 'a').
 
         res = execute (conn, """
         SELECT begadr, endadr, varid, varnew, s1, s2 FROM {locstemed}
-        WHERE s1 != '*' AND s1 != '?' AND varnew NOT REGEXP '^z'
+        WHERE s1 != '*' AND varnew NOT REGEXP '^z'
         ORDER BY begadr, endadr DESC, varnew
         """, parameters)
 
         Variant = collections.namedtuple ('Variant', 'begadr, endadr, varid, varnew, s1, s2')
 
         update = []
-        for key, group in itertools.groupby (res, operator.itemgetter (0, 1)):
+        for key, group in itertools.groupby (res, operator.itemgetter (0, 1)): # group by (begadr, endadr)
             G = nx.DiGraph ()
             rows = list (map (Variant._make, group))
 
             for row in rows:
-                G.add_edge (row.varnew, row.s1)
-                if row.s2:
-                    G.add_edge (row.varnew, row.s2)
+                if row.s1 != '?':
+                    G.add_edge (row.varnew, row.s1)
+                    if row.s2:
+                        G.add_edge (row.varnew, row.s2)
 
             if not nx.is_directed_acyclic_graph (G):
                 message (1, "Error: Not a DAG at variant {begadr}/{endadr}".format (row))
@@ -1656,9 +1717,12 @@ def copy_genealogical_data (dba, parameters):
 
             for row in rows:
                 prior_mask = 0
-                for (s, d) in nx.bfs_edges (G, row.varnew):
-                    if s[0] != d: # exclude self-loops, which may happen if 'a' reading is prior to 'af'.
-                        prior_mask |= 1 << (ord (d[0]) - 96) # 'a' => 2, 'b' => 4, ...
+                if row.s1 == '?':
+                    prior_mask = 1
+                else:
+                    for (s, d) in nx.bfs_edges (G, row.varnew):
+                        if s[0] != d: # exclude self-loops, which may happen if 'a' reading is prior to 'af'.
+                            prior_mask |= 1 << (ord (d[0]) - 96) # 'a' => 2, 'b' => 4, ...
                 if prior_mask > 0:
                     update.append (
                         {
@@ -1669,7 +1733,7 @@ def copy_genealogical_data (dba, parameters):
                         }
                     )
 
-        message (3, "Updating rows {upd}".format (upd = update[:100]))
+        # message (3, "Updating rows {upd}".format (upd = update[:100]))
 
         # do not use row syntax (a, b) = (:a, :b) here, it is awfully slow
         res = executemany (conn, """
@@ -1688,14 +1752,11 @@ class Bag (object):
 
     n_mss = 0               # No. of manuscripts
     n_passages = 0          # No. of passages
-    n_var_passages = 0      # No. of variant passages
     n_chapters = 0          # No. of chapters
     mss = None              # list of named tuple Manuscript
     passages = None         # list of passages
     chapters = None         # list of named tuple Chapter
-    var_passages = None     # list of indices of variant passages only
     labez_matrix = None     # hs x passages matrix of labez
-    var_labez_matrix = None # hs x variant passages matrix of labez
     affinity_matrix = None  # hs x hs matrix of similarity measure
 
 
@@ -1713,14 +1774,21 @@ def create_labez_matrix (dba, parameters, val):
 
         np.set_printoptions (threshold = 30)
 
-        # get no. of passages
-        res = execute (conn, "SELECT anfadr, endadr FROM {pass} ORDER BY anfadr, endadr DESC", parameters)
-        val.n_passages = res.rowcount
+        # get passages and chapters
+        res = execute (conn, """
+        SELECT anfadr, endadr, kapanf
+        FROM {pass}
+        ORDER BY anfadr, endadr DESC
+        """, parameters)
+
+        res = list (res)
+        val.n_passages = len (res)
         val.passages   = ["%s-%s" % (x[0], x[1]) for x in res]
 
         # get manuscript names and numbers
         res = execute (conn, "SELECT hs, hsnr FROM {ms} ORDER BY id", parameters)
-        val.n_mss = res.rowcount
+        res = list (res)
+        val.n_mss = len (res)
         val.mss = list (map (Manuscript._make, res))
 
         # get no. of chapters
@@ -1742,52 +1810,66 @@ def create_labez_matrix (dba, parameters, val):
 
         # Matrix ms x pass
 
-        # First initialize all manuscripts in the matrix to the labezs of Manuscript
-        # A ...
-        labez_matrix = np.ones ((val.n_mss, val.n_passages), dtype = int)
-
+        # Initialize all manuscripts to the labezs of manuscript A
         res = execute (conn, """
-        SELECT pass_id - 1 as pass, labez
-        FROM {labez}
-        WHERE ms_id = 1 AND labez <> 1
+        SELECT ord_labez (labez) as labez
+        FROM {att} a
+        JOIN {pass} p
+        ON a.hs = 'A' AND a.anfadr = p.anfadr AND a.endadr = p.endadr
+        ORDER BY p.id
         """, parameters)
 
+        labez_matrix = np.fromiter ((row[0] for row in res), np.int, val.n_passages)
+        labez_matrix = np.broadcast_to (labez_matrix, (val.n_mss, val.n_passages)).copy ()
+
+        # Unroll lacunae
+        message (1, "        : Unrolling lacunae with rtree ...")
+
+        from rtree import index
+        res = execute (conn, """
+        SELECT ms.id - 1 as ms_id, lac.anfadr, lac.endadr
+        FROM {lac} lac
+        JOIN {ms} ms
+        ON lac.hsnr = ms.hsnr
+        """, parameters)
+
+        idx = index.Index ()
         for row in res:
-            labez_matrix[:, row[0]] = row[1]
+            idx.insert (row[0], (row[1], 0, row[2], 1))
 
-        # ... then overwrite the matrix with the labezs from actual manuscripts
         res = execute (conn, """
-        SELECT ms_id - 1 as ms, pass_id - 1 as pass, labez
-        FROM {labez}
+        SELECT id - 1 as pass_id, anfadr, endadr
+        FROM {pass}
         """, parameters)
-
         for row in res:
-            labez_matrix[row[0], row[1]] = row[2]
+            ms_ids = list (idx.intersection ((row[1], 0, row[2], 1)))
+            labez_matrix[ms_ids, [row[0]]] = 0
 
-        # Get ids of variant passages
+        message (1, "        : Unrolled lacunae with rtree")
+
+        # ... then overwrite with the labezs from actual manuscripts
         res = execute (conn, """
-        SELECT a.id - 1
-        FROM (
-          SELECT DISTINCT p.id, labez
-          FROM {att} AS att
-          JOIN {pass} AS p
-          ON p.anfadr = att.anfadr AND p.endadr = att.endadr
-          WHERE labez NOT REGEXP '^z' AND labezsuf NOT REGEXP 'f|o'
-        ) AS a
-        GROUP BY a.id
-        HAVING count (*) > 1
+        SELECT ms.id - 1 as ms_id, p.id - 1 as pass_id, ord_labez (labez) as labez
+        FROM {att} a
+        JOIN {pass} p
+        ON (p.anfadr, p.endadr) = (a.anfadr, a.endadr)
+        JOIN {ms} ms
+        ON ms.hsnr = a.hsnr
         """, parameters)
 
-        val.var_pass = np.fromiter ((row[0] for row in res), np.int)
-        val.n_var_passages = len (val.var_pass)
-        val.var_labez_matrix = labez_matrix.take (val.var_pass, 1)
+        r0, r1, r2 = zip (*res)
+        labez_matrix[r0, r1] = r2
+
+        message (1, "        : Overwritten with actual labez")
+
+        # set lacunae to 0
+        labez_matrix[labez_matrix == 26] = 0
+
         val.labez_matrix = labez_matrix
 
         print (val.n_mss)
         print (val.n_passages)
         print (val.labez_matrix.shape)
-        print (val.n_var_passages)
-        print (val.var_labez_matrix.shape)
 
         message (1, "Step 32 : Building Byzantine text ...")
 
@@ -1826,31 +1908,26 @@ def create_labez_matrix (dba, parameters, val):
 
         # print ("Byz: ", byz_text)
 
-        # Insert the Byz text into the matrix
+        # Replace the Byz text into the matrix
         val.labez_matrix[1] = byz_text
 
-        # Insert the Byz text into labez table
-        execute (conn, """
-        DELETE FROM {labez}
-        WHERE ms_id = 2
-        """, parameters)
-        param_array = []
-        for i, labez in enumerate (byz_text):
-            param_array.append ({ 'pass_id' : i + 1, 'labez' : labez })
-        executemany (conn, """
-        INSERT INTO {labez} (ms_id, pass_id, labez, labezsuf)
-        VALUES (2, :pass_id, :labez, '')
-        """, parameters, param_array)
+        # Write the labez table
+        message (1, "        : Writing Labez table ...")
+        execute (conn, 'TRUNCATE {labez}'    , parameters)
 
+        values = []
+        for i in range (val.n_mss):
+            for j in range (val.n_passages):
+                values.append ((i + 1, j + 1, val.labez_matrix[i, j]))
+
+        for i in range (0, len (values), DB_INSERT_CHUNK_SIZE):
+            executemany_raw (conn, """
+            INSERT INTO {labez} (ms_id, pass_id, labez)
+            VALUES (%s, %s, %s)
+            """, parameters, values [i:i + DB_INSERT_CHUNK_SIZE])
 
         # Boolean matrix ms x pass set where passage is defined
-        val.def_matrix = np.asmatrix (np.zeros_like (val.labez_matrix, dtype = int))
-        val.def_matrix[val.labez_matrix != 0] = 1
-
-        # Length of manuscripts (no. of defined passages)
-        val.ms_length = val.def_matrix * np.ones ((val.n_passages, 1), dtype = int)
-        val.ms_length = val.ms_length.A[:, 0]
-        print ("Manuscript Length Array: ", val.ms_length)
+        val.def_matrix = np.greater (val.labez_matrix, 0)
 
         # debug plot the matrix
         ticks_labels_x = plot.passages_labels (val.passages)
@@ -1875,11 +1952,14 @@ def calculate_mss_similarity (dba, parameters, val):
 
     """
 
-    message (1, "Step 33 : Calculating mss similarity ...")
+    message (1, "Step 34 : Calculating mss similarity ...")
 
     with dba.engine.begin () as conn:
 
-        # load local stem for each passage
+        # Matrix passage x labez containing bitmask of prior readings, '?' = 1, 'a' = 2, ...
+        prior_matrix = np.zeros ((val.n_passages, MAX_LABEZ), dtype = np.uint32)
+
+        # load matrix from database, load local stem for each passage
         res = execute (conn, """
         SELECT p.id - 1 as pass_id, ord_labez (varid) as varid, prior
         FROM {locstemed} l
@@ -1888,8 +1968,6 @@ def calculate_mss_similarity (dba, parameters, val):
         WHERE prior > 0
         """, parameters)
 
-        # Matrix passage x labez containing bitmask of prior readings, 'a' = 2
-        prior_matrix = np.zeros ((val.n_passages, MAX_LABEZ), dtype = np.uint32)
         for row in res:
             prior_matrix[row[0], row[1]] = row[2]
 
@@ -1904,14 +1982,41 @@ def calculate_mss_similarity (dba, parameters, val):
 
         # Matrix chapter x ms x ms with count of the passages that are older in ms1 than in ms2
         val.older_matrix  = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
+        val.newer_matrix  = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
+
+        # Matrix chapter x ms x ms with count of the passages whose relationship is unclear in ms1 and ms2
+        val.unclear_matrix  = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
+
+        # Matrix chapter x ms x ms with ranking of manuscript similarity
+        val.rank_matrix  = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
+
+        # Matrix chapter x ms of chapter lengths
+        val.chap_matrix = np.zeros ((val.n_chapters, val.n_mss), dtype = np.uint16)
 
         # pre-genealogical coherence (outputs symmetrical matrices)
         # loop over all mss O(n_mss² * n_chapters * n_passages)
+
+        # start and end are suitable for range indexing, we want single item indexing, thus - 1
+        chapter_ends   = [ch.end - 1 for ch in val.chapters[1:]]
+
+        def sum_on_chapters (a):
+            """Sum passages on chapters.  Also inserts a chapter 0 for the whole book.
+            Input arrays are typically boolean.
+
+            """
+            cs = np.cumsum (a)
+            total = cs[-1]
+            cs = cs[chapter_ends]
+            cs = cs - np.insert (cs, 0, 0)[:-1]
+            cs = np.insert (cs, 0, total)
+            return cs
 
         message (1, "          Calculating mss similarity pre-co ...")
         for j in range (0, val.n_mss):
             labezj = val.labez_matrix[j]
             defj   = val.def_matrix[j]
+
+            val.chap_matrix[:,j] = sum_on_chapters (defj)
 
             for k in range (j + 1, val.n_mss):
                 labezk = val.labez_matrix[k]
@@ -1921,13 +2026,11 @@ def calculate_mss_similarity (dba, parameters, val):
                 def_or      = np.logical_or  (defj, defk)
                 labez_eq    = np.logical_and (def_and, np.equal (labezj, labezk))
 
-                for i, chapter in enumerate (val.chapters):
-                    val.and_matrix[i,j,k] = val.and_matrix[i,k,j] = np.sum (def_and[0, chapter.start:chapter.end])
-                    val.or_matrix[i,j,k]  = val.or_matrix[i,k,j]  = np.sum (def_or[0, chapter.start:chapter.end])
-                    val.eq_matrix[i,j,k]  = val.eq_matrix[i,k,j]  = np.sum (labez_eq[0, chapter.start:chapter.end])
+                val.and_matrix[:,j,k] = val.and_matrix[:,k,j] = sum_on_chapters (def_and)
+                val.or_matrix[:,j,k]  = val.or_matrix[:,k,j]  = sum_on_chapters (def_or)
+                val.eq_matrix[:,j,k]  = val.eq_matrix[:,k,j]  = sum_on_chapters (labez_eq)
 
         # Matrix ms x ms with count of the passages that are different in both mss
-        message (2, "          Calculating diff and quotient matrices ...")
         val.diff_matrix = val.and_matrix - val.eq_matrix
 
         # calculate
@@ -1935,28 +2038,110 @@ def calculate_mss_similarity (dba, parameters, val):
             val.quotient_matrix = val.eq_matrix / val.and_matrix
             val.quotient_matrix[val.and_matrix == 0] = 0.0
 
+        #
         # genealogical coherence (outputs asymmetrical matrices)
         # loop over all mss O(n_mss² * n_chapters * n_passages)
+        #
 
         message (1, "          Calculating mss similarity post-co ...")
-        r = np.arange (0, val.n_passages) # for fancy indexing
-        for j in range (0, val.n_mss):
-            labezj = np.left_shift (1, val.labez_matrix[j]) # 'a' => 2
-            for k in range (0, val.n_mss):
-                labezk = val.labez_matrix[k] # b
 
-                # prior_matrix['b'] == 2
-                # and == 2
+        # For integer array indexing of the prior_matrix.
+        # See: https://docs.scipy.org/doc/numpy/reference/arrays.indexing.html#advanced-indexing
+        p = np.arange (0, val.n_passages)
+        m = np.arange (0, val.n_mss)
+
+        # some time-saving preparations
+        labez_mask_matrix = np.left_shift (1, val.labez_matrix)
+        labez_mask_matrix[labez_mask_matrix == 1] = 0 # set lacunae to 0
+
+        labez_prior_matrix = np.zeros_like (val.labez_matrix)
+        for j in range (0, val.n_mss):
+            labez_prior_matrix[j] = prior_matrix[p, val.labez_matrix[j]]
+
+        labez_matrix_source_is_unclear = np.equal (labez_prior_matrix, 1)
+        labez_prior_matrix[labez_prior_matrix == 1] = 0 # set unclear to 0
+
+        # the loop
+        for j in range (0, val.n_mss):
+            for k in range (0, val.n_mss):
+                # See: VGA/VGActs_allGenTab3Ph3.pl
 
                 # set bit if the reading of j is prior to the reading of k
-                labez_is_older = np.bitwise_and (labezj, prior_matrix[r, labezk]) > 0
+                labezj_is_older = np.bitwise_and (labez_mask_matrix[j], labez_prior_matrix[k]) > 0
+                labezk_is_older = np.bitwise_and (labez_mask_matrix[k], labez_prior_matrix[j]) > 0
 
-                if k == 0 and np.any (labez_is_older):
-                    message (1, "Error labez older than A in msid %d in passages: %s"
-                             % (j, np.nonzero (labez_is_older)))
+		# wenn die vergl. Hss. von einander abweichen u. eine von ihnen
+		# Q1 = '?' hat, UND KEINE VON IHNEN QUELLE DER ANDEREN IST, ist
+		# die Beziehung 'UNCLEAR'
 
-                for i, chapter in enumerate (val.chapters):
-                    val.older_matrix[i,j,k] = np.sum (labez_is_older[chapter.start:chapter.end])
+                unclear = np.logical_and (val.labez_matrix[j], val.labez_matrix[k])
+                unclear = np.logical_and (unclear, np.not_equal (val.labez_matrix[j], val.labez_matrix[k]))
+                unclear = np.logical_and (unclear, np.logical_or (
+                    labez_matrix_source_is_unclear[j], labez_matrix_source_is_unclear[k]))
+                unclear = np.logical_and (unclear, np.logical_not (np.logical_or (labezj_is_older, labezk_is_older)))
+
+                # if k == 0 and np.any (labezj_is_older):
+                #    message (1, "Error labez older than A in msid %d in passages: %s"
+                #             % (j, np.nonzero (labezj_is_older)))
+
+                val.unclear_matrix[:,j,k] = sum_on_chapters (unclear)
+                val.older_matrix[:,j,k] = val.newer_matrix[:,k,j] = sum_on_chapters (labezj_is_older)
+
+        # incipit ranking stuff
+        #
+        # All potential ancestors are assigned a ranking number (NR) larger than
+        # 0 according to the degree of agreement (PERC1), if two conditions are
+        # met. The figure under W1<W2 must be larger than the figure under W1>W2
+        # and the compared witness must not be too fragmentary. The latter case
+        # is supposed, if the number of variant passages shared by two
+        # manuscripts under comparison is lower than a half of the variant
+        # passages contained in the witness whose potential ancestors are
+        # retrieved. -- CBGMWorkflow3.docx
+
+        message (1, "          Ranking ...")
+
+        # make a DESC ranking
+        qm = 1.0 - val.quotient_matrix
+
+        # build mask of items *not* to rank (negative mask)
+        # mask is set where k is newer than j
+
+        mask = val.older_matrix > val.newer_matrix
+        mask = np.logical_or (mask, val.and_matrix < (val.chap_matrix[:, :, np.newaxis] / 2))
+        mask = np.logical_or (mask, np.eye (val.n_mss, dtype = bool))
+
+        qm[mask] = np.nan
+
+        for i, chapter in enumerate (val.chapters):
+            if RANK_MERGE_DUPLICATES:
+                for j in range (0, val.n_mss):
+                    dummy, val.rank_matrix[i,j] = np.unique (qm[i,j], return_inverse = True)
+            else:
+                val.rank_matrix[i] = qm[i].argsort ().argsort ()
+
+        val.rank_matrix += 1
+        val.rank_matrix[mask] = 0
+
+        print ("mask\n", mask[0])
+        print ("quot\n", qm[0])
+        print ("ranks\n", val.rank_matrix[0])
+
+        #print (val.rank_matrix[0])
+
+        # sanity tests
+
+        # labez older than ms A
+
+        if val.older_matrix[0,:,0].any ():
+            message (1, "Error: found labez older than A in msids: %s"
+                     % (np.nonzero (val.older_matrix[0,:,0])))
+
+        # norel < 0
+        norel_matrix = (val.and_matrix - val.eq_matrix - val.older_matrix -
+                        np.transpose (val.older_matrix, (0, 2, 1)) - val.unclear_matrix)
+        if np.less (norel_matrix, 0).any ():
+            message (1, "Error: norel < 0 in mss. %s"
+                     % (np.nonzero (np.less (norel_matrix, 0))))
 
         # debug
         if 0:
@@ -1975,46 +2160,80 @@ def calculate_mss_similarity (dba, parameters, val):
 
         # np.fill_diagonal (val.quotient_matrix, 0.0) # remove affinity to self
 
-        message (2, "          Updating Manuscripts table ...")
-        param_array = []
-        for i, length in enumerate (val.ms_length):
-            param_array.append ( { 'id' : i + 1, 'length' : length } )
+
+        message (2, "          Updating length in Manuscripts and Chapters tables ...")
+
+        values_mss = []
+        values_chapters = []
+
+        for i, ms in enumerate (val.mss):
+            for j, chapter in enumerate (val.chapters):
+                length = np.sum (val.def_matrix[i, chapter.start:chapter.end])
+                values_chapters.append ( { 'ms_id': i + 1, 'chapter': j, 'length': length } )
+                if j == 0:
+                    values_mss.append ( { 'ms_id': i + 1, 'length': length } )
+
         executemany (conn, """
-        UPDATE {ms} SET length = :length
-        WHERE id = :id
-        """, parameters, param_array)
+        UPDATE {ms}
+        SET length = :length
+        WHERE id = :ms_id
+        """, parameters, values_mss)
+
+        executemany (conn, """
+        UPDATE {chap}
+        SET length = :length
+        WHERE ms_id = :ms_id AND chapter = :chapter
+        """, parameters, values_chapters)
+
 
         message (2, "          Filling Affinity table ...")
         execute (conn, "TRUNCATE {aff}", parameters)
+        execute (conn, 'DROP INDEX IF EXISTS Affinity ON {aff}', parameters)
 
         for i, chapter in enumerate (val.chapters):
-            param_array = []
-            for j, ms1 in enumerate (val.mss):
-                for k, ms2 in enumerate (val.mss):
-                    param_array.append (
-                        {
-                            'id1' :      j + 1,
-                            'id2' :      k + 1,
-                            'chapter' :  chapter.n,
-                            'common' :   val.and_matrix[i,j,k],
-                            'equal' :    val.eq_matrix[i,j,k],
-                            'older' :    val.older_matrix[i,j,k],
-                            'newer' :    val.older_matrix[i,k,j],
-                            'affinity' : val.quotient_matrix[i,j,k]
-                        }
-                    )
+            values = []
+            for j in range (0, val.n_mss):
+                for k in range (0, val.n_mss):
+                    common = val.and_matrix[i,j,k]
+                    if common > 0 and j != k:
+                        values.append ( (
+                            j + 1,
+                            k + 1,
+                            chapter.n,
+                            common,
+                            val.eq_matrix[i,j,k],
+                            val.older_matrix[i,j,k],
+                            val.older_matrix[i,k,j],
+                            val.unclear_matrix[i,j,k],
+                            val.quotient_matrix[i,j,k],
+                            val.rank_matrix[i,j,k],
+                        ) )
 
-            executemany (conn, """
-            INSERT INTO {aff} (id1, id2, chapter, common, equal, older, newer, affinity)
-            VALUES (:id1, :id2, :chapter, :common, :equal, :older, :newer, :affinity)
-            """, parameters, param_array)
+            # speed gain for using executemany_raw: 65s to 55s :-(
+            # probably the bottleneck here is string formatting with %s
+            executemany_raw (conn, """
+            INSERT INTO {aff} (id1, id2, chapter, common, equal, older, newer, unclear, affinity, rank)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, parameters, values)
 
-        print ("eq\n",    val.eq_matrix)
-        print ("older\n", val.older_matrix)
-        print ("diff\n",  val.diff_matrix)
-        print ("and\n",   val.and_matrix)
-        print ("or\n",    val.or_matrix)
-        print ("quot\n",  val.quotient_matrix)
+        # insert second half of matrix
+        #execute (conn, """
+        #INSERT INTO {aff} (id1, id2, chapter, common, equal, older, newer, unclear, affinity, rank)
+        #SELECT id2, id1, chapter, common, equal, newer, older, unclear, affinity, rank
+        #FROM {aff}
+        #""", parameters)
+
+        execute (conn, 'CREATE INDEX Affinity ON {aff} (affinity)', parameters)
+
+
+        print ("eq\n",      val.eq_matrix)
+        print ("older\n",   val.older_matrix)
+        print ("unclear\n", val.unclear_matrix)
+        print ("diff\n",    val.diff_matrix)
+        print ("and\n",     val.and_matrix)
+        print ("or\n",      val.or_matrix)
+        print ("quot\n",    val.quotient_matrix)
+        print ("rank\n",    val.rank_matrix)
 
 
 def affinity_clustering (dba, parameters, val):
@@ -2046,8 +2265,13 @@ def affinity_to_gephi (dba, parameters, val):
         execute (conn, "TRUNCATE {g_nodes}", parameters)
         execute (conn, "TRUNCATE {g_edges}", parameters)
 
+        # Length of manuscripts (no. of defined passages)
+        val.ms_length = np.asmatrix (val.def_matrix) * np.ones ((val.n_passages, 1), dtype = int)
+        val.ms_length = val.ms_length.A[:, 0]
+        print ("Manuscript Length Array: ", val.ms_length)
+
         # Build Gephi nodes table.  Every ms gets to be a node.  Simple.
-        param_array = []
+        values = []
         for i in range (0, val.n_mss):
             hs = val.mss[i].hs
             hsnr = val.mss[i].hsnr
@@ -2061,7 +2285,7 @@ def affinity_to_gephi (dba, parameters, val):
                 color = '255,255,128'
             if hsnr < 100000:
                 color = '255,0,0'
-            param_array.append ( {
+            values.append ( {
                 'id'        : hsnr,
                 'label'     : hs,
                 'color'     : color,
@@ -2072,7 +2296,7 @@ def affinity_to_gephi (dba, parameters, val):
         executemany (conn, """
         INSERT INTO {g_nodes} (id, label, color, nodecolor, nodesize)
         VALUES (:id, :label, :color, :nodecolor, :nodesize)
-        """, parameters, param_array)
+        """, parameters, values)
 
         # Build Gephi edges table.  Needs brains.  Creating an edge between every 2
         # mss will not give a very meaningful graph.  We have to keep only the most
@@ -2085,7 +2309,7 @@ def affinity_to_gephi (dba, parameters, val):
         rank_matrix = rank_matrix[0:, -keep:]  # keep the most similar entries
         # Now we have the indices of the X most similar mss.
 
-        param_array = []
+        values = []
         qq = math.log (val.n_passages)
         for i in range (2, val.n_mss): # do not include 'A' and 'MT'
             hs_src = val.mss[i].hsnr
@@ -2093,7 +2317,7 @@ def affinity_to_gephi (dba, parameters, val):
                 k = rank_matrix[i, j]
                 hs_dest = val.mss[k].hsnr
                 q = val.quotient_matrix[0, i, k] * math.log (max (1.0, val.and_matrix[0, i, k])) / qq
-                param_array.append ( {
+                values.append ( {
                     'id'     : "%s-%s" % (hs_src, hs_dest),
                     'source' : hs_src,
                     'target' : hs_dest,
@@ -2103,7 +2327,7 @@ def affinity_to_gephi (dba, parameters, val):
         executemany (conn, """
         INSERT INTO {g_edges} (id, source, target, weight)
         VALUES (:id, :source, :target, :weight)
-        """, parameters, param_array)
+        """, parameters, values)
 
         # np.savetxt ('affinity.csv', val.quotient_matrix)
 
@@ -2155,6 +2379,8 @@ def print_stats (dba, parameters):
 
 if __name__ == '__main__':
 
+    logging.basicConfig ()
+
     parser = argparse.ArgumentParser (description='Prepare a new database for CBGM')
 
     parser.add_argument ('source_db', metavar='SOURCE_DB',    help='the source ECM database (required)')
@@ -2190,6 +2416,8 @@ if __name__ == '__main__':
     v = Bag ()
 
     dba = db.DBA (args.profile, args.target_db)
+
+    logging.getLogger ('sqlalchemy.engine').setLevel (logging.ERROR)
 
     try:
         for step in range (args.range[0], args.range[1] + 1):
@@ -2242,7 +2470,7 @@ if __name__ == '__main__':
 
             if step == 31:
                 create_ms_pass_tables (dba, parameters)
-                create_labez_table (dba, parameters)
+                # create_labez_table (dba, parameters)
                 if args.verbose >= 1:
                     print_stats (dba, parameters)
                 continue

@@ -1,0 +1,59 @@
+{% extends "site.html" %}
+
+{% block head %}
+<link href="/static/css/coherence.css" rel="stylesheet" type="text/css">
+<link href="/static/css/relatives.css" rel="stylesheet" type="text/css">
+
+<title>{{_('Attestation for %(passage)s', passage = passage.hr_pass)}}</title>
+
+<script>
+  require ([
+    "/static/js/d3-passage-stemma-layout.js",
+    "d3-force",
+    "relatives",
+    "coherence",
+    ], function (stemma, force, relatives, attestation) {
+
+    var pass_id = {{passage.pass_id}};
+
+    stemma.init_json ('/stemma.json/' + pass_id);
+    force.init ();
+    relatives.init (pass_id);
+    attestation.init ();
+    attestation.set_attestation (pass_id);
+  });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="bs-docs-header">
+  <div class="container">
+    <h1>{{_('Attestation for %(passage)s', passage = passage.hr_pass)}}</h1>
+  </div>
+</div>
+
+<div class="container bs-docs-container">
+  <div id="passage-stemma-wrapper">
+  </div>
+
+  <ul id="attestations" class="list-group">
+    {% for r in values.readings %}
+    <li class="list-group-item">
+      <h4 class="list-group-item-heading">
+	<a data-labez="{{r.labez}}" class="fg_labez"
+	   href="/ms_attesting/{{passage.pass_id}}/{{r.labez|e}}">{{r.labez|e}}{{r.labezsuf|e}} {{r.lesart|e}}</a>
+      </h4>
+      <ul class="list-group-item-text attesting-mss list-inline">
+	{% for id, hs in r.manuscripts -%}
+	<li><a class="ms" data-ms-id="{{id|e}}">{{hs|e}}.</a></li>
+	{% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<div id="svg-wrapper">
+</div>
+
+{% endblock %}

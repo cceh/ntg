@@ -21,9 +21,10 @@ DEFAULTS = {
     'att'       : 'Att',
     'lac'       : 'Lac',
     'labez'     : 'Labez',
-    'ms'        : 'Manuscripts',  # ???
-    'pass'      : 'Passages',     # ???
-    'npass'     : 'NestedPassages',     # ???
+    'ms'        : 'Manuscripts',
+    'chap'      : 'Chapters',
+    'pass'      : 'Passages',
+    'npass'     : 'NestedPassages',
     'aff'       : 'Affinity',
     'vp'        : 'VP',
     'rdg'       : 'Rdg',

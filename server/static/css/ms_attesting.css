@@ -6,6 +6,12 @@ div.relatives {
 div.panel {
   display: inline-block;
 }
-div.panel a.close {
+div.panel-relatives-toolbar {
+  display: none;
+}
+div.panel-relatives-header {
+  border-bottom-width: 0;
+}
+div.panel-relatives-header .close {
   display: none;
 }

@@ -1,14 +1,43 @@
 /* Generated file. Do not edit. */
-div.panel {
-  width: 25em;
+div.panel-relatives {
+  width: 30em;
 }
-div.panel span.ms {
+div.panel-relatives span.ms {
   font-weight: bold;
+}
+div.panel-relatives-header .close {
+  padding-left: 4px;
+  font-size: 1.1em;
+}
+div.panel-heading.panel-relatives-toolbar {
+  border-bottom-width: 0;
+}
+div.dropdown-menu-labez {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  border-width: 0;
+  padding: 0;
+  min-width: 20px;
+  width: 160px;
+  width: -moz-max-content;
+  width: -webkit-max-content;
+  width: max-content;
+}
+.btn-labez {
+  color: white;
+  border-color: black;
+}
+table.relatives {
+  margin-bottom: 0;
 }
 table.relatives th {
   text-align: right;
 }
-table.relatives td.index {
+table.relatives td.rank {
+  text-align: right;
+}
+table.relatives td.direction {
   text-align: right;
 }
 table.relatives td.perc {

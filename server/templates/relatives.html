@@ -1,27 +1,88 @@
-  <div class="panel panel-default">
+<div class="panel panel-default panel-relatives"
+     data-ms-id="{{ms.id_}}" data-hsnr="{{ms.hsnr}}">
 
-    <div class="panel-heading">{{_('Relatives for ')}}
-      <span class="labez labez_{{ms.labez}} ms" data-id="{{ms.id_}}">{{ms.hs}} ({{ms.labez}}{{ms.labezsuf}})</span>
-      <span class="labez labez_{{mt.labez}}">{{_('(MT %(perc)s %(labez)s)',
-        perc = "{:.2%}".format (mt.aff), labez = mt.labez + mt.labezsuf)}}</span>
-      <a class="close" data-dismiss="alert">&times;</a>
+  <div class="panel-heading panel-relatives-header">
+    <span>{{caption}}</span>
+    <span data-labez="{{ms.labez}}" class="fg_labez ms hilite-source"
+	  data-ms-id="{{ms.id_}}">{{ms.hs}} ({{ms.labez}}{{ms.labezsuf}})</span>
+    <span data-labez="{{mt.labez}}" class="fg_labez">{{_('(MT %(perc)s %(labez)s)',
+    perc = "{:.2%}".format (mt.aff), labez = mt.labez + mt.labezsuf)}}</span>
+
+    <a class="close tooltip-close"   ><span class="glyphicon glyphicon-remove"></span></a>
+    <a class="close tooltip-minimize"><span class="glyphicon glyphicon-collapse-up"></span></a>
+    <a class="close tooltip-maximize"><span class="glyphicon glyphicon-collapse-down"></span></a>
+  </div>
+
+  <div class="panel-heading panel-relatives-toolbar">
+    <div class="btn-toolbar toolbar-relatives" role="toolbar">
+      <div class="relatives-type btn-group btn-group-xs" data-toggle="buttons">
+	<label class="btn btn-primary">
+          <input type="radio" name="type" data-opt="rel">{{_('Rel')}}</input>
+	</label>
+	<label class="btn btn-primary">
+          <input type="radio" name="type" data-opt="anc">{{_('Anc')}}</input>
+	</label>
+	<label class="btn btn-primary">
+          <input type="radio" name="type" data-opt="des">{{_('Des')}}</input>
+	</label>
+      </div>
+
+      <div class="relatives-chapter btn-group btn-group-xs" data-toggle="buttons">
+	<label class="btn btn-primary">
+          <input type="radio" name="chapter" data-opt="0">{{_('All')}}</input>
+	</label>
+	<label class="btn btn-primary">
+          <input type="radio" name="chapter" data-opt="{{pass_chapter}}">{{_('Ch')}}</input>
+	</label>
+      </div>
+
+      <div class="relatives-limit btn-group btn-group-xs" data-toggle="buttons">
+	<label class="btn btn-primary">
+          <input type="radio" name="limit" data-opt="10">10</input>
+	</label>
+	<label class="btn btn-primary">
+          <input type="radio" name="limit" data-opt="20">20</input>
+	</label>
+	<label class="btn btn-primary">
+          <input type="radio" name="limit" data-opt="30">30</input>
+	</label>
+      </div>
+
+      <div class="relatives-labez btn-group btn-group-xs">
+	<button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-labez bg_labez"
+		data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	  <span class="btn_text"></span> <span class="caret"></span>
+	</button>
+	<div class="dropdown-menu dropdown-menu-labez">
+	  <div class="btn-group btn-group-xs" data-toggle="buttons">
+	    {% for v in variants %}
+	    <label class="btn btn-labez bg_labez" data-labez="{{v.labez|e}}">
+              <input type="radio" name="labez" data-opt="{{v.labez|e}}">{{v.labez_i18n|e}}</input>
+	    </label>
+	    {% endfor %}
+	  </div>
+	</div>
+      </div>
     </div>
+  </div>
 
+  <div class="panel-relatives-content">
     <table class="relatives table table-condensed">
       {% for r in rows %}
-      <tr class="labez labez_{{r.labez}}"{% if loop.first %} class="first"{% endif %}>
-        <td class="index">{{loop.index}}</td>
-        <td class="direction">{{r.direction|e}}</td>
-        <th class="ms"><span data-id="{{r.id}}">{{r.hs|e}}</span></th>
-        <td class="perc">{{ "{:.1%}".format (r.equal / r.common) }}</td>
-        <td class="equal">{{ "%d/%d" % (r.equal, r.common) }}</td>
-        {# actually newer, older because the row is associated with the target ms #}
-        <td class="older">{{ "%d:%d" % (r.newer, r.older) }}</td>
-        <td class="labez">{{ "%s%s"    % (r.labez, r.labezsuf) }}
-          {%- if mt.labez == r.labez and mt.labezsuf == r.labezsuf: %} (MT){% endif -%}
-        </td>
+      <tr data-labez="{{r.labez}}" class="fg_labez{% if loop.first %} first{% endif %}">
+	<td class="rank">{{(r.rank or '')}}</td>
+	<td class="direction">{{r.direction|e}}</td>
+	<th class="ms"><span class="ms hilite-target" data-ms-id="{{r.ms_id}}">{{r.hs|e}}</span></th>
+	<td class="perc">{{(100.0 * r.equal / r.common)|round(1)}}%</td>
+	<td class="equal">{{r.equal}}/{{r.common}}</td>
+	{# actually newer, older because the row is associated with the target ms #}
+	<td class="older">{{r.newer}}:{{r.older}}:{{r.unclear}}:{{r.norel}}</td>
+	<td class="labez">{{r.labez}}{{r.labezsuf}}
+	{%- if mt.labez == r.labez and mt.labezsuf == r.labezsuf: %} (MT){% endif -%}
+	</td>
       </tr>
       {% endfor %}
     </table>
-
   </div>
+
+</div>

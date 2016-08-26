@@ -1,16 +1,44 @@
-div.panel {
-    width: 26em;
+div.panel-relatives {
+    width: 30em;
     span.ms {
         font-weight: bold;
     }
 }
 
+div.panel-relatives-header .close {
+    padding-left: 4px;
+    font-size: 1.1em;
+}
+
+div.panel-heading.panel-relatives-toolbar {
+    border-bottom-width: 0;
+}
+
+div.dropdown-menu-labez {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    border-width: 0;
+    padding: 0;
+    min-width: 20px;
+    width: 160px;
+    width: -moz-max-content;
+    width: -webkit-max-content;
+    width: max-content;
+}
+
+.btn-labez {
+    color: white;
+    border-color: black;
+}
+
 table.relatives {
+    margin-bottom: 0;
     th {
         text-align: right;
     }
     td {
-        &.index {
+        &.rank {
             text-align: right;
         }
         &.direction {

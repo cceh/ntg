@@ -30,6 +30,8 @@ import sqlalchemy
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.sql import text
 
+import pandas as pd
+
 from .tools import message, tabulate
 from .config import args
 
@@ -50,6 +52,20 @@ def executemany (conn, sql, parameters, param_array, debug_level = 3):
     result = conn.execute (text (sql), param_array)
     message (debug_level, "%d rows" % result.rowcount)
     return result
+
+
+def executemany_raw (conn, sql, parameters, param_array, debug_level = 3):
+    sql = sql.format (**parameters)
+    message (debug_level, sql.rstrip () + ';')
+    result = conn.execute (sql, param_array)
+    message (debug_level, "%d rows" % result.rowcount)
+    return result
+
+
+def execute_pandas (conn, sql, parameters, debug_level = 3):
+    sql = sql.format (**parameters)
+    message (debug_level, sql.rstrip () + ';')
+    return pd.read_sql_query (text (sql), conn, parameters)
 
 
 def debug (conn, msg, sql, parameters):
@@ -211,8 +227,9 @@ CREATE_TABLE_LABEZ = """
   "ms_id"     INTEGER       NOT NULL,
   "pass_id"   INTEGER       NOT NULL,
   "labez"     INTEGER       NOT NULL DEFAULT 0,
-  "labezsuf"  VARCHAR(32)   DEFAULT NULL,
-  UNIQUE KEY (ms_id, pass_id, labez, labezsuf)
+  "labezsuf"  VARCHAR(32)   NOT NULL DEFAULT '',
+  UNIQUE KEY (ms_id, pass_id),
+  KEY (pass_id)
 )
 """
 
@@ -293,6 +310,18 @@ CREATE_TABLE_MANUSCRIPTS = """
 )
 """
 
+CREATE_TABLE_CHAPTERS = """
+(
+  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
+  "ms_id"     INTEGER       NOT NULL,
+  "hsnr"      INTEGER       NOT NULL,
+  "hs"        VARCHAR(32)   NOT NULL,
+  "chapter"   INTEGER       NOT NULL,
+  "length"    INTEGER       ,
+  UNIQUE KEY (ms_id, chapter)
+)
+"""
+
 CREATE_TABLE_AFFINITY = """
 (
   "chapter"   INTEGER       NOT NULL,
@@ -302,6 +331,8 @@ CREATE_TABLE_AFFINITY = """
   "equal"     INTEGER       NOT NULL,
   "older"     INTEGER       NOT NULL,
   "newer"     INTEGER       NOT NULL,
+  "unclear"   INTEGER       NOT NULL,
+  "rank"      INTEGER       ,
   "affinity"  FLOAT         NOT NULL,
   PRIMARY KEY (chapter, id1, id2)
 )
