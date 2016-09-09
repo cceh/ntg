@@ -1,0 +1,75 @@
+{
+    // See: http://eslint.org/docs/rules/
+
+    "extends" : [
+        // "airbnb"
+        "airbnb-base/legacy"
+        // "eslint:recommended"
+    ],
+    "env" : {
+        "amd"     : true,
+        "browser" : true,
+        "jquery"  : true
+    },
+    "globals" : {
+        "requirejs" : false
+    },
+    "rules" : {
+        // restrict airbnb
+
+        // style.js
+        "comma-dangle"      : ["error", "always-multiline"],
+        "consistent-this"   : ["error", "that"],
+        "func-call-spacing" : ["error", "always"],
+        "indent" : ["error", 4, {
+            "SwitchCase"         : 0,
+            "VariableDeclarator" : 1,
+            "outerIIFEBody"      : 1,
+            "MemberExpression"   : 1
+        }],
+        "key-spacing"       : ["error", {
+            "singleLine" : {
+                "beforeColon" : false,
+                "afterColon"  : true
+            },
+            "multiLine" : {
+                "beforeColon" : true,
+                "afterColon"  : true,
+                "align"       : "colon"
+            }
+        }],
+        "max-len" : ["warn", 120, 4, {
+            "ignoreUrls"     : true,
+            "ignoreComments" : false
+        }],
+        "quote-props"                 : ["error", "always"],
+        "space-before-function-paren" : ["error", "always"],
+
+        // best-practices.js
+        "curly"  : ["error", "all"],
+        "eqeqeq" : ["error", "always"],
+
+        // variables.js
+        "no-unused-vars" : ["error", { "argsIgnorePattern": "^dummy_" }],
+
+        // strict.js
+        "strict" : ["error", "function"],
+
+        // relax airbnb
+
+        // style.js
+        "camelcase"            : "off",
+        "func-names"           : "off",
+        "no-mixed-operators"   : ["error", { "allowSamePrecedence" : true }],
+        "no-spaced-func"       : "off",
+        "no-underscore-dangle" : "off",
+
+        // best practices
+        "no-multi-spaces"   : "off",
+        "no-param-reassign" : "off",
+        "vars-on-top"       : "off",
+
+        // import.js
+        "import/no-amd" : "off"
+    }
+}

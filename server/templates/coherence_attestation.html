@@ -7,11 +7,12 @@
 <link href="/static/css/coherence_attestation.css" rel="stylesheet" type="text/css" />
 <title>{{_('Attestation for %(passage)s %(labez)s', passage = passage.hr_pass, labez = labez)}}</title>
 <script>
-  require (["d3-stemma"], function (stemma) {
+  require (["d3-common", "d3-stemma"], function (d3c, stemma) {
     var pass_id = {{passage.pass_id}};
     var labez = '{{labez}}';
 
     stemma.init_json ('/coherence.json/' + pass_id + '/attestation/' + labez);
+    d3c.insert_css_attestation_colors ();
   });
 </script>
 {% endblock %}

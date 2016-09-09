@@ -1,11 +1,35 @@
 // This is a RequireJS module.
 define (['jquery', 'd3', 'lodash', 'relatives', 'jquery-ui'],
-        function ($, d3, _, relatives) {
+
+function ($, d3, _, relatives) {
+    'use strict';
 
     var globals = {};
 
+    var force = d3.forceSimulation ().alphaMin (0.01);
+
     function node_class (d) {
-        return 'node group_' + d.group + ' hsnr_' + d.hsnr + ' ' + 'fg_labez';
+        return 'node group_' + d.group + ' hsnr_' + d.hsnr + ' fg_labez';
+    }
+
+    function dragged (d) {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+    }
+
+    function dragstarted (d) {
+        if (!d3.event.active) {
+            force.alphaTarget (0.3).restart ();
+        }
+        dragged (d);
+    }
+
+    function dragended (d) {
+        if (!d3.event.active) {
+            force.alphaTarget (0);
+        }
+        d.fx = null;
+        d.fy = null;
     }
 
     /*
@@ -64,11 +88,8 @@ define (['jquery', 'd3', 'lodash', 'relatives', 'jquery-ui'],
     }
     */
 
-    var force = d3.forceSimulation ().alphaMin (0.01);
-
     function init () {
-
-        var width  = $('#svg-wrapper').width ();
+        var width  = $ ('#svg-wrapper').width ();
         var height = width * 0.5;
 
         var svg = d3.select ('#svg-wrapper')
@@ -77,13 +98,15 @@ define (['jquery', 'd3', 'lodash', 'relatives', 'jquery-ui'],
             .attr ('height', height);
 
         var g = svg.append ('g')
-            .attr ('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+            .attr ('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')');
 
         var g_links = g.append ('g').attr ('id', 'links');
         var g_nodes = g.append ('g').attr ('id', 'nodes');
 
         d3.json ('/affinity.json', function (error, json) {
-            if (error) throw error;
+            if (error) {
+                throw error;
+            }
 
             globals.links = json.links;
 
@@ -105,13 +128,13 @@ define (['jquery', 'd3', 'lodash', 'relatives', 'jquery-ui'],
 
             var link = g_links.selectAll ('.link')
                 .data (json.links)
-                .enter().append('line')
+                .enter ().append ('line')
                 .attr ('id', function (d) { return 's' + d.source.id + 't' + d.target.id; })
                 .attr ('class', 'link');
 
             var node = g_nodes.selectAll ('.node')
-                .data(json.nodes)
-                .enter().append('g')
+                .data (json.nodes)
+                .enter ().append ('g')
                 .attr ('id',         function (d) { return 'n' + d.id; })
                 .attr ('data-ms-id', function (d) { return d.id; })
                 .attr ('class',      'node')
@@ -121,22 +144,24 @@ define (['jquery', 'd3', 'lodash', 'relatives', 'jquery-ui'],
                        .on ('end', dragended));
 
             node.append ('circle')
-                .attr ('r',     function(d) { return d.radius; })
+                .attr ('r',     function (d) { return d.radius; })
                 .attr ('class', function (d) { return node_class (d); });
 
             node.append ('text')
                 .attr ('class', 'node')
                 .text (function (d) { return d.hs; });
 
-            /*node.on ('click.highlight', function (d) {
+            /*
+              node.on ('click.highlight', function (d) {
                 on_click (d.id);
                 d3.event.stopPropagation ();
-            });*/
+              });
+            */
 
             // relatives.init_bootstrap_popup (node);
             relatives.init_jquery_popup (node);
 
-            force.on ('tick', function (e) {
+            force.on ('tick', function () {
                 link
                     .attr ('x1', function (d) { return d.source.x; })
                     .attr ('y1', function (d) { return d.source.y; })
@@ -155,46 +180,28 @@ define (['jquery', 'd3', 'lodash', 'relatives', 'jquery-ui'],
         });
 
         // Content of popup changed.  Redo highlighting.
-        $(document).on ('ntg.popup.changed', function (event) {
+        $ (document).on ('ntg.popup.changed', function () {
             var sources = relatives.get_ms_ids_from_popups ('source');
             var targets = relatives.get_ms_ids_from_popups ('target');
 
-            $('.highlight').removeClass ('highlight');
-            $('.selected').removeClass ('selected');
+            $ ('.highlight').removeClass ('highlight');
+            $ ('.selected').removeClass ('selected');
 
-            $('#nodes g[data-ms-id]')
-                .filter (function (index) {
-                    return $(this).attr ('data-ms-id') in targets;
+            $ ('#nodes g[data-ms-id]')
+                .filter (function () {
+                    return $ (this).attr ('data-ms-id') in targets;
                 })
                 .addClass ('highlight');
-            $('#nodes g[data-ms-id]')
-                .filter (function (index) {
-                    return $(this).attr ('data-ms-id') in sources;
+            $ ('#nodes g[data-ms-id]')
+                .filter (function () {
+                    return $ (this).attr ('data-ms-id') in sources;
                 })
                 .addClass ('selected');
         });
     }
 
-    function dragstarted (d) {
-        if (!d3.event.active)
-            force.alphaTarget (0.3).restart ();
-        dragged (d);
-    }
-
-    function dragged (d) {
-        d.fx = d3.event.x;
-        d.fy = d3.event.y;
-    }
-
-    function dragended (d) {
-        if (!d3.event.active)
-            force.alphaTarget (0);
-        d.fx = null;
-        d.fy = null;
-    }
-
     // return an object that defines this module
     return {
-        init: init,
+        'init' : init,
     };
 });

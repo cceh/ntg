@@ -16,11 +16,11 @@ import flask
 from flask import request
 import flask_babel
 from flask_babel import gettext as _, ngettext as n_
-
-from sqlalchemy import create_engine, MetaData, Table
-from sqlalchemy.sql import text
+import six
 import networkx as nx
 import networkx.readwrite.json_graph
+from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy.sql import text
 
 # for server-side DAG layout via GraphViz
 import pygraphviz as pgv
@@ -309,7 +309,9 @@ def relatives (hsnr, pass_id):
 @app.route('/coherence.json/<passage_or_id>/attestation/<labez>')
 def coherence_attestation_json (passage_or_id, labez):
 
-    max_rank = 10
+    chapter = request.args.get ('chapter') or 0
+    limit   = int (request.args.get ('limit') or 10)
+    # labez   = request.args.get ('labez') or 'a'
 
     with dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -323,29 +325,40 @@ def coherence_attestation_json (passage_or_id, labez):
                             # our parsing in the js
                             arrowhead = "none", arrowtail = "none")
 
+        # get nodes attesting labez
         res = execute (conn, """
-        SELECT ms_id, hs
-        FROM {labez} labez
-        JOIN {ms} ms
-          ON ms.id = labez.ms_id AND labez.pass_id = :pass_id AND labez.labez = :labez_ord
-        ORDER BY ms_id
+        SELECT ms_id
+        FROM {labez}
+        WHERE pass_id = :pass_id AND labez = :labez_ord /* AND ms_id > 2 */
         """, dict (parameters, pass_id = passage.pass_id, labez_ord = ord_labez (labez)))
 
-        Mss = collections.namedtuple ('Mss', 'ms_id hs')
-        mss = list (map (Mss._make, res))
-        for ms in mss:
-            G.add_node (ms.ms_id, label = ms.hs, labez = labez)
+        Nodes = collections.namedtuple ('Nodes', 'ms_id')
+        nodes = list (map (Nodes._make, res))
+
+        for n in nodes:
+            G.add_node (n.ms_id)
+
+        # FIXME: the ranking -- write only `compatibility´ info to database?
+
+        # connect nodes attesting labez to their lowest ranking ancestor attesting labez
+        # res = execute (conn, """
+        # SELECT aff.id1, aff.id2, aff.rank
+        # FROM {aff} aff
+        # WHERE aff.id1 IN :nodes AND aff.id2 IN :nodes AND aff.chapter = :chapter AND aff.rank > 0 AND aff.rank <= :limit
+        # ORDER BY rank, id2
+        # """, dict (parameters, nodes = list (G.nodes ()), chapter = chapter, limit = limit))
 
         res = execute (conn, """
         SELECT aff.id1, aff.id2, aff.rank
         FROM {aff} aff
-        JOIN {labez} labez1
-          ON aff.id1 = labez1.ms_id AND labez1.pass_id = :pass_id AND labez1.labez = :labez_ord
-        JOIN {labez} labez2
-          ON aff.id2 = labez2.ms_id AND labez2.pass_id = :pass_id AND labez2.labez = :labez_ord
-        WHERE aff.chapter = 0 AND aff.rank > 0 AND aff.rank <= :rank
-        ORDER BY rank, id1, id2
-        """, dict (parameters, pass_id = passage.pass_id, labez_ord = ord_labez (labez), rank = max_rank))
+        WHERE (id1, rank) IN (
+          SELECT id1, min (rank)
+          FROM {aff}
+          WHERE id1 IN :nodes AND id2 IN :nodes AND chapter = :chapter AND rank > 0 AND rank <= :limit
+          GROUP BY id1
+        ) AND chapter = :chapter
+        ORDER BY id2
+        """, dict (parameters, nodes = list (G.nodes ()), chapter = chapter, limit = limit))
 
         Ranks = collections.namedtuple ('Ranks', 'ms_id1 ms_id2 rank')
         ranks = list (map (Ranks._make, res))
@@ -358,6 +371,50 @@ def coherence_attestation_json (passage_or_id, labez):
                 else:
                     G.add_edge (r.ms_id2, r.ms_id1)
                 has_parent.add (r.ms_id1)
+
+        # connect root nodes attesting labez to their lowest ranking ancestor
+        # G.nodes () always returns string keys
+        root_nodes = set ([int (n) for n in G.nodes ()]) - has_parent
+
+        for root_node in root_nodes:
+            res = execute (conn, """
+            SELECT aff.id1, aff.id2, aff.rank
+            FROM {aff} aff
+            JOIN {labez} labez
+              ON labez.ms_id = aff.id2 AND labez.pass_id = :pass_id
+            WHERE aff.id1 = :root_node /* AND id2 > 2 */ AND aff.chapter = :chapter AND aff.rank > 0 AND labez.labez > 0
+            ORDER BY aff.rank
+            LIMIT 1
+            """, dict (parameters, root_node = root_node, pass_id = passage.pass_id, chapter = chapter))
+
+            ranks = list (map (Ranks._make, res))
+            for r in ranks:
+                if not r.ms_id1 in has_parent:
+                    if r.rank > 1:
+                        G.add_edge (r.ms_id2, r.ms_id1, rank = r.rank)
+                    else:
+                        G.add_edge (r.ms_id2, r.ms_id1)
+                    has_parent.add (r.ms_id1)
+
+        root_nodes = set ([int (n) for n in G.nodes ()]) - has_parent
+        # get node labels
+        res = execute (conn, """
+        SELECT ms.id, ms.hs, char_labez (labez.labez) as labez
+        FROM {ms} ms
+        JOIN {labez} labez
+          ON ms.id = labez.ms_id AND labez.pass_id = :pass_id
+        WHERE ms.id IN :ms_ids
+        """, dict (parameters, ms_ids = G.nodes (), pass_id = passage.pass_id))
+
+        Mss = collections.namedtuple ('Mss', 'ms_id hs labez')
+        mss = list (map (Mss._make, res))
+        for ms in mss:
+            n = G.get_node (ms.ms_id)
+            n.attr['label'] = ms.hs
+            n.attr['labez'] = ms.labez
+            if ms.ms_id in root_nodes:
+                n.attr['label'] = "%s: %s" % (ms.labez, ms.hs)
+
 
         # nx.set_node_attributes (G, 'pos', nx.nx_pydot.pydot_layout (G, prog='dot'))
         G.layout (prog = 'dot')
@@ -538,6 +595,10 @@ def stemma_json (pass_id):
             G.add_edge (row.s1, row.varnew)
         if row.s2 and row.s2 != '*':
             G.add_edge (row.s2, row.varnew)
+
+    # Add a '?' node because it is not stored in the database
+    if [r for r in rows if r.s1 == '?' or r.s2 == '?']:
+        G.add_node ('?', label = '?')
 
     # nx.set_node_attributes (G, 'pos', nx.nx_pydot.pydot_layout (G, prog='dot'))
     G.layout (prog = 'dot')

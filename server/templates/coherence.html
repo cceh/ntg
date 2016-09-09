@@ -12,15 +12,15 @@
     "d3-force",
     "relatives",
     "coherence",
-    ], function (stemma, force, relatives, attestation) {
+    ], function (stemma, force, relatives, coherence) {
 
     var pass_id = {{passage.pass_id}};
 
     stemma.init_json ('/stemma.json/' + pass_id);
     force.init ();
     relatives.init (pass_id);
-    attestation.init ();
-    attestation.set_attestation (pass_id);
+    coherence.init ();
+    coherence.set_attestation (pass_id);
   });
 </script>
 {% endblock %}

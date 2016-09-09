@@ -1,17 +1,10 @@
 // This is a RequireJS module.
-define (['jquery', 'd3', 'd3-common', 'lodash', 'graphlib-dot', 'jquery-ui'],
-        function ($, d3, d3c, _, _graphlibDot) {
+define (['jquery', 'd3', 'd3-common', 'lodash', 'jquery-ui'],
+
+function ($, d3, d3c, _) {
+    'use strict';
 
     var radius = 15;
-    var nodeSize = [40, 50];
-
-    var tree = d3.tree ().nodeSize (nodeSize);
-
-    function sort_labez (a, b) {
-        var aid = (a.data.id == '?') ? 'z' : a.data.id;
-        var bid = (b.data.id == '?') ? 'z' : b.data.id;
-        return aid.localeCompare (bid);
-    }
 
     function init_json (url) {
         // Display a precomputed DAG
@@ -31,10 +24,12 @@ define (['jquery', 'd3', 'd3-common', 'lodash', 'graphlib-dot', 'jquery-ui'],
             .append ('path')
             .attr ('d', 'M 0 0 L 10 5 L 0 10 z');
 
-        var g   = svg.append ('g');
+        var g = svg.append ('g');
 
         d3.json (url, function (error, json) {
-            if (error) throw error;
+            if (error) {
+                throw error;
+            }
 
             // replace indices with node objects
             _.forEach (json.links, function (link) {
@@ -51,7 +46,7 @@ define (['jquery', 'd3', 'd3-common', 'lodash', 'graphlib-dot', 'jquery-ui'],
                 .attr ('id', function (d, i) { return 'link_' + i; })
                 .attr ('class', 'link')
                 .attr ('marker-end', 'url(#triangle)')
-                .attr ('d', function(d) {
+                .attr ('d', function (d) {
                     var path = '';
                     var arr = d.pos.split (' ');
                     // var endp = arr.shift ().substring (2); // arrow endpoint
@@ -67,7 +62,7 @@ define (['jquery', 'd3', 'd3-common', 'lodash', 'graphlib-dot', 'jquery-ui'],
                 .attr ('text-anchor', 'middle')
                 .append ('textPath')
                 .attr ('startOffset', '50%')
-                .attr ('xlink:href', function (d,i) { return '#link_' + i; })
+                .attr ('xlink:href', function (d, i) { return '#link_' + i; })
                 .text (function (d) { return d.rank; });
 
 
@@ -75,8 +70,12 @@ define (['jquery', 'd3', 'd3-common', 'lodash', 'graphlib-dot', 'jquery-ui'],
                 .data (json.nodes)
                 .enter ().append ('g')
                 // .filter (function (d) { return d.depth > 0; })
-                .attr ('class', function (d) { return 'node node-' + (d.children ? 'internal' : 'leaf'); })
-                .attr ('transform', function (d) { return 'translate(' + d.x + ',' + d.y + ')'; });
+                .attr ('class', function (d) {
+                    return 'node node-' + (d.children ? 'internal' : 'leaf');
+                })
+                .attr ('transform', function (d) {
+                    return 'translate(' + d.x + ',' + d.y + ')';
+                });
 
             node.append ('circle')
                 .attr ('class', 'node fg_labez')
@@ -91,39 +90,13 @@ define (['jquery', 'd3', 'd3-common', 'lodash', 'graphlib-dot', 'jquery-ui'],
             // shrinkwrap
             var bbox = g.node ().getBBox ();
             svg.attr ('width',  bbox.width)
-               .attr ('height', bbox.height);
+                .attr ('height', bbox.height);
             g.attr ('transform', 'translate(' + -bbox.x + ',' + -bbox.y + ')');
-
         });
-
-    }
-
-    function init_dot (url) {
-        // Display a precomputed DAG from a .dot format
-
-        var svg = d3.select ('#passage-stemma-wrapper').append ('svg');
-        var g   = svg.append ('g');
-
-        d3.text (url, function (error, dot) {
-            var graph = graphlibDot.read (dot);
-            // var graph = graphlibDot.read('digraph { 1; 2; 1 -> 2 [label=\'label\'] }');
-
-            var render = new dagreD3.render ();
-            render (g, graph);
-
-            // shrinkwrap
-            var bbox = g.node ().getBBox ();
-            svg.attr ('width',  bbox.width)
-               .attr ('height', bbox.height);
-            g.attr ('transform', 'translate(' + -bbox.x + ',' + -bbox.y + ')');
-
-        });
-
     }
 
     // return an object that defines this module
     return {
-        init_json: init_json,
-        init_dot: init_dot,
+        'init_json' : init_json,
     };
 });

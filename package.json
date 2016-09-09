@@ -14,9 +14,17 @@
   "bugs": {
     "url": "https://github.com/cceh/ntg/issues"
   },
-  "license": "GPL3",
+  "license": "GPL-3.0",
   "devDependencies": {
     "bower": "*",
+    "eslint": "^3.4.0",
+    "eslint-config-airbnb": "^10.0.1",
+    "eslint-config-standard": "^6.0.0",
+    "eslint-plugin-import": "^1.14.0",
+    "eslint-plugin-jsx-a11y": "^2.2.0",
+    "eslint-plugin-promise": "^2.0.1",
+    "eslint-plugin-react": "^6.2.0",
+    "eslint-plugin-standard": "^2.0.0",
     "grunt": "*",
     "grunt-contrib-csslint": "*",
     "grunt-contrib-jshint": "*",
