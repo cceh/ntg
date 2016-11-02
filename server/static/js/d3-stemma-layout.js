@@ -1,15 +1,21 @@
 // This is a RequireJS module.
-define (['jquery', 'd3', 'd3-common', 'lodash', 'jquery-ui'],
+define (['jquery', 'd3', 'lodash', 'relatives', 'jquery-ui'],
 
-function ($, d3, d3c, _) {
+function ($, d3, _, relatives) {
     'use strict';
 
     var radius = 15;
 
-    function init_json (url) {
+    function init_json (url, selector, id_prefix) {
         // Display a precomputed DAG
+        //
+        // Load a precomputed GraphViz DAG in JSON format and convert it into a
+        // SVG, then append the SVG to the element specified by the selector.
 
-        var svg = d3.select ('#passage-stemma-wrapper').append ('svg');
+        var root = d3.select (selector);
+        root.selectAll ('*').remove ();
+        var svg = root.append ('svg');
+
         svg
             .append ('defs')
             .append ('marker')
@@ -43,7 +49,7 @@ function ($, d3, d3c, _) {
 
             link.append ('path')
                 // .filter (function (d) { return d.depth > 1; })
-                .attr ('id', function (d, i) { return 'link_' + i; })
+                .attr ('id', function (d, i) { return id_prefix + 'link_' + i; })
                 .attr ('class', 'link')
                 .attr ('marker-end', 'url(#triangle)')
                 .attr ('d', function (d) {
@@ -59,17 +65,18 @@ function ($, d3, d3c, _) {
                 });
 
             link.append ('text')
-                .attr ('text-anchor', 'middle')
+                .attr ('text-anchor', 'end')
                 .append ('textPath')
-                .attr ('startOffset', '50%')
-                .attr ('xlink:href', function (d, i) { return '#link_' + i; })
-                .text (function (d) { return d.rank; });
+                .attr ('startOffset', '100%')
+                .attr ('xlink:href', function (d, i) { return '#' + id_prefix + 'link_' + i; })
+                .text (function (d) { return d.rank ? d.rank + '      ' : ''; }); // <-- &nbsp; !!!
 
 
             var node = g.selectAll ('.node')
                 .data (json.nodes)
                 .enter ().append ('g')
                 // .filter (function (d) { return d.depth > 0; })
+                .attr ('data-ms-id', function (d) { return d['data-ms-id']; })
                 .attr ('class', function (d) {
                     return 'node node-' + (d.children ? 'internal' : 'leaf');
                 })
@@ -79,13 +86,16 @@ function ($, d3, d3c, _) {
 
             node.append ('circle')
                 .attr ('class', 'node fg_labez')
-                .attr ('data-href',  function (d) { return d.href; })
+                // .attr ('data-href',  function (d) { return d.href; })
                 .attr ('data-labez', function (d) { return d.labez; })
                 .attr ('r', radius);
 
             node.append ('text')
                 .attr ('class', 'node')
                 .text (function (d) { return d.label; });
+
+            // relatives.init_bootstrap_popup (node);
+            relatives.init_jquery_popup (node);
 
             // shrinkwrap
             var bbox = g.node ().getBBox ();

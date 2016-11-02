@@ -123,7 +123,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask ('git',        ['shell:git-fetch-collation']);
 
-    grunt.registerTask ('lint',       ['pylint', 'shell:eshint']);
+    grunt.registerTask ('lint',       ['pylint', 'shell:eslint']);
     grunt.registerTask ('mo',         ['pot', 'potomo']);
     grunt.registerTask ('testdeploy', ['lint', 'less', 'mo', 'shell:testdeploy']);
     grunt.registerTask ('deploy',     ['lint', 'less', 'mo', 'shell:deploy']);

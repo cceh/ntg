@@ -1,21 +1,26 @@
 requirejs.config ({
     'paths' : {
-        'bootstrap'      : '/static/bower_components/bootstrap/dist/js/bootstrap',
-        'bootstrap3cdn'  : 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min',
-        'jquery'         : 'https://code.jquery.com/jquery-3.1.0',
-        'jquery-migrate' : 'https://code.jquery.com/jquery-migrate-3.0.0',
-        'jquery-ui'      : 'https://code.jquery.com/ui/1.12.0-rc.2/jquery-ui',
-        'lodash'         : 'https://cdn.jsdelivr.net/lodash/4.13.1/lodash',
-        'd3'             : 'https://d3js.org/d3.v4',
-        'd3-common'      : '/static/js/d3-common',
-        'd3-force'       : '/static/js/d3-force-layout',
-        'd3-stemma'      : '/static/js/d3-passage-stemma-layout',
-        'relatives'      : '/static/js/relatives',
-        'coherence'      : '/static/js/coherence',
+        'bootstrap'             : '/static/bower_components/bootstrap/dist/js/bootstrap',
+        'bootstrap-slider'      : '/static/bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider',
+        'bootstrap3cdn'         : 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min',
+        'jquery'                : 'https://code.jquery.com/jquery-3.1.0',
+        'jquery-migrate'        : 'https://code.jquery.com/jquery-migrate-3.0.0',
+        'jquery-ui'             : 'https://code.jquery.com/ui/1.12.0-rc.2/jquery-ui',
+        'lodash'                : 'https://cdn.jsdelivr.net/lodash/4.13.1/lodash',
+        'd3'                    : 'https://d3js.org/d3.v4',
+        'd3-common'             : '/static/js/d3-common',
+        'd3-force'              : '/static/js/d3-force-layout',
+        'd3-stemma'             : '/static/js/d3-stemma-layout',
+        'relatives'             : '/static/js/relatives',
+        'coherence'             : '/static/js/coherence',
+        'coherence-attestation' : '/static/js/coherence_attestation',
+        'tools'                 : '/static/js/tools',
     },
     'shim' : {
         'bootstrap' : {
-            'deps' : ['jquery'],
+            // make sure jquery-ui gets loaded before bootstrap because we are
+            // going to use noConflict () to remove bootstrap functions
+            'deps' : ['jquery', 'jquery-ui'],
         },
     },
     // curl -s url | openssl dgst -sha256 -binary | openssl base64 -A

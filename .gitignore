@@ -2,6 +2,8 @@
 *.dot
 bower_components/
 node_modules/
+output/
+server/templates/schemas.xml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -88,10 +88,12 @@ text.node {
 text.node:hover {
   text-decoration: underline;
 }
-#svg-wrapper {
+#passage-stemma-wrapper,
+#local-stemma-wrapper {
   width: 100%;
 }
-#passage-stemma-wrapper svg {
+#passage-stemma-wrapper svg,
+#local-stemma-wrapper svg {
   display: block;
   margin: 1em auto;
 }

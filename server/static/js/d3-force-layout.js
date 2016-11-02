@@ -12,6 +12,10 @@ function ($, d3, _, relatives) {
         return 'node group_' + d.group + ' hsnr_' + d.hsnr + ' fg_labez';
     }
 
+    function node_data (d, labez_ord) {
+        return labez_ord > 0 ? String.fromCharCode (labez_ord + 96) : 'lac';
+    }
+
     function dragged (d) {
         d.fx = d3.event.x;
         d.fy = d3.event.y;
@@ -32,67 +36,11 @@ function ($, d3, _, relatives) {
         d.fy = null;
     }
 
-    /*
-    function get_nearest (id) {
-        // Return the ids of the 10 nearest nodes
-
-        var ids = [];
-        var selected = 0;
-        _.forEach (globals.links, function (o) {
-            if (id == o.source.id && o.target.labez > 0) {
-                ids.push (o.target.id);
-                selected++;
-                if (selected >= 10)
-                    // Exit early.  Works because links are sorted by hsnr, affinity DESC.
-                    return false;
-            }
-        });
-        return ids;
-    }
-
-    function select_adjacent (source_id, target_ids) {
-        // Select source and targets and all links from source to target.
-        //
-        // Also select assorted related items like table entries.
-        //
-        // source_id: id of source node
-        // target_ids: array of target ids
-        // Return a jQuery selection
-
-        var selection = $();
-        _.forEach (target_ids, function (target_id) {
-            selection = selection.add ($('#n' + target_id));
-            selection = selection.add ($('#s' + source_id + 't' + target_id));
-            selection = selection.add ($('#attestations .ms[data-ms-id=' + target_id + ']'));
-        });
-        return selection;
-    }
-
-    function on_click (id) {
-        // Select / deselect nodes
-        $node = $('#n' + id);
-        $node.toggleClass ('selected');
-        $span = $('#attestations .ms[data-ms-id=' + id + ']');
-        $span.toggleClass ('selected');
-
-        $('.highlight').removeClass ('highlight');
-
-        $('g.node.selected').each (function () {
-            var id = d3.select (this).datum ().id;
-            var ids = get_nearest (id);
-            $(this).addClass ('highlight');
-            $('#attestations .ms[data-ms-id=' + id + ']').addClass ('highlight');
-            select_adjacent (id, ids).addClass ('highlight');
-        });
-        d3.selectAll ('line.highlight').raise ();
-    }
-    */
-
-    function init () {
-        var width  = $ ('#svg-wrapper').width ();
+    function init (wrapper_selector) {
+        var width  = $ (wrapper_selector).width ();
         var height = width * 0.5;
 
-        var svg = d3.select ('#svg-wrapper')
+        var svg = d3.select (wrapper_selector)
             .append ('svg')
             .attr ('width', width)
             .attr ('height', height);
@@ -102,6 +50,8 @@ function ($, d3, _, relatives) {
 
         var g_links = g.append ('g').attr ('id', 'links');
         var g_nodes = g.append ('g').attr ('id', 'nodes');
+
+        globals.wrapper_selector = wrapper_selector;
 
         d3.json ('/affinity.json', function (error, json) {
             if (error) {
@@ -151,13 +101,6 @@ function ($, d3, _, relatives) {
                 .attr ('class', 'node')
                 .text (function (d) { return d.hs; });
 
-            /*
-              node.on ('click.highlight', function (d) {
-                on_click (d.id);
-                d3.event.stopPropagation ();
-              });
-            */
-
             // relatives.init_bootstrap_popup (node);
             relatives.init_jquery_popup (node);
 
@@ -200,8 +143,26 @@ function ($, d3, _, relatives) {
         });
     }
 
+    function set_attestation (pass_id) {
+        // Change the color of the nodes in the graph to reflect the attestation
+        // of a passage.
+
+        d3.json ('/coherence.json/' + pass_id, function (error, json) {
+            if (error) {
+                throw error;
+            }
+
+            d3.selectAll (globals.wrapper_selector + ' circle.node')
+                .attr ('data-labez', function (d) {
+                    d.labez = _.get (json.attestations, d.id, 1); // set labez on data!
+                    return node_data (d, d.labez);
+                });
+        });
+    }
+
     // return an object that defines this module
     return {
-        'init' : init,
+        'init'            : init,
+        'set_attestation' : set_attestation,
     };
 });

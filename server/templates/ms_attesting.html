@@ -5,7 +5,7 @@
 {% block head %}
 <link href="/static/css/relatives.css" rel="stylesheet" type="text/css" />
 <link href="/static/css/ms_attesting.css" rel="stylesheet" type="text/css" />
-<title>{{_('Attestation for %(passage)s %(labez)s', passage = passage, labez = labez)}}</title>
+<title>{{_('Attestation for %(passage)s %(labez)s', passage = passage.hr_pass, labez = labez)}}</title>
 <script>
   require (["jquery"], function ($) {
     $ (function () {
@@ -22,13 +22,13 @@
 
 <div class="bs-docs-header">
   <div class="container">
-    <h1>{{_('Attestation for %(passage)s %(labez)s', passage = passage, labez = labez)}}</h1>
+    <h1>{{_('Attestation for %(passage)s %(labez)s', passage = passage.hr_pass, labez = labez)}}</h1>
   </div>
 </div>
 
 <div class="container bs-docs-container">
   {% for r in rows %}
-  <div class="relatives" data-href="/relatives/{{pass_id|e}}/{{r.hsnr|e}}"></div>
+  <div class="relatives" data-href="/relatives/{{passage.pass_id|e}}/{{r.hsnr|e}}"></div>
   {% endfor %}
 </div>
 

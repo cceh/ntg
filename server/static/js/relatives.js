@@ -1,8 +1,8 @@
 // This is a RequireJS module.
 
-define (['jquery', 'd3', 'd3-common', 'lodash', 'bootstrap', 'jquery-ui'],
+define (['jquery', 'lodash', 'd3', 'd3-common', 'tools', 'jquery-ui'],
 
-function ($, d3, d3c, _) {
+function ($, _, d3, d3c, tools) {
     'use strict';
 
     var pass_id = 0;
@@ -12,6 +12,7 @@ function ($, d3, d3c, _) {
         'chapter' : '0',
         'limit'   : '10',
         'labez'   : 'all',
+        'mode'    : 'rec',
     };
 
     var URLS = {
@@ -24,39 +25,12 @@ function ($, d3, d3c, _) {
         $ (document).trigger ('ntg.popup.changed');
     }
 
-    function check_bootstrap_buttons ($panel, opts) {
-        _.forEach (opts, function (value, key) {
-            var $input = $panel.find ('input[name="' + key  + '"][data-opt="' + value + '"]');
-            var $group = $input.closest ('.btn-group');
-            $input.checked = true;
-            $group.find ('label.btn').removeClass ('active');
-            $input.closest ('label.btn').addClass ('active');
-        });
-        $panel.find ('.dropdown-toggle-labez')
-            .attr ('data-labez', opts.labez);
-        var labez_i18n = $panel.find ('.btn-labez[data-labez="' + opts.labez + '"]').text ();
-        $panel.find ('.dropdown-toggle-labez span.btn_text').text (labez_i18n);
-    }
-
-    $.widget ('custom.d3_tooltip', $.ui.tooltip, {
-        // This is a jquery-ui tooltip that groks the SVG DOM.
+    $.widget ('custom.relatives_tooltip', $.ui.tooltip, {
+        // This is a jquery-ui tooltip that opens on click and stays open until
+        // explicitly closed by the user.
         'options' : {
-            'items'    : 'g.node',
             'classes'  : { 'ui-tooltip': 'tooltip-relatives tooltip-relatives-data' },
             'position' : { 'my': 'center bottom-3' },
-            'content'  : function (callback) {
-                var hsnr = d3c.to_d3 ($ (this)).datum ().hsnr;
-                $.get (URLS[DEFAULTS.type] + pass_id + '/' + hsnr, DEFAULTS, function (data) {
-                    callback (data);
-                });
-            },
-            'open' : function (event, ui) {
-                var el = ui.tooltip;
-                el.data ('options', $.extend ({}, DEFAULTS));
-                check_bootstrap_buttons (el, el.data ('options'));
-                el.find ('.dropdown-toggle').dropdown ();
-                changed ();
-            },
         },
         '_create' : function () {
             this._super ();
@@ -66,6 +40,40 @@ function ($, d3, d3c, _) {
         '_open' : function (event, target, dummy_content) {
             this._superApply (arguments);
             this._off (target, 'mouseleave focusout');
+
+            var tooltipData = this._find (target);
+            var $tooltip = tooltipData.tooltip;
+            $tooltip.draggable ();
+        },
+        '_removeTooltip' : function (dummy_tooltip) {
+            // _removeTooltip () is called when the closing animation is completed.
+            this._superApply (arguments);
+            // At this point the tooltip has been removed from the DOM.
+            changed ();
+        },
+    });
+
+    $.widget ('custom.d3_tooltip', $.custom.relatives_tooltip, {
+        // This is a jquery-ui tooltip that groks the SVG DOM.
+        'options' : {
+            'items'   : 'g.node',
+            'content' : function (callback) {
+                var hsnr = d3c.to_d3 ($ (this)).datum ().hsnr;
+                $.get (URLS[DEFAULTS.type] + pass_id + '/' + hsnr, DEFAULTS, function (data) {
+                    callback (data);
+                });
+            },
+            'open' : function (event, ui) {
+                var $el = ui.tooltip;
+                var $panel = $el.find ('div.panel');
+                $panel.data ('options', $.extend ({}, DEFAULTS));
+                tools.handle_bootstrap_buttons (new $.Event ('init', { 'target': $panel }));
+                $el.find ('.dropdown-toggle').dropdown ();
+                changed ();
+            },
+        },
+        '_open' : function (event, target, dummy_content) {
+            this._superApply (arguments);
 
             // Reposition the popup manually because jquery doesn't grok the SVG
             // DOM.
@@ -81,14 +89,6 @@ function ($, d3, d3c, _) {
                 'collision' : 'flipfit flip',
                 'of'        : event,
             });
-
-            $tooltip.draggable ();
-        },
-        '_removeTooltip' : function (dummy_tooltip) {
-            // _removeTooltip () is called when the closing animation is completed.
-            this._superApply (arguments);
-            // At this point the tooltip has been removed from the DOM.
-            changed ();
         },
     });
 
@@ -97,6 +97,28 @@ function ($, d3, d3c, _) {
             var $this = $ (this);
             $this.d3_tooltip ();
             $this.d3_tooltip ('open');
+        });
+    }
+
+    function init_tooltip ($elem, pass_id_) {
+        $elem.relatives_tooltip ({
+            'items'    : 'a.ms',
+            'classes'  : { 'ui-tooltip': 'tooltip-relatives tooltip-relatives-data' },
+            'position' : { 'my': 'center bottom-3' },
+            'open'     : function (event, ui) {
+                var $el = ui.tooltip;
+                var $panel = $el.find ('div.panel');
+                $panel.data ('options', $.extend ({}, DEFAULTS));
+                tools.handle_bootstrap_buttons (new $.Event ('init', { 'target': $panel }));
+                $el.find ('.dropdown-toggle').dropdown ();
+                // changed ();
+            },
+            'content' : function (callback) {
+                var hsnr = $ (this).attr ('data-hsnr');
+                $.get ('/relatives/' + pass_id_ + '/' + hsnr, {}, function (data) {
+                    callback (data);
+                });
+            },
         });
     }
 
@@ -166,19 +188,20 @@ function ($, d3, d3c, _) {
 
     function options (event) {
         var $target  = $ (event.target);
+        var $panel   = $target.closest ('div.panel');
         var $tooltip = $target.closest ('.ui-tooltip');
-        var $panel   = $target.closest ('div.panel-relatives');
 
-        var opts = $tooltip.data ('options');
-        opts[$target.attr ('name')] = $target.attr ('data-opt');
+        tools.handle_bootstrap_buttons (event);
 
-        var hsnr    = $panel.attr  ('data-hsnr');
+        var opts = $panel.data ('options');
+        var hsnr = $panel.attr ('data-hsnr');
 
         $.get (URLS[opts.type] + pass_id + '/' + hsnr, opts, function (data) {
-            $panel.replaceWith (data);
-            // transfer old state to new elements
-            check_bootstrap_buttons ($tooltip, opts);
+            var $newpanel = $ (data);
+            $newpanel.data ('options', opts);
+            $panel.replaceWith ($newpanel);
             $tooltip.find ('.dropdown-toggle').dropdown ();
+            tools.handle_bootstrap_buttons (new $.Event ('init', { 'target': $newpanel }));
             changed ();
         });
 
@@ -204,8 +227,21 @@ function ($, d3, d3c, _) {
 
         // click on close icon in jquery-ui popup
         $ (document).on ('click', '.ui-tooltip .tooltip-close', function (event) {
-            var $popup = $ (this).parents ('.ui-tooltip');
-            popup_to_elem ($popup).d3_tooltip ('close');
+            var $popup = $ (this).closest ('.ui-tooltip');
+            var $elem = popup_to_elem ($popup);
+            if ($elem.length) {
+                // FIXME: Since D3_tooltip inherits from relatives_tooltip, find
+                // a way to use a "virtual function" here.
+                if ($elem.is (":data('customRelatives_tooltip')")) {
+                    $elem.relatives_tooltip ('close');
+                }
+                if ($elem.is (":data('customD3_tooltip')")) {
+                    $elem.d3_tooltip ('close');
+                }
+            } else {
+                // workaround for when the element doesn't exist anymore
+                $popup.remove ();
+            }
             changed ();
             event.stopPropagation ();
         });
@@ -213,7 +249,7 @@ function ($, d3, d3c, _) {
         // click on minimize icon in jquery-ui popup
         $ (document).on ('click', '.ui-tooltip .tooltip-minimize', function (event) {
             var $this = $ (this);
-            var $popup = $this.parents ('.ui-tooltip');
+            var $popup = $this.closest ('.ui-tooltip');
             $popup.find ('.panel-relatives-content').slideUp ();
             $popup.find ('.panel-relatives-toolbar').slideUp ();
             // Remove content from sight of get_ms_ids_from_popups ().
@@ -225,7 +261,7 @@ function ($, d3, d3c, _) {
         // click on maximize icon in jquery-ui popup
         $ (document).on ('click', '.ui-tooltip .tooltip-maximize', function (event) {
             var $this = $ (this);
-            var $popup = $this.parents ('.ui-tooltip');
+            var $popup = $this.closest ('.ui-tooltip');
             $popup.parent ().append ($popup); // bring to front
             $popup.find ('.panel-relatives-content').slideDown ();
             $popup.find ('.panel-relatives-toolbar').slideDown ();
@@ -237,7 +273,7 @@ function ($, d3, d3c, _) {
 
         // click on close icon in bootstrap popup
         $ (document).on ('click', '.popover .tooltip-close', function (event) {
-            var $popup = $ (this).parents ('.popover');
+            var $popup = $ (this).closest ('.popover');
             popup_to_elem ($popup).popover ('destroy');
             changed ();
             event.stopPropagation ();
@@ -247,8 +283,10 @@ function ($, d3, d3c, _) {
     // return an object that defines this module
     return {
         'init'                   : init,
+        'init_tooltip'           : init_tooltip,
         'init_jquery_popup'      : init_jquery_popup,
         'init_bootstrap_popup'   : init_bootstrap_popup,
         'get_ms_ids_from_popups' : get_ms_ids_from_popups,
+        'DEFAULTS'               : DEFAULTS,
     };
 });

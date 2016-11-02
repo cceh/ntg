@@ -1,50 +1,43 @@
 // This is a RequireJS module.
-define (['jquery', 'd3', 'd3-common', 'lodash', 'relatives', 'd3-force', 'jquery-ui'],
+define (['jquery', 'lodash', 'tools', 'd3', 'd3-common', 'd3-stemma', 'd3-force',
+         'relatives', 'coherence-attestation', 'bootstrap'],
 
-function ($, d3, d3c, _) {
+function ($, _, tools, d3, d3common, d3stemma, d3force, relatives, ca) {
     'use strict';
 
-    function node_data (d, labez_ord) {
-        return labez_ord > 0 ? String.fromCharCode (labez_ord + 96) : 'lac';
-    }
+    function init (params) {
+        var pass_id = params.pass_id;
 
-    function init () {
-        // click on data-ms-id
+        $ (document).off ('.data-api');
+        $.fn.bootstrapTooltip = $.fn.tooltip.noConflict ();
+
+        relatives.init (pass_id);
+
+        d3stemma.init_json (
+            '/stemma.json/' + pass_id,
+            '#local-stemma-wrapper',
+            'local_stemma_'
+        );
+
+        ca.init ($.extend (params, {
+            'wrapper_selector' : '#passage-stemma-wrapper',
+        }));
+
+        d3force.init ('#force-layout-wrapper');
+        d3force.set_attestation (pass_id);
+
+        d3common.insert_css_attestation_colors ();
+
+        // click on ms in list of labez or in relatives popup
         $ (document).on ('click', '.ms[data-ms-id]', function (event) {
-            var ms_id = $ (event.target).attr ('data-ms-id');
-            var node = $ ('g[data-ms-id="' + ms_id + '"]');
-            node.d3_tooltip ();
-            node.d3_tooltip ('open');
-        });
-        // click on data-href
-        $ (document).on ('click', 'circle[data-href]', function (event) {
-            window.location = $ (event.target).attr ('data-href');
-        });
-    }
-
-    function set_attestation (pass_id) {
-        // Change the color of the nodes in the graph to reflect the attestation
-        // of a passage.  Also change the color of the items in the attestation
-        // list which functions as legend.
-
-        d3c.insert_css_attestation_colors ();
-
-        d3.json ('/coherence.json/' + pass_id, function (error, json) {
-            if (error) {
-                throw error;
-            }
-
-            d3.selectAll ('#svg-wrapper circle.node')
-                .attr ('data-labez', function (d) {
-                    d.labez = _.get (json.attestations, d.id, 1); // set labez on data!
-                    return node_data (d, d.labez);
-                });
+            var $target = $ (event.target);
+            relatives.init_tooltip ($target, pass_id);
+            $target.relatives_tooltip ('open');
         });
     }
 
     // return an object that defines this module
     return {
-        'init'            : init,
-        'set_attestation' : set_attestation,
+        'init' : init,
     };
 });

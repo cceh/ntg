@@ -1,28 +1,23 @@
 {% extends "site.html" %}
 
 {% block head %}
-<link href="/static/css/coherence.css" rel="stylesheet" type="text/css">
-<link href="/static/css/relatives.css" rel="stylesheet" type="text/css">
+<link href="/static/bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/coherence.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/relatives.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/coherence_attestation.css" rel="stylesheet" type="text/css" />
 
 <title>{{_('Attestation for %(passage)s', passage = passage.hr_pass)}}</title>
 
 <script>
-  require ([
-    "/static/js/d3-passage-stemma-layout.js",
-    "d3-force",
-    "relatives",
-    "coherence",
-    ], function (stemma, force, relatives, coherence) {
-
-    var pass_id = {{passage.pass_id}};
-
-    stemma.init_json ('/stemma.json/' + pass_id);
-    force.init ();
-    relatives.init (pass_id);
-    coherence.init ();
-    coherence.set_attestation (pass_id);
+  require (['coherence'], function (coherence) {
+    coherence.init ({
+      pass_id:          {{passage.pass_id}},
+      chapter:          '{{passage.chapter}}',
+      labez:            'a',
+    });
   });
 </script>
+
 {% endblock %}
 
 {% block content %}
@@ -33,27 +28,92 @@
 </div>
 
 <div class="container bs-docs-container">
-  <div id="passage-stemma-wrapper">
+  <div id="local-stemma-wrapper">
   </div>
 
   <ul id="attestations" class="list-group">
     {% for r in values.readings %}
     <li class="list-group-item">
       <h4 class="list-group-item-heading">
-	<a data-labez="{{r.labez}}" class="fg_labez"
-	   href="/ms_attesting/{{passage.pass_id}}/{{r.labez|e}}">{{r.labez|e}}{{r.labezsuf|e}} {{r.lesart|e}}</a>
+        <a data-labez="{{r.labez}}" class="fg_labez"
+           href="/ms_attesting/{{passage.pass_id}}/{{r.labez|e}}">{{r.labez|e}}{{r.labezsuf|e}} {{r.lesart|e}}</a>
       </h4>
       <ul class="list-group-item-text attesting-mss list-inline">
-	{% for id, hs in r.manuscripts -%}
-	<li><a class="ms" data-ms-id="{{id|e}}">{{hs|e}}.</a></li>
-	{% endfor %}
+        {% for id, hs, hsnr in r.manuscripts -%}
+        <li><a class="ms" data-ms-id="{{id|e}}" data-hsnr="{{hsnr|e}}">{{hs|e}}.</a></li>
+        {% endfor %}
       </ul>
     </li>
     {% endfor %}
   </ul>
+
+  <div class="panel panel-default panel-coherence-attestation"
+       data-pass-id="{{passage.pass_id}}">
+
+    <div class="panel-heading panel-coherence-attestation-toolbar">
+      <div class="btn-toolbar toolbar-coherence-attestation" role="toolbar">
+
+        <div class="coherence-attestation-labez btn-group btn-group-xs">
+          <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-labez bg_labez"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="btn_text"></span> <span class="caret"></span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-labez">
+            <div class="btn-group btn-group-xs" data-toggle="buttons">
+              {% for v in variants %}
+              <label class="btn btn-labez bg_labez" data-labez="{{v.labez|e}}">
+                <input type="radio" name="labez" data-opt="{{v.labez|e}}">{{v.labez_i18n|e}}</input>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div class="coherence-attestation-connectivity btn-group btn-group-xs" data-toggle="buttons">
+          <label class="btn btn-primary">
+            <span class="connectivity-label"></span>
+            <input type="text" name="connectivity" />
+          </label>
+        </div>
+
+        <div class="coherence-attestation-chapter btn-group btn-group-xs" data-toggle="buttons">
+          <label class="btn btn-primary">
+            <input type="radio" name="chapter" data-opt="0">{{_('All')}}</input>
+          </label>
+          <label class="btn btn-primary">
+            <input type="radio" name="chapter" data-opt="{{passage.chapter}}">{{_('Ch')}}</input>
+          </label>
+        </div>
+
+        <div class="coherence-attestation-include btn-group btn-group-xs" data-toggle="buttons">
+          <label class="btn btn-primary">
+            <input type="checkbox" name="include" data-opt="A">{{_('A')}}</input>
+          </label>
+          <label class="btn btn-primary">
+            <input type="checkbox" name="include" data-opt="MT">{{_('MT')}}</input>
+          </label>
+        </div>
+
+        <div class="coherence-attestation-mode btn-group btn-group-xs" data-toggle="buttons">
+          <label class="btn btn-primary">
+            <input type="radio" name="mode" data-opt="rec">{{_('Rec')}}</input>
+          </label>
+          <label class="btn btn-primary">
+            <input type="radio" name="mode" data-opt="sim">{{_('Sim')}}</input>
+          </label>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="passage-stemma-wrapper">
+    </div>
+  </div>
+
+  <div id="force-layout-wrapper">
+  </div>
+
 </div>
 
-<div id="svg-wrapper">
-</div>
 
 {% endblock %}

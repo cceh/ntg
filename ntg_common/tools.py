@@ -18,56 +18,55 @@ DEFAULTS = {
     #'attlac' : 'ActsAttLac_3',
     #'tmp'    : 'ActsTmp_3',
 
-    'att'       : 'Att',
-    'lac'       : 'Lac',
-    'labez'     : 'Labez',
-    'ms'        : 'Manuscripts',
-    'chap'      : 'Chapters',
-    'pass'      : 'Passages',
-    'npass'     : 'NestedPassages',
-    'aff'       : 'Affinity',
-    'vp'        : 'VP',
-    'rdg'       : 'Rdg',
-    'witn'      : 'Witn',
-    'listval'   : 'MsListVal',
-    'vg'        : 'VG',
-    'tmp'       : 'Tmp',
+    'att'       : 'att',
+    'lac'       : 'lac',
+    'labez'     : 'labez',
+    'ms'        : 'manuscripts',
+    'chap'      : 'chapters',
+    'pass'      : 'passages',
+    'aff'       : 'affinity',
+    'vp'        : 'vp',
+    'rdg'       : 'rdg',
+    'witn'      : 'witn',
+    'listval'   : 'mslistval',
+    'vg'        : 'vg',
+    'tmp'       : 'tmp',
     'g_nodes'   : 'nodes',
     'g_edges'   : 'edges',
-    'locstemed' : 'LocStemEd',
-    'locstemedtmp' : 'LocStemEdTmp',
+    'locstemed' : 'locstemed',
+    'locstemedtmp' : 'locstemedtmp',
 }
 """ Defaults for init_parameters () """
 
 
 BOOKS = (
-    ("Mt", "Matthew"),
-	("Mc", "Mark"),
-    ("L", "Luke"),
-	("J", "John"),
+    ("Mt",  "Matthew"),
+	("Mc",  "Mark"),
+    ("L",   "Luke"),
+	("J",   "John"),
 	("Act", "Acts"),
-	("R", "Romans"),
-	("1K", "1Corinthians"),
-	("2K", "2Corinthians"),
-	("G", "Galatians"),
-	("E", "Ephesians"),
-	("Ph", "Philippians"),
+	("R",   "Romans"),
+	("1K",  "1Corinthians"),
+	("2K",  "2Corinthians"),
+	("G",   "Galatians"),
+	("E",   "Ephesians"),
+	("Ph",  "Philippians"),
 	("Kol", "Colossians"),
 	("1Th", "1Thessalonians"),
 	("2Th", "2Thessalonians"),
-	("1T", "1Timothy"),
-	("2T", "2Timothy"),
-	("Tt", "Titus"),
+	("1T",  "1Timothy"),
+	("2T",  "2Timothy"),
+	("Tt",  "Titus"),
 	("Phm", "Philemon"),
-	("H", "Hebrews"),
-	("Jc", "James"),
-	("1P", "1Peter"),
-	("2P", "2Peter"),
-	("1J", "1John"),
-	("2J", "2John"),
-	("3J", "3John"),
-	("Jd", "Jude"),
-	("Ap", "Revelation")
+	("H",   "Hebrews"),
+	("Jc",  "James"),
+	("1P",  "1Peter"),
+	("2P",  "2Peter"),
+	("1J",  "1John"),
+	("2J",  "2John"),
+	("3J",  "3John"),
+	("Jd",  "Jude"),
+	("Ap",  "Revelation")
 )
 """ Titles of the NT books """
 
@@ -83,13 +82,12 @@ def init_parameters (defaults):
     target_db = quote (args.target_db) + '.'
 
     for k, v in defaults.items ():
-        parameters['target_table_' + k] = quote (v)
-        parameters[k] = target_db + quote (v)
+        parameters[k] = quote (v)
 
     parameters['source_db']  = quote (args.source_db)
     parameters['target_db']  = quote (args.target_db)
     parameters['src_vg_db']  = quote (args.src_vg_db)
-    parameters['table_mask'] = "Acts%02d%%" % args.chapter if args.chapter else "Acts%"
+    parameters['table_mask'] = "^Acts%02d" % args.chapter if args.chapter else "^Acts"
 
     return parameters
 

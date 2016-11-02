@@ -64,23 +64,21 @@ class Passage (object):
         start, end =  self.fix (passage_or_id)
 
         if int (start) > 10000000:
-            self.start, self.end = start, end
-            self.hr_pass = self.format (start, end)
             res = execute (conn, """
-            SELECT id
+            SELECT id, anfadr, endadr, kapanf
             FROM {pass}
             WHERE anfadr = :anfadr AND endadr = :endadr
             """, dict (parameters, anfadr = start, endadr = end))
-            self.pass_id = res.scalar ()
         else:
-            self.pass_id = start
             res = execute (conn, """
-            SELECT anfadr, endadr
+            SELECT id, anfadr, endadr, kapanf
             FROM {pass}
             WHERE id = :pass_id
             """, dict (parameters, pass_id = start))
-            self.start, self.end = res.first ()
-            self.hr_pass = self.format (self.start, self.end)
+
+        self.pass_id, self.start, self.end, self.chapter = res.first ()
+        self.hr_pass = self.format (self.start, self.end)
+
 
     @staticmethod
     def fix (passage):
@@ -97,6 +95,7 @@ class Passage (object):
 
     @staticmethod
     def format (start, end):
+        # Format a passage in the format: Acts 1:2/3-4
         def scan (p):
             p = str (int (p))
             m = re.match (r'^(\d)(\d\d)(\d\d)(\d\d\d)$', p)
@@ -127,6 +126,20 @@ class Passage (object):
         return res
 
 
+    def variants (self, conn, prefix = [], suffix = []):
+        # Get a list of all variants for this passage
+        res = execute (conn, """
+        SELECT DISTINCT char_labez (labez) as labez
+        FROM {labez}
+        WHERE pass_id = :pass_id
+        ORDER BY labez
+        """, dict (parameters, pass_id = self.pass_id))
+
+        res = prefix + list (res) + suffix
+        Variants = collections.namedtuple ('Variants', 'labez labez_i18n')
+        return list (map (Variants._make, ((r[0], LABEZ_I18N.get (r[0], r[0])) for r in res)))
+
+
 def ord_labez (labez):
     if labez == 'lac':
         return 0
@@ -139,25 +152,36 @@ def char_labez (labez):
     return chr (labez + 96)
 
 
+def get_pgv ():
+    G = pgv.AGraph (directed = True, dpi = 100, ordering = "out",
+                    ranksep = 0.4, nodesep = 0.2, rankdir = 'BT')
+    G.node_attr.update (width = 0.6, fixedsize = "shape", shape ="circle")
+    G.edge_attr.update (headclip = "false", tailclip = "false",
+                        # important! otherwise the pos will contain endpoint
+                        # positions which will offset our parsing in the js
+                        arrowhead = "none", arrowtail = "none")
+    return G
+
+
 @app.route ("/")
 def index ():
     return flask.render_template ('index.html')
 
 
-@app.route('/ms_attesting/<int:pass_id>/<labez>')
-def ms_attesting (pass_id, labez):
+@app.route('/ms_attesting/<passage_or_id>/<labez>')
+def ms_attesting (passage_or_id, labez):
     """ Get all mss. attesting labez at passage. """
 
     with dba.engine.begin () as conn:
+        passage = Passage (conn, passage_or_id)
 
         res = execute (conn, """
         SELECT anfadr, endadr
         FROM {pass}
         WHERE id = :pass_id
-        """, dict (parameters, pass_id = pass_id))
+        """, dict (parameters, pass_id = passage.pass_id))
 
         row = res.fetchone ()
-        passage = format_passage (row[0], row[1])
 
         res = execute (conn, """
         SELECT hsnr
@@ -171,13 +195,13 @@ def ms_attesting (pass_id, labez):
 
         # convert tuples to lists
         return flask.render_template ("ms_attesting.html",
-                                      pass_id = pass_id, passage = passage, labez = labez, rows = attesting)
+                                      passage = passage, labez = labez, rows = attesting)
 
 
-@app.route('/relatives/<int:pass_id>/<int:hsnr>')
-@app.route('/ancestors/<int:pass_id>/<int:hsnr>')
-@app.route('/descendants/<int:pass_id>/<int:hsnr>')
-def relatives (hsnr, pass_id):
+@app.route('/relatives/<passage_or_id>/<int:hsnr>')
+@app.route('/ancestors/<passage_or_id>/<int:hsnr>')
+@app.route('/descendants/<passage_or_id>/<int:hsnr>')
+def relatives (hsnr, passage_or_id):
     """Output a table of the nearest relatives of a manuscript.
 
     Output a table of the nearest relatives/ancestors/descendants of a
@@ -188,6 +212,8 @@ def relatives (hsnr, pass_id):
     chapter = request.args.get ('chapter') or 0
     limit   = int (request.args.get ('limit') or 10)
     labez   = request.args.get ('labez') or 'all'
+    mode    = request.args.get ('mode') or 'rec'
+    include = request.args.getlist ('include[]') or []
 
     caption = _('Relatives for')
     where = ''
@@ -204,7 +230,11 @@ def relatives (hsnr, pass_id):
     else:
         where += ' AND labez = %d' % ord_labez (labez)
 
+    prefix = '' if mode == 'rec' else 'p_'
+
     with dba.engine.begin () as conn:
+
+        passage = Passage (conn, passage_or_id)
 
         # Get the manuscript name
         ms = Bag ()
@@ -218,13 +248,13 @@ def relatives (hsnr, pass_id):
         SELECT char_labez (labez) as labez, labezsuf
         FROM {labez}
         WHERE ms_id = :ms_id AND pass_id = :pass_id
-        """, dict (parameters, ms_id = ms.id_ + 1, pass_id = pass_id))
+        """, dict (parameters, ms_id = ms.id_ + 1, pass_id = passage.pass_id))
         ms.labez, ms.labezsuf = res.fetchone ()
 
         # Get the passage
         res = execute (conn, """
         SELECT kapanf FROM {pass} WHERE id = :pass_id
-        """, dict (parameters, pass_id = pass_id))
+        """, dict (parameters, pass_id = passage.pass_id))
         pass_chapter, = res.fetchone ()
 
         # Get the affinity of the manuscript to MT
@@ -239,60 +269,73 @@ def relatives (hsnr, pass_id):
         SELECT char_labez (labez) as labez, labezsuf
         FROM {labez}
         WHERE ms_id = 2 AND pass_id = :pass_id
-        """, dict (parameters, pass_id = pass_id))
+        """, dict (parameters, pass_id = passage.pass_id))
         mt.labez, mt.labezsuf = res.fetchone ()
 
-        # Get all variants for this passage
-        res = execute (conn, """
-        SELECT DISTINCT char_labez (labez) as clabez
-        FROM {labez}
-        WHERE pass_id = :pass_id
-        ORDER BY clabez
-        """, dict (parameters, pass_id = pass_id))
-        res = [('all', )] + list (res) + [('all+lac', )]
-        Variants = collections.namedtuple ('Variants', 'labez labez_i18n')
-        variants = list (map (Variants._make, ((r[0], LABEZ_I18N.get (r[0], r[0])) for r in res)))
+        Nodes = collections.namedtuple ('Nodes', 'ms_id')
 
-        # Get chapter length
-        # To make the following huge query a bit smaller
-        res = execute (conn, """
-        SELECT length
-        FROM {chap}
-        WHERE ms_id = :ms_id1 AND chapter = :chapter
-        """, dict (parameters, ms_id1 = ms.id_ + 1, chapter = chapter))
-        chapter_length, = res.fetchone ()
+        if include:
+            # get ids of nodes to include
+            res = execute (conn, """
+            SELECT id
+            FROM {ms}
+            WHERE (hs IN :include)
+            ORDER BY id
+            """, dict (parameters, include = tuple (include)))
+
+            include = [str (n.ms_id) for n in map (Nodes._make, res)]
+
+        exclude = set (include) ^ set (['1', '2'])
+        tools.message (1, 'EXCLUDE ' + ' '.join (exclude))
+        exclude.add (-1) # a non-existing id to avoid SQL error
 
         # Get the X most similar manuscripts and their attestations
         res = execute (conn, """
-        SELECT aff.rank,
+        /* get the :limit closest ancestors for this node */
+        WITH ranks AS (
+          SELECT id1, id2, rank () OVER (ORDER BY affinity DESC) AS rank, affinity
+          FROM {aff} a
+          JOIN {chap} c
+            ON c.ms_id = a.id1 AND c.chapter = a.chapter
+          WHERE id1 = :ms_id1 AND a.chapter = :chapter AND id2 NOT IN :exclude
+            AND {prefix}newer > {prefix}older AND a.common > c.length / 2
+          ORDER BY affinity DESC
+        )
+
+        SELECT r.rank,
                ms2.id - 1 as ms_id,
                ms2.hs,
                ms2.hsnr,
                aff.common,
                aff.equal,
-               aff.older,
-               aff.newer,
+               aff.{prefix}older,
+               aff.{prefix}newer,
                aff.unclear,
-               aff.common - aff.equal - aff.older - aff.newer - aff.unclear as norel,
-               if (aff.newer < aff.older, '', if (aff.newer = aff.older, '=', '>')) as direction,
+               aff.common - aff.equal - aff.{prefix}older - aff.{prefix}newer - aff.unclear as norel,
+               CASE WHEN aff.{prefix}newer < aff.{prefix}older THEN ''
+                    WHEN aff.{prefix}newer = aff.{prefix}older THEN '='
+                    ELSE '>'
+               END as direction,
                aff.affinity,
                char_labez (labez.labez) as labez,
                labez.labezsuf
         FROM
           {aff} aff
         JOIN {ms} ms2
-          ON aff.id2 = ms2.id
+          ON aff.id2 = ms2.id AND aff.id2 NOT IN :exclude
         JOIN {labez} labez
           ON aff.id2 = labez.ms_id
         JOIN {chap} ch
-          ON aff.id2 = ch.ms_id AND ch.chapter = :chapter
-        WHERE id1 = :ms_id1 AND aff.chapter = :chapter AND aff.common > 0
-              AND ch.length > :threshold AND labez.pass_id = :pass_id {where}
-        ORDER BY affinity DESC, rank, newer DESC, older DESC
+          ON ch.ms_id = aff.id1 AND ch.chapter = aff.chapter
+        LEFT JOIN ranks r
+          ON r.id2 = aff.id2
+        WHERE aff.id1 = :ms_id1 AND aff.chapter = :chapter AND aff.common > 0
+              AND aff.common > ch.length / 2 AND labez.pass_id = :pass_id {where}
+        ORDER BY affinity DESC, r.rank, {prefix}newer DESC, {prefix}older DESC, hsnr
         LIMIT :limit
         """, dict (parameters, where = where, ms_id1 = ms.id_ + 1, hsnr = hsnr,
-                   pass_id = pass_id, chapter = chapter, limit = limit,
-                   threshold = max (1, chapter_length // 2)))
+                   pass_id = passage.pass_id, chapter = chapter, limit = limit,
+                   prefix = prefix, exclude = tuple (exclude)))
 
         Relatives = collections.namedtuple (
             'Relatives',
@@ -300,70 +343,100 @@ def relatives (hsnr, pass_id):
         )
         relatives = list (map (Relatives._make, res))
 
+        variants = passage.variants (conn, [('all', )], [('all+lac', )])
+
         # convert tuples to lists
-        return flask.render_template ("relatives.html",
-                                      pass_id = pass_id, pass_chapter = pass_chapter, caption = caption,
+        return flask.render_template ("relatives.html", passage = passage, caption = caption,
                                       ms = ms, mt = mt, variants = variants, rows = relatives)
 
 
 @app.route('/coherence.json/<passage_or_id>/attestation/<labez>')
 def coherence_attestation_json (passage_or_id, labez):
 
-    chapter = request.args.get ('chapter') or 0
-    limit   = int (request.args.get ('limit') or 10)
-    # labez   = request.args.get ('labez') or 'a'
+    chapter      = request.args.get ('chapter') or 0
+    connectivity = int (request.args.get ('connectivity') or 10)
+    mode         = request.args.get ('mode') or 'rec'
+    include      = request.args.getlist ('include[]') or []
+
+    prefix = '' if mode == 'rec' else 'p_'
 
     with dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
 
-        G = pgv.AGraph (directed = True, ordering = "out", dpi = 100,
-                        ranksep = 0.2, nodesep = 0.2, rankdir = 'BT')
-        G.node_attr.update (width = 0.6, fixedsize = "shape", shape ="circle")
-        G.edge_attr.update (headclip = "false", tailclip = "false",
-                            # headclip, tailclip: important! otherwise the pos
-                            # will contain endpoint positions which will offset
-                            # our parsing in the js
-                            arrowhead = "none", arrowtail = "none")
+        G = get_pgv ()
+
+        Nodes = collections.namedtuple ('Nodes', 'ms_id')
+
+        if include:
+            # get ids of nodes to include
+            res = execute (conn, """
+            SELECT id
+            FROM {ms}
+            WHERE (hs IN :include)
+            ORDER BY id
+            """, dict (parameters, include = tuple (include)))
+
+            include = [str (n.ms_id) for n in map (Nodes._make, res)]
+
+        exclude = set (include) ^ set (['1', '2'])
+        tools.message (1, 'EXCLUDE ' + ' '.join (exclude))
+        exclude.add (-1) # a non-existing id to avoid SQL error
 
         # get nodes attesting labez
         res = execute (conn, """
         SELECT ms_id
         FROM {labez}
-        WHERE pass_id = :pass_id AND labez = :labez_ord /* AND ms_id > 2 */
-        """, dict (parameters, pass_id = passage.pass_id, labez_ord = ord_labez (labez)))
+        WHERE pass_id = :pass_id AND labez = :labez_ord AND ms_id NOT IN :exclude
+        """, dict (parameters, exclude = tuple (exclude),
+                   pass_id = passage.pass_id, labez_ord = ord_labez (labez)))
 
-        Nodes = collections.namedtuple ('Nodes', 'ms_id')
         nodes = list (map (Nodes._make, res))
 
         for n in nodes:
             G.add_node (n.ms_id)
 
-        # FIXME: the ranking -- write only `compatibility´ info to database?
-
-        # connect nodes attesting labez to their lowest ranking ancestor attesting labez
-        # res = execute (conn, """
-        # SELECT aff.id1, aff.id2, aff.rank
-        # FROM {aff} aff
-        # WHERE aff.id1 IN :nodes AND aff.id2 IN :nodes AND aff.chapter = :chapter AND aff.rank > 0 AND aff.rank <= :limit
-        # ORDER BY rank, id2
-        # """, dict (parameters, nodes = list (G.nodes ()), chapter = chapter, limit = limit))
-
         res = execute (conn, """
-        SELECT aff.id1, aff.id2, aff.rank
-        FROM {aff} aff
-        WHERE (id1, rank) IN (
-          SELECT id1, min (rank)
-          FROM {aff}
-          WHERE id1 IN :nodes AND id2 IN :nodes AND chapter = :chapter AND rank > 0 AND rank <= :limit
-          GROUP BY id1
-        ) AND chapter = :chapter
-        ORDER BY id2
-        """, dict (parameters, nodes = list (G.nodes ()), chapter = chapter, limit = limit))
+        /* get the :connectivity closest ancestors for every node */
+        WITH ranks AS (
+          SELECT id1, id2, rank () OVER (PARTITION BY id1 ORDER BY affinity DESC) AS rank, affinity
+          FROM {aff} a
+          JOIN {chap} c
+            ON c.ms_id = a.id1 AND c.chapter = a.chapter
+          WHERE id1 IN :nodes AND a.chapter = :chapter AND id2 NOT IN :exclude
+            AND {prefix}newer > {prefix}older AND a.common > c.length / 2
+        )
 
-        Ranks = collections.namedtuple ('Ranks', 'ms_id1 ms_id2 rank')
-        ranks = list (map (Ranks._make, res))
+        /* get the closest ancestor attesting labez */
+
+        (SELECT DISTINCT ON (id1) 1 as u, id1, id2, rank
+        FROM ranks r
+        JOIN {labez} l2
+          ON l2.ms_id = id2 AND l2.pass_id = :pass_id AND l2.labez = :labez_ord
+        WHERE r.rank <= :connectivity AND id2 NOT IN :exclude
+        ORDER BY id1, affinity DESC)
+
+        UNION
+
+        /* get the closest ancestor attesting anything (as fallback if the query
+           above fails to get a result) */
+
+        (SELECT DISTINCT ON (id1) 2 as u, id1, id2, rank
+        FROM ranks
+        JOIN {labez} l2
+          ON l2.ms_id = id2 AND l2.pass_id = :pass_id AND l2.labez > 0
+        WHERE id2 NOT IN :exclude
+        ORDER BY id1, affinity DESC)
+
+        ORDER BY u, id1, rank DESC
+        """, dict (parameters, nodes = tuple (G.nodes ()), exclude = tuple (exclude),
+                   chapter = chapter, pass_id = passage.pass_id, prefix = prefix,
+                   labez_ord = ord_labez (labez), connectivity = connectivity))
 
         has_parent = set ()
+
+        Ranks = collections.namedtuple ('Ranks', 'u ms_id1 ms_id2 rank')
+        ranks = list (map (Ranks._make, res))
+
         for r in ranks:
             if not r.ms_id1 in has_parent:
                 if r.rank > 1:
@@ -372,48 +445,29 @@ def coherence_attestation_json (passage_or_id, labez):
                     G.add_edge (r.ms_id2, r.ms_id1)
                 has_parent.add (r.ms_id1)
 
-        # connect root nodes attesting labez to their lowest ranking ancestor
         # G.nodes () always returns string keys
         root_nodes = set ([int (n) for n in G.nodes ()]) - has_parent
 
-        for root_node in root_nodes:
-            res = execute (conn, """
-            SELECT aff.id1, aff.id2, aff.rank
-            FROM {aff} aff
-            JOIN {labez} labez
-              ON labez.ms_id = aff.id2 AND labez.pass_id = :pass_id
-            WHERE aff.id1 = :root_node /* AND id2 > 2 */ AND aff.chapter = :chapter AND aff.rank > 0 AND labez.labez > 0
-            ORDER BY aff.rank
-            LIMIT 1
-            """, dict (parameters, root_node = root_node, pass_id = passage.pass_id, chapter = chapter))
-
-            ranks = list (map (Ranks._make, res))
-            for r in ranks:
-                if not r.ms_id1 in has_parent:
-                    if r.rank > 1:
-                        G.add_edge (r.ms_id2, r.ms_id1, rank = r.rank)
-                    else:
-                        G.add_edge (r.ms_id2, r.ms_id1)
-                    has_parent.add (r.ms_id1)
-
-        root_nodes = set ([int (n) for n in G.nodes ()]) - has_parent
-        # get node labels
+        # set node labels
         res = execute (conn, """
-        SELECT ms.id, ms.hs, char_labez (labez.labez) as labez
+        SELECT ms.id, ms.hs, ms.hsnr, char_labez (labez.labez) as labez
         FROM {ms} ms
         JOIN {labez} labez
           ON ms.id = labez.ms_id AND labez.pass_id = :pass_id
         WHERE ms.id IN :ms_ids
-        """, dict (parameters, ms_ids = G.nodes (), pass_id = passage.pass_id))
+        """, dict (parameters, ms_ids = tuple (G.nodes ()), pass_id = passage.pass_id))
 
-        Mss = collections.namedtuple ('Mss', 'ms_id hs labez')
+        Mss = collections.namedtuple ('Mss', 'ms_id hs hsnr labez')
         mss = list (map (Mss._make, res))
         for ms in mss:
             n = G.get_node (ms.ms_id)
-            n.attr['label'] = ms.hs
+            n.attr['hsnr']  = ms.hsnr
             n.attr['labez'] = ms.labez
+            n.attr['data-ms-id'] = ms.ms_id - 1
             if ms.ms_id in root_nodes:
                 n.attr['label'] = "%s: %s" % (ms.labez, ms.hs)
+            else:
+                n.attr['label'] = ms.hs
 
 
         # nx.set_node_attributes (G, 'pos', nx.nx_pydot.pydot_layout (G, prog='dot'))
@@ -421,15 +475,6 @@ def coherence_attestation_json (passage_or_id, labez):
 
     # return flask.json.jsonify (nx.readwrite.json_graph.node_link_data (G))
     return graph_to_d3json (G)
-
-
-@app.route('/coherence/<passage_or_id>/attestation/<labez>')
-def coherence_attestation (passage_or_id, labez):
-
-    with dba.engine.begin () as conn:
-        passage = Passage (conn, passage_or_id)
-
-        return flask.render_template ('coherence_attestation.html', passage = passage, labez = labez)
 
 
 @app.route('/coherence/<passage>')
@@ -444,7 +489,7 @@ def coherence (passage):
         res = execute (conn, """
         SELECT DISTINCT labez, labezsuf, ord_labez (labez) as ord_labez, lesart
         FROM {att}
-        WHERE anfadr = :anfadr AND endadr = :endadr AND NOT labez REGEXP '^z'
+        WHERE anfadr = :anfadr AND endadr = :endadr AND labez !~ '^z'
         ORDER BY labez, labezsuf
         """, dict (parameters, anfadr = passage.start, endadr = passage.end))
 
@@ -454,10 +499,10 @@ def coherence (passage):
         values.readings = []
         for r in readings:
             res = execute (conn, """
-            SELECT ms.id - 1 as id, ms.hs
+            SELECT ms.id - 1 as id, ms.hs, ms.hsnr
             FROM {att} att
             JOIN {ms} ms
-            ON att.hsnr = ms.hsnr
+              ON att.hsnr = ms.hsnr
             WHERE anfadr = :anfadr AND endadr = :endadr AND labez = :labez AND labezsuf = :labezsuf
             ORDER BY ms.hsnr
             """, dict (parameters, anfadr = passage.start, endadr = passage.end,
@@ -481,7 +526,9 @@ def coherence (passage):
         Attestation = collections.namedtuple ('Attestation', 'id labez labezsuf')
         values.attestation = list (map (Attestation._make, res))
 
-        return flask.render_template ('coherence.html', passage = passage, values = values)
+        variants = passage.variants (conn)
+
+        return flask.render_template ('coherence.html', passage = passage, values = values, variants = variants)
 
     return 'Error'
 
@@ -515,8 +562,8 @@ def get_stemma (pass_id):
         SELECT varid, varnew, s1, s2
         FROM {locstemed} s
         JOIN {pass} p
-        ON s.begadr = p.anfadr AND s.endadr = p.endadr
-        WHERE s.varnew NOT REGEXP '^z' AND p.id = :pass_id
+          ON s.begadr = p.anfadr AND s.endadr = p.endadr
+        WHERE s.varnew !~ '^z' AND p.id = :pass_id
         ORDER BY varnew
         """, dict (parameters, pass_id = pass_id))
 
@@ -539,7 +586,7 @@ def graph_to_d3json (g):
         params = {}
         params['x'] = float (x)
         params['y'] = float (y)
-        for name in ('label', 'labez', 'href'):
+        for name in ('label', 'labez', 'href', 'hsnr', 'data-ms-id'):
             if name in n.attr:
                 params[name] = n.attr[name]
 
@@ -552,6 +599,8 @@ def graph_to_d3json (g):
                 params[name] = e.attr[name]
 
         nxg.add_edge (e[0], e[1], **params)
+
+    nx.nx_pydot.write_dot (nxg, '/tmp/GraphViz.dot') # debug
 
     return flask.json.jsonify (nx.readwrite.json_graph.node_link_data (nxg))
 
@@ -579,24 +628,16 @@ def stemma_json (pass_id):
     """
     rows = get_stemma (pass_id)
 
-    # G = nx.DiGraph (rankdir = "BT", ordering = "out")
-    G = pgv.AGraph (directed = True, ordering = "out", dpi = 100,
-                    ranksep = 0.2, nodesep = 0.2, rankdir = 'BT')
-    G.node_attr.update (width = 0.6, fixedsize = "shape", shape ="circle")
-    G.edge_attr.update (headclip = "false", tailclip = "false",
-                        # important! otherwise the pos will contain endpoint
-                        # positions which will offset our parsing in the js
-                        arrowhead = "none", arrowtail = "none")
+    G = get_pgv ()
 
     for row in rows:
-        G.add_node (row.varnew, label = row.varnew, labez = row.varid,
-                    href = "/coherence/%s/attestation/%s" % (pass_id, row.varid))
+        G.add_node (row.varnew, label = row.varnew, labez = row.varid)
         if row.s1 != '*':
             G.add_edge (row.s1, row.varnew)
         if row.s2 and row.s2 != '*':
             G.add_edge (row.s2, row.varnew)
 
-    # Add a '?' node because it is not stored in the database
+    # Add a '?' node because there is none in the database
     if [r for r in rows if r.s1 == '?' or r.s2 == '?']:
         G.add_node ('?', label = '?')
 
@@ -614,6 +655,12 @@ def affinity_json ():
     Returns manuscript affinities in a json format suitable for D3.js.
 
     """
+    chapter = request.args.get ('chapter') or 0
+    limit   = int (request.args.get ('limit') or 10)
+
+    nodes = []
+    edges = []
+
     with dba.engine.begin () as conn:
 
         res = execute (conn, """
@@ -621,9 +668,6 @@ def affinity_json ():
         FROM Manuscripts
         ORDER BY id
         """, {})
-
-        nodes = []
-        edges = []
 
         # Every ms gets to be a node.
         for row in res:
@@ -636,37 +680,47 @@ def affinity_json ():
                 'radius' : 5 + math.log (length)
             } )
 
-            # Build edges table.  Needs brains.  Creating an edge between every
-            # two mss will not give a very meaningful graph.  We have to keep only
-            # the most significant edges.  But what is significant?
-            #
-            # Currently we `edge´: for each manuscript the X most similar
-            # manuscripts that are at least half as long.
+        # Build edges table.  Needs brains.  Creating an edge between every
+        # two mss will not give a very meaningful graph.  We have to keep only
+        # the most significant edges.  But what is significant?
+        #
+        # Currently we `edge´: for each manuscript the X most similar
+        # manuscripts that are at least half as long.
 
-            limit = 20
+        res = execute (conn, """
+        /* get the :limit closest relatives for every node */
+        SELECT id1, id2, common, equal, rank
+        FROM (
+          SELECT id1, id2, common, equal, rank () OVER (PARTITION BY id1 ORDER BY affinity DESC) AS rank, affinity
+          FROM {aff} a
+          JOIN {chap} c
+            ON a.id1 = c.ms_id AND a.chapter = c.chapter
+          WHERE a.chapter = :chapter AND a.common >= c.length / 2 AND a.newer >= a.older
+        ) AS r
+        WHERE r.rank <= :limit
+        ORDER BY id1, id2
+        """, dict (parameters, limit = limit, chapter = chapter))
 
-            res2 = execute (conn, """
-            SELECT id1, id2, common, equal
-            FROM {aff} aff
-              JOIN {ms} ms1
-              JOIN {ms} ms2
-              ON aff.id1 = ms1.id AND aff.id2 = ms2.id
-                AND common >= ms1.length / 2
-            WHERE chapter = 0 AND id1 = :id1
-            ORDER BY affinity DESC
-            LIMIT :limit
-            """, dict (parameters, id1 = id_, limit = limit))
+        # res2 = execute (conn, """
+        # SELECT id1, id2, common, equal
+        # FROM {aff} aff
+        # JOIN {ms} ms1
+        #   ON aff.id1 = ms1.id
+        # WHERE common >= ms1.length / 2 AND chapter = 0 AND aff.id1 = :id1
+        # ORDER BY affinity DESC
+        # LIMIT :limit
+        # """, dict (parameters, id1 = id_, limit = limit))
 
-            for i, row in enumerate (res2):
-                id1, id2, common, equal = row
+        for row in res:
+            id1, id2, common, equal, rank = row
 
-                edges.append ( {
-                    'source' : id1 - 1,
-                    'target' : id2 - 1,
-                    'common' : common,
-                    'equal'  : equal,
-                    'rank'   : i + 1
-                } )
+            edges.append ( {
+                'source' : id1 - 1,
+                'target' : id2 - 1,
+                'common' : common,
+                'equal'  : equal,
+                'rank'   : rank
+            } )
 
         return flask.json.jsonify ({
             'nodes': nodes,
@@ -684,12 +738,12 @@ if __name__ == "__main__":
 
     parser.parse_args (namespace = args)
     args.source_db = 'ECM_Acts_Ph3'
-    args.target_db = 'ECM_Acts_UpdatePh3'
+    args.target_db = 'ntg'
     args.src_vg_db = 'VarGenAtt_ActPh3'
     args.chapter = 0
     args.start_time = datetime.datetime.now ()
 
-    dba = db.DBA (args.profile)
+    dba = db.PostgreSQLEngine (database = args.target_db)
 
     parameters = tools.init_parameters (tools.DEFAULTS)
 

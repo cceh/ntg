@@ -5,7 +5,9 @@
 How To Configure Database Access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Edit your ~/.my.cnf and add these sections: ::
+The MySQL database:
+
+Edit (or create) your ~/.my.cnf and add these sections: ::
 
     [ntg-local]
     host="localhost"
@@ -24,13 +26,35 @@ Edit your ~/.my.cnf and add these sections: ::
 Replace *username* and *password* with your own username and password.
 **Make sure ~/.my.cnf is readable only by yourself!**
 
+The Postgres database:
+
+1. Create a postgres user. Login to postgres as superuser and say: ::
+
+    CREATE USER <username> CREATEDB PASSWORD '<password>';
+
+2. Edit (or create) your ~/.pgpass and add this line: ::
+
+    localhost:5432:ntg:<username>:<password>
+
+Replace <username> and <password> with your own username and password.
+**Make sure ~/.pgpass is readable only by yourself!**
+
+
 """
 
-import sqlalchemy
-from sqlalchemy import create_engine, MetaData, Table
-from sqlalchemy.sql import text
+import os
+import os.path
 
-import pandas as pd
+import sqlalchemy
+from sqlalchemy import *
+from sqlalchemy.sql import text
+from sqlalchemy.dialects import postgresql
+import sqlalchemy.types
+import sqlalchemy_utils
+from sqlalchemy_utils import IntRangeType
+from sqlalchemy.ext.declarative import declarative_base
+
+# import pandas as pd
 
 from .tools import message, tabulate
 from .config import args
@@ -38,8 +62,21 @@ from .config import args
 MYSQL_DEFAULT_GROUP  = "ntg-local"
 
 
+class CoerceInteger (sqlalchemy.types.TypeDecorator):
+    """ Coerce numpy integers to python integers
+    before passing off to the database."""
+
+    impl = sqlalchemy.types.Integer
+
+    def process_bind_param (self, value, dialect):
+        return int (value)
+
+    def process_result_value (self, value, dialect):
+        return value
+
+
 def execute (conn, sql, parameters, debug_level = 3):
-    sql = sql.format (**parameters)
+    sql = sql.strip ().format (**parameters)
     message (debug_level, sql.rstrip () + ';')
     result = conn.execute (text (sql), parameters)
     message (debug_level, "%d rows" % result.rowcount)
@@ -47,7 +84,7 @@ def execute (conn, sql, parameters, debug_level = 3):
 
 
 def executemany (conn, sql, parameters, param_array, debug_level = 3):
-    sql = sql.format (**parameters)
+    sql = sql.strip ().format (**parameters)
     message (debug_level, sql.rstrip () + ';')
     result = conn.execute (text (sql), param_array)
     message (debug_level, "%d rows" % result.rowcount)
@@ -55,17 +92,17 @@ def executemany (conn, sql, parameters, param_array, debug_level = 3):
 
 
 def executemany_raw (conn, sql, parameters, param_array, debug_level = 3):
-    sql = sql.format (**parameters)
+    sql = sql.strip ().format (**parameters)
     message (debug_level, sql.rstrip () + ';')
     result = conn.execute (sql, param_array)
     message (debug_level, "%d rows" % result.rowcount)
     return result
 
 
-def execute_pandas (conn, sql, parameters, debug_level = 3):
-    sql = sql.format (**parameters)
-    message (debug_level, sql.rstrip () + ';')
-    return pd.read_sql_query (text (sql), conn, parameters)
+# def execute_pandas (conn, sql, parameters, debug_level = 3):
+#     sql = sql.format (**parameters)
+#     message (debug_level, sql.rstrip () + ';')
+#     return pd.read_sql_query (text (sql), conn, parameters)
 
 
 def debug (conn, msg, sql, parameters):
@@ -137,250 +174,434 @@ def on_connect (dbapi_connection, connection_record):
     cursor.execute ("SET sql_mode = 'ANSI'")
 
 
-CREATE_TABLE_ATT = """
-(
-  "id"          INTEGER       AUTO_INCREMENT PRIMARY KEY,
-  "buch"        INTEGER       DEFAULT NULL,
-  "kapanf"      INTEGER       DEFAULT NULL,
-  "versanf"     INTEGER       DEFAULT NULL,
-  "wortanf"     INTEGER       DEFAULT NULL,
-  "kapend"      INTEGER       DEFAULT 0,
-  "versend"     INTEGER       DEFAULT 0,
-  "wortend"     INTEGER       DEFAULT NULL,
-  "hsnr"        INTEGER       DEFAULT NULL,
-  "hs"          VARCHAR(32)   DEFAULT NULL,
-  "anfadr"      INTEGER       DEFAULT NULL,
-  "endadr"      INTEGER       DEFAULT NULL,
-  "labez"       VARCHAR(32)   DEFAULT '',
-  "labezsuf"    VARCHAR(32)   DEFAULT '',
-  "lemma"       VARCHAR(1024) DEFAULT '',
-  "lesart"      VARCHAR(1024) DEFAULT '',
-  "suffix2"     VARCHAR(255)  DEFAULT '',
-  "kontrolle"   VARCHAR(1)    DEFAULT '',
-  "fehler"      INTEGER       DEFAULT 0,
-  "suff"        VARCHAR(32)   DEFAULT '',
-  "vid"         VARCHAR(32)   DEFAULT '',
-  "vl"          VARCHAR(32)   DEFAULT '',
-  "korr"        VARCHAR(32)   DEFAULT '',
-  "lekt"        VARCHAR(32)   DEFAULT '',
-  "komm"        VARCHAR(32)   DEFAULT '',
-  "anfalt"      INTEGER       DEFAULT NULL,
-  "endalt"      INTEGER       DEFAULT NULL,
-  "labezalt"    VARCHAR(32)   DEFAULT '',
-  "lasufalt"    VARCHAR(32)   DEFAULT '',
-  "base"        VARCHAR(1)    DEFAULT '',
-  "over"        VARCHAR(1)    DEFAULT '',
-  "comp"        VARCHAR(1)    DEFAULT '',
-  "over1"       VARCHAR(1)    DEFAULT '',
-  "comp1"       VARCHAR(1)    DEFAULT '',
-  "printout"    VARCHAR(32)   DEFAULT '',
-  "category"    VARCHAR(1)    DEFAULT '',
-  "created"     DATE          DEFAULT NULL
-)
-"""
+class MySQLEngine (object):
+    """ Database Interface """
 
-CREATE_TABLE_LAC = """
-(
-  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
-  "buch"      INTEGER       NOT NULL,
-  "kapanf"    INTEGER       NOT NULL,
-  "versanf"   INTEGER       NOT NULL,
-  "wortanf"   INTEGER       NOT NULL,
-  "wortend"   INTEGER       DEFAULT NULL,
-  "hsnr"      INTEGER       DEFAULT NULL,
-  "hs"        VARCHAR(32)   DEFAULT NULL,
-  "anfadr"    INTEGER       DEFAULT NULL,
-  "endadr"    INTEGER       DEFAULT NULL,
-  "labez"     VARCHAR(32)   NOT NULL,
-  "labezsuf"  VARCHAR(32)   DEFAULT NULL,
-  "lemma"     VARCHAR(1024) NOT NULL,
-  "lesart"    VARCHAR(1024) DEFAULT NULL,
-  "suffix2"   VARCHAR(32)   DEFAULT NULL,
-  "kontrolle" VARCHAR(1)    DEFAULT NULL,
-  "kapend"    INTEGER       DEFAULT 0,
-  "versend"   INTEGER       DEFAULT 0,
-  "fehler"    INTEGER       DEFAULT 0,
-  "suff"      VARCHAR(32)   DEFAULT NULL,
-  "vid"       VARCHAR(32)   DEFAULT NULL,
-  "vl"        VARCHAR(32)   DEFAULT NULL,
-  "korr"      VARCHAR(32)   DEFAULT NULL,
-  "lekt"      VARCHAR(32)   DEFAULT NULL,
-  "komm"      VARCHAR(32)   DEFAULT NULL,
-  "anfalt"    INTEGER       DEFAULT NULL,
-  "endalt"    INTEGER       DEFAULT NULL,
-  "labezalt"  VARCHAR(32)   DEFAULT NULL,
-  "lasufalt"  VARCHAR(32)   DEFAULT NULL,
-  "printout"  VARCHAR(32)   DEFAULT NULL,
-  "category"  VARCHAR(1)    DEFAULT NULL,
-  "base"      VARCHAR(1)    DEFAULT '',
-  "over"      VARCHAR(1)    DEFAULT '',
-  "comp"      VARCHAR(1)    DEFAULT '',
-  "over1"     VARCHAR(1)    DEFAULT '',
-  "comp1"     VARCHAR(1)    DEFAULT '',
-  "created"   DATE          DEFAULT NULL
-)
-"""
+    def __init__ (self, group = None, db = None):
+        if group is None:
+            group = MYSQL_DEFAULT_GROUP
+        if db is None:
+            db = ''
 
-CREATE_TABLE_LABEZ = """
-(
-  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
-  "ms_id"     INTEGER       NOT NULL,
-  "pass_id"   INTEGER       NOT NULL,
-  "labez"     INTEGER       NOT NULL DEFAULT 0,
-  "labezsuf"  VARCHAR(32)   NOT NULL DEFAULT '',
-  UNIQUE KEY (ms_id, pass_id),
-  KEY (pass_id)
-)
-"""
+        message (3, "MySQLEngine: Reading init group: {group}".format (group = group), True)
+        message (3, "MySQLEngine: Connecting to db: {db}".format (db = db), True)
 
-CREATE_TABLE_VP = """
-(
-  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
-  "anfadr"    INTEGER       NOT NULL,
-  "endadr"    INTEGER       NOT NULL,
-  "bzdef"     INTEGER       NOT NULL DEFAULT 0,
-  "check"     VARCHAR(1)    NULL
-)
-"""
+        self.engine = create_engine (
+            "mysql:///{db}?read_default_group={group}".format (db = db, group = group))
 
-CREATE_TABLE_RDG = """
-(
-  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
-  "anfadr"    INTEGER       NOT NULL,
-  "endadr"    INTEGER       NOT NULL,
-  "labez"     VARCHAR(32)   NOT NULL,
-  "labezsuf"  VARCHAR(32)   NOT NULL,
-  "lesart"    VARCHAR(1024) NOT NULL,
-  "bz"        INTEGER       NOT NULL DEFAULT 0,
-  "bzdef"     INTEGER       NOT NULL DEFAULT 0,
-  "byz"       VARCHAR(1)    NOT NULL DEFAULT '',
-  "check"     VARCHAR(1)    NULL,
-  UNIQUE KEY (anfadr, endadr, labez)
-)
-"""
+        self.connection = self.connect ()
 
-CREATE_TABLE_WITN = """
-(
-  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
-  "anfadr"    INTEGER       NOT NULL,
-  "endadr"    INTEGER       NOT NULL,
-  "labez"     VARCHAR(32)   NOT NULL,
-  "labezsuf"  VARCHAR(32)   NOT NULL,
-  "hsnr"      INTEGER       NOT NULL,
-  "hs"        VARCHAR(32)   NOT NULL
-)
-"""
+    def connect (self):
+        connection = self.engine.connect ()
+        # Make MySQL more compatible with other SQL databases
+        connection.execute ("SET sql_mode='ANSI'")
+        return connection
 
-CREATE_TABLE_MSLISTVAL = """
-(
-  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
-  "hsnr"      INTEGER       NOT NULL,
-  "hs"        VARCHAR(32)   NOT NULL,
-  "chapter"   INTEGER       NOT NULL,
-  "sumtxt"    INTEGER       NOT NULL DEFAULT 0,
-  "summt"     INTEGER       NOT NULL DEFAULT 0,
-  "uemt"      INTEGER       NOT NULL DEFAULT 0,
-  "qmt"       FLOAT         NOT NULL DEFAULT 0.0,
-  "check"     VARCHAR(1)    NULL
-)
-"""
 
-CREATE_TABLE_VG = """
-(
-  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
-  "hsnr"      INTEGER       NOT NULL,
-  "hsnr2"     INTEGER       NOT NULL,
-  "chapter"   INTEGER       NOT NULL,
-  "sumtxt"    INTEGER       NOT NULL DEFAULT 0,
-  "summt"     INTEGER       NOT NULL DEFAULT 0,
-  "uemt"      INTEGER       NOT NULL DEFAULT 0,
-  "qmt"       FLOAT         NOT NULL DEFAULT 0.0,
-  "check"     VARCHAR(1)    NULL
-)
-"""
+class PostgreSQLEngine (object):
+    """ PostgreSQL Database Interface """
 
-CREATE_TABLE_MANUSCRIPTS = """
-(
-  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
-  "hsnr"      INTEGER       NOT NULL,
-  "hs"        VARCHAR(32)   NOT NULL,
-  "length"    INTEGER       ,
-  UNIQUE KEY (hsnr),
-  UNIQUE KEY (hs)
-)
-"""
+    def __init__ (self, **kwargs):
 
-CREATE_TABLE_CHAPTERS = """
-(
-  "id"        INTEGER       AUTO_INCREMENT PRIMARY KEY,
-  "ms_id"     INTEGER       NOT NULL,
-  "hsnr"      INTEGER       NOT NULL,
-  "hs"        VARCHAR(32)   NOT NULL,
-  "chapter"   INTEGER       NOT NULL,
-  "length"    INTEGER       ,
-  UNIQUE KEY (ms_id, chapter)
-)
-"""
+        args = self.get_connection_params (kwargs)
 
-CREATE_TABLE_AFFINITY = """
-(
-  "chapter"   INTEGER       NOT NULL,
-  "id1"       INTEGER       NOT NULL,
-  "id2"       INTEGER       NOT NULL,
-  "common"    INTEGER       NOT NULL,
-  "equal"     INTEGER       NOT NULL,
-  "older"     INTEGER       NOT NULL,
-  "newer"     INTEGER       NOT NULL,
-  "unclear"   INTEGER       NOT NULL,
-  "rank"      INTEGER       ,
-  "affinity"  FLOAT         NOT NULL,
-  PRIMARY KEY (chapter, id1, id2)
-)
-"""
+        url = "postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}?sslmode=disable".format (**args)
 
-CREATE_TABLE_GEPHI_NODES = """
-(
-  "id"        VARCHAR(32)   NOT NULL,
-  "label"     VARCHAR(32)   ,
-  "color"     VARCHAR(32)   ,
-  "nodecolor" VARCHAR(32)   ,
-  "nodesize"  FLOAT         ,
-  "x"         FLOAT         ,
-  "y"         FLOAT         ,
-  "size"      FLOAT         ,
-  PRIMARY KEY (id)
-)
-"""
+        if (not sqlalchemy_utils.functions.database_exists (url)):
+            message (3, "PostgreSQLEngine: Creating database '{database}'".format (**args), True)
+            sqlalchemy_utils.functions.create_database (url)
 
-CREATE_TABLE_GEPHI_EDGES = """
-(
-  "id"        VARCHAR(65)   NOT NULL,
-  "label"     VARCHAR(32)   ,
-  "source"    VARCHAR(32)   NOT NULL,
-  "target"    VARCHAR(32)   NOT NULL,
-  "weight"    FLOAT         NOT NULL DEFAULT 1.0,
-  PRIMARY KEY (source, target)
-)
-"""
+        message (3, "PostgreSQLEngine: Connecting to postgres database '{database}' as user '{user}'"
+                 .format (**args), True)
 
-CREATE_TABLE_LOCSTEMED = """
-(
-  "id"     INTEGER      NOT NULL AUTO_INCREMENT,
-  "begadr" INTEGER      NOT NULL,
-  "endadr" INTEGER      NOT NULL,
-  "varid"  VARCHAR(2)   NOT NULL,
-  "varnew" VARCHAR(2)   NOT NULL DEFAULT '',
-  "s1"     VARCHAR(2)   NOT NULL DEFAULT '',
-  "s2"     VARCHAR(2)   NOT NULL DEFAULT '',
-  "prior"  INTEGER      NOT NULL DEFAULT 0,
-  "prs1"   VARCHAR(2)   NOT NULL DEFAULT '',
-  "prs2"   VARCHAR(2)   NOT NULL DEFAULT '',
-  "check"  VARCHAR(2)   NOT NULL DEFAULT '',
-  "check2" VARCHAR(2)   NOT NULL DEFAULT '',
-  "w"      varchar(1)   NOT NULL DEFAULT '',
-  PRIMARY KEY (id)
-)
-"""
+        self.engine = create_engine (url + "?server_side_cursors")
+
+
+    def connect (self):
+        return self.engine.connect ()
+
+
+    def get_connection_params (self, args = None):
+        """ Get connection parameters from environment. """
+
+        defaults = {
+            'host'     : 'localhost',
+            'port'     : '5432',
+            'database' : 'ntg',
+            'user'     : 'ntg',
+        }
+
+        if args is None:
+            args = {}
+
+        params = ('host', 'port', 'database', 'user') # order must match ~/.pgpass
+        res = {}
+
+        for param in params:
+            res[param] = args.get (param) or os.environ.get ('PG' + param.upper ()) or defaults[param]
+
+        # scan ~/.pgpass for password
+        pgpass = os.path.expanduser ("~/.pgpass")
+        try:
+            with open (pgpass, "r") as f:
+                for line in f.readlines ():
+                    line = line.strip ()
+                    if line == '' or line.startswith ('#'):
+                        continue
+                    # format: hostname:port:database:username:password
+                    fields = line.split (':')
+                    if all ([field == '*' or field == res[param]
+                             for field, param in zip (fields, params)]):
+                        res['password'] = fields[4]
+                        break
+
+        except IOError:
+            print ("Error: could not open %s for reading" % pgpass)
+
+        return res
+
+
+def create_functions (dest, parameters):
+    execute (dest, """
+    DROP FUNCTION IF EXISTS char_labez (INTEGER)
+    """, parameters)
+
+    execute (dest, """
+    DROP FUNCTION IF EXISTS ord_labez (CHAR (2))
+    """, parameters)
+
+    execute (dest, """
+    CREATE FUNCTION char_labez (l INTEGER) RETURNS CHAR (3) AS
+    $$
+        SELECT CASE WHEN l > 0 THEN chr (l + 96) ELSE 'lac' END;
+    $$
+    LANGUAGE SQL IMMUTABLE;
+    """, parameters)
+
+    execute (dest, """
+    CREATE FUNCTION ord_labez (l CHAR (2)) RETURNS INTEGER AS
+    $$
+        SELECT CASE WHEN ascii (l) >= 122 THEN 0 ELSE ascii (l) - 96 END;
+    $$
+    LANGUAGE SQL IMMUTABLE;
+    """, parameters)
+
+
+Base = declarative_base ()
+
+class Att (Base):
+    __tablename__ = 'att'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    buch      = Column (Integer,       nullable = False)
+    kapanf    = Column (Integer,       nullable = False)
+    versanf   = Column (Integer,       nullable = False)
+    wortanf   = Column (Integer,       nullable = False)
+    kapend    = Column (Integer,       nullable = False)
+    versend   = Column (Integer,       nullable = False)
+    wortend   = Column (Integer,       nullable = False)
+    hsnr      = Column (Integer,       nullable = False, index = True)
+    hs        = Column (String(32),    nullable = False, index = True)
+    anfadr    = Column (Integer,       nullable = False, index = True)
+    endadr    = Column (Integer,       nullable = False, index = True)
+    labez     = Column (String(32),    nullable = False, server_default = '')
+    labezsuf  = Column (String(32),    server_default = '')
+    lemma     = Column (String(1024),  server_default = '')
+    lesart    = Column (String(1024),  server_default = '')
+    suffix2   = Column (String(32),    server_default = '')
+    kontrolle = Column (String(1),     server_default = '')
+    fehler    = Column (Integer,       server_default = '0')
+    suff      = Column (String(32),    server_default = '')
+    vid       = Column (String(32),    server_default = '')
+    vl        = Column (String(32),    server_default = '')
+    korr      = Column (String(32),    server_default = '')
+    lekt      = Column (String(32),    server_default = '')
+    komm      = Column (String(32),    server_default = '')
+    anfalt    = Column (Integer)
+    endalt    = Column (Integer)
+    labezalt  = Column (String(32),    server_default = '')
+    lasufalt  = Column (String(32),    server_default = '')
+    base      = Column (String(1),     server_default = '')
+    over      = Column (String(1),     server_default = '')
+    comp      = Column (String(1),     server_default = '')
+    over1     = Column (String(1),     server_default = '')
+    comp1     = Column (String(1),     server_default = '')
+    printout  = Column (String(32),    server_default = '')
+    category  = Column (String(1),     server_default = '')
+    irange    = Column (IntRangeType,  nullable = False)
+    created   = Column (DateTime)
+
+    __table_args__ = (
+        UniqueConstraint ('hs', 'irange', name = 'unique_att_hs_irange'),
+    )
+
+
+class Lac (Base): # same as class Att
+    __tablename__ = 'lac'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    buch      = Column (Integer,       nullable = False)
+    kapanf    = Column (Integer,       nullable = False)
+    versanf   = Column (Integer,       nullable = False)
+    wortanf   = Column (Integer,       nullable = False)
+    kapend    = Column (Integer,       nullable = False)
+    versend   = Column (Integer,       nullable = False)
+    wortend   = Column (Integer,       nullable = False)
+    hsnr      = Column (Integer,       nullable = False)
+    hs        = Column (String(32),    nullable = False)
+    anfadr    = Column (Integer,       nullable = False)
+    endadr    = Column (Integer,       nullable = False)
+    labez     = Column (String(32),    nullable = False, server_default = '')
+    labezsuf  = Column (String(32),    server_default = '')
+    lemma     = Column (String(1024),  server_default = '')
+    lesart    = Column (String(1024),  server_default = '')
+    suffix2   = Column (String(32),    server_default = '')
+    kontrolle = Column (String(1),     server_default = '')
+    fehler    = Column (Integer,       server_default = '0')
+    suff      = Column (String(32),    server_default = '')
+    vid       = Column (String(32),    server_default = '')
+    vl        = Column (String(32),    server_default = '')
+    korr      = Column (String(32),    server_default = '')
+    lekt      = Column (String(32),    server_default = '')
+    komm      = Column (String(32),    server_default = '')
+    anfalt    = Column (Integer)
+    endalt    = Column (Integer)
+    labezalt  = Column (String(32),    server_default = '')
+    lasufalt  = Column (String(32),    server_default = '')
+    base      = Column (String(1),     server_default = '')
+    over      = Column (String(1),     server_default = '')
+    comp      = Column (String(1),     server_default = '')
+    over1     = Column (String(1),     server_default = '')
+    comp1     = Column (String(1),     server_default = '')
+    printout  = Column (String(32),    server_default = '')
+    category  = Column (String(1),     server_default = '')
+    irange    = Column (IntRangeType,  nullable = False)
+    created   = Column (DateTime)
+
+    __table_args__ = (
+        Index ('lac_irange_gist_idx', 'irange', postgresql_using = 'gist'),
+        UniqueConstraint ('hs', 'irange', name = 'unique_lac_hs_irange')
+    )
+
+
+class Labez (Base):
+    __tablename__ = 'labez'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    ms_id     = Column (Integer,       nullable = False)
+    pass_id   = Column (Integer,       nullable = False, index = True)
+    labez     = Column (Integer,       nullable = False, server_default = '0')
+    labezsuf  = Column (String (32),   nullable = False, server_default = '')
+
+    __table_args__ = (
+        UniqueConstraint ('ms_id', 'pass_id', name = 'unique_labez_ms_id_pass_id'),
+    )
+
+
+class VP (Base):
+    __tablename__ = 'vp'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    anfadr    = Column (Integer,       nullable = False)
+    endadr    = Column (Integer,       nullable = False)
+    bzdef     = Column (Integer,       nullable = False, server_default = '0')
+    check     = Column (String (1),    nullable = False, server_default = '')
+
+
+class Rdg (Base):
+    __tablename__ = 'rdg'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    anfadr    = Column (Integer,       nullable = False)
+    endadr    = Column (Integer,       nullable = False)
+    labez     = Column (String (32),   nullable = False, server_default = '')
+    labezsuf  = Column (String (32),   nullable = False, server_default = '')
+    lesart    = Column (String (1024), nullable = False, server_default = '')
+    bz        = Column (Integer,       nullable = False, server_default = '0')
+    bzdef     = Column (Integer,       nullable = False, server_default = '0')
+    byz       = Column (String (1),    nullable = False, server_default = '')
+    check     = Column (String (1),    nullable = False, server_default = '')
+
+    __table_args__ = (
+        UniqueConstraint ('anfadr', 'endadr', 'labez', name = 'unique_rdg_anfadr_endadr_labez'),
+    )
+
+
+class Witn (Base):
+    __tablename__ = 'witn'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    anfadr    = Column (Integer,       nullable = False)
+    endadr    = Column (Integer,       nullable = False)
+    labez     = Column (String (32),   nullable = False, server_default = '')
+    labezsuf  = Column (String (32),   nullable = False, server_default = '')
+    hsnr      = Column (Integer,       nullable = False)
+    hs        = Column (String (32),   nullable = False)
+
+
+class MsListVal (Base):
+    __tablename__ = 'mslistval'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    hsnr      = Column (Integer,       nullable = False)
+    hs        = Column (String (32),   nullable = False)
+    chapter   = Column (Integer,       nullable = False)
+    sumtxt    = Column (Integer,       nullable = False, server_default = '0')
+    summt     = Column (Integer,       nullable = False, server_default = '0')
+    uemt      = Column (Integer,       nullable = False, server_default = '0')
+    qmt       = Column (Float,         nullable = False, server_default = '0.0')
+    check     = Column (String (1),    nullable = False, server_default = '')
+
+
+class VG (Base):
+    __tablename__ = 'vg'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    hsnr      = Column (Integer,       nullable = False)
+    hsnr2     = Column (Integer,       nullable = False)
+    chapter   = Column (Integer,       nullable = False)
+    sumtxt    = Column (Integer,       nullable = False, server_default = '0')
+    summt     = Column (Integer,       nullable = False, server_default = '0')
+    uemt      = Column (Integer,       nullable = False, server_default = '0')
+    qmt       = Column (Float,         nullable = False, server_default = '0.0')
+    check     = Column (String (1),    nullable = False, server_default = '')
+
+
+Base2 = declarative_base ()
+
+class Manuscripts (Base2):
+    __tablename__ = 'manuscripts'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    hsnr      = Column (Integer,       nullable = False, unique = True)
+    hs        = Column (String (32),   nullable = False, unique = True)
+    length    = Column (Integer)
+
+
+class Chapters (Base2):
+    __tablename__ = 'chapters'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    ms_id     = Column (Integer,       nullable = False)
+    hsnr      = Column (Integer,       nullable = False)
+    hs        = Column (String (32),   nullable = False)
+    chapter   = Column (Integer,       nullable = False)
+    length    = Column (Integer)
+
+    __table_args__ = (
+        UniqueConstraint ('ms_id', 'chapter', name = 'unique_chapters_ms_id_chapter'),
+        UniqueConstraint ('hsnr',  'chapter', name = 'unique_chapters_hsnr_chapter'),
+    )
+
+
+class Passages (Base2):
+    __tablename__ = 'passages'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    buch      = Column (Integer,       nullable = False)
+    kapanf    = Column (Integer,       nullable = False)
+    versanf   = Column (Integer,       nullable = False)
+    wortanf   = Column (Integer,       nullable = False)
+    kapend    = Column (Integer,       nullable = False)
+    versend   = Column (Integer,       nullable = False)
+    wortend   = Column (Integer,       nullable = False)
+    anfadr    = Column (Integer,       nullable = False)
+    endadr    = Column (Integer,       nullable = False)
+    irange    = Column (IntRangeType,  nullable = False)
+    comp      = Column (Boolean,       nullable = False, server_default = "False")
+    fehlvers  = Column (Boolean,       nullable = False, server_default = "False")
+
+    __table_args__ = (
+        UniqueConstraint ('irange', name = 'unique_passages_irange'),
+    )
+
+
+class Affinity (Base2):
+    __tablename__ = 'affinity'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    chapter   = Column (Integer,       nullable = False)
+    id1       = Column (Integer,       nullable = False)
+    id2       = Column (Integer,       nullable = False)
+    common    = Column (Integer,       nullable = False)
+    equal     = Column (Integer,       nullable = False)
+    older     = Column (Integer,       nullable = False)
+    newer     = Column (Integer,       nullable = False)
+    unclear   = Column (Integer,       nullable = False)
+    p_older   = Column (Integer,       nullable = False)
+    p_newer   = Column (Integer,       nullable = False)
+    p_unclear = Column (Integer,       nullable = False)
+    affinity  = Column (Float,         nullable = False, index = True)
+
+    __table_args__ = (
+        UniqueConstraint ('chapter', 'id1', 'id2', name = 'unique_affinity_chapter_id1_id2'),
+    )
+
+
+class GephiNodes (Base2):
+    __tablename__ = 'nodes'
+
+    id        = Column (String (32),   primary_key = True)
+    label     = Column (String (32))
+    color     = Column (String (32))
+    nodecolor = Column (String (32))
+    nodesize  = Column (Float)
+    x         = Column (Float)
+    y         = Column (Float)
+    size      = Column (Float)
+
+
+class GephiEdges (Base2):
+    __tablename__ = 'edges'
+
+    id        = Column (String (65),   primary_key = True)
+    label     = Column (String (32))
+    source    = Column (String (32),   nullable = False)
+    target    = Column (String (32),   nullable = False)
+    weight    = Column (Float,         nullable = False, server_default = '1.0')
+
+    __table_args__ = (
+        UniqueConstraint ('source', 'target', name = 'unique_gephi_edges_source_target'),
+    )
+
+
+class LocStemEd (Base2):
+    __tablename__ = 'locstemed'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    begadr    = Column (Integer,       nullable = False)
+    endadr    = Column (Integer,       nullable = False)
+    varid     = Column (String (2),    nullable = False)
+    varnew    = Column (String (2),    nullable = False, server_default = '')
+    s1        = Column (String (2),    nullable = False, server_default = '')
+    s2        = Column (String (2),    nullable = False, server_default = '')
+    ancestors = Column (postgresql.ARRAY (String (2), dimensions = 1), nullable = False, server_default = '{}')
+    prs1      = Column (String (2),    nullable = False, server_default = '')
+    prs2      = Column (String (2),    nullable = False, server_default = '')
+    check     = Column (String (2),    nullable = False, server_default = '')
+    check2    = Column (String (2),    nullable = False, server_default = '')
+    w         = Column (String (1),    nullable = False, server_default = '')
+
+    __table_args__ = (
+        UniqueConstraint ('begadr', 'endadr', 'varnew', name = 'unique_locstemed_begadr_endadr_varnew'),
+    )
+
+
+class LocStemEdTmp (Base2):
+    __tablename__ = 'locstemedtmp'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    begadr    = Column (Integer,       nullable = False)
+    endadr    = Column (Integer,       nullable = False)
+    varid     = Column (String (2),    nullable = False)
+    varnew    = Column (String (2),    nullable = False, server_default = '')
+    s1        = Column (String (2),    nullable = False, server_default = '')
+    s2        = Column (String (2),    nullable = False, server_default = '')
+    prs1      = Column (String (2),    nullable = False, server_default = '')
+    prs2      = Column (String (2),    nullable = False, server_default = '')
+    check     = Column (String (2),    nullable = False, server_default = '')
+    check2    = Column (String (2),    nullable = False, server_default = '')
+    w         = Column (String (1),    nullable = False, server_default = '')
 
 
 BYZ_HSNR = "(300010, 300180, 300350, 303300, 303980, 304240, 312410)"
