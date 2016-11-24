@@ -1,16 +1,27 @@
 #!/bin/bash
 
-DUMPS="/home/highlander/uni/prj/ntg/CCeH/dumps"
+DUMPS="/home/highlander/uni/prj/ntg/dumps"
 
-for db in ECM_ActsPh3 ECM_Acts_BasePh3 ECM_Acts_UpdatePh3 ECM_Acts_CBGMPh3 \
-                      ECM_Acts_Mss ECM_Acts_PotAncPh3 ECM_Acts_VGPh3 \
-                      ECM_Acts_Sp_01Ph3 VarGenAtt_ActPh3
+ulimit -n 2048 # too many open files in ECM_ActsPh4
+
+for dump in $DUMPS/*.dump
 do
-    echo "Creating $db ..."
+    db=`basename -s .dump "$dump"`
+    echo "Dropping $db ..."
     mysql -e "DROP DATABASE IF EXISTS $db"
+
+    if [[ $dump =~ ECM_Acts_Sp_(..) ]]
+    then
+        if [[ "${BASH_REMATCH[1]}" > "01" ]]
+        then
+            continue
+        fi
+    fi
+
+    echo "Creating $db ..."
+
     mysql -e "CREATE DATABASE $db"
     mysql -D "$db" < "$DUMPS/$db.dump"
 done
-
 
 echo "Done"

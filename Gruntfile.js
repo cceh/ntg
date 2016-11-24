@@ -105,6 +105,11 @@ module.exports = function (grunt) {
                 'command' :
                 'jshint --reporter=./jshint-reporter-emacs.js Gruntfile.js server/static/js/*.js',
             },
+            'jsdoc' : {
+                // http://usejsdoc.org/about-commandline.html
+                'command' :
+                'jsdoc -d jsdoc -a all server/static/js/*.js',
+            },
         },
 
         'watch' : {
@@ -121,12 +126,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks ('grunt-pylint');
     grunt.loadNpmTasks ('grunt-shell');
 
-    grunt.registerTask ('git',        ['shell:git-fetch-collation']);
-
     grunt.registerTask ('lint',       ['pylint', 'shell:eslint']);
     grunt.registerTask ('mo',         ['pot', 'potomo']);
-    grunt.registerTask ('testdeploy', ['lint', 'less', 'mo', 'shell:testdeploy']);
-    grunt.registerTask ('deploy',     ['lint', 'less', 'mo', 'shell:deploy']);
+    grunt.registerTask ('doc',        ['shell:jsdoc']);
 
     grunt.registerTask ('default',    ['shell:eslint', 'less']);
 };

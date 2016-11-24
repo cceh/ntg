@@ -1,3 +1,10 @@
+form.passage-selector {
+    margin-bottom: 20px;
+    input[type=text] {
+	width: 8em;
+    }
+}
+
 div.ui-tooltip.tooltip-relatives {
     padding: 0;
     border: none;
@@ -21,7 +28,7 @@ div.popover-relatives {
     }
 }
 
-#attestations {
+#apparatus-wrapper {
     font-size: smaller;
     h4.list-group-item-heading {
 	display: inline;
@@ -46,18 +53,16 @@ a.selected, span.selected {
 }
 
 
-line.link {
-    stroke: #ccc;
-    stroke-width: 2px;
-    stroke-opacity: .6;
-    fill: none;
-}
-
-path.link {
-    stroke: #ccc;
-    stroke-width: 2px;
-    stroke-opacity: .6;
-    fill: none;
+path, line {
+    &.link {
+	stroke: #ccc;
+	stroke-width: 2px;
+	stroke-opacity: .6;
+	fill: none;
+	&.broken {
+	    stroke-dasharray: 4 4;
+	}
+    }
 }
 
 circle.node {

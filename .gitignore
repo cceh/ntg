@@ -1,7 +1,9 @@
 *~
+\#*\#
 *.dot
 bower_components/
 node_modules/
+jsdoc/
 output/
 server/templates/schemas.xml
 

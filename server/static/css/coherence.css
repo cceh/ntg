@@ -1,4 +1,10 @@
 /* Generated file. Do not edit. */
+form.passage-selector {
+  margin-bottom: 20px;
+}
+form.passage-selector input[type=text] {
+  width: 8em;
+}
 div.ui-tooltip.tooltip-relatives {
   padding: 0;
   border: none;
@@ -17,13 +23,13 @@ div.popover-relatives div.popover-content {
 div.popover-relatives table.table {
   margin-bottom: 1px;
 }
-#attestations {
+#apparatus-wrapper {
   font-size: smaller;
 }
-#attestations h4.list-group-item-heading {
+#apparatus-wrapper h4.list-group-item-heading {
   display: inline;
 }
-#attestations ul.list-group-item-text {
+#apparatus-wrapper ul.list-group-item-text {
   display: inline;
   padding-left: 2em;
 }
@@ -39,17 +45,16 @@ a.selected,
 span.selected {
   outline: 2px solid #f00;
 }
+path.link,
 line.link {
   stroke: #ccc;
   stroke-width: 2px;
   stroke-opacity: .6;
   fill: none;
 }
-path.link {
-  stroke: #ccc;
-  stroke-width: 2px;
-  stroke-opacity: .6;
-  fill: none;
+path.link.broken,
+line.link.broken {
+  stroke-dasharray: 4 4;
 }
 circle.node {
   stroke: #fff;

@@ -46,13 +46,17 @@ import os
 import os.path
 
 import sqlalchemy
-from sqlalchemy import *
-from sqlalchemy.sql import text
-from sqlalchemy.dialects import postgresql
 import sqlalchemy.types
+
+from sqlalchemy import *
+from sqlalchemy.dialects import postgresql
+from sqlalchemy.ext import compiler
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.schema import DDLElement
+from sqlalchemy.sql import table, text
+
 import sqlalchemy_utils
 from sqlalchemy_utils import IntRangeType
-from sqlalchemy.ext.declarative import declarative_base
 
 # import pandas as pd
 
@@ -73,6 +77,28 @@ class CoerceInteger (sqlalchemy.types.TypeDecorator):
 
     def process_result_value (self, value, dialect):
         return value
+
+
+class CreateView (DDLElement):
+    def __init__ (self, name, sql):
+        self.name = name
+        self.sql = sql
+
+class DropView (DDLElement):
+    def __init__ (self, name):
+        self.name = name
+
+@compiler.compiles(CreateView)
+def compile (element, compiler, **kw):
+    return "CREATE OR REPLACE VIEW %s AS %s" % (element.name, element.sql.strip ())
+
+@compiler.compiles(DropView)
+def compile (element, compiler, **kw):
+    return "DROP VIEW IF EXISTS %s" % (element.name)
+
+def view (name, metadata, sql):
+    CreateView (name, sql).execute_at ('after-create', metadata)
+    DropView (name).execute_at ('before-drop', metadata)
 
 
 def execute (conn, sql, parameters, debug_level = 3):
@@ -139,7 +165,6 @@ def fix (conn, msg, check_sql, fix_sql, parameters):
             if result.rowcount > 0:
                 message (0, "*** ERROR: {msg} ***".format (msg = msg), True)
                 tabulate (result)
-
 
 
 class DBA (object):
@@ -273,7 +298,7 @@ def create_functions (dest, parameters):
     execute (dest, """
     CREATE FUNCTION char_labez (l INTEGER) RETURNS CHAR (3) AS
     $$
-        SELECT CASE WHEN l > 0 THEN chr (l + 96) ELSE 'lac' END;
+        SELECT CASE WHEN l > 0 THEN chr (l + 96) ELSE 'z' END;
     $$
     LANGUAGE SQL IMMUTABLE;
     """, parameters)
@@ -383,88 +408,74 @@ class Lac (Base): # same as class Att
         UniqueConstraint ('hs', 'irange', name = 'unique_lac_hs_irange')
     )
 
+if 0:
+    class VP (Base):
+        __tablename__ = 'vp'
 
-class Labez (Base):
-    __tablename__ = 'labez'
-
-    id        = Column (Integer,       primary_key = True, autoincrement = True)
-    ms_id     = Column (Integer,       nullable = False)
-    pass_id   = Column (Integer,       nullable = False, index = True)
-    labez     = Column (Integer,       nullable = False, server_default = '0')
-    labezsuf  = Column (String (32),   nullable = False, server_default = '')
-
-    __table_args__ = (
-        UniqueConstraint ('ms_id', 'pass_id', name = 'unique_labez_ms_id_pass_id'),
-    )
+        id        = Column (Integer,       primary_key = True, autoincrement = True)
+        anfadr    = Column (Integer,       nullable = False)
+        endadr    = Column (Integer,       nullable = False)
+        bzdef     = Column (Integer,       nullable = False, server_default = '0')
+        check     = Column (String (1),    nullable = False, server_default = '')
 
 
-class VP (Base):
-    __tablename__ = 'vp'
+    class Rdg (Base):
+        __tablename__ = 'rdg'
 
-    id        = Column (Integer,       primary_key = True, autoincrement = True)
-    anfadr    = Column (Integer,       nullable = False)
-    endadr    = Column (Integer,       nullable = False)
-    bzdef     = Column (Integer,       nullable = False, server_default = '0')
-    check     = Column (String (1),    nullable = False, server_default = '')
+        id        = Column (Integer,       primary_key = True, autoincrement = True)
+        anfadr    = Column (Integer,       nullable = False)
+        endadr    = Column (Integer,       nullable = False)
+        labez     = Column (String (32),   nullable = False, server_default = '')
+        labezsuf  = Column (String (32),   nullable = False, server_default = '')
+        lesart    = Column (String (1024), nullable = False, server_default = '')
+        bz        = Column (Integer,       nullable = False, server_default = '0')
+        bzdef     = Column (Integer,       nullable = False, server_default = '0')
+        byz       = Column (String (1),    nullable = False, server_default = '')
+        check     = Column (String (1),    nullable = False, server_default = '')
 
-
-class Rdg (Base):
-    __tablename__ = 'rdg'
-
-    id        = Column (Integer,       primary_key = True, autoincrement = True)
-    anfadr    = Column (Integer,       nullable = False)
-    endadr    = Column (Integer,       nullable = False)
-    labez     = Column (String (32),   nullable = False, server_default = '')
-    labezsuf  = Column (String (32),   nullable = False, server_default = '')
-    lesart    = Column (String (1024), nullable = False, server_default = '')
-    bz        = Column (Integer,       nullable = False, server_default = '0')
-    bzdef     = Column (Integer,       nullable = False, server_default = '0')
-    byz       = Column (String (1),    nullable = False, server_default = '')
-    check     = Column (String (1),    nullable = False, server_default = '')
-
-    __table_args__ = (
-        UniqueConstraint ('anfadr', 'endadr', 'labez', name = 'unique_rdg_anfadr_endadr_labez'),
-    )
+        __table_args__ = (
+            UniqueConstraint ('anfadr', 'endadr', 'labez', name = 'unique_rdg_anfadr_endadr_labez'),
+        )
 
 
-class Witn (Base):
-    __tablename__ = 'witn'
+    class Witn (Base):
+        __tablename__ = 'witn'
 
-    id        = Column (Integer,       primary_key = True, autoincrement = True)
-    anfadr    = Column (Integer,       nullable = False)
-    endadr    = Column (Integer,       nullable = False)
-    labez     = Column (String (32),   nullable = False, server_default = '')
-    labezsuf  = Column (String (32),   nullable = False, server_default = '')
-    hsnr      = Column (Integer,       nullable = False)
-    hs        = Column (String (32),   nullable = False)
-
-
-class MsListVal (Base):
-    __tablename__ = 'mslistval'
-
-    id        = Column (Integer,       primary_key = True, autoincrement = True)
-    hsnr      = Column (Integer,       nullable = False)
-    hs        = Column (String (32),   nullable = False)
-    chapter   = Column (Integer,       nullable = False)
-    sumtxt    = Column (Integer,       nullable = False, server_default = '0')
-    summt     = Column (Integer,       nullable = False, server_default = '0')
-    uemt      = Column (Integer,       nullable = False, server_default = '0')
-    qmt       = Column (Float,         nullable = False, server_default = '0.0')
-    check     = Column (String (1),    nullable = False, server_default = '')
+        id        = Column (Integer,       primary_key = True, autoincrement = True)
+        anfadr    = Column (Integer,       nullable = False)
+        endadr    = Column (Integer,       nullable = False)
+        labez     = Column (String (32),   nullable = False, server_default = '')
+        labezsuf  = Column (String (32),   nullable = False, server_default = '')
+        hsnr      = Column (Integer,       nullable = False)
+        hs        = Column (String (32),   nullable = False)
 
 
-class VG (Base):
-    __tablename__ = 'vg'
+    class MsListVal (Base):
+        __tablename__ = 'mslistval'
 
-    id        = Column (Integer,       primary_key = True, autoincrement = True)
-    hsnr      = Column (Integer,       nullable = False)
-    hsnr2     = Column (Integer,       nullable = False)
-    chapter   = Column (Integer,       nullable = False)
-    sumtxt    = Column (Integer,       nullable = False, server_default = '0')
-    summt     = Column (Integer,       nullable = False, server_default = '0')
-    uemt      = Column (Integer,       nullable = False, server_default = '0')
-    qmt       = Column (Float,         nullable = False, server_default = '0.0')
-    check     = Column (String (1),    nullable = False, server_default = '')
+        id        = Column (Integer,       primary_key = True, autoincrement = True)
+        hsnr      = Column (Integer,       nullable = False)
+        hs        = Column (String (32),   nullable = False)
+        chapter   = Column (Integer,       nullable = False)
+        sumtxt    = Column (Integer,       nullable = False, server_default = '0')
+        summt     = Column (Integer,       nullable = False, server_default = '0')
+        uemt      = Column (Integer,       nullable = False, server_default = '0')
+        qmt       = Column (Float,         nullable = False, server_default = '0.0')
+        check     = Column (String (1),    nullable = False, server_default = '')
+
+
+    class VG (Base):
+        __tablename__ = 'vg'
+
+        id        = Column (Integer,       primary_key = True, autoincrement = True)
+        hsnr      = Column (Integer,       nullable = False)
+        hsnr2     = Column (Integer,       nullable = False)
+        chapter   = Column (Integer,       nullable = False)
+        sumtxt    = Column (Integer,       nullable = False, server_default = '0')
+        summt     = Column (Integer,       nullable = False, server_default = '0')
+        uemt      = Column (Integer,       nullable = False, server_default = '0')
+        qmt       = Column (Float,         nullable = False, server_default = '0.0')
+        check     = Column (String (1),    nullable = False, server_default = '')
 
 
 Base2 = declarative_base ()
@@ -508,11 +519,68 @@ class Passages (Base2):
     anfadr    = Column (Integer,       nullable = False)
     endadr    = Column (Integer,       nullable = False)
     irange    = Column (IntRangeType,  nullable = False)
-    comp      = Column (Boolean,       nullable = False, server_default = "False")
-    fehlvers  = Column (Boolean,       nullable = False, server_default = "False")
+    lemma     = Column (String(1024),  nullable = False, server_default = '')
+    comp      = Column (Boolean,       nullable = False, server_default = 'False')
+    fehlvers  = Column (Boolean,       nullable = False, server_default = 'False')
 
     __table_args__ = (
         UniqueConstraint ('irange', name = 'unique_passages_irange'),
+    )
+
+
+class Readings (Base2):
+    __tablename__ = 'readings'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    pass_id   = Column (Integer,       ForeignKey ('passages.id'), nullable = False, index = True)
+    labez     = Column (String (2),    nullable = False, server_default = '')
+    labezsuf  = Column (String (32),   nullable = False, server_default = '')
+    lesart    = Column (String(1024),  nullable = False, server_default = '')
+
+    __table_args__ = (
+        UniqueConstraint ('pass_id', 'labez', 'labezsuf', name = 'unique_readings_pass_id_labez_labezsuf'),
+    )
+
+
+class Variants (Base2):
+    __tablename__ = 'var'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+    ms_id     = Column (Integer,       ForeignKey ('manuscripts.id'), nullable = False, index = True)
+    pass_id   = Column (Integer,       ForeignKey ('passages.id'),    nullable = False, index = True)
+    labez     = Column (String (2),    nullable = False, server_default = '')
+    labezsuf  = Column (String (32),   nullable = False, server_default = '')
+    varid     = Column (String (2),    nullable = False, server_default = '')
+    varnew    = Column (String (2),    nullable = False, server_default = '')
+
+    __table_args__ = (
+        UniqueConstraint ('ms_id', 'pass_id', name = 'unique_var_ms_id_pass_id'),
+    )
+
+
+class LocStemEd (Base2):
+    __tablename__ = 'locstemed'
+
+    id         = Column (Integer,       primary_key = True, autoincrement = True)
+    pass_id    = Column (Integer,       ForeignKey ('passages.id'), nullable = False, index = True)
+    varid      = Column (String (2),    nullable = False)
+    varnew     = Column (String (2),    nullable = False, server_default = '')
+    s1         = Column (String (2),    nullable = False, server_default = '')
+    s2         = Column (String (2),    nullable = False, server_default = '')
+    parents    = Column (Integer,       nullable = False, server_default = '0')
+    ancestors  = Column (Integer,       nullable = False, server_default = '0')
+    varnewmask = Column (Integer,       nullable = False, server_default = '0')
+    s1mask     = Column (Integer,       nullable = False, server_default = '0')
+    s2mask     = Column (Integer,       nullable = False, server_default = '0')
+    prs1       = Column (String (2),    nullable = False, server_default = '')
+    prs2       = Column (String (2),    nullable = False, server_default = '')
+    check      = Column (String (2),    nullable = False, server_default = '')
+    check2     = Column (String (2),    nullable = False, server_default = '')
+    w          = Column (String (1),    nullable = False, server_default = '')
+
+    __table_args__ = (
+        UniqueConstraint ('pass_id', 'varnew', 's1', name = 'unique_locstemed_pass_id_varnew_s1'),
+        Index ('index_locstemed_pass_id_varnew', 'pass_id', 'varnew'),
     )
 
 
@@ -521,8 +589,8 @@ class Affinity (Base2):
 
     id        = Column (Integer,       primary_key = True, autoincrement = True)
     chapter   = Column (Integer,       nullable = False)
-    id1       = Column (Integer,       nullable = False)
-    id2       = Column (Integer,       nullable = False)
+    id1       = Column (Integer,       ForeignKey ('manuscripts.id'), nullable = False)
+    id2       = Column (Integer,       ForeignKey ('manuscripts.id'), nullable = False)
     common    = Column (Integer,       nullable = False)
     equal     = Column (Integer,       nullable = False)
     older     = Column (Integer,       nullable = False)
@@ -536,6 +604,14 @@ class Affinity (Base2):
     __table_args__ = (
         UniqueConstraint ('chapter', 'id1', 'id2', name = 'unique_affinity_chapter_id1_id2'),
     )
+
+
+view ('var_view', Base2.metadata, """
+    SELECT ms.hs, ms.hsnr, p.anfadr, p.endadr, var.*
+    FROM var
+    JOIN passages p     ON var.pass_id = p.id
+    JOIN manuscripts ms ON var.ms_id   = ms.id
+    """)
 
 
 class GephiNodes (Base2):
@@ -563,65 +639,3 @@ class GephiEdges (Base2):
     __table_args__ = (
         UniqueConstraint ('source', 'target', name = 'unique_gephi_edges_source_target'),
     )
-
-
-class LocStemEd (Base2):
-    __tablename__ = 'locstemed'
-
-    id        = Column (Integer,       primary_key = True, autoincrement = True)
-    begadr    = Column (Integer,       nullable = False)
-    endadr    = Column (Integer,       nullable = False)
-    varid     = Column (String (2),    nullable = False)
-    varnew    = Column (String (2),    nullable = False, server_default = '')
-    s1        = Column (String (2),    nullable = False, server_default = '')
-    s2        = Column (String (2),    nullable = False, server_default = '')
-    ancestors = Column (postgresql.ARRAY (String (2), dimensions = 1), nullable = False, server_default = '{}')
-    prs1      = Column (String (2),    nullable = False, server_default = '')
-    prs2      = Column (String (2),    nullable = False, server_default = '')
-    check     = Column (String (2),    nullable = False, server_default = '')
-    check2    = Column (String (2),    nullable = False, server_default = '')
-    w         = Column (String (1),    nullable = False, server_default = '')
-
-    __table_args__ = (
-        UniqueConstraint ('begadr', 'endadr', 'varnew', name = 'unique_locstemed_begadr_endadr_varnew'),
-    )
-
-
-class LocStemEdTmp (Base2):
-    __tablename__ = 'locstemedtmp'
-
-    id        = Column (Integer,       primary_key = True, autoincrement = True)
-    begadr    = Column (Integer,       nullable = False)
-    endadr    = Column (Integer,       nullable = False)
-    varid     = Column (String (2),    nullable = False)
-    varnew    = Column (String (2),    nullable = False, server_default = '')
-    s1        = Column (String (2),    nullable = False, server_default = '')
-    s2        = Column (String (2),    nullable = False, server_default = '')
-    prs1      = Column (String (2),    nullable = False, server_default = '')
-    prs2      = Column (String (2),    nullable = False, server_default = '')
-    check     = Column (String (2),    nullable = False, server_default = '')
-    check2    = Column (String (2),    nullable = False, server_default = '')
-    w         = Column (String (1),    nullable = False, server_default = '')
-
-
-BYZ_HSNR = "(300010, 300180, 300350, 303300, 303980, 304240, 312410)"
-"""Manuscripts that contain the Byzantine Text.
-
-We use these manuscripts to establish the Byzantine Text according to our rules.
-
-"""
-
-FEHLVERSE = """
-    (
-      anfadr >= 50837002 and endadr <= 50837046 or
-      anfadr >= 51534002 and endadr <= 51534012 or
-      anfadr >= 52406020 and endadr <= 52408014 or
-      anfadr >= 52829002 and endadr <= 52829024
-    )
-    """
-"""Verses added in later times.
-
-These verses were added to the NT in later times. Because they are not original
-they are not included in the text of manuscript 'A'.
-
-"""

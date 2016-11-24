@@ -1,18 +1,148 @@
-// This is a RequireJS module.
-define (['jquery', 'd3', 'lodash', 'relatives', 'jquery-ui'],
+/**
+ * This module converts a graph in .dot format into SVG.  The .dot file must be
+ * pre-processed in order to contain coordinates for each node and bezier paths
+ * for each edge.
+ *
+ * @module d3-stemma-layout
+ * @author Marcello Perathoner
+ */
 
-function ($, d3, _, relatives) {
+define (['jquery', 'd3', 'lodash', 'pegjs', 'text!/static/js/dot-grammar.pegjs'],
+
+function ($, d3, _, peg, parser_src) {
     'use strict';
 
-    var radius = 15;
+    var DEFAULTS = {
+        'radius' : 15,
+        'parser' : peg.generate (parser_src),
+    };
 
-    function init_json (url, selector, id_prefix) {
-        // Display a precomputed DAG
-        //
-        // Load a precomputed GraphViz DAG in JSON format and convert it into a
-        // SVG, then append the SVG to the element specified by the selector.
+    /**
+     * Create an SVG graph from a dot file.
+     *
+     * @function load_dot
+     *
+     * @param {string} url - The url (must serve dot format.)
+     *
+     * @param {function} complete - A function to be called when the dot is loaded
+     * and all SVG elements have been created.
+     */
+    function load_dot (url, complete) {
+        var that = this;
+        var svg = this.svg;
+        svg.selectAll ('g').transition ().duration (300).style ('opacity', 0.0)
+            .remove ();
 
-        var root = d3.select (selector);
+        $.get (url, function (data) {
+            var graph = that.parser.parse (data);
+            var stmts = graph[0].stmts;
+
+            var attrs = _.keyBy (_.filter (stmts, function (o) { return o.type === 'attr'; }), 'attrType');
+            var nodes = _.keyBy (_.filter (stmts, function (o) { return o.type === 'node'; }), 'id');
+            var links = _.filter (stmts, function (o) { return o.type === 'edge'; });
+
+            // shrinkwrap
+            var bb = attrs.graph.attrs.bb.split (',');
+            var bbox = {
+                'x'      : bb[0],
+                'y'      : bb[1],
+                'width'  : bb[2],
+                'height' : bb[3],
+            };
+            var g = svg.append ('g');
+
+            svg.attr ('width',  bbox.width).style ('opacity', 0.0);
+
+            svg.transition ()
+                .duration (300)
+                .attr ('height', bbox.height)
+                .transition ()
+                .duration (300)
+                .style ('opacity', 1.0);
+
+            // g.attr ('transform', 'translate(' + -bbox.x + ',' + -bbox.y + ')');
+
+            // replace ids with node objects
+            _.forEach (links, function (link, i) {
+                link.source = nodes[link.elems[0].id];
+                link.target = nodes[link.elems[1].id];
+                link.id = that.id_prefix + 'link_' + i;
+            });
+
+            var link = g.selectAll ('.link')
+                .data (links)
+                .enter ();
+
+            link.append ('path')
+                .attr ('id', function (d) { return d.id; })
+                .attr ('class', function (d) {
+                    return 'link' + (d.attrs.broken ? ' broken' : '');
+                })
+                // .attr ('marker-end', 'url(#triangle)')
+                .attr ('d', function (d) {
+                    var path = '';
+                    var arr = d.attrs.pos.split (' ');
+                    path += 'M' + arr.shift ();
+                    while (arr.length) {
+                        path += 'C' + arr.shift () + ' ' + arr.shift () + ' ' + arr.shift ();
+                    }
+                    return path;
+                });
+
+            link.filter (function (d) {
+                return d.attrs.rank;
+            })
+                .append ('text')
+                .attr ('text-anchor', 'end')
+                .append ('textPath')
+                .attr ('startOffset', '100%')
+                .attr ('xlink:href', function (d) { return '#' + d.id; })
+                .append ('tspan')
+                .attr ('dy', '-5')
+                .text (function (d) { return d.attrs.rank ? d.attrs.rank + '      ' : ''; }); // <-- &nbsp; !!!
+
+
+            var node = g.selectAll ('.node')
+                .data (_.map (nodes, 'attrs'))
+                .enter ().append ('g')
+                .attr ('data-id', function (d) { return d['ms-id']; })
+                .attr ('class', function (d) {
+                    return 'node node-' + (d.children ? 'internal' : 'leaf');
+                })
+                .attr ('transform', function (d) {
+                    return 'translate(' + d.pos + ')';
+                });
+
+            node.append ('circle')
+                .attr ('class', 'node fg_labez')
+                .attr ('data-labez', function (d) { return d.labez; })
+                .attr ('r', that.radius);
+
+            node.append ('text')
+                .attr ('class', 'node')
+                .text (function (d) { return d.label; });
+
+            if (complete) {
+                complete ();
+            }
+        });
+    }
+
+    /**
+     * Initialize the module.
+     *
+     * @function init
+     *
+     * @param {string} wrapper_selector - A d3|jQuery selector that points to
+     * the element inside of which the graph will be placed.
+     *
+     * @param {string} id_prefix - The prefix to add to all ids.  Use if you have
+     * more than one graph on a page.
+     *
+     * @returns {Graph} - The graph object.
+     */
+    function init (wrapper_selector, id_prefix) {
+        var root = d3.select (wrapper_selector);
         root.selectAll ('*').remove ();
         var svg = root.append ('svg');
 
@@ -30,83 +160,17 @@ function ($, d3, _, relatives) {
             .append ('path')
             .attr ('d', 'M 0 0 L 10 5 L 0 10 z');
 
-        var g = svg.append ('g');
-
-        d3.json (url, function (error, json) {
-            if (error) {
-                throw error;
-            }
-
-            // replace indices with node objects
-            _.forEach (json.links, function (link) {
-                link.source = json.nodes[link.source];
-                link.target = json.nodes[link.target];
-            });
-
-            var link = g.selectAll ('.link')
-                .data (json.links)
-                .enter ();
-
-            link.append ('path')
-                // .filter (function (d) { return d.depth > 1; })
-                .attr ('id', function (d, i) { return id_prefix + 'link_' + i; })
-                .attr ('class', 'link')
-                .attr ('marker-end', 'url(#triangle)')
-                .attr ('d', function (d) {
-                    var path = '';
-                    var arr = d.pos.split (' ');
-                    // var endp = arr.shift ().substring (2); // arrow endpoint
-                    path += 'M' + arr.shift ();
-                    while (arr.length) {
-                        path += 'C' + arr.shift () + ' ' + arr.shift () + ' ' + arr.shift ();
-                    }
-                    // path += 'L' + endp;
-                    return path;
-                });
-
-            link.append ('text')
-                .attr ('text-anchor', 'end')
-                .append ('textPath')
-                .attr ('startOffset', '100%')
-                .attr ('xlink:href', function (d, i) { return '#' + id_prefix + 'link_' + i; })
-                .text (function (d) { return d.rank ? d.rank + '      ' : ''; }); // <-- &nbsp; !!!
-
-
-            var node = g.selectAll ('.node')
-                .data (json.nodes)
-                .enter ().append ('g')
-                // .filter (function (d) { return d.depth > 0; })
-                .attr ('data-ms-id', function (d) { return d['data-ms-id']; })
-                .attr ('class', function (d) {
-                    return 'node node-' + (d.children ? 'internal' : 'leaf');
-                })
-                .attr ('transform', function (d) {
-                    return 'translate(' + d.x + ',' + d.y + ')';
-                });
-
-            node.append ('circle')
-                .attr ('class', 'node fg_labez')
-                // .attr ('data-href',  function (d) { return d.href; })
-                .attr ('data-labez', function (d) { return d.labez; })
-                .attr ('r', radius);
-
-            node.append ('text')
-                .attr ('class', 'node')
-                .text (function (d) { return d.label; });
-
-            // relatives.init_bootstrap_popup (node);
-            relatives.init_jquery_popup (node);
-
-            // shrinkwrap
-            var bbox = g.node ().getBBox ();
-            svg.attr ('width',  bbox.width)
-                .attr ('height', bbox.height);
-            g.attr ('transform', 'translate(' + -bbox.x + ',' + -bbox.y + ')');
-        });
+        return $.extend (
+            {
+                'id_prefix' : id_prefix,
+                'svg'       : svg,
+                'load_dot'  : load_dot,
+            },
+            DEFAULTS
+        );
     }
 
-    // return an object that defines this module
-    return {
-        'init_json' : init_json,
+    return /** @alias module:d3-stemma-layout */ {
+        'init' : init,
     };
 });

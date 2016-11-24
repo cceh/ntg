@@ -4,9 +4,9 @@
 <link href="/static/bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css" rel="stylesheet" type="text/css" />
 <link href="/static/css/coherence.css" rel="stylesheet" type="text/css" />
 <link href="/static/css/relatives.css" rel="stylesheet" type="text/css" />
-<link href="/static/css/coherence_attestation.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/textflow.css" rel="stylesheet" type="text/css" />
 
-<title>{{_('Attestation for %(passage)s', passage = passage.hr_pass)}}</title>
+<title>{{_('Attestation for %(passage)s', passage = passage.to_hr ())}}</title>
 
 <script>
   require (['coherence'], function (coherence) {
@@ -14,6 +14,7 @@
       pass_id:          {{passage.pass_id}},
       chapter:          '{{passage.chapter}}',
       labez:            'a',
+      title_prefix:     '{{_('Attestation for')}}',
     });
   });
 </script>
@@ -23,60 +24,75 @@
 {% block content %}
 <div class="bs-docs-header">
   <div class="container">
-    <h1>{{_('Attestation for %(passage)s', passage = passage.hr_pass)}}</h1>
+    <h1>{{_('Attestation for')}} {{passage.to_hr ()}}</h1>
   </div>
 </div>
 
 <div class="container bs-docs-container">
-  <div id="local-stemma-wrapper">
+  <div>
+    <form class="passage-selector form-inline">
+      <!-- <button type="button" data="-3" class="btn btn-primary">&#x23ee;</button>
+      <button type="button" data="-2" class="btn btn-primary">&#x23ea;</button> -->
+      <button type="button" data="-1" class="btn btn-primary">&#x23f4;</button>
+      <div class="form-group">
+        <label class="sr-only">Variant Address:</label>
+        <input type="text" class="form-control" name="dest" placeholder="12:34/56-78" />
+      </div>
+      <button type="button" data="Go" class="btn btn-primary">Go</button>
+      <button type="button" data="1" class="btn btn-primary">&#x23f5;</button>
+      <!-- <button type="button" data="2" class="btn btn-primary">&#x23e9;</button>
+      <button type="button" data="3" class="btn btn-primary">&#x23ed;</button> -->
+      <input type="hidden" name="pass_id" value="{{passage.pass_id}}" />
+    </form>
   </div>
 
-  <ul id="attestations" class="list-group">
-    {% for r in values.readings %}
-    <li class="list-group-item">
-      <h4 class="list-group-item-heading">
-        <a data-labez="{{r.labez}}" class="fg_labez"
-           href="/ms_attesting/{{passage.pass_id}}/{{r.labez|e}}">{{r.labez|e}}{{r.labezsuf|e}} {{r.lesart|e}}</a>
-      </h4>
-      <ul class="list-group-item-text attesting-mss list-inline">
-        {% for id, hs, hsnr in r.manuscripts -%}
-        <li><a class="ms" data-ms-id="{{id|e}}" data-hsnr="{{hsnr|e}}">{{hs|e}}.</a></li>
-        {% endfor %}
-      </ul>
-    </li>
-    {% endfor %}
-  </ul>
+  <div class="panel panel-default panel-apparatus">
+    <div class="panel-heading panel-apparatus-caption">
+      {{_('Apparatus')}}
+    </div>
 
-  <div class="panel panel-default panel-coherence-attestation"
+    <ul id="apparatus-wrapper" class="list-group">
+    </ul>
+  </div>
+
+  <div class="panel panel-default panel-local-stemma">
+    <div class="panel-heading panel-local-stemma-caption">
+      {{_('Local Stemma')}}
+    </div>
+
+    <div id="local-stemma-wrapper">
+    </div>
+  </div>
+
+  <div class="panel panel-default panel-textflow"
        data-pass-id="{{passage.pass_id}}">
+    <div class="panel-heading panel-textflow-caption">
+      {{_('Textflow Diagram')}}
+    </div>
 
-    <div class="panel-heading panel-coherence-attestation-toolbar">
-      <div class="btn-toolbar toolbar-coherence-attestation" role="toolbar">
+    <div class="panel-heading panel-textflow-toolbar">
+      <div class="btn-toolbar toolbar-textflow" role="toolbar">
 
-        <div class="coherence-attestation-labez btn-group btn-group-xs">
+        <div class="textflow-labez btn-group btn-group-xs">
           <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-labez bg_labez"
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="btn_text"></span> <span class="caret"></span>
           </button>
           <div class="dropdown-menu dropdown-menu-labez">
             <div class="btn-group btn-group-xs" data-toggle="buttons">
-              {% for v in variants %}
-              <label class="btn btn-labez bg_labez" data-labez="{{v.labez|e}}">
-                <input type="radio" name="labez" data-opt="{{v.labez|e}}">{{v.labez_i18n|e}}</input>
-              </label>
-              {% endfor %}
+              <!-- filled by coherence.js -->
             </div>
           </div>
         </div>
 
-        <div class="coherence-attestation-connectivity btn-group btn-group-xs" data-toggle="buttons">
+        <div class="textflow-connectivity btn-group btn-group-xs" data-toggle="buttons">
           <label class="btn btn-primary">
             <span class="connectivity-label"></span>
             <input type="text" name="connectivity" />
           </label>
         </div>
 
-        <div class="coherence-attestation-chapter btn-group btn-group-xs" data-toggle="buttons">
+        <div class="textflow-chapter btn-group btn-group-xs" data-toggle="buttons">
           <label class="btn btn-primary">
             <input type="radio" name="chapter" data-opt="0">{{_('All')}}</input>
           </label>
@@ -85,7 +101,7 @@
           </label>
         </div>
 
-        <div class="coherence-attestation-include btn-group btn-group-xs" data-toggle="buttons">
+        <div class="textflow-include btn-group btn-group-xs" data-toggle="buttons">
           <label class="btn btn-primary">
             <input type="checkbox" name="include" data-opt="A">{{_('A')}}</input>
           </label>
@@ -94,7 +110,13 @@
           </label>
         </div>
 
-        <div class="coherence-attestation-mode btn-group btn-group-xs" data-toggle="buttons">
+        <div class="coherence-fragments btn-group btn-group-xs" data-toggle="buttons">
+	      <label class="btn btn-primary">
+            <input type="checkbox" name="fragments" data-opt="1">{{_('Frag')}}</input>
+	      </label>
+        </div>
+
+        <div class="textflow-mode btn-group btn-group-xs" data-toggle="buttons">
           <label class="btn btn-primary">
             <input type="radio" name="mode" data-opt="rec">{{_('Rec')}}</input>
           </label>
@@ -110,7 +132,14 @@
     </div>
   </div>
 
-  <div id="force-layout-wrapper">
+  <div class="panel panel-default panel-force-layout">
+
+    <div class="panel-heading panel-force-layout-caption">
+      {{_('Force Diagram')}}
+    </div>
+
+    <div id="force-layout-wrapper">
+    </div>
   </div>
 
 </div>

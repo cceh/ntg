@@ -65,40 +65,23 @@ N_FIELDS = 'base comp comp1 komm kontrolle korr lekt over over1 suff suffix2 vid
 NULL_FIELDS = 'lemma lesart'.split ()
 """ Fields to look for NULL """
 
-MAX_LABEZ = ord ('z') - ord ('a') + 1
-""" Max. no. of different labez """
-
 DB_INSERT_CHUNK_SIZE = 100000
 
 def ord_labez (labez):
     return ord (labez[0]) - 96
 
 
-def ord_labez_locstem (labez):
-    if labez == '':
-        return 0
-    if labez == '*':
-        return 0
-    if labez == '?':
-        return 1
-    return 1 << ord (labez[0]) - 96
+def char_labez (labez):
+    return chr (labez + 96);
 
 
 def step01 (dba, dbb, parameters):
     """Copy tables to new database
 
     Copy the (28 * 2) mysql tables to 2 tables in a new postgres database.  Do
-    *not* copy versions and patristic manuscripts.  Create indices and some
-    views.
+    *not* copy versions and patristic manuscripts.
 
     """
-
-    message (1, "Step  1 : Creating tables ...")
-
-    db.Base.metadata.drop_all (dbb.engine)
-    db.Base.metadata.create_all (dbb.engine)
-    with dbb.engine.begin () as dest:
-        db.create_functions (dest, parameters)
 
     message (1, "Step  1 : Copying tables ...")
 
@@ -116,10 +99,19 @@ def step01 (dba, dbb, parameters):
     dba_meta.reflect ()
 
     with dba.engine.begin () as src:
+
+        # create two big tables for easier debugging
+        rows = execute (src, """
+        CREATE OR REPLACE TABLE {att} LIKE Acts01GVZ;
+        """, parameters)
+        rows = execute (src, """
+        CREATE OR REPLACE TABLE {lac} LIKE Acts01GVZlac;
+        """, parameters)
+
         with dbb.engine.begin () as dest:
 
             # Get a list of tables (there are two tables per chapter)
-            table_mask = re.compile (parameters['table_mask'])
+            table_mask = re.compile (r"^Acts\d\dGVZ")
             for table_name in sorted (dba_meta.tables.keys ()):
                 if not table_mask.match (table_name):
                     continue
@@ -153,87 +145,13 @@ def step01 (dba, dbb, parameters):
                 ON CONFLICT DO NOTHING
                 """, parameters, [r for r in rows])
 
-
-def create_ms_pass_tables (dba, parameters):
-    """ Create the Manuscripts, Chapters, Passages and Nested Passages tables. """
-
-    db.Base2.metadata.drop_all   (dba.engine)
-    db.Base2.metadata.create_all (dba.engine)
-
-    with dba.engine.begin () as conn:
-
-        # The Manuscripts Table
-
-        # ms_id = 1
-        execute (conn, """
-        INSERT INTO {ms} (hs, hsnr) VALUES ('A', 0)
-        """, parameters)
-
-        # ms_id = 2
-        execute (conn, """
-        INSERT INTO {ms} (hs, hsnr) VALUES ('MT', 1)
-        """, parameters)
-
-        # ms_id = 3, ...
-        execute (conn, """
-        INSERT INTO {ms} (hs, hsnr)
-        SELECT DISTINCT hs, hsnr
-        FROM {att}
-        WHERE hsnr >= 100000
-        ORDER BY hsnr
-        """, parameters)
-
-        # The Chapters Table
-
-        execute (conn, """
-        INSERT INTO {chap} (ms_id, hs, hsnr, chapter)
-        SELECT ms.id, ms.hs, ms.hsnr, c.chapter
-        FROM {ms} ms
-        CROSS JOIN (
-          SELECT 0 AS chapter
-          UNION
-          SELECT DISTINCT kapanf AS chapter
-          FROM {att}
-        ) AS c
-        """, parameters)
-
-        # The Passages Table
-
-        execute (conn, """
-        DROP INDEX IF EXISTS {pass}_irange_gist_idx
-        """, parameters)
-
-        execute (conn, """
-        INSERT INTO {pass} (buch, kapanf, versanf, wortanf, kapend, versend, wortend, anfadr, endadr, irange)
-        SELECT DISTINCT buch, kapanf, versanf, wortanf, kapend, versend, wortend,
-                        anfadr, endadr, int4range (anfadr, endadr + 1)
-        FROM {att}
-        ORDER BY anfadr, endadr DESC
-        """, parameters)
-
-        execute (conn, """
-        CREATE INDEX {pass}_irange_gist_idx ON {pass} USING GIST (irange)
-        """, parameters)
-
-        # Mark Nested Passages
-
-        execute (conn, """
-        UPDATE {pass} p
-        SET comp = True
-        WHERE EXISTS (
-          SELECT irange FROM {pass} p2
-          WHERE p.irange && p2.irange AND p.id <> p2.id
-        )
-        """, parameters)
-
-        # Fehlverse
-
-        parameters['fehlverse'] = db.FEHLVERSE
-        execute (conn, """
-        UPDATE {pass} p
-        SET fehlvers = True
-        WHERE {fehlverse}
-        """, parameters)
+                # Copy the chapter tables into one big table
+                rows = execute (src, """
+                INSERT INTO {t} ({fields})
+                SELECT {fields}
+                FROM {source_table}
+                WHERE hsnr < 500000 AND endadr >= anfadr
+                """, parameters)
 
 
 def step01b (dba, parameters):
@@ -304,7 +222,6 @@ def step01c (dba, parameters):
         """, parameters)
 
         # Alle Fehlverse in A mit labez 'zu'?
-        parameters['fehlverse'] = db.FEHLVERSE
         fix (conn, "Fehlverse in A with labez <> 'zu'", """
         SELECT anfadr, endadr, labez
         FROM {att}
@@ -385,6 +302,12 @@ def step01c (dba, parameters):
         UPDATE {lac}
         SET anfadr = 51201001
         WHERE anfadr = 51201002;
+        UPDATE {lac}
+        SET endadr = 52831035
+        WHERE endadr = 52831034;
+        UPDATE {lac}
+        SET endadr = 51130024
+        WHERE hsnr = 202440 AND anfadr = 51101002;
         """, parameters)
 
         # Check consistency between Att and Lac tables
@@ -564,7 +487,7 @@ def step05 (dba, parameters):
           FROM {att}
           WHERE hs ~ 'T[1-9]'
           GROUP BY hsnr, anfadr, endadr
-          HAVING COUNT (*) = 1
+          HAVING count (*) = 1
         ) AS t
         WHERE (u.hsnr, u.anfadr, u.endadr) = (t.hsnr, t.anfadr, t.endadr)
 
@@ -787,7 +710,7 @@ def step07 (dba, parameters):
     message (2, "          %d zw labez updated" % updated)
 
 
-def step08 (dba, parameters):
+def delete_passages_without_variants (dba, parameters):
     """Delete passages without variants
 
     Aus: prepare4cbgm_5.py
@@ -811,149 +734,21 @@ def step08 (dba, parameters):
 
     """
 
-    message (1, "Step  8 : Delete passages without variants ...")
-
     with dba.engine.begin () as conn:
 
         execute (conn, """
         DELETE FROM {att}
         WHERE (anfadr, endadr) IN (
           SELECT anfadr, endadr
-          FROM {att}
-          WHERE labez !~ '^z'
+          FROM (
+            SELECT DISTINCT anfadr, endadr, labez
+            FROM {att}
+            WHERE labez !~ '^z'
+          ) AS i
           GROUP BY anfadr, endadr
           HAVING count (*) <= 1
         )
         """, parameters)
-
-
-def copy_genealogical_data (dbsrc, dbsrcvg, dbdest, parameters):
-    """Copy / update genealogical data
-
-    Aus: VGA/Att2CBGM.pl, VGA/PortCBGMInfo.pl
-
-    """
-
-    dbsrc_meta = sqlalchemy.schema.MetaData (bind = dbsrc.engine)
-    dbsrc_meta.reflect ()
-    dbsrcvg_meta = sqlalchemy.schema.MetaData (bind = dbsrcvg.engine)
-    dbsrcvg_meta.reflect ()
-
-    with dbdest.engine.begin () as dest:
-
-        execute (dest, """
-        TRUNCATE {locstemed}
-        """, parameters)
-
-        execute (dest, """
-        TRUNCATE {locstemedtmp}
-        """, parameters)
-
-        with dbsrc.engine.begin () as src:
-
-            table_mask = re.compile (r'^Acts\d\dGVZ$')
-            for table_name in sorted (dbsrc_meta.tables.keys ()):
-                if not table_mask.match (table_name):
-                    continue
-                message (1, "        : Copying table %s" % table_name)
-
-                parameters['source_table'] = table_name
-
-                rows = execute (src, """
-                SELECT DISTINCT anfadr, endadr, labez, labez, IF (labez = 'a', '*', 'a')
-                FROM {source_table}
-                """, parameters)
-
-                executemany_raw (dest, """
-                INSERT INTO {locstemed} (begadr, endadr, varid, varnew, s1)
-                VALUES (%s, %s, %s, %s, %s)
-                """, parameters, [r for r in rows])
-
-
-        with dbsrcvg.engine.begin () as src:
-
-            table_mask = re.compile (r'^LocStemEdAct\d\d$')
-            for table_name in sorted (dbsrcvg_meta.tables.keys ()):
-                if not table_mask.match (table_name):
-                    continue
-                message (1, "        : Copying table %s" % table_name)
-
-                parameters['source_table'] = table_name
-
-                rows = execute (src, """
-                SELECT begadr, endadr, varid, varnew, s1, s2, prs1, prs2, `check`, COALESCE (check2, ''), w
-                FROM {source_table}
-                """, parameters)
-
-                executemany_raw (dest, """
-                INSERT INTO {locstemedtmp} (begadr, endadr, varid, varnew, s1, s2, prs1, prs2, "check", check2, w)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, parameters, [r for r in rows])
-
-
-def preprocess_genealogical_data (dba, parameters):
-    """Preprocess genealogical data
-
-    Aus: VGA/Att2CBGM.pl, VGA/PortCBGMInfo.pl
-
-    """
-
-    with dba.engine.begin () as conn:
-
-        fix (conn, "Ambiguous Local Stemmata", """
-        SELECT begadr, endadr, varnew
-        FROM {locstemedtmp}
-        GROUP BY begadr, endadr, varnew HAVING COUNT (*) > 1
-        """, """
-        DELETE FROM {locstemedtmp} WHERE (begadr, endadr, varnew, s1) = (51702028, 51702030, 'c2', 'b');
-        DELETE FROM {locstemedtmp} WHERE (begadr, endadr, varnew, s1) = (52830006, 52830014, 'd', 'a1')
-        """, parameters)
-
-        # delete all passages which do not exist anymore
-        execute (conn, """
-        DELETE FROM {locstemedtmp} d
-        WHERE NOT EXISTS (
-          SELECT anfadr, endadr
-          FROM {pass} p
-          WHERE (d.begadr, d.endadr) = (p.anfadr, p.endadr)
-        )
-        """, parameters)
-
-        # overwrite with changed passages
-        execute (conn, """
-        INSERT INTO {locstemed} (begadr, endadr, varid, varnew, s1, s2, prs1, prs2, "check", check2, w)
-          SELECT begadr, endadr, varid, varnew, s1, s2, prs1, prs2, "check", check2, w
-          FROM {locstemedtmp}
-        ON CONFLICT DO NOTHING
-        """, parameters)
-
-    with dba.engine.begin () as conn:
-
-        # preprocess source readings
-        #
-        # We want to quickly test if a reading is older than another reading.
-        # We don't want to traverse the graph back to the root every time this
-        # question comes up.  So we add a field to the LocStemEd table that
-        # contains an array of all ancestral readings for every reading.
-
-        res = execute (conn, """
-        WITH RECURSIVE tree AS (
-          SELECT begadr, endadr, varnew, ARRAY[s1::TEXT::VARCHAR] AS ancestors
-          FROM {locstemed}
-          WHERE s1 IN ('*', '?') AND varnew !~ '^z'
-        UNION
-          SELECT l.begadr, l.endadr, l.varnew,
-            CASE WHEN l.s1 = t.varnew THEN l.s1 || t.ancestors ELSE l.s2 || t.ancestors END
-          FROM {locstemed} l, tree t
-          WHERE l.begadr = t.begadr AND l.endadr = t.endadr
-            AND (l.s1 = t.varnew OR l.s2 = t.varnew) AND l.varnew !~ '^z'
-        )
-        UPDATE {locstemed} l
-        SET ancestors = t.ancestors
-        FROM tree t
-        WHERE t.begadr = l.begadr AND t.endadr = l.endadr AND t.varnew = l.varnew
-        """, parameters)
-
 
 
 Manuscript = collections.namedtuple ('Manuscript', 'hs hsnr')
@@ -968,12 +763,104 @@ class Bag (object):
     mss = None              # list of named tuple Manuscript
     passages = None         # list of passages
     chapters = None         # list of named tuple Chapter
-    labez_matrix = None     # hs x passages matrix of labez
-    affinity_matrix = None  # hs x hs matrix of similarity measure
+    varid_matrix = None    # mss x passages matrix of varnew
+    affinity_matrix = None  # mss x mss matrix of similarity measure
 
 
-def create_labez_table (dba, parameters):
-    """Labez-Tabelle erstellen
+def create_ms_pass_tables (dba, parameters):
+    """ Create the Manuscripts, Chapters, Passages and Nested Passages tables. """
+
+    with dba.engine.begin () as conn:
+
+        # The Manuscripts Table
+
+        # ms_id = 1
+        execute (conn, """
+        INSERT INTO {ms} (hs, hsnr) VALUES ('A', 0)
+        """, parameters)
+
+        # ms_id = 2
+        execute (conn, """
+        INSERT INTO {ms} (hs, hsnr) VALUES ('MT', 1)
+        """, parameters)
+
+        # ms_id = 3, 4, 5, ...
+        execute (conn, """
+        INSERT INTO {ms} (hs, hsnr)
+        SELECT DISTINCT hs, hsnr
+        FROM {att}
+        WHERE hsnr >= 100000
+        ORDER BY hsnr
+        """, parameters)
+
+        # The Chapters Table
+
+        execute (conn, """
+        INSERT INTO {chap} (ms_id, hs, hsnr, chapter)
+        SELECT ms.id, ms.hs, ms.hsnr, c.chapter
+        FROM {ms} ms
+        CROSS JOIN (
+          SELECT 0 AS chapter
+          UNION
+          SELECT DISTINCT kapanf AS chapter
+          FROM {att}
+        ) AS c
+        """, parameters)
+
+        # The Passages Table
+
+        execute (conn, """
+        DROP INDEX IF EXISTS {pass}_irange_gist_idx
+        """, parameters)
+
+        execute (conn, """
+        INSERT INTO {pass} (buch, kapanf, versanf, wortanf, kapend, versend, wortend, anfadr, endadr, irange, lemma)
+        SELECT buch, kapanf, versanf, wortanf, kapend, versend, wortend,
+               anfadr, endadr, int4range (anfadr, endadr + 1),
+               MODE () WITHIN GROUP (ORDER BY lemma) AS lemma
+        FROM {att}
+        GROUP BY buch, kapanf, versanf, wortanf, kapend, versend, wortend, anfadr, endadr, int4range (anfadr, endadr + 1)
+        ORDER BY anfadr, endadr DESC
+        """, parameters)
+
+        execute (conn, """
+        CREATE INDEX {pass}_irange_gist_idx ON {pass} USING GIST (irange)
+        """, parameters)
+
+        # Mark Nested Passages
+
+        execute (conn, """
+        UPDATE {pass} p
+        SET comp = True
+        WHERE EXISTS (
+          SELECT irange FROM {pass} p2
+          WHERE p.irange && p2.irange AND p.id <> p2.id
+        )
+        """, parameters)
+
+        # Fehlverse
+
+        execute (conn, """
+        UPDATE {pass} p
+        SET fehlvers = True
+        WHERE {fehlverse}
+        """, parameters)
+
+        # The Readings Table
+
+        res = execute (conn, """
+        INSERT INTO {read} (pass_id, labez, labezsuf, lesart)
+        SELECT p.id AS pass_id, labez, labezsuf,
+               MODE () WITHIN GROUP (ORDER BY lesart) AS lesart
+        FROM {att} a
+        JOIN {pass} p
+          ON (a.anfadr, a.endadr) = (p.anfadr, p.endadr)
+        GROUP BY p.id, labez, labezsuf
+        """, parameters)
+
+
+def create_var_table (dba, parameters):
+    """Tabelle 'var' erstellen
 
     Aus: prepare4cbgm_9.py
 
@@ -983,14 +870,14 @@ def create_labez_table (dba, parameters):
         für die variierten Stellen.
 
     Build a table containing only the information we need for CBGM, that is:
-    manuscript id, passage id, and labez.
+    manuscript id, passage id, and varnew.
 
     """
 
     with dba.engine.begin () as conn:
 
         execute (conn, """
-        TRUNCATE {labez}
+        TRUNCATE {var}
         """, parameters)
 
         # First clean up the lacunae table as any errors there will be
@@ -1003,10 +890,10 @@ def create_labez_table (dba, parameters):
             AND int4range (l.anfadr, l.endadr + 1) <@ int4range (l2.anfadr, l2.endadr + 1)
         """, parameters)
 
-        # unroll lacunae.  All lacunae get a labez of 0.
+        # unroll lacunae.  All lacunae get a labez of 'zz'.
         execute (conn, """
-        INSERT INTO {labez} (ms_id, pass_id, labez, labezsuf)
-        SELECT DISTINCT ms.id, p.id, 0, ''
+        INSERT INTO {var} (ms_id, pass_id, labez, labezsuf)
+        SELECT DISTINCT ms.id, p.id, 'zz', ''
         FROM {lac} l
         JOIN {pass} p
           ON p.irange <@ int4range (l.anfadr, l.endadr + 1)
@@ -1014,10 +901,10 @@ def create_labez_table (dba, parameters):
           ON ms.hsnr = l.hsnr
         """, parameters)
 
-        # copy labez eventually overwriting lacunae
+        # copy labez from att eventually overwriting lacunae
         execute (conn, """
-        INSERT INTO {labez} (ms_id, pass_id, labez, labezsuf)
-        SELECT ms.id as ms_id, p.id as pass_id, ord_labez (att.labez) as labez, labezsuf
+        INSERT INTO {var} (ms_id, pass_id, labez, labezsuf)
+        SELECT ms.id as ms_id, p.id as pass_id, labez, labezsuf
           FROM {att} att
           JOIN {pass} p
             ON p.anfadr = att.anfadr AND p.endadr = att.endadr
@@ -1027,10 +914,14 @@ def create_labez_table (dba, parameters):
           DO UPDATE SET labez = EXCLUDED.labez, labezsuf = EXCLUDED.labezsuf
         """, parameters)
 
-        # fill with labez 'a'
+        #
+        # Build a positive apparatus
+        #
+
+        # 1. Insert missing rows and set labez = ''
         execute (conn, """
-        INSERT INTO {labez} (ms_id, pass_id, labez, labezsuf)
-        SELECT ms.id, p.id, 1, ''
+        INSERT INTO {var} (ms_id, pass_id, labez, labezsuf)
+        SELECT ms.id, p.id, '', ''
           FROM
             {pass} p
           CROSS JOIN
@@ -1038,34 +929,410 @@ def create_labez_table (dba, parameters):
         ON CONFLICT DO NOTHING
         """, parameters)
 
-        # finally fix the 'Fehlverse'
+        # Mark Fehlverse with 'zu'.
+        execute (conn, """
+        UPDATE {var}
+        SET labez = 'zu'
+        FROM {pass} p
+        WHERE p.id = pass_id AND p.fehlvers AND labez = ''
+        """, parameters)
+
+        # Fill A with labez 'zz'.  No reading for A means that the original text
+        # could not be established.
+        #execute (conn, """
+        #UPDATE {var}
+        #SET labez = 'zz'
+        #WHERE labez = '' AND ms_id = 1
+        #""", parameters)
+
+        # Fill with labez 'a'.
+        execute (conn, """
+        UPDATE {var}
+        SET labez = 'a'
+        WHERE labez = ''
+        """, parameters)
+
+
+def copy_genealogical_data (dbsrc, dbsrcvg, dbdest, parameters):
+    """Copy / update genealogical data
+
+    Aus: VGA/Att2CBGMPh3.pl
+
+    "kopiert die Daten aus ECM_Acts_CBGM nach VarGenAtt_Act,
+    zur weiteren Bearbeitung im Stemma-Editor"
+
+    INSERT INTO LocStemEdAct (varid, begadr, endadr)
+      SELECT DISTINCT labez, anfadr, endadr FROM Acts01";
+    UPDATE LocStemEdAct SET varnew = varid;
+    UPDATE LocStemEdAct SET s1 = '*' WHERE varid =  'a';
+    UPDATE LocStemEdAct SET s1 = 'a' WHERE varid <> 'a';
+
+    Same play with VarGenAttAct w/o DISTINCT.
+    Same play with RdgAct w/o DISTINCT.
+
+
+    Aus: VGA/PortCBGMInfoPh3.pl
+
+    "Kopiert die genealogischen Informationen von einer Phase zur nächsten.
+
+    Splitts müssen nur dort übertragen werden, wo sich der Apparat nicht
+    geändert hat.  Hat sich der Apparat geändert, d.h. gibt es in der neuen
+    Phase für eine Adresse keine Entsprechung in der vorhergehenden Phase, so
+    werden die Defaultwerte eingetragen.  Zuerst muss festgestellt werden, wo
+    Splitts oder Zusammenlegungen stattgefunden haben.  Dann werden diese
+    Lesarten gelöscht und aus der vorhergehenden Phase kopiert.
+
+    Stellen mit geänderter Leitzeile werden zunächst einfach übergangen.
+
+    Defaultwerte eintragen, wenn eine variierte Stelle mit gleicher numerischer
+    Adresse mehr Lesarten als in der vorhergehenden Phase hat, die nicht nur
+    versionell bezeugt sind."
+
+    VarGenAtt_ActPh2 -> VarGenAtt_ActPh3
+
+
+    1. copy entries from att with default values (every other labez depends on
+       a) (done in the last step)
+
+    2. overwrite with values from locstemed (done in this step)
+
+    FIXME: do we really need step 1? To provide the new passages if the
+    apparatus changed? At least it doesn't do any damage because there should be
+    no passages in att that are not in locstemed also.
+
+
+    """
+
+    dbsrc_meta = sqlalchemy.schema.MetaData (bind = dbsrc.engine)
+    dbsrc_meta.reflect ()
+    dbsrcvg_meta = sqlalchemy.schema.MetaData (bind = dbsrcvg.engine)
+    dbsrcvg_meta.reflect ()
+
+    with dbdest.engine.begin () as dest:
+
+        execute (dest, """
+        TRUNCATE {locstemed}
+        """, parameters)
+
+        with dbsrcvg.engine.begin () as src:
+
+            # Create debug tables
+
+            def create_debug_table (dest_table, source_tables):
+                """Copy 28 tables into one for easier debugging."""
+
+                rows = execute (src, """
+                CREATE OR REPLACE TABLE {dest_table} LIKE {source_table}
+                """, dict (parameters, dest_table = dest_table, source_table = source_tables + '01'))
+
+                table_mask = re.compile ('^' + source_tables + r'\d\d$')
+                for source_table in sorted (dbsrcvg_meta.tables.keys ()):
+                    if not table_mask.match (source_table):
+                        continue
+                    message (1, "        : Copying table %s" % source_table)
+
+                    source_model = sqlalchemy.Table (source_table, dbsrcvg_meta, autoload = True)
+                    source_columns = ['`' + column.name.lower () + '`'
+                                      for column in source_model.columns if column.name != 'id']
+
+                    rows = execute (src, """
+                    INSERT INTO {dest_table} ({columns})
+                    SELECT {columns}
+                    FROM {source_table}
+                    """, dict (parameters, source_table = source_table, dest_table = dest_table,
+                               columns = ', '.join (source_columns)))
+
+            create_debug_table (parameters['locstemed'], 'LocStemEdAct')
+            create_debug_table (parameters['read'],      'RdgAct')
+            create_debug_table (parameters['var'],       'VarGenAttAct')
+
+            # LocStemEd
+            #
+            # Generate LocStemEd from VarGenAtt.  This is the production
+            # LocStemEd table.  We prefer to recreate it from VarGenAtt to
+            # guarantee that those two tables will not be out of sync.
+
+            params = []
+            table_mask = re.compile (r'^VarGenAttAct\d\d$')
+            for table_name in sorted (dbsrcvg_meta.tables.keys ()):
+                if not table_mask.match (table_name):
+                    continue
+                message (1, "        : Copying table %s" % table_name)
+
+                parameters['source_table'] = table_name
+
+                rows = execute (src, """
+                SELECT varid, varnew, s1, s2, begadr, endadr
+                FROM {source_table}
+                GROUP BY begadr, endadr, varid, varnew, s1, s2
+                """, parameters)
+
+                params += [r for r in rows]
+
+            executemany_raw (dest, """
+            INSERT INTO {locstemed} (pass_id, varid, varnew, s1, s2)
+            SELECT p.id, %s, %s, %s, %s
+            FROM {pass} p
+            WHERE (p.anfadr, p.endadr) = (%s, %s)
+            ON CONFLICT (pass_id, varnew, s1)
+              DO UPDATE SET s1 = EXCLUDED.s1, s2 = EXCLUDED.s2
+            """, parameters, params)
+
+
+            fix (dest, "Loop in local stemma", """
+            SELECT *
+            FROM {locstemed}
+            WHERE varnew = s1 OR varnew = s2;
+            """, """
+            UPDATE {locstemed}
+            SET s1 = '?'
+            WHERE varnew = s1
+            """, parameters)
+
+            fix (dest, "Readings older than 'A'", """
+            SELECT *
+            FROM {var}_view v
+            JOIN {locstemed} l USING (pass_id, varnew)
+            WHERE v.ms_id = 1 AND l.s1 NOT IN ('*', '?')
+            """, """
+            /* harmonize it with other occurences but shoudn't it be '?' ? */
+            UPDATE {locstemed} l
+            SET s1 = 'a'
+            FROM {var}_view v
+            WHERE v.pass_id = l.pass_id AND v.varnew = l.varnew
+              AND v.ms_id = 1 AND l.s1 NOT IN ('*', '?') AND v.varnew = 'zu';
+
+            UPDATE {locstemed} l
+            SET s1 = '*'
+            FROM {pass} p
+            WHERE l.pass_id = p.id AND (anfadr, endadr) = (50220027, 50220027)
+              AND varnew = 'a';
+
+            UPDATE {locstemed} l
+            SET s1 = 'a'
+            FROM {pass} p
+            WHERE l.pass_id = p.id AND (anfadr, endadr) = (50220027, 50220027)
+              AND varnew = 'b';
+
+            """, parameters)
+
+            # VarGenAtt
+
+            params = []
+            table_mask = re.compile (r'^VarGenAttAct\d\d$')
+            for table_name in sorted (dbsrcvg_meta.tables.keys ()):
+                if not table_mask.match (table_name):
+                    continue
+                message (1, "        : Copying table %s" % table_name)
+
+                parameters['source_table'] = table_name
+
+                rows = execute (src, """
+                SELECT begadr, endadr, varid, varnew, GROUP_CONCAT(ms) AS hsnr
+                FROM {source_table}
+                GROUP BY begadr, endadr, varid, varnew
+                """, parameters)
+
+                for r in rows:
+                    params.append ({
+                        'anfadr' : r[0],
+                        'endadr' : r[1],
+                        'varid'  : r[2],
+                        'varnew' : r[3],
+                        'hsnr'   : [int (hsnr) for hsnr in r[4].split (',')],
+                    })
+
+            executemany (dest, """
+            UPDATE {var} v
+            SET varid = :varid, varnew = :varnew
+            FROM {ms} ms, {pass} pass
+            WHERE v.ms_id   = ms.id   AND ARRAY[ms.hsnr] <@ ARRAY[:hsnr]
+              AND v.pass_id = pass.id AND (pass.anfadr, pass.endadr) = (:anfadr, :endadr)
+            """, parameters, params)
+
+            # Because VarGenAttActXX does not contain manuscripts that are not
+            # defined in chapter XX we must put in the 'zz' readings ourselves.
+            execute (dest, """
+            UPDATE {var}
+            SET varid = 'z', varnew = 'zz'
+            WHERE labez = 'zz' AND varnew = ''
+            """, parameters)
+
+
+            fix (dest, "Bogus varnew", """
+            SELECT *
+            FROM {var}
+            WHERE ord_labez (varid) != ord_labez (varnew)
+            ORDER BY ms_id, pass_id, varnew
+            """, """
+            UPDATE {var}
+            SET varnew = 'a'
+            WHERE varid = 'a' AND varnew = 's';
+            DELETE FROM {locstemed}
+            WHERE ord_labez (varid) != ord_labez (varnew)
+            """, parameters)
+
+
+
+def build_byzantine_text (dba, parameters):
+    """ Create the byzantine pseudo-text
+
+    Aus: PreCo/PreCoActs/ActsMT2.pl
+
+        Update der Tabellen, byzantinische Handschriften werden markiert und
+        gezählt.
+
+        Im Laufe der Textgeschichte hat sich eine Textform durchgesetzt, der
+        sogenannte Mehrheitstext, der auch Byzantinischer Text genannt wird.
+        Diese Textform wird exemplarisch durch die sieben Handschriften 1, 18,
+        35, 330, 398, 424 und 1241 repräsentiert.  Für jede variierte Stelle
+        wird nun gezählt und festgehalten, wieviele dieser sieben Handschriften
+        bei einer Lesart vertreten sind.  Eine Lesart gilt als Mehrheitslesart,
+        wenn sie
+
+        a) von mindestens sechs der oben genannten repräsentativen Handschriften
+           bezeugt wird und höchstens eine Handschrift abweicht, oder
+
+        b) von fünf Repräsentanten bezeugt wird und zwei mit unterschiedlichen
+           Lesarten abweichen.
+
+    """
+
+    with dba.engine.begin () as conn:
+
+        execute (conn, """
+        DELETE FROM {var} WHERE ms_id = 2
+        """, parameters)
+
+        res = execute (conn, """
+        INSERT INTO {var} (ms_id, pass_id, labez, varid, varnew)
+          SELECT 2, pass_id, varid, varid, varid
+          FROM (
+            SELECT pass_id,
+                   (ARRAY_AGG (varid ORDER BY cnt DESC))[1] AS varid,
+                   ARRAY_AGG (cnt ORDER BY cnt DESC) AS mask
+            FROM (
+              SELECT pass_id, varid, count (*) AS cnt
+              FROM {var} v
+              JOIN {ms} ms
+                ON v.ms_id = ms.id
+              WHERE hsnr IN {byzlist}
+              GROUP BY pass_id, varid
+            ) AS q1
+            GROUP BY pass_id
+          ) AS q2
+          WHERE mask IN ('{{7}}', '{{6,1}}', '{{5,1,1}}')
+        """, parameters)
+
+        # Fill with labez 'zz' where MT is undefined
+        execute (conn, """
+        INSERT INTO {var} (ms_id, pass_id, labez, varid, varnew)
+        SELECT 2, p.id, 'zz', 'z', 'zz'
+        FROM {pass} p
+        ON CONFLICT DO NOTHING
+        """, parameters)
+
+
+def preprocess_local_stemmas (dba, parameters):
+    """Preprocess local stemmas
+
+    Preprocess the locstemed table to allow for faster retrieval of ancestors.
+
+    """
+
+    with dba.engine.begin () as conn:
+
+        fix (conn, "Disconnected local stemma: s1 without corresponding varnew", """
+        SELECT DISTINCT l1.pass_id, p.anfadr, p.endadr, l1.s1
+        FROM {locstemed} l1
+        JOIN {pass} p
+          ON l1.pass_id = p.id
+        WHERE l1.s1 NOT IN ('*', '?', '') AND l1.varnew !~ '^z' AND NOT EXISTS (
+          SELECT * FROM {locstemed} l2
+          WHERE l1.pass_id = l2.pass_id AND l1.s1 = l2.varnew
+        )
+        ORDER BY l1.pass_id, l1.s1
+        """, "", parameters)
+
+        # preprocess source readings
         #
-        # As of here all Fehlverse are marked with the labez 'a' which may be
-        # incorrect.  Actually all Fehlverse are correctly marked 'zu' in 'A',
-        # so we might get away with doing nothing.
+        # We want to quickly test if a reading is older than another reading.
+        # We don't want to traverse the graph back to the root every time this
+        # question comes up.  So we add a field to the LocStemEd table that
+        # contains an array of all ancestral readings for every reading.
 
-        # FIXME: I don't really understand what is wanted here.
+        res = execute (conn, """
+        WITH mask AS (
+          SELECT pass_id, varnew,
+                 1 << (row_number () OVER (PARTITION BY pass_id ORDER BY varnew))::integer AS mask
+          FROM {locstemed}
+        )
 
-        # execute (conn, """
-        # UPDATE {labez} lab
-        # JOIN
-        #   {att} att
-        # JOIN
-        #   (SELECT * FROM {pass} WHERE comp AND fehlvers)
-        #   AS p
-        # JOIN
-        #   {ms} ms
-        # ON lab.ms_id = ms.id AND
-        #    lab.pass_id = p.id AND
-        #    p.anfadr = att.anfadr AND p.endadr = att.endadr
-        #    AND ms.hsnr = att.hsnr
-        #    AND att.base = 'a'
-        # SET lab.labez = 0
-        # """, parameters)
+        UPDATE {locstemed} l
+        SET varnewmask = m.mask
+        FROM mask m
+        WHERE (l.pass_id, l.varnew) = (m.pass_id, m.varnew);
+        """, parameters)
+
+        res = execute (conn, """
+        WITH mask AS (
+          SELECT pass_id, varnew,
+                 1 << (row_number () OVER (PARTITION BY pass_id ORDER BY varnew))::integer AS mask
+          FROM {locstemed}
+        )
+
+        UPDATE {locstemed} l
+        SET s1mask = m.mask
+        FROM mask m
+        WHERE (l.pass_id, l.s1) = (m.pass_id, m.varnew);
+        """, parameters)
+
+        res = execute (conn, """
+        WITH mask AS (
+          SELECT pass_id, varnew,
+                 1 << (row_number () OVER (PARTITION BY pass_id ORDER BY varnew))::integer AS mask
+          FROM {locstemed}
+        )
+
+        UPDATE {locstemed} l
+        SET s2mask = m.mask
+        FROM mask m
+        WHERE (l.pass_id, l.s2) = (m.pass_id, m.varnew);
+        """, parameters)
+
+        res = execute (conn, """
+        UPDATE {locstemed} l
+        SET parents = s1mask + s2mask
+        """, parameters)
+
+        res = execute (conn, """
+        WITH RECURSIVE tree AS (
+          SELECT pass_id, varnew, 0 AS ancestors
+          FROM {locstemed}
+          WHERE s1 IN ('*', '?')
+        UNION
+          SELECT l.pass_id, l.varnew,
+            CASE WHEN l.s1 = t.varnew THEN s1mask + t.ancestors ELSE s2mask + t.ancestors END
+          FROM {locstemed} l
+          JOIN tree t
+            ON l.pass_id = t.pass_id AND (l.s1 = t.varnew OR l.s2 = t.varnew)
+        )
+
+        UPDATE {locstemed} l
+        SET ancestors = t.ancestors
+        FROM tree t
+        WHERE (l.pass_id, l.varnew) = (t.pass_id, t.varnew);
+        """, parameters)
+
+        # These are the passages where A could not be established.
+        res = execute (conn, """
+        DELETE FROM  {locstemed} l
+        WHERE varnew = 'zz' and s1 = '?'
+        """, parameters)
 
 
-def create_labez_matrix (dba, parameters, val):
-    """Create the labez matrix.
+def create_varid_matrix (dba, parameters, val):
+    """Create the varid matrix.
 
     Create a matrix of manuscripts x passages.  Each entry represents one
     reading: 0 = lacuna, 1 = 'a', 2 = 'b', ...
@@ -1106,111 +1373,29 @@ def create_labez_matrix (dba, parameters, val):
         val.chapters.insert (0, Chapter (0, val.chapters[0].start, val.chapters[-1].end))
         val.n_chapters += 1
 
-        # DEBUG FIXME
-        #val.chapters = val.chapters[:5]
-        #val.n_chapters = 5
-
         # Matrix ms x pass
 
-        # Initialize all manuscripts to the labez 'a'
-        labez_matrix = np.broadcast_to (np.array ([1], np.uint32), (val.n_mss, val.n_passages)).copy ()
+        # Initialize all manuscripts to the varnew 'a'
+        varid_matrix  = np.broadcast_to (np.array ([1], np.uint32), (val.n_mss, val.n_passages)).copy ()
 
-        # overwrite where actual labez is different from 'a'
+        # overwrite matrix where actual varnew is different from 'a'
         res = execute (conn, """
-        SELECT ms_id - 1, pass_id - 1, labez
-        FROM {labez} a
-        WHERE labez != 1
+        SELECT ms_id - 1, pass_id - 1, ord_labez (varid) as varid
+        FROM {var}
+        WHERE varid != 'a'
         """, parameters)
 
         for row in res:
-            labez_matrix [row[0], row[1]] = row[2]
+            varid_matrix [row[0], row[1]] = row[2]
 
-        val.labez_matrix = labez_matrix
+        val.varid_matrix = varid_matrix
+
+        # Boolean matrix ms x pass set where passage is defined
+        val.def_matrix = np.greater (val.varid_matrix, 0)
 
         print (val.n_mss)
         print (val.n_passages)
-        print (val.labez_matrix.shape)
-
-
-def build_byzantine_text (dba, parameters, val):
-    """ Create the byzantine pseudo-text
-
-    Aus: PreCo/PreCoActs/ActsMT2.pl
-
-        Update der Tabellen, byzantinische Handschriften werden markiert und
-        gezählt.
-
-        Im Laufe der Textgeschichte hat sich eine Textform durchgesetzt, der
-        sogenannte Mehrheitstext, der auch Byzantinischer Text genannt wird.
-        Diese Textform wird exemplarisch durch die sieben Handschriften 1, 18,
-        35, 330, 398, 424 und 1241 repräsentiert.  Für jede variierte Stelle
-        wird nun gezählt und festgehalten, wieviele dieser sieben Handschriften
-        bei einer Lesart vertreten sind.  Eine Lesart gilt als Mehrheitslesart,
-        wenn sie
-
-        a) von mindestens sechs der oben genannten repräsentativen Handschriften
-           bezeugt wird und höchstens eine Handschrift abweicht, oder
-
-        b) von fünf Repräsentanten bezeugt wird und zwei mit unterschiedlichen
-           Lesarten abweichen.
-
-    """
-
-    with dba.engine.begin () as conn:
-
-        # Get the labez of some typical Byzantine texts
-        parameters['byzlist'] = db.BYZ_HSNR
-        res = execute (conn, """
-        SELECT id - 1 AS id
-        FROM {ms}
-        WHERE hsnr IN {byzlist}
-        """, parameters)
-        assert res.rowcount == 7, "The list of Byzantine texts must contain exactly 7 manuscripts."
-        byz_ids = np.fromiter ((row[0] for row in res), np.int)
-        print ("Byz Ids: ", byz_ids)
-        byz_labez_matrix = val.labez_matrix.take (byz_ids, 0)
-
-        # Group the labez at each passage
-        byz_bincount = np.apply_along_axis (np.bincount, 0, byz_labez_matrix, minlength = 27)
-        print (byz_bincount)
-
-        # Calculate the Byzantine labez for each passage
-        byz_text = np.zeros (val.n_passages, dtype = int)
-
-        for i, bc in enumerate (byz_bincount.T):
-            for j, b in enumerate (bc):
-                if b >= 6:
-                    # must be 7+0 or 6+1 or 6+0
-                    byz_text[i] = j
-                    continue
-                if b == 5 and 2 not in bc[1:]: # bc[0] is lacuna
-                    # must be 5+1+1 or 5+1 or 5+0
-                    byz_text[i] = j
-                    continue
-
-        # print ("Byz: ", byz_text)
-
-        # Replace the Byz text into the matrix
-        val.labez_matrix[1] = byz_text
-
-        # Write the labez table
-        message (1, "        : Writing Labez table ...")
-        # execute (conn, 'TRUNCATE {labez}'    , parameters)
-
-        values = []
-        # for i in range (val.n_mss):
-        for j in range (val.n_passages):
-            values.append ((2, j + 1, int (val.labez_matrix[1, j])))
-
-        executemany_raw (conn, """
-        INSERT INTO {labez} (ms_id, pass_id, labez)
-        VALUES (%s, %s, %s)
-        ON CONFLICT (ms_id, pass_id)
-          DO UPDATE SET labez = EXCLUDED.labez
-        """, parameters, values)
-
-        # Boolean matrix ms x pass set where passage is defined
-        val.def_matrix = np.greater (val.labez_matrix, 0)
+        print (val.varid_matrix.shape)
 
         # debug plot the matrix
         if PLOT:
@@ -1224,8 +1409,24 @@ def build_byzantine_text (dba, parameters, val):
             plot.plt.close ()
 
 
-def calculate_mss_similarity (dba, parameters, val):
-    """Calculate mss similarity
+def count_by_chapter (a, chapter_ends):
+    """Count passages by chapter.
+
+    Count the number of passages per chapter (that satisfy a certain condition).
+    Also insert a chapter 0 for the sum over the whole book.  Input is an array
+    of one boolean per passage.
+
+    """
+    cs = np.cumsum (a)   # cs[1] = a[0] + a[1], ...
+    total = cs[-1]
+    cs = cs[chapter_ends]
+    cs = cs - np.insert (cs, 0, 0)[:-1]
+    cs = np.insert (cs, 0, total)
+    return cs
+
+
+def calculate_mss_similarity_preco (dba, parameters, val):
+    """Calculate pre-coherence mss similarity
 
     Aus: VGA/VG05_all3.pl
 
@@ -1240,27 +1441,6 @@ def calculate_mss_similarity (dba, parameters, val):
 
     with dba.engine.begin () as conn:
 
-        # Matrix passage x labez containing bitmask of ancestral readings, '?' = 1, 'a' = 2, ...
-        local_stemma_ancestor_matrix = np.zeros ((val.n_passages, MAX_LABEZ), dtype = np.uint32)
-        local_stemma_parent_matrix   = np.zeros ((val.n_passages, MAX_LABEZ), dtype = np.uint32)
-
-        # load matrix from database, load local stem for each passage
-        res = execute (conn, """
-        SELECT p.id - 1 as pass_id, ord_labez (varnew) as varnew, ancestors, s1, s2
-        FROM {locstemed} l
-        JOIN {pass} p
-          ON (l.begadr, l.endadr) = (p.anfadr, p.endadr)
-        WHERE ancestors != ARRAY[]::VARCHAR[]
-        """, parameters)
-
-        LocStemEd = collections.namedtuple ('LocStemEd', 'pass_id varnew ancestors s1 s2')
-        rows = list (map (LocStemEd._make, res))
-
-        for row in rows:
-            local_stemma_parent_matrix[row.pass_id, row.varnew] = ord_labez_locstem (row.s1) | ord_labez_locstem (row.s2)
-            for ancestor in row.ancestors:
-                local_stemma_ancestor_matrix[row.pass_id, row.varnew] |= ord_labez_locstem (ancestor)
-
         # Matrix chapter x ms x ms with count of the passages that are defined in both mss
         val.and_matrix = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
 
@@ -1270,79 +1450,87 @@ def calculate_mss_similarity (dba, parameters, val):
         # Matrix chapter x ms of chapter lengths
         val.chapter_len_matrix = np.zeros ((val.n_chapters, val.n_mss), dtype = np.uint16)
 
-        # pre-genealogical coherence (outputs symmetrical matrices)
-        # loop over all mss O(n_mss² * n_chapters * n_passages)
-
         # ch.end is the end of a range index, so it is actually one behind the
         # item we want to know
-        chapter_ends = [ch.end - 1 for ch in val.chapters[1:]]
+        val.chapter_ends = [ch.end - 1 for ch in val.chapters[1:]]
 
-        def count_by_chapter (a):
-            """Count passages by chapter.
+        # pre-genealogical coherence outputs symmetrical matrices
+        # loop over all mss O(n_mss² * n_chapters * n_passages)
 
-            Count the number of passages per chapter (that satisfy a certain
-            condition).  Also insert a chapter 0 for the sum over the whole
-            book.  Input is an array of one boolean per passage.
-
-            Uses chapter_ends.
-
-            """
-            cs = np.cumsum (a)   # cs[1] = a[0] + a[1], ...
-            total = cs[-1]
-            cs = cs[chapter_ends]
-            cs = cs - np.insert (cs, 0, 0)[:-1]
-            cs = np.insert (cs, 0, total)
-            return cs
-
-        message (1, "          Calculating mss similarity pre-co ...")
         for j in range (0, val.n_mss):
-            labezj = val.labez_matrix[j]
+            varidj = val.varid_matrix[j]
             defj   = val.def_matrix[j]
 
             for k in range (j + 1, val.n_mss):
-                labezk = val.labez_matrix[k]
+                varidk = val.varid_matrix[k]
                 defk   = val.def_matrix[k]
 
                 def_and  = np.logical_and (defj, defk)
-                labez_eq = np.logical_and (def_and, np.equal (labezj, labezk))
+                varid_eq = np.logical_and (def_and, np.equal (varidj, varidk))
 
-                val.and_matrix[:,j,k] = val.and_matrix[:,k,j] = count_by_chapter (def_and)
-                val.eq_matrix[:,j,k]  = val.eq_matrix[:,k,j]  = count_by_chapter (labez_eq)
+                val.and_matrix[:,j,k] = val.and_matrix[:,k,j] = count_by_chapter (def_and, val.chapter_ends)
+                val.eq_matrix[:,j,k]  = val.eq_matrix[:,k,j]  = count_by_chapter (varid_eq, val.chapter_ends)
 
         # calculate quotient
         with np.errstate (divide = 'ignore', invalid = 'ignore'):
             val.quotient_matrix = val.eq_matrix / val.and_matrix
             val.quotient_matrix[val.and_matrix == 0] = 0.0
 
-        # np.fill_diagonal (val.quotient_matrix, 0.0) # remove affinity to self
-
         # calculate chapter lengths
         for j in range (0, val.n_mss):
-            val.chapter_len_matrix[:,j] = count_by_chapter (val.def_matrix[j])
+            val.chapter_len_matrix[:,j] = count_by_chapter (val.def_matrix[j], val.chapter_ends)
 
-        #
-        # genealogical coherence (outputs asymmetrical matrices)
-        # loop over all mss O(n_mss² * n_chapters * n_passages)
-        #
 
-        message (1, "          Calculating mss similarity post-co ...")
+def calculate_mss_similarity_postco (dba, parameters, val):
+    """Calculate post-coherence mss similarity
 
-        # For integer array indexing of the local_stemma_ancestor_matrix.
-        # See: https://docs.scipy.org/doc/numpy/reference/arrays.indexing.html#advanced-indexing
-        p = np.arange (0, val.n_passages)
-        # m = np.arange (0, val.n_mss)
+    Genealogical coherence outputs asymmetrical matrices.
+    Loop over all mss O(n_mss² * n_chapters * n_passages).
 
-        # some time-saving preparations
-        labez_mask_matrix = np.left_shift (1, val.labez_matrix)
-        labez_mask_matrix[labez_mask_matrix == 1] = 0 # set lacunae to 0
+    """
 
-        def postco (local_stemma_matrix):
-            labez_ancestor_matrix = np.zeros_like (val.labez_matrix)
-            for j in range (0, val.n_mss):
-                labez_ancestor_matrix[j] = local_stemma_matrix[p, val.labez_matrix[j]]
+    with dba.engine.begin () as conn:
 
-            labez_matrix_source_is_unclear = np.equal (labez_ancestor_matrix, 1)
-            labez_ancestor_matrix[labez_ancestor_matrix == 1] = 0 # set '?' (unclear) to 0
+        # load ancestors for each varnew
+        res = execute (conn, """
+        SELECT v.ms_id   - 1 AS ms_id,
+               v.pass_id - 1 AS pass_id,
+               l.varnewmask,
+               l.parents,
+               l.ancestors,
+               s1 = '?' as unclear
+        FROM {var} v
+        JOIN {locstemed} l
+          ON (v.pass_id, v.varnew) = (l.pass_id, l.varnew) AND l.varnew !~ '^z'
+        """, parameters)
+
+        LocStemEd = collections.namedtuple ('LocStemEd', 'ms_id pass_id varnewmask parents ancestors unclear')
+        rows = list (map (LocStemEd._make, res))
+
+        # Matrix mss x passages containing the bitmask of the current reading
+        mask_matrix     = np.zeros ((val.n_mss, val.n_passages), np.uint64)
+        # Matrix mss x passages containing the bitmask of the parent readings
+        parent_matrix   = np.zeros ((val.n_mss, val.n_passages), np.uint64)
+        # Matrix mss x passages containing the bitmask of the ancestral readings
+        ancestor_matrix = np.zeros ((val.n_mss, val.n_passages), np.uint64)
+        # Matrix mss x passages containing True if source is unclear (s1 = '?')
+        quest_matrix    = np.zeros ((val.n_mss, val.n_passages), np.bool_)
+
+        # If ((current bitmask of ms j) and (ancestor bitmask of ms k) > 0) then
+        # ms j is an ancestor of ms k.
+
+        for row in rows:
+            mask_matrix     [row.ms_id, row.pass_id] = row.varnewmask
+            parent_matrix   [row.ms_id, row.pass_id] = row.parents
+            ancestor_matrix [row.ms_id, row.pass_id] = row.ancestors
+            quest_matrix    [row.ms_id, row.pass_id] = row.unclear
+
+        print (mask_matrix)
+        print (parent_matrix)
+        print (ancestor_matrix)
+        print (quest_matrix)
+
+        def postco (mask_matrix, anc_matrix):
 
             local_stemmas_with_loops = set ()
 
@@ -1357,14 +1545,19 @@ def calculate_mss_similarity (dba, parameters, val):
                     # See: VGA/VGActs_allGenTab3Ph3.pl
 
                     # set bit if the reading of j is ancestral to the reading of k
-                    labezj_is_older = np.bitwise_and (labez_mask_matrix[j], labez_ancestor_matrix[k]) > 0
-                    labezk_is_older = np.bitwise_and (labez_mask_matrix[k], labez_ancestor_matrix[j]) > 0
+                    varidj_is_older = np.bitwise_and (mask_matrix[j], anc_matrix[k]) > 0
+                    varidk_is_older = np.bitwise_and (mask_matrix[k], anc_matrix[j]) > 0
 
-                    check = np.logical_and (labezj_is_older, labezk_is_older)
+                    if j == 0 and k > 0 and varidk_is_older.any ():
+                        message (1, "Error: found varid older than A in msid: %d = %s"
+                                 % (k, np.nonzero (varidk_is_older)))
+
+                    # error check for loops
+                    check = np.logical_and (varidj_is_older, varidk_is_older)
                     if np.any (check):
                         not_check       = np.logical_not (check)
-                        labezj_is_older = np.logical_and (labezj_is_older, not_check)
-                        labezk_is_older = np.logical_and (labezk_is_older, not_check)
+                        varidj_is_older = np.logical_and (varidj_is_older, not_check)
+                        varidk_is_older = np.logical_and (varidk_is_older, not_check)
 
                         local_stemmas_with_loops |= set (np.nonzero (check)[0])
 
@@ -1372,33 +1565,27 @@ def calculate_mss_similarity (dba, parameters, val):
                     # Q1 = '?' hat, UND KEINE VON IHNEN QUELLE DER ANDEREN IST, ist
                     # die Beziehung 'UNCLEAR'
 
-                    unclear = np.logical_and (val.labez_matrix[j], val.labez_matrix[k])
-                    unclear = np.logical_and (unclear, np.not_equal (val.labez_matrix[j], val.labez_matrix[k]))
-                    unclear = np.logical_and (unclear, np.logical_or (
-                        labez_matrix_source_is_unclear[j], labez_matrix_source_is_unclear[k]))
-                    unclear = np.logical_and (unclear, np.logical_not (np.logical_or (labezj_is_older, labezk_is_older)))
+                    unclear = np.logical_and (val.def_matrix[j], val.def_matrix[k])
+                    unclear = np.logical_and (unclear, np.not_equal (val.varid_matrix[j], val.varid_matrix[k]))
+                    unclear = np.logical_and (unclear, np.logical_or (quest_matrix[j], quest_matrix[k]))
+                    unclear = np.logical_and (unclear, np.logical_not (np.logical_or (varidj_is_older, varidk_is_older)))
 
-                    # if k == 0 and np.any (labezj_is_older):
-                    #    message (1, "Error labez older than A in msid %d in passages: %s"
-                    #             % (j, np.nonzero (labezj_is_older)))
-
-                    ancestor_matrix[:,j,k] = count_by_chapter (labezj_is_older)
-                    unclear_matrix[:,j,k]  = count_by_chapter (unclear)
+                    ancestor_matrix[:,j,k] = count_by_chapter (varidj_is_older, val.chapter_ends)
+                    unclear_matrix[:,j,k]  = count_by_chapter (unclear, val.chapter_ends)
 
             if local_stemmas_with_loops:
                 message (1, "Error: found loops in local stemmata: %s" % sorted (local_stemmas_with_loops))
 
             return ancestor_matrix, unclear_matrix
 
-        val.ancestor_matrix, val.unclear_ancestor_matrix = postco (local_stemma_ancestor_matrix)
-        val.parent_matrix,   val.unclear_parent_matrix   = postco (local_stemma_parent_matrix)
+        val.parent_matrix,   val.unclear_parent_matrix   = postco (mask_matrix, parent_matrix)
+        val.ancestor_matrix, val.unclear_ancestor_matrix = postco (mask_matrix, ancestor_matrix)
 
         # sanity tests
 
-        # labez older than ms A
-
+        # varid older than ms A
         if val.ancestor_matrix[0,:,0].any ():
-            message (1, "Error: found labez older than A in msids: %s"
+            message (1, "Error: found varid older than A in msids: %s"
                      % (np.nonzero (val.ancestor_matrix[0,:,0])))
 
         # norel < 0
@@ -1612,13 +1799,9 @@ def print_stats (dba, parameters):
         att = res.scalar ()
         res = execute (conn, "SELECT count(*) FROM {lac}", parameters)
         lac = res.scalar ()
-        res = execute (conn, "SELECT count(*) FROM {labez}", parameters)
-        lab = res.scalar ()
 
         message (1, "rows in att        = {cnt}".format (cnt = att))
         message (1, "rows in lac        = {cnt}".format (cnt = lac))
-        message (1, "rows in labez      = {cnt}".format (cnt = lab))
-        message (1, "delta              = {cnt}".format (cnt = lab - (hs * passages)))
 
         # sum (passages in chapter * mss with chapter)
 
@@ -1686,6 +1869,11 @@ if __name__ == '__main__':
     try:
         for step in range (args.range[0], args.range[1] + 1):
             if step == 1:
+                message (1, "Step  1 : Creating tables ...")
+
+                db.Base.metadata.drop_all (dbdest.engine)
+                db.Base.metadata.create_all (dbdest.engine)
+
                 step01  (dbsrc1, dbdest, parameters)
                 step01b (dbdest, parameters)
                 step01c (dbdest, parameters)
@@ -1712,35 +1900,49 @@ if __name__ == '__main__':
                     print_stats (dbdest, parameters)
                 continue
             if step == 8:
-                step08 (dbdest, parameters)
+                message (1, "Step  8 : Deleting passages without variants ...")
+                delete_passages_without_variants (dbdest, parameters)
                 if args.verbose >= 1:
                     print_stats (dbdest, parameters)
                 continue
-
 
             if step == 31:
-                message (1, "Step 31 : Filling the Manuscripts and Passages tables ...")
+                message (1, "Step 31 : Dropping tables ...")
+                db.Base2.metadata.drop_all   (dbdest.engine)
+                message (1, "        : Creating tables ...")
+                db.Base2.metadata.create_all (dbdest.engine)
+                message (1, "        : Creating functions ...")
+                with dbdest.engine.begin () as dest:
+                    db.create_functions (dest, parameters)
+
+                message (1, "        : Filling the Manuscripts and Passages tables ...")
                 create_ms_pass_tables (dbdest, parameters)
-                message (1, "Step 31 : Create Labez Table ...")
-                create_labez_table (dbdest, parameters)
-                if args.verbose >= 1:
-                    print_stats (dbdest, parameters)
+
+                message (1, "        : Filling the Var table ...")
+                create_var_table (dbdest, parameters)
                 continue
+
             if step == 32:
                 message (1, "Step 32 : Copying genealogical data ...")
                 copy_genealogical_data (dbsrc1, dbsrc2, dbdest, parameters)
-                message (1, "        : Preprocessing genealogical data ...")
-                preprocess_genealogical_data (dbdest, parameters)
+
+                message (1, "        : Building Byzantine text ...")
+                build_byzantine_text (dbdest, parameters)
+
+                message (1, "        : Preprocessing local stemmas ...")
+                preprocess_local_stemmas (dbdest, parameters)
                 continue
+
             if step == 33:
-                message (1, "Step 33 : Creating the labez matrix ...")
-                create_labez_matrix (dbdest, parameters, v)
-                message (1, "Step 33 : Building Byzantine text ...")
-                build_byzantine_text (dbdest, parameters, v)
-                continue
-            if step == 34:
-                message (1, "Step 34 : Calculating mss similarity ...")
-                calculate_mss_similarity (dbdest, parameters, v)
+                message (1, "Step 33 : Creating the varid matrix ...")
+                create_varid_matrix (dbdest, parameters, v)
+
+                message (1, "        : Calculating mss similarity pre-co ...")
+                calculate_mss_similarity_preco (dbdest, parameters, v)
+
+                message (1, "        : Calculating mss similarity post-co ...")
+                calculate_mss_similarity_postco (dbdest, parameters, v)
+
                 message (1, "        : Exporting Gephi Tables ...")
                 affinity_to_gephi (dbdest, parameters, v)
                 continue

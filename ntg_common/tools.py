@@ -6,6 +6,8 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import datetime
+import os
+import subprocess
 import sys
 
 import six
@@ -20,16 +22,12 @@ DEFAULTS = {
 
     'att'       : 'att',
     'lac'       : 'lac',
-    'labez'     : 'labez',
-    'ms'        : 'manuscripts',
-    'chap'      : 'chapters',
     'pass'      : 'passages',
+    'chap'      : 'chapters',
+    'ms'        : 'manuscripts',
+    'var'       : 'var',
+    'read'      : 'readings',
     'aff'       : 'affinity',
-    'vp'        : 'vp',
-    'rdg'       : 'rdg',
-    'witn'      : 'witn',
-    'listval'   : 'mslistval',
-    'vg'        : 'vg',
     'tmp'       : 'tmp',
     'g_nodes'   : 'nodes',
     'g_edges'   : 'edges',
@@ -70,6 +68,30 @@ BOOKS = (
 )
 """ Titles of the NT books """
 
+BYZ_HSNR = "(300010, 300180, 300350, 303300, 303980, 304240, 312410)"
+"""Manuscripts attesting the Byzantine Text.
+
+We use these manuscripts as templates to establish the Byzantine Text according
+to our rules.
+
+"""
+
+FEHLVERSE = """
+    (
+      anfadr >= 50837002 and endadr <= 50837046 or
+      anfadr >= 51534002 and endadr <= 51534012 or
+      anfadr >= 52406020 and endadr <= 52408014 or
+      anfadr >= 52829002 and endadr <= 52829024
+    )
+    """
+"""Verses added in later times.
+
+These verses were added to the NT in later times. Because they are not original
+they are not included in the text of manuscript 'A'.
+
+"""
+
+
 def init_parameters (defaults):
 
     def quote (s):
@@ -84,10 +106,11 @@ def init_parameters (defaults):
     for k, v in defaults.items ():
         parameters[k] = quote (v)
 
-    parameters['source_db']  = quote (args.source_db)
-    parameters['target_db']  = quote (args.target_db)
-    parameters['src_vg_db']  = quote (args.src_vg_db)
-    parameters['table_mask'] = "^Acts%02d" % args.chapter if args.chapter else "^Acts"
+    parameters['source_db'] = quote (args.source_db)
+    parameters['target_db'] = quote (args.target_db)
+    parameters['src_vg_db'] = quote (args.src_vg_db)
+    parameters['fehlverse'] = FEHLVERSE
+    parameters['byzlist']   = BYZ_HSNR
 
     return parameters
 
@@ -154,3 +177,31 @@ def tabulate (res, stream = sys.stdout):
         stream.write ("|\n")
     line ()
     stream.write ("%d rows\n" % len (rows))
+
+
+def graphviz_layout (dot):
+    """ Call the GraphViz dot program to precompute the graph layout. """
+
+    cmdline = ['dot', '-Tdot']
+
+    p = subprocess.Popen (
+        cmdline,
+        stdin  = subprocess.PIPE,
+        stdout = subprocess.PIPE,
+        stderr = subprocess.PIPE,
+        universal_newlines = True)
+
+    try:
+        outs, errs = p.communicate (dot, timeout = 15)
+    except subprocess.TimeoutExpired:
+        p.kill ()
+        outs, errs = p.communicate ()
+
+    if p.returncode != 0:
+        raise subprocess.CalledProcessError (
+            'Program terminated with status: %d. stderr is: %s' % (
+                p.returncode, errs))
+    elif errs:
+        message (3, errs)
+
+    return outs

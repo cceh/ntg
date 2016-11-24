@@ -232,7 +232,7 @@ von der Zeilenbreite der Vorlage gewinnen. ([NESTLE1923]_ § 103)
 
 Brevior lectio potior: die kürzere Lesart ist die stärkere.  Schreiber
 haben öfter hinzugefügt als weggelassen.  (Einige Wissenschaftler
-glauben hingegen, daß die ausgelassen Zeile der häufigste
+glauben hingegen, daß die ausgelassene Zeile der häufigste
 Schreiberfehler ist. Siehe: [METZGER2005]_ S. 213f)
 
 Difficilior lectio potior: die schwerere Lesart ist die Stärkere.
@@ -242,7 +242,26 @@ Schreiber haben schwer verständliche Passagen oft vereinfacht.
 anderen Lesarten am leichtesten erklären läßt.  ([NESTLE1923]_ § 115)
 
 *Knowledge of documents should precede final judgement upon readings.*
-([WESTCOTT1881]_  S. 31)
+([WESTCOTT1881]_ S. 31)
+
+
+Terminologie
+============
+
+Lesart
+------
+
+Eine Lesart hat eine eindeutige Adresse, eine Lesartenbezeichnung
+(Labez), das Suffix einer Lesartenbezeichnung (Labezsuf) und natürlich
+den Text der Lesart selbst.  Das Suffix kennzeichnet z.B. eine
+Fehlerlesart oder ein Orthographicum.
+
+
+Variierte Stelle
+----------------
+
+Eine variierte Stelle (variant passage) hat mindestens zwei oder mehr
+Lesarten.
 
 
 Die Datenbank
@@ -518,6 +537,11 @@ Literatur
 .. [CLARK1918] Clark, Albert C. 1918. *The Descent of Manuscripts*.
    Oxford
 
+.. [GÄBEL2015] Georg Gäbel et al. 2015. *The CBGM Applied to Variants
+   from Acts. Methodological Background.* Institut für Neutestamentliche
+   Textforschung, University of Münster.
+   http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-background.pdf
+
 .. [METZGER2005] Metzger, Bruce Manning.  2005.  The Text of the New
    Testament.  4th Edition.
 
@@ -530,9 +554,14 @@ Literatur
    umgearbeitet von Ernst von Dobschütz.*  Göttingen: Vandenhoeck &
    Ruprecht.
 
-.. [WACHTEL2015]  Wachtel, Klaus.  *The Coherence Method and History.*
-   Institut für Neutestamentliche Textforschung, University of Münster.
-   http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-history.pdf
+.. [WACHTEL2015] Wachtel, Klaus.  2015.  *The Coherence Method and
+   History.* Institut für Neutestamentliche Textforschung, University of
+   Münster.  http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-history.pdf
+
+.. [WACHTEL2015a] Wachtel, Klaus.  2015.  *Constructing Local Stemmata
+   for the ECM of Acts: Examples.*  Institut für Neutestamentliche
+   Textforschung, University of Münster.
+   http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-examples.pdf
 
 .. [WESTCOTT1881] Westcott, Brooke Foss and Hort, Fenton John Anthony.
    *The New Testament in the Original Greek.  Volume 2.  Introduction
