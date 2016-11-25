@@ -12,26 +12,23 @@ define (['jquery', 'd3', 'lodash', 'pegjs', 'text!/static/js/dot-grammar.pegjs']
 function ($, d3, _, peg, parser_src) {
     'use strict';
 
-    var DEFAULTS = {
-        'radius' : 15,
-        'parser' : peg.generate (parser_src),
-    };
+    var dot_parser = peg.generate (parser_src);
 
     /**
      * Create an SVG graph from a dot file.
      *
      * @function load_dot
      *
-     * @param {string} url - The url (must serve dot format.)
+     * @param {string} url - The url (must serve dot format).
      *
-     * @param {function} complete - A function to be called when the dot is loaded
-     * and all SVG elements have been created.
+     * @returns {Promise} - A promise resolved when all SVG elements have been created.
      */
-    function load_dot (url, complete) {
-        var that = this;
+    function load_dot (url) {
+        var that = this; // instance
         var svg = this.svg;
         svg.selectAll ('g').transition ().duration (300).style ('opacity', 0.0)
             .remove ();
+        var deferred = new $.Deferred ();
 
         $.get (url, function (data) {
             var graph = that.parser.parse (data);
@@ -105,7 +102,7 @@ function ($, d3, _, peg, parser_src) {
             var node = g.selectAll ('.node')
                 .data (_.map (nodes, 'attrs'))
                 .enter ().append ('g')
-                .attr ('data-id', function (d) { return d['ms-id']; })
+                .attr ('data-ms-id', function (d) { return d.ms_id; })
                 .attr ('class', function (d) {
                     return 'node node-' + (d.children ? 'internal' : 'leaf');
                 })
@@ -122,10 +119,9 @@ function ($, d3, _, peg, parser_src) {
                 .attr ('class', 'node')
                 .text (function (d) { return d.label; });
 
-            if (complete) {
-                complete ();
-            }
+            deferred.resolve ();
         });
+        return deferred.promise ();
     }
 
     /**
@@ -139,7 +135,7 @@ function ($, d3, _, peg, parser_src) {
      * @param {string} id_prefix - The prefix to add to all ids.  Use if you have
      * more than one graph on a page.
      *
-     * @returns {Graph} - The graph object.
+     * @returns {Graph} - A graph instance.
      */
     function init (wrapper_selector, id_prefix) {
         var root = d3.select (wrapper_selector);
@@ -160,14 +156,13 @@ function ($, d3, _, peg, parser_src) {
             .append ('path')
             .attr ('d', 'M 0 0 L 10 5 L 0 10 z');
 
-        return $.extend (
-            {
-                'id_prefix' : id_prefix,
-                'svg'       : svg,
-                'load_dot'  : load_dot,
-            },
-            DEFAULTS
-        );
+        return {
+            'id_prefix' : id_prefix,
+            'svg'       : svg,
+            'load_dot'  : load_dot,
+            'parser'    : dot_parser,
+            'radius'    : 15,
+        };
     }
 
     return /** @alias module:d3-stemma-layout */ {

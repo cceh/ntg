@@ -1,5 +1,13 @@
-// This is a RequireJS module.
-
+/**
+ * This module implements the popups that show the relatives of a manuscript.
+ *
+ * The popups are currently implemented as jquery-ui tooltips, which probably
+ * was a bad idea, mainly because only one popup per element is possible and you
+ * cannot easily open multiple popups for one manuscript.
+ *
+ * @module relatives
+ * @author Marcello Perathoner
+ */
 define (['jquery', 'lodash', 'd3', 'd3-common', 'tools', 'navigator', 'jquery-ui'],
 
 function ($, _, d3, d3c, tools, nav) {
@@ -25,9 +33,10 @@ function ($, _, d3, d3c, tools, nav) {
         $ (document).trigger ('ntg.popup.changed');
     }
 
+    // Create and register a custom jquery-ui tooltip that opens on click and
+    // stays open until explicitly closed by the user.
+
     $.widget ('custom.relatives_tooltip', $.ui.tooltip, {
-        // This is a jquery-ui tooltip that opens on click and stays open until
-        // explicitly closed by the user.
         'options' : {
             'classes'  : { 'ui-tooltip': 'tooltip-relatives tooltip-relatives-data' },
             'position' : { 'my': 'center bottom-3' },
@@ -39,6 +48,12 @@ function ($, _, d3, d3c, tools, nav) {
                 tools.set_toolbar_buttons ($panel, data);
                 $el.find ('.dropdown-toggle').dropdown ();
                 changed ();
+            },
+            'content' : function (callback) {
+                var ms_id = $ (this).attr ('data-ms-id');
+                $.get (URLS[DEFAULTS.type] + nav.passage.id + '/' + ms_id, DEFAULTS, function (data) {
+                    callback (data);
+                });
             },
         },
         '_create' : function () {
@@ -62,13 +77,15 @@ function ($, _, d3, d3c, tools, nav) {
         },
     });
 
-    $.widget ('custom.svg_tooltip', $.custom.relatives_tooltip, {
-        // This is a jquery-ui tooltip that groks the SVG DOM.
+    // Create and register a custom jquery-ui tooltip like the above one, that
+    // also groks the SVG DOM.
+
+    $.widget ('custom.relatives_svg_tooltip', $.custom.relatives_tooltip, {
         '_open' : function (event, target, dummy_content) {
             this._superApply (arguments);
 
-            // Reposition the popup manually because jquery doesn't grok the SVG
-            // DOM.
+            // After opening reposition the popup manually because jquery
+            // doesn't grok the SVG DOM.
             var rect = target.get (0).getBoundingClientRect ();
             var bodyRect = document.body.getBoundingClientRect (); // account for scrolling
             var tooltipData = this._find (target);
@@ -84,33 +101,9 @@ function ($, _, d3, d3c, tools, nav) {
         },
     });
 
-    function init_svg_tooltip ($elem) {
-        $elem.svg_tooltip ({
-            'items'   : 'g.node',
-            'content' : function (callback) {
-                var hsnr = d3c.to_d3 ($ (this)).datum ().hsnr;
-                $.get (URLS[DEFAULTS.type] + nav.passage.id + '/' + hsnr, DEFAULTS, function (data) {
-                    callback (data);
-                });
-            },
-        });
-    }
-
-    function init_tooltip ($elem) {
-        $elem.relatives_tooltip ({
-            'items'   : '.ms[data-ms-id]',
-            'content' : function (callback) {
-                var ms_id = $ (this).attr ('data-ms-id');
-                $.get (URLS[DEFAULTS.type] + nav.passage.id + '/' + ms_id, DEFAULTS, function (data) {
-                    callback (data);
-                });
-            },
-        });
-    }
-
     /*
     function close_jquery_popups () {
-        $ ('g.node[aria-describedby]').svg_tooltip ('close');
+        $ ('g.node[aria-describedby]').relatives_svg_tooltip ('close');
     }
     */
 
@@ -125,7 +118,7 @@ function ($, _, d3, d3c, tools, nav) {
         var $tooltip = $target.closest ('.ui-tooltip');
 
         event.data = $panel.data ('options');
-        var ms_id   = $panel.attr ('data-ms-id');
+        var ms_id  = $panel.attr ('data-ms-id');
 
         tools.handle_toolbar_events (event);
 
@@ -141,8 +134,22 @@ function ($, _, d3, d3c, tools, nav) {
         event.stopPropagation ();
     }
 
+    /**
+     * Get a list of the mss. currently displayed in the tooltip.  Get either
+     * the 'source' ms. -- the ms. this tooltip is all about -- or the target
+     * mss. -- the mss. related to the 'source' ms.
+     *
+     * N.B.  When you open a tooltip, the nodes listed in the tooltip are also
+     * highlighted in the affinity cloud.  The affinity cloud uses this function
+     * to find out which nodes to highlight.
+     *
+     * @function get_ms_ids_from_popups
+     *
+     * @param {string} what - 'source' or 'target'
+     *
+     * @return {Object} - Array of ms_ids
+     */
     function get_ms_ids_from_popups (what) {
-        // what == source or target
         var ms_ids = {};
         $ ('div.tooltip-relatives-data .hilite-' + what + '[data-ms-id]').each (function () {
             ms_ids[$ (this).attr ('data-ms-id')] = true;
@@ -150,6 +157,11 @@ function ($, _, d3, d3c, tools, nav) {
         return ms_ids;
     }
 
+    /**
+     * Initialize the module.
+     *
+     * @function init
+     */
     function init () {
         // click on buttons in toolbar
         $ (document).on ('click', 'div.toolbar-relatives input', options);
@@ -159,10 +171,10 @@ function ($, _, d3, d3c, tools, nav) {
             var $popup = $ (this).closest ('.ui-tooltip');
             var $elem = popup_to_elem ($popup);
             if ($elem.length) {
-                // FIXME: Since svg_tooltip inherits from relatives_tooltip, find
+                // FIXME: Since relatives_svg_tooltip inherits from relatives_tooltip, find
                 // a way to use a "virtual function" here.
                 try {
-                    $elem.svg_tooltip ('close');
+                    $elem.relatives_svg_tooltip ('close');
                 } catch (e) {
                     $elem.relatives_tooltip ('close');
                 }
@@ -200,12 +212,8 @@ function ($, _, d3, d3c, tools, nav) {
         });
     }
 
-    // return an object that defines this module
     return {
         'init'                   : init,
-        'init_tooltip'           : init_tooltip,
-        'init_svg_tooltip'       : init_svg_tooltip,
         'get_ms_ids_from_popups' : get_ms_ids_from_popups,
-        'DEFAULTS'               : DEFAULTS,
     };
 });

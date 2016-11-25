@@ -93,11 +93,11 @@ text.node {
 text.node:hover {
   text-decoration: underline;
 }
-#passage-stemma-wrapper,
+#textflow-wrapper,
 #local-stemma-wrapper {
   width: 100%;
 }
-#passage-stemma-wrapper svg,
+#textflow-wrapper svg,
 #local-stemma-wrapper svg {
   display: block;
   margin: 1em auto;

@@ -1,8 +1,8 @@
 /**
- * This module displays a graph using the D3 force layout.  The data comes from
- * a JSON file.
+ * This module displays an affinity cloud using the D3 force layout.  It
+ * retrieves the data, a sparse affinity matrix, in JSON format.
  *
- * @module d3-force-layout
+ * @module affinity
  * @author Marcello Perathoner
  */
 
@@ -41,8 +41,8 @@ function ($, d3, _) {
      * @summary Set the attestation color of the nodes.
      *
      * Change the color of the nodes in the graph to reflect the attestation of
-     * a passage.  If the graph topology does not change between passages,
-     * (currently it does not) we only need to change node colors.
+     * a passage.  If the graph topology does not change between passages
+     * (currently it does not), we only need to change node colors.
      *
      * @function set_attestation
      *
@@ -58,7 +58,7 @@ function ($, d3, _) {
 
             wrapper.selectAll ('circle.node')
                 .attr ('data-labez', function (d) {
-                    d.labez = _.get (json.attestations, d.id, 'a')[0]; // set labez on data!
+                    d.labez = _.get (json.attestations, d.ms_id, 'a')[0]; // set labez on data!
                     return d.labez;
                 });
         });
@@ -76,14 +76,14 @@ function ($, d3, _) {
         $ ('.highlight').removeClass ('highlight');
         $ ('.selected').removeClass ('selected');
 
-        var $nodes = $ ('#' + this.id_prefix + 'nodes g[data-id]');
+        var $nodes = $ ('#' + this.id_prefix + 'nodes g[data-ms-id]');
 
         $nodes.filter (function () {
-            return $ (this).attr ('data-id') in targets;
+            return $ (this).attr ('data-ms-id') in targets;
         }).addClass ('highlight');
 
         $nodes.filter (function () {
-            return $ (this).attr ('data-id') in sources;
+            return $ (this).attr ('data-ms-id') in sources;
         }).addClass ('selected');
     }
 
@@ -92,23 +92,23 @@ function ($, d3, _) {
      *
      * @function load_json
      *
-     * @param {string} url - The url (must serve json format.)
+     * @param {string} url - The url (must serve json format).
      *
-     * @param {function} complete - A function to be called when the graph is loaded
-     * and all SVG elements have been created.
+     * @returns {Promise} - A promise resolved when all SVG elements have been created.
      */
-    function load_json (url, complete) {
+    function load_json (url) {
         var that = this;
+        var deferred = new $.Deferred ();
 
         d3.json (url, function (error, json) {
             if (error) {
-                throw error;
+                deferred.reject ();
+                return;
             }
 
-            // Keep A and MT on the horizontal center axis
+            // Fix A and MT on the horizontal center axis
             var A  = json.nodes[0];
             var MT = json.nodes[1];
-
             A.fx = -that.width / 4;
             A.fy = 0;
             MT.fx = that.width / 4;
@@ -130,8 +130,8 @@ function ($, d3, _) {
             var node = that.g_nodes.selectAll ('.node')
                 .data (json.nodes)
                 .enter ().append ('g')
-                .attr ('id',      function (d) { return that.id_prefix + 'n' + d.id; })
-                .attr ('data-id', function (d) { return d.id; })
+                .attr ('id',         function (d) { return that.id_prefix + 'n' + d.ms_id; })
+                .attr ('data-ms-id', function (d) { return d.ms_id; })
                 .attr ('class',   'node')
                 .call (d3.drag ()
                        .on ('start', dragstarted)
@@ -158,14 +158,14 @@ function ($, d3, _) {
                 // Turn on collision detection when simulation is quite cool
                 if (force.alpha () < 0.1 && !force.force ('collide')) {
                     force.force ('collide', d3.forceCollide (16));
+                    // Release A and MT nodes.
                     A.fy = A.fx = null;
                     MT.fy = MT.fx = null;
                 }
             });
-            if (complete) {
-                complete ();
-            }
+            deferred.resolve ();
         });
+        return deferred.promise ();
     }
 
     /**
@@ -210,7 +210,7 @@ function ($, d3, _) {
         };
     }
 
-    return /** @alias module:d3-force-layout */ {
+    return /** @alias module:affinity */ {
         'init' : init,
     };
 });

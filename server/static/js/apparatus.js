@@ -1,6 +1,6 @@
 /**
- * This module implements the apparatus table.  It retrieves the apparatus data
- * in JSON format and builds a list of readings and of manuscripts attesting
+ * This module displays the apparatus table.  It retrieves the apparatus data in
+ * JSON format and builds a list of readings and of the manuscripts that attest
  * that reading.
  *
  * @module apparatus
@@ -60,13 +60,16 @@ function ($, _, tools) {
      *
      * @function init
      *
-     * @param {dict} params - A dictionary containing the parameters.
+     * @param {string} wrapper_selector - The element that should contain the apparatus table.
+     *
+     * @param {string} id_prefix - Prefix to use for all for the ids. (currently unused)
      *
      * @returns {dict} - The module instance object.
      */
-    function init (params) {
+    function init (wrapper_selector, id_prefix) {
         var instance = {};
-        instance.wrapper      = $ (params.wrapper_selector);
+        instance.wrapper      = $ (wrapper_selector);
+        instance.id_prefix    = $ (id_prefix);
         instance.load_passage = load_passage;
         return instance;
     }

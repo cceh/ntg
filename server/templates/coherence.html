@@ -29,22 +29,8 @@
 </div>
 
 <div class="container bs-docs-container">
-  <div>
-    <form class="passage-selector form-inline">
-      <!-- <button type="button" data="-3" class="btn btn-primary">&#x23ee;</button>
-      <button type="button" data="-2" class="btn btn-primary">&#x23ea;</button> -->
-      <button type="button" data="-1" class="btn btn-primary">&#x23f4;</button>
-      <div class="form-group">
-        <label class="sr-only">Variant Address:</label>
-        <input type="text" class="form-control" name="dest" placeholder="12:34/56-78" />
-      </div>
-      <button type="button" data="Go" class="btn btn-primary">Go</button>
-      <button type="button" data="1" class="btn btn-primary">&#x23f5;</button>
-      <!-- <button type="button" data="2" class="btn btn-primary">&#x23e9;</button>
-      <button type="button" data="3" class="btn btn-primary">&#x23ed;</button> -->
-      <input type="hidden" name="pass_id" value="{{passage.pass_id}}" />
-    </form>
-  </div>
+
+  {% include 'navigator.html' %}
 
   <div class="panel panel-default panel-apparatus">
     <div class="panel-heading panel-apparatus-caption">
@@ -64,85 +50,25 @@
     </div>
   </div>
 
-  <div class="panel panel-default panel-textflow"
-       data-pass-id="{{passage.pass_id}}">
+  <div class="panel panel-default panel-textflow">
     <div class="panel-heading panel-textflow-caption">
       {{_('Textflow Diagram')}}
     </div>
 
-    <div class="panel-heading panel-textflow-toolbar">
-      <div class="btn-toolbar toolbar-textflow" role="toolbar">
+    {% include 'textflow-toolbar.html' %}
 
-        <div class="textflow-labez btn-group btn-group-xs">
-          <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-labez bg_labez"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="btn_text"></span> <span class="caret"></span>
-          </button>
-          <div class="dropdown-menu dropdown-menu-labez">
-            <div class="btn-group btn-group-xs" data-toggle="buttons">
-              <!-- filled by coherence.js -->
-            </div>
-          </div>
-        </div>
-
-        <div class="textflow-connectivity btn-group btn-group-xs" data-toggle="buttons">
-          <label class="btn btn-primary">
-            <span class="connectivity-label"></span>
-            <input type="text" name="connectivity" />
-          </label>
-        </div>
-
-        <div class="textflow-chapter btn-group btn-group-xs" data-toggle="buttons">
-          <label class="btn btn-primary">
-            <input type="radio" name="chapter" data-opt="0">{{_('All')}}</input>
-          </label>
-          <label class="btn btn-primary">
-            <input type="radio" name="chapter" data-opt="{{passage.chapter}}">{{_('Ch')}}</input>
-          </label>
-        </div>
-
-        <div class="textflow-include btn-group btn-group-xs" data-toggle="buttons">
-          <label class="btn btn-primary">
-            <input type="checkbox" name="include" data-opt="A">{{_('A')}}</input>
-          </label>
-          <label class="btn btn-primary">
-            <input type="checkbox" name="include" data-opt="MT">{{_('MT')}}</input>
-          </label>
-        </div>
-
-        <div class="coherence-fragments btn-group btn-group-xs" data-toggle="buttons">
-	      <label class="btn btn-primary">
-            <input type="checkbox" name="fragments" data-opt="1">{{_('Frag')}}</input>
-	      </label>
-        </div>
-
-        <div class="textflow-mode btn-group btn-group-xs" data-toggle="buttons">
-          <label class="btn btn-primary">
-            <input type="radio" name="mode" data-opt="rec">{{_('Rec')}}</input>
-          </label>
-          <label class="btn btn-primary">
-            <input type="radio" name="mode" data-opt="sim">{{_('Sim')}}</input>
-          </label>
-        </div>
-
-      </div>
-    </div>
-
-    <div id="passage-stemma-wrapper">
+    <div id="textflow-wrapper">
     </div>
   </div>
 
-  <div class="panel panel-default panel-force-layout">
-
-    <div class="panel-heading panel-force-layout-caption">
-      {{_('Force Diagram')}}
+  <div class="panel panel-default panel-affinity">
+    <div class="panel-heading panel-affinity-caption">
+      {{_('Affinity Cloud')}}
     </div>
 
-    <div id="force-layout-wrapper">
+    <div id="affinity-wrapper">
     </div>
   </div>
-
 </div>
-
 
 {% endblock %}

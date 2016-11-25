@@ -15,7 +15,7 @@ requirejs.config ({
         'coherence'        : '/static/js/coherence',
         'navigator'        : '/static/js/navigator',
         'apparatus'        : '/static/js/apparatus',
-        'd3-force'         : '/static/js/d3-force-layout',
+        'affinity'         : '/static/js/affinity',
         'd3-stemma'        : '/static/js/d3-stemma-layout',
         'd3-common'        : '/static/js/d3-common',
         'textflow'         : '/static/js/textflow',

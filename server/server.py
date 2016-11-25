@@ -559,7 +559,7 @@ def textflow_dot (passage_or_id, varnew):
             attrs['varid']  = ms.varid
             attrs['varnew'] = ms.varnew
             attrs['labez']  = ms.varnew[0]
-            attrs['ms-id']  = ms.ms_id - 1
+            attrs['ms_id']  = ms.ms_id - 1
             attrs['label']  = ms.hs
 
         for n in G:
@@ -778,7 +778,7 @@ def affinity_json ():
         for row in res:
             id_, hs, hsnr, length = row
             nodes.append ( {
-                'id'     : id_ - 1,
+                'ms_id'  : id_ - 1,
                 'hs'     : hs,
                 'hsnr'   : hsnr,
                 'group'  : hsnr // 100000,

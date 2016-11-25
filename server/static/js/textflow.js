@@ -20,6 +20,25 @@ function ($, _, d3, d3stemma, relatives, tools) {
         $ (document).trigger ('ntg.textflow.changed');
     }
 
+    function options (event) {
+        var instance = event.data;
+        var data = instance.data;
+        event.data = data;
+
+        tools.handle_toolbar_events (event);
+        instance.load_passage (data.pass_id, data.labez);
+        event.stopPropagation ();
+    }
+
+    /**
+     * Load a new passage.
+     *
+     * @function load_passage
+     *
+     * @param {int} pass_id - The passage to display.
+     *
+     * @param {string} labez - The labez to display.
+     */
     function load_passage (pass_id, labez) {
         this.data.pass_id = pass_id;
         this.data.labez = labez;
@@ -36,25 +55,27 @@ function ($, _, d3, d3stemma, relatives, tools) {
         });
     }
 
-    function options (event) {
-        var instance = event.data;
-        var data = instance.data;
-        event.data = data;
-
-        tools.handle_toolbar_events (event);
-        instance.load_passage (data.pass_id, data.labez);
-        event.stopPropagation ();
-    }
-
-    function init (wrapper_selector, toolbar_selector, id_prefix) {
+    /**
+     * Initialize the module.
+     *
+     * @function init
+     *
+     * @param {string} wrapper_selector - The element that should contain the apparatus table.
+     *
+     * @param {string} id_prefix - Prefix to use for all for the ids. (currently unused)
+     *
+     * @param {string} toolbar_selector - The toolbar to initialize and use.
+     *
+     * @returns {dict} - The module instance object.
+     */
+    function init (wrapper_selector, id_prefix, toolbar_selector) {
         var instance = {};
         instance.wrapper      = $ (wrapper_selector);
         instance.toolbar      = $ (toolbar_selector);
         instance.id_prefix    = id_prefix;
         instance.graph        = d3stemma.init (wrapper_selector, id_prefix);
         instance.load_passage = load_passage;
-
-        instance.data = {
+        instance.data         = {
             'pass_id'      : 1,
             'labez'        : 'a',
             'connectivity' : '10',
@@ -64,16 +85,16 @@ function ($, _, d3, d3stemma, relatives, tools) {
             'mode'         : 'rec',
         };
 
+        // Init toolbar.
         instance.toolbar.find ('.dropdown-toggle').dropdown ();
         instance.toolbar.find ('input[name="connectivity"]').bootstrapSlider ({
             'value' : 10,
             'ticks' : [1, 5, 10, 20],
         });
 
-        // slider
+        // Answer toolbar activity.
+        $ (document).on ('click',     toolbar_selector + ' input', instance, options);
         $ (document).on ('slideStop', toolbar_selector + ' input[name="connectivity"]', instance, options);
-        // click on buttons in toolbar
-        $ (document).on ('click', toolbar_selector + ' input', instance, options);
 
         return instance;
     }

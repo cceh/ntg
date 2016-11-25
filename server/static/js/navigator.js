@@ -35,7 +35,7 @@ define (['jquery'], function ($) {
      * @returns {dict} - The module object.
      */
     function init (title_prefix) {
-        module.title_prefix = title_prefix
+        module.title_prefix = title_prefix;
 
         // Tape recorder controls
         $ ('form.passage-selector').on ('click', function (event) {
