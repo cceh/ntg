@@ -5,6 +5,8 @@ bower_components/
 node_modules/
 jsdoc/
 output/
+*pg_dump*
+pip-freeze.txt
 server/templates/schemas.xml
 
 # Byte-compiled / optimized / DLL files

@@ -31,13 +31,14 @@ function ($, _, tools) {
                 var data = {
                     'pass_id' : pass_id,
                     'labez'   : group[0].varnew[0],
+                    'varnew'  : group[0].varnew,
                     'reading' : json.readings[group[0].varnew[0]],
                 };
                 html.push ('<li class="list-group-item">');
                 html.push ('<h4 class="list-group-item-heading">');
                 html.push (tools.format (
                     '<a data-labez="{labez}" class="fg_labez" ' +
-                        'href="/ms_attesting/{pass_id}/{labez}">{labez} {reading}</a></h4>',
+                        'href="/ms_attesting/{pass_id}/{labez}">{varnew} {reading}</a></h4>',
                     data));
 
                 html.push ('<ul class="list-group-item-text attesting-mss list-inline">');
