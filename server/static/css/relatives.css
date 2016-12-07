@@ -1,8 +1,12 @@
 div.panel-relatives {
-  width: 32em;
+  width: 36em;
 }
 div.panel-relatives span.ms {
   font-weight: bold;
+}
+div.panel-relatives div.panel-relatives-content {
+  max-height: 50em;
+  overflow: auto;
 }
 div.panel-relatives-header .close {
   padding-left: 4px;

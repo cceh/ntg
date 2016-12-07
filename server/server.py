@@ -322,6 +322,8 @@ def relatives (hs_hsnr_id, passage_or_id):
     else:
         f_where = 'AND aff.common > ch.length / 2'
 
+    limit = '' if limit == 0 else ' LIMIT %d' % limit
+
     with dba.engine.begin () as conn:
 
         passage = Passage (conn, passage_or_id)
@@ -381,7 +383,7 @@ def relatives (hs_hsnr_id, passage_or_id):
 
         # Get the X most similar manuscripts and their attestations
         res = execute (conn, """
-        /* get the :limit closest ancestors for this node */
+        /* get the LIMIT closest ancestors for this node */
         WITH ranks AS (
           SELECT id1, id2, rank () OVER (ORDER BY affinity DESC) AS rank, affinity
           FROM {aff} aff
@@ -424,7 +426,7 @@ def relatives (hs_hsnr_id, passage_or_id):
         WHERE aff.id1 = :ms_id1 AND aff.chapter = :chapter AND aff.common > 0
               AND v.pass_id = :pass_id {where} {f_where}
         ORDER BY affinity DESC, r.rank, {prefix}newer DESC, {prefix}older DESC, hsnr
-        LIMIT :limit
+        {limit}
         """, dict (parameters, where = where, f_where = f_where, ms_id1 = ms.ms_id + 1, hsnr = ms.hsnr,
                    pass_id = passage.pass_id, chapter = chapter, limit = limit,
                    prefix = prefix, exclude = tuple (exclude)))
