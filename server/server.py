@@ -58,7 +58,7 @@ class Manuscript (object):
     """ Represent one manuscript. """
 
     RE_HSNR = re.compile (r'^\d{6}$')
-    RE_MSID = re.compile (r'^[1-9]\d*$')
+    RE_MSID = re.compile (r'^\d+$')
     RE_HS   = re.compile (r'^[PL]?[s\d]+[.]?$')
 
     def __init__ (self, conn, manuscript_id_or_hs_or_hsnr):
