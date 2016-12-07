@@ -33,6 +33,10 @@ LANGUAGES = {
 
 LABEZ_I18N = {
     'z':       _('Lac'),
+    'zu':      _('Overlap'),
+    'zv':      _('Lac'),
+    'zw':      _('Lac'),
+    'zz':      _('Lac'),
     'lac':     _('Lac'),
     'all':     _('All'),
     'all+lac': _('All+Lac'),
@@ -604,8 +608,12 @@ def apparatus_json (passage_or_id):
         GROUP BY p.id, labez
         """, dict (parameters, pass_id = passage.pass_id))
 
+        # dict of labez: lesart
         readings = { row[0]: row[1] for row in res }
-        readings['z'] = LABEZ_I18N['z']
+        for k in readings.keys ():
+            if k in LABEZ_I18N:
+                readings[k] = LABEZ_I18N[k]
+        readings['zz'] = LABEZ_I18N['zz']
 
         # list of varnew => manuscripts
         res = execute (conn, """
