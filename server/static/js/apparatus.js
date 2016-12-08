@@ -32,7 +32,7 @@ function ($, _, tools) {
                     'pass_id' : pass_id,
                     'labez'   : group[0].varnew[0],
                     'varnew'  : group[0].varnew,
-                    'reading' : json.readings[group[0].varnew],
+                    'reading' : _.get (json.readings, group[0].varnew, json.readings[group[0].varnew[0]])
                 };
                 html.push ('<li class="list-group-item">');
                 html.push ('<h4 class="list-group-item-heading">');
