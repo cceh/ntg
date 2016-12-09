@@ -1,0 +1,128 @@
+# Translations template for NTG.
+# Copyright (C) 2016 ORGANIZATION
+# This file is distributed under the same license as the NTG project.
+# Marcello Perathoner <marcello@perathoner.de>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: NTG 2.0\n"
+"Report-Msgid-Bugs-To: marcello@perathoner.de\n"
+"POT-Creation-Date: 2016-12-09 10:58+0100\n"
+"PO-Revision-Date: 2016-12-09 10:59+0100\n"
+"Last-Translator: Marcello Perathoner <marcello@perathoner.de>\n"
+"Language-Team: German <>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Gtranslator 2.91.7\n"
+
+#: server/server.py:35 server/server.py:37 server/server.py:39
+#: server/server.py:40
+msgid "Lac"
+msgstr "Lac"
+
+#: server/server.py:36
+msgid "Overlap"
+msgstr "Überlappt"
+
+#: server/server.py:38
+msgid "Dub"
+msgstr "Zweifelhaft"
+
+#: server/server.py:41 server/templates/relatives.html:34
+#: server/templates/relatives.html:49 server/templates/textflow-toolbar.html:25
+msgid "All"
+msgstr "Alle"
+
+#: server/server.py:42
+msgid "All+Lac"
+msgstr "Alle+Lac"
+
+#: server/server.py:302
+msgid "Relatives for"
+msgstr "Verwandte von"
+
+#: server/server.py:306
+msgid "Ancestors for"
+msgstr "Ahnen von"
+
+#: server/server.py:309
+msgid "Descendants for"
+msgstr "Nachkommen von"
+
+#: server/templates/coherence.html:9
+#, python-format
+msgid "Attestation for %(passage)s"
+msgstr "Bezeugung von %(passage)s"
+
+#: server/templates/coherence.html:17 server/templates/coherence.html:27
+msgid "Attestation for"
+msgstr "Bezeugung von"
+
+#: server/templates/coherence.html:37
+msgid "Apparatus"
+msgstr "Apparat"
+
+#: server/templates/coherence.html:46
+msgid "Local Stemma"
+msgstr "Lokales Stemma"
+
+#: server/templates/coherence.html:55
+msgid "Textual Flow Diagram"
+msgstr "Textfluss-Diagramm"
+
+#: server/templates/coherence.html:66
+msgid "Affinity Cloud"
+msgstr "Affinitäts-Cloud"
+
+#: server/templates/ms_attesting.html:8 server/templates/ms_attesting.html:25
+#, python-format
+msgid "Attestation for %(passage)s %(labez)s"
+msgstr "Bezeugung von %(passage)s %(labez)s"
+
+#: server/templates/relatives.html:9
+#, python-format
+msgid "(MT %(perc)s %(labez)s)"
+msgstr "(MT %(perc)s %(labez)s)"
+
+#: server/templates/relatives.html:22
+msgid "Rel"
+msgstr "Alle"
+
+#: server/templates/relatives.html:25
+msgid "Anc"
+msgstr "Vor"
+
+#: server/templates/relatives.html:28
+msgid "Des"
+msgstr "Nach"
+
+#: server/templates/relatives.html:37 server/templates/textflow-toolbar.html:28
+msgid "Ch"
+msgstr "Kap"
+
+#: server/templates/relatives.html:55 server/templates/textflow-toolbar.html:34
+msgid "A"
+msgstr "A"
+
+#: server/templates/relatives.html:58 server/templates/textflow-toolbar.html:37
+msgid "MT"
+msgstr "MT"
+
+#: server/templates/relatives.html:64 server/templates/textflow-toolbar.html:43
+msgid "Frag"
+msgstr "Frag"
+
+#: server/templates/relatives.html:70 server/templates/textflow-toolbar.html:49
+msgid "Rec"
+msgstr "Rek"
+
+#: server/templates/relatives.html:73 server/templates/textflow-toolbar.html:52
+msgid "Sim"
+msgstr "Sim"
+
+#~ msgid "zz"
+#~ msgstr "zz"

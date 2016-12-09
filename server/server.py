@@ -15,7 +15,7 @@ import os.path
 import flask
 from flask import request
 import flask_babel
-from flask_babel import gettext as _, ngettext as n_
+from flask_babel import gettext as _, ngettext as n_, lazy_gettext as l_
 import six
 import networkx as nx
 
@@ -32,14 +32,14 @@ LANGUAGES = {
 }
 
 LABEZ_I18N = {
-    'z':       _('Lac'),
-    'zu':      _('Overlap'),
-    'zv':      _('Lac'),
-    'zw':      _('Dub'),
-    'zz':      _('Lac'),
-    'lac':     _('Lac'),
-    'all':     _('All'),
-    'all+lac': _('All+Lac'),
+    'z':       l_('Lac'),
+    'zu':      l_('Overlap'),
+    'zv':      l_('Lac'),
+    'zw':      l_('Dub'),
+    'zz':      l_('Lac'),
+    'lac':     l_('Lac'),
+    'all':     l_('All'),
+    'all+lac': l_('All+Lac'),
 }
 
 app = flask.Flask ("server")
@@ -850,5 +850,8 @@ if __name__ == "__main__":
     dba = db.PostgreSQLEngine (database = args.target_db)
 
     parameters = tools.init_parameters (tools.DEFAULTS)
+
+    tools.message (3, "Found translations for: {translations}".format (
+        translations = ', '.join ([l.get_display_name () for l in babel.list_translations ()])), True)
 
     app.run ()

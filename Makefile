@@ -77,7 +77,7 @@ define LOCALE_TEMPLATE
 
 .PRECIOUS: po/$(1).po
 
-update_mo: tmp/i18n/$(1)/LC_MESSAGES/messages.mo
+update_mo: server/translations/$(1)/LC_MESSAGES/messages.mo
 
 update_po: po/$(1).po
 
@@ -87,7 +87,7 @@ po/$(1).po: po/server.pot
 	else msginit --locale=$(1) -i $$? -o $$@; \
 	fi
 
-tmp/i18n/$(1)/LC_MESSAGES/messages.mo: po/$(1).po
+server/translations/$(1)/LC_MESSAGES/messages.mo: po/$(1).po
 	-mkdir -p $$(dir $$@)
 	msgfmt -o $$@ $$?
 
@@ -97,8 +97,8 @@ $(foreach lang,$(TRANSLATIONS),$(eval $(call LOCALE_TEMPLATE,$(lang))))
 
 po/server.pot: $(PY_SOURCES) $(TEMPLATES) pybabel.cfg Makefile
 	PYTHONPATH=.; pybabel extract -F pybabel.cfg --no-wrap --add-comments=NOTE \
-	--project=NTG --text-domain=ntg --version=2.0 --msgid-bugs-address=marcello@perathoner.de \
-	-k '__:1,2' -k '_lazy' -k '_n:1,2' -k '_x:1,2c' -o $@ .
-
+	--copyright-holder="CCeH Cologne" --project=NTG --version=2.0 \
+	--msgid-bugs-address=marcello@perathoner.de \
+	-k 'l_' -k 'n_:1,2' -o $@ .
 
 update_pot: po/server.pot

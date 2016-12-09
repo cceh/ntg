@@ -1,0 +1,124 @@
+# Translations template for NTG.
+# Copyright (C) 2016 CCeH Cologne
+# This file is distributed under the same license as the NTG project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: NTG 2.0\n"
+"Report-Msgid-Bugs-To: marcello@perathoner.de\n"
+"POT-Creation-Date: 2016-12-09 11:12+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: server/server.py:35 server/server.py:37 server/server.py:39
+#: server/server.py:40
+msgid "Lac"
+msgstr ""
+
+#: server/server.py:36
+msgid "Overlap"
+msgstr ""
+
+#: server/server.py:38
+msgid "Dub"
+msgstr ""
+
+#: server/server.py:41 server/templates/relatives.html:34
+#: server/templates/relatives.html:49 server/templates/textflow-toolbar.html:25
+msgid "All"
+msgstr ""
+
+#: server/server.py:42
+msgid "All+Lac"
+msgstr ""
+
+#: server/server.py:302
+msgid "Relatives for"
+msgstr ""
+
+#: server/server.py:306
+msgid "Ancestors for"
+msgstr ""
+
+#: server/server.py:309
+msgid "Descendants for"
+msgstr ""
+
+#: server/templates/coherence.html:9
+#, python-format
+msgid "Attestation for %(passage)s"
+msgstr ""
+
+#: server/templates/coherence.html:17 server/templates/coherence.html:27
+msgid "Attestation for"
+msgstr ""
+
+#: server/templates/coherence.html:37
+msgid "Apparatus"
+msgstr ""
+
+#: server/templates/coherence.html:46
+msgid "Local Stemma"
+msgstr ""
+
+#: server/templates/coherence.html:55
+msgid "Textual Flow Diagram"
+msgstr ""
+
+#: server/templates/coherence.html:66
+msgid "Affinity Cloud"
+msgstr ""
+
+#: server/templates/ms_attesting.html:8 server/templates/ms_attesting.html:25
+#, python-format
+msgid "Attestation for %(passage)s %(labez)s"
+msgstr ""
+
+#: server/templates/relatives.html:9
+#, python-format
+msgid "(MT %(perc)s %(labez)s)"
+msgstr ""
+
+#: server/templates/relatives.html:22
+msgid "Rel"
+msgstr ""
+
+#: server/templates/relatives.html:25
+msgid "Anc"
+msgstr ""
+
+#: server/templates/relatives.html:28
+msgid "Des"
+msgstr ""
+
+#: server/templates/relatives.html:37 server/templates/textflow-toolbar.html:28
+msgid "Ch"
+msgstr ""
+
+#: server/templates/relatives.html:55 server/templates/textflow-toolbar.html:34
+msgid "A"
+msgstr ""
+
+#: server/templates/relatives.html:58 server/templates/textflow-toolbar.html:37
+msgid "MT"
+msgstr ""
+
+#: server/templates/relatives.html:64 server/templates/textflow-toolbar.html:43
+msgid "Frag"
+msgstr ""
+
+#: server/templates/relatives.html:70 server/templates/textflow-toolbar.html:49
+msgid "Rec"
+msgstr ""
+
+#: server/templates/relatives.html:73 server/templates/textflow-toolbar.html:52
+msgid "Sim"
+msgstr ""
+
