@@ -35,7 +35,7 @@ LABEZ_I18N = {
     'z':       _('Lac'),
     'zu':      _('Overlap'),
     'zv':      _('Lac'),
-    'zw':      _('Lac'),
+    'zw':      _('Dub'),
     'zz':      _('Lac'),
     'lac':     _('Lac'),
     'all':     _('All'),
