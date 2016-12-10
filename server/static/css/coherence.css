@@ -1,8 +1,12 @@
+h1 span.appname {
+  float: right;
+  color: inherit;
+}
 form.passage-selector {
   margin-bottom: 20px;
 }
 form.passage-selector input[type=text] {
-  width: 8em;
+  width: 12em;
 }
 div.ui-tooltip.tooltip-relatives {
   padding: 0;

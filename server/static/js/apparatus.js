@@ -23,7 +23,7 @@ function ($, _, tools) {
         this.pass_id = pass_id;
 
         var that = this;
-        $.getJSON ('/apparatus.json/' + pass_id, function (json) {
+        $.getJSON ('apparatus.json/' + pass_id, function (json) {
             var html = [];
             var groups = _.groupBy (json.manuscripts, 'varnew');
 

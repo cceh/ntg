@@ -1858,6 +1858,9 @@ if __name__ == '__main__':
 
     args.start_time = datetime.datetime.now ()
     parameters = tools.init_parameters (tools.DEFAULTS)
+    parameters['source_db'] = tools.quote (args.source_db)
+    parameters['target_db'] = tools.quote (args.target_db)
+    parameters['src_vg_db'] = tools.quote (args.src_vg_db)
 
     dbsrc1 = db.MySQLEngine      (args.profile, args.source_db)
     dbsrc2 = db.MySQLEngine      (args.profile, args.src_vg_db)

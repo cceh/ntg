@@ -8,6 +8,7 @@ output/
 *pg_dump*
 pip-freeze.txt
 server/templates/schemas.xml
+server/instance/*.conf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

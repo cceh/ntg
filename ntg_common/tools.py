@@ -92,23 +92,18 @@ they are not included in the text of manuscript 'A'.
 """
 
 
+def quote (s):
+    if ' ' in s:
+        return '"' + s + '"'
+    return s
+
 def init_parameters (defaults):
 
-    def quote (s):
-        if ' ' in s:
-            return '"' + s + '"'
-        return s
-
     parameters = dict ()
-
-    target_db = quote (args.target_db) + '.'
 
     for k, v in defaults.items ():
         parameters[k] = quote (v)
 
-    parameters['source_db'] = quote (args.source_db)
-    parameters['target_db'] = quote (args.target_db)
-    parameters['src_vg_db'] = quote (args.src_vg_db)
     parameters['fehlverse'] = FEHLVERSE
     parameters['byzlist']   = BYZ_HSNR
 

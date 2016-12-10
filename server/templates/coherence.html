@@ -4,19 +4,12 @@
 <link href="/static/bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css" rel="stylesheet" type="text/css" />
 <link href="/static/css/coherence.css" rel="stylesheet" type="text/css" />
 <link href="/static/css/relatives.css" rel="stylesheet" type="text/css" />
-<link href="/static/css/textflow.css" rel="stylesheet" type="text/css" />
+<link href="/static/css/textflow.css"  rel="stylesheet" type="text/css" />
 
-<title>{{_('Attestation for %(passage)s', passage = passage.to_hr ())}}</title>
+<title></title>
 
 <script>
-  require (['coherence'], function (coherence) {
-    coherence.init ({
-      pass_id:          {{passage.pass_id}},
-      chapter:          '{{passage.chapter}}',
-      labez:            'a',
-      title_prefix:     '{{_('Attestation for')}}',
-    });
-  });
+  require (['coherence'], function (coherence) { coherence.init () });
 </script>
 
 {% endblock %}
@@ -24,7 +17,7 @@
 {% block content %}
 <div class="bs-docs-header">
   <div class="container">
-    <h1>{{_('Attestation for')}} {{passage.to_hr ()}}</h1>
+    <h1>{{_('Attestation for')}} <span class="passage"></span> <span class="appname">{{config['APPLICATION_NAME']}}</span></h1>
   </div>
 </div>
 

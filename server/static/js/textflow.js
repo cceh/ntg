@@ -39,18 +39,20 @@ function ($, _, d3, d3stemma, relatives, tools) {
      *
      * @param {string} labez - The labez to display.
      */
-    function load_passage (pass_id, labez) {
-        this.data.pass_id = pass_id;
+    function load_passage (passage, labez) {
+        this.data.pass_id = passage.id;
         this.data.labez = labez;
 
         this.graph.load_dot (
-            '/textflow.dot/' + pass_id + '/attestation/' + labez + '?' +
+            'textflow.dot/' + passage.id + '/attestation/' + labez + '?' +
                 $.param (_.pick (this.data, ['connectivity', 'chapter', 'include', 'fragments', 'mode']))
         );
-        var promise = tools.load_labez_dropdown (this.toolbar.find ('div.textflow-labez'), pass_id);
+        var promise = tools.load_labez_dropdown (this.toolbar.find ('div.textflow-labez'), passage.id);
         var that = this;
         promise.done (function () {
             tools.set_toolbar_buttons (that.toolbar, that.data);
+            // Maybe we changed chapter while navigating.  Set a new chapter.
+            that.toolbar.find ('div.textflow-chapter input[data-opt != "0"]').attr ('data-opt', passage.chapter);
             changed ();
         });
     }

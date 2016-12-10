@@ -24,9 +24,9 @@ function ($, _, d3, d3c, tools, nav) {
     };
 
     var URLS = {
-        'rel' : '/relatives/',
-        'anc' : '/ancestors/',
-        'des' : '/descendants/',
+        'rel' : 'relatives/',
+        'anc' : 'ancestors/',
+        'des' : 'descendants/',
     };
 
     function changed () {

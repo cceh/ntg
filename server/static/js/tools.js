@@ -115,7 +115,7 @@ function ($, _) {
     function load_labez_dropdown ($group, pass_id) {
         var $menu = $group.find ('div[data-toggle="buttons"]');
 
-        var promise = $.get ('/passage.json/' + pass_id);
+        var promise = $.get ('passage.json/' + pass_id);
         promise.done (function (json) {
             $menu.empty ();
             _.forEach (json.variants, function (value) {

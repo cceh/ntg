@@ -23,12 +23,13 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
      */
     function set_passage (json) {
         module.apparatus.load_passage (json.id);
-        module.local_stemma.load_dot ('/stemma.dot/' + json.id);
-        module.textflow.load_passage (json.id, 'a');
+        module.local_stemma.load_dot ('stemma.dot/' + json.id);
+        module.textflow.load_passage (json, 'a');
+        window.location.hash = '#' + json.passage;
 
         // make sure attestation gets set *after* the nodes are loaded
         module.affinity_promise.done (function () {
-            module.affinity.set_attestation ('/attestation.json/' + json.id);
+            module.affinity.set_attestation ('attestation.json/' + json.id);
         });
     }
 
@@ -36,22 +37,19 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
      * Initialize the module.
      *
      * @function init
-     *
-     * @param {dict} params - A dictionary containing the parameters.  The
-     * server initializes the params in coherence.html.
      */
-    function init (params) {
+    function init () {
         $ (document).off ('.data-api');
         $.fn.bootstrapTooltip = $.fn.tooltip.noConflict ();
 
-        module.navigator    = navigator.init (params.title_prefix);
+        module.navigator    = navigator.init ();
         module.apparatus    = apparatus.init ('#apparatus-wrapper',    'app_');
         module.local_stemma = d3stemma.init  ('#local-stemma-wrapper', 'ls_');
         module.textflow     = textflow.init  ('#textflow-wrapper',     'tf_', 'div.toolbar-textflow');
         module.affinity     = affinity.init  ('#affinity-wrapper',     'aff_');
         relatives.init ();
 
-        module.affinity_promise = module.affinity.load_json ('/affinity.json');
+        module.affinity_promise = module.affinity.load_json ('affinity.json');
 
         d3common.insert_css_palette (
             d3common.generate_css_palette (
@@ -93,7 +91,10 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
         });
 
         // Simulate user navigation set the passage on all modules.
-        module.navigator.set_passage (params.pass_id);
+        if (window.location.hash) {
+            var hash = window.location.hash.substring (1);
+            module.navigator.set_passage (hash);
+        }
     }
 
     module.init = init;

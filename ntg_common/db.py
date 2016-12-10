@@ -130,7 +130,6 @@ def executemany_raw (conn, sql, parameters, param_array, debug_level = 3):
 #     message (debug_level, sql.rstrip () + ';')
 #     return pd.read_sql_query (text (sql), conn, parameters)
 
-
 def debug (conn, msg, sql, parameters):
     # print values
     if args.verbose >= 3:

@@ -6,20 +6,24 @@
 import argparse
 import collections
 import datetime
+import glob
 import itertools
 import math
 import re
 import sys
+import os
 import os.path
 
 import flask
-from flask import request
+from flask import request, current_app
 import flask_babel
 from flask_babel import gettext as _, ngettext as n_, lazy_gettext as l_
 import six
 import networkx as nx
 
-sys.path.append (os.path.dirname (os.path.abspath (__file__)) + "/..")
+sys.path.append (os.path.abspath (os.path.dirname (__file__) + '/..'))
+
+instance_path = os.path.abspath (os.path.dirname (__file__) + '/instance')
 
 from ntg_common import db
 from ntg_common.db import execute
@@ -42,12 +46,13 @@ LABEZ_I18N = {
     'all+lac': l_('All+Lac'),
 }
 
-app = flask.Flask ("server")
-babel = flask_babel.Babel (app)
+app = flask.Blueprint ('the_app', __name__)
+static_app = flask.Flask (__name__)
 
-@babel.localeselector
+
 def get_locale ():
     return flask.request.accept_languages.best_match (LANGUAGES.keys ())
+
 
 class Bag (object):
     """ Class to stick values in. """
@@ -175,6 +180,8 @@ class Passage (object):
             'hr'       : self.to_hr (),
             'start'    : str (self.start),
             'end'      : str (self.end),
+            'passage'  : self.to_passage (),
+            'chapter'  : str (self.chapter),
             'variants' : self.variants (),
         })
 
@@ -206,6 +213,14 @@ class Passage (object):
         return start, start[:cut] + end
 
 
+    def to_passage (self):
+        # get a passage id in the form "start-end"
+        if self.start == self.end:
+            return str (self.start)
+        common = len (os.path.commonprefix ((str (self.start), str (self.end))))
+        return str (self.start) + '-' + str (self.end)[common:]
+
+
     def variants (self, prefix = [], suffix = [], delete = []):
         # Get a list of all variants for this passage
 
@@ -233,9 +248,14 @@ class Passage (object):
         return list (map (Variants._make, ((k, v) for k, v in d.items ())))
 
 
-@app.route ("/")
+@static_app.route ("/")
 def index ():
     return flask.render_template ('index.html')
+
+
+@app.route ("/")
+def index ():
+    return flask.render_template ('links.html')
 
 
 @app.route('/passage.json/<passage_or_id>')
@@ -245,7 +265,7 @@ def passage_json (passage_or_id):
     dest   = request.args.get ('dest')
     button = request.args.get ('button')
 
-    with dba.engine.begin () as conn:
+    with current_app.config.dba.engine.begin () as conn:
         if dest and button == 'Go':
             passage = Passage (conn, Passage.parse (dest))
             return passage.to_json ()
@@ -263,7 +283,7 @@ def passage_json (passage_or_id):
 def ms_attesting (passage_or_id, labez):
     """ Serve all relatives of all mss. attesting labez at passage. """
 
-    with dba.engine.begin () as conn:
+    with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
 
         res = execute (conn, """
@@ -324,7 +344,7 @@ def relatives (hs_hsnr_id, passage_or_id):
 
     limit = '' if limit == 0 else ' LIMIT %d' % limit
 
-    with dba.engine.begin () as conn:
+    with current_app.config.dba.engine.begin () as conn:
 
         passage = Passage (conn, passage_or_id)
         ms      = Manuscript (conn, hs_hsnr_id)
@@ -460,7 +480,7 @@ def textflow_dot (passage_or_id, varnew):
     else:
         f_where = 'AND a.common > c.length / 2'
 
-    with dba.engine.begin () as conn:
+    with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
 
         G = nx.DiGraph ()
@@ -583,21 +603,23 @@ def textflow_dot (passage_or_id, varnew):
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
 
 
-@app.route('/coherence/<passage_or_id>')
-def coherence (passage_or_id):
-    """ The main page of the user interface. """
+@app.route('/coherence')
+def coherence ():
+    """The main page of the user interface.
 
-    with dba.engine.begin () as conn:
-        passage = Passage (conn, passage_or_id)
-        return flask.render_template ('coherence.html', passage = passage)
-    return 'Error'
+    This page gets a hashtag parameter for the passage id.  All
+    relevant content is loaded by ajax.
+
+    """
+
+    return flask.render_template ('coherence.html')
 
 
 @app.route('/apparatus.json/<passage_or_id>')
 def apparatus_json (passage_or_id):
     """ The contents of the apparatus table. """
 
-    with dba.engine.begin () as conn:
+    with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
 
         # list of labez => lesart
@@ -639,7 +661,7 @@ def apparatus_json (passage_or_id):
 @app.route('/attestation.json/<passage_or_id>')
 def attestation_json (passage_or_id):
 
-    with dba.engine.begin () as conn:
+    with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
 
         res = execute (conn, """
@@ -662,7 +684,7 @@ def attestation_json (passage_or_id):
 def local_stemma (passage_or_id):
     """Return a local stemma as nx graph."""
 
-    with dba.engine.begin () as conn:
+    with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
 
         res = execute (conn, """
@@ -776,7 +798,7 @@ def affinity_json ():
     nodes = []
     edges = []
 
-    with dba.engine.begin () as conn:
+    with current_app.config.dba.engine.begin () as conn:
 
         res = execute (conn, """
         SELECT id, hs, hsnr, length
@@ -834,24 +856,50 @@ def affinity_json ():
 
 
 if __name__ == "__main__":
+    from werkzeug.wsgi import DispatcherMiddleware
+    from werkzeug.serving import run_simple
+
     parser = argparse.ArgumentParser (description='An application server for CBGM')
 
     parser.add_argument ('-v', '--verbose', dest='verbose', action='count',
                          help='increase output verbosity', default=0)
-    parser.add_argument ('-d', '--database', dest='target_db', default='ntg',
-                         metavar='DATABASE', help="the postgres database to use (default='ntg')")
+    parser.add_argument ('-c', '--config-path', dest='config_path',
+                         default=instance_path, metavar='CONFIG_PATH',
+                         help="the directory where the config files reside (default='%s')" % instance_path)
 
-    parser.parse_args (namespace = args)
-    args.source_db = ''
-    args.src_vg_db = ''
-    args.chapter = 0
+    args = parser.parse_args (namespace = args)
     args.start_time = datetime.datetime.now ()
-
-    dba = db.PostgreSQLEngine (database = args.target_db)
-
     parameters = tools.init_parameters (tools.DEFAULTS)
+
+    babel = flask_babel.Babel ()
+    babel.localeselector (get_locale)
+
+    instances = collections.OrderedDict ()
+
+    for fn in glob.glob (args.config_path.rstrip ('/') + '/*.conf'):
+        sub_app = flask.Flask (__name__)
+        sub_app.config.from_pyfile (fn)
+        sub_app.register_blueprint (app) # , url_prefix = sub_app.config['APPLICATION_ROOT'])
+
+        tools.message (3, "{name} at {path} from conf {conf}".format (
+            name = sub_app.config['APPLICATION_NAME'],
+            path = sub_app.config['APPLICATION_ROOT'],
+            conf = fn), True)
+
+        sub_app.config.dba = db.PostgreSQLEngine (
+            host     = sub_app.config['PGHOST'],
+            port     = sub_app.config['PGPORT'],
+            database = sub_app.config['PGDATABASE'],
+            user     = sub_app.config['PGUSER']
+        )
+
+        # tools.message (3, "URL Map {urlmap}".format (urlmap = sub_app.url_map))
+
+        babel.init_app (sub_app)
+        instances[sub_app.config['APPLICATION_ROOT']] = sub_app
 
     tools.message (3, "Found translations for: {translations}".format (
         translations = ', '.join ([l.get_display_name () for l in babel.list_translations ()])), True)
 
-    app.run ()
+    dispatcher = DispatcherMiddleware (static_app, instances)
+    run_simple ('127.0.0.1', 5000, dispatcher)
