@@ -26,7 +26,7 @@ function ($, _, d3, d3stemma, relatives, tools) {
         event.data = data;
 
         tools.handle_toolbar_events (event);
-        instance.load_passage (data.pass_id, data.labez);
+        instance.load_passage (data.passage, data.labez);
         event.stopPropagation ();
     }
 
@@ -35,12 +35,12 @@ function ($, _, d3, d3stemma, relatives, tools) {
      *
      * @function load_passage
      *
-     * @param {int} pass_id - The passage to display.
+     * @param {Object} passage - The passage to display.
      *
      * @param {string} labez - The labez to display.
      */
     function load_passage (passage, labez) {
-        this.data.pass_id = passage.id;
+        this.data.passage = passage;
         this.data.labez = labez;
 
         this.graph.load_dot (
@@ -78,7 +78,7 @@ function ($, _, d3, d3stemma, relatives, tools) {
         instance.graph        = d3stemma.init (wrapper_selector, id_prefix);
         instance.load_passage = load_passage;
         instance.data         = {
-            'pass_id'      : 1,
+            'passage'      : null,
             'labez'        : 'a',
             'connectivity' : '10',
             'chapter'      : '0',

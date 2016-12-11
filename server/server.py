@@ -248,17 +248,17 @@ class Passage (object):
         return list (map (Variants._make, ((k, v) for k, v in d.items ())))
 
 
-@static_app.route ("/")
+@static_app.endpoint ('index')
 def index ():
     return flask.render_template ('index.html')
 
 
-@app.route ("/")
-def index ():
+@app.endpoint ('links')
+def links ():
     return flask.render_template ('links.html')
 
 
-@app.route('/passage.json/<passage_or_id>')
+@app.endpoint ('passage.json')
 def passage_json (passage_or_id):
 
     passage_or_id = request.args.get ('pass_id') or passage_or_id
@@ -279,7 +279,7 @@ def passage_json (passage_or_id):
         return passage.to_json ()
 
 
-@app.route('/ms_attesting/<passage_or_id>/<labez>')
+@app.endpoint ('ms_attesting')
 def ms_attesting (passage_or_id, labez):
     """ Serve all relatives of all mss. attesting labez at passage. """
 
@@ -301,9 +301,7 @@ def ms_attesting (passage_or_id, labez):
                                       passage = passage, labez = labez, rows = attesting)
 
 
-@app.route('/relatives/<passage_or_id>/<hs_hsnr_id>')
-@app.route('/ancestors/<passage_or_id>/<hs_hsnr_id>')
-@app.route('/descendants/<passage_or_id>/<hs_hsnr_id>')
+@app.endpoint ('relatives')
 def relatives (hs_hsnr_id, passage_or_id):
     """Output a table of the nearest relatives of a manuscript.
 
@@ -464,7 +462,7 @@ def relatives (hs_hsnr_id, passage_or_id):
                                       ms = ms, mt = mt, variants = variants, rows = relatives)
 
 
-@app.route('/textflow.dot/<passage_or_id>/attestation/<varnew>')
+@app.endpoint ('textflow.dot')
 def textflow_dot (passage_or_id, varnew):
 
     chapter      = request.args.get ('chapter') or 0
@@ -603,7 +601,7 @@ def textflow_dot (passage_or_id, varnew):
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
 
 
-@app.route('/coherence')
+@app.endpoint ('coherence')
 def coherence ():
     """The main page of the user interface.
 
@@ -615,7 +613,7 @@ def coherence ():
     return flask.render_template ('coherence.html')
 
 
-@app.route('/apparatus.json/<passage_or_id>')
+@app.endpoint ('apparatus.json')
 def apparatus_json (passage_or_id):
     """ The contents of the apparatus table. """
 
@@ -658,7 +656,7 @@ def apparatus_json (passage_or_id):
     return 'Error'
 
 
-@app.route('/attestation.json/<passage_or_id>')
+@app.endpoint ('attestation.json')
 def attestation_json (passage_or_id):
 
     with current_app.config.dba.engine.begin () as conn:
@@ -758,7 +756,7 @@ def nx_to_dot (nxg):
     return '\n'.join (dot)
 
 
-@app.route('/stemma.dot/<passage_or_id>')
+@app.endpoint ('stemma.dot')
 def stemma_dot (passage_or_id):
     """Serve a local stemma in dot format.
 
@@ -785,7 +783,7 @@ def stemma_dot (passage_or_id):
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
 
 
-@app.route('/affinity.json')
+@app.endpoint ('affinity.json')
 def affinity_json ():
     """ Return manuscript affinities for D3.
 
@@ -856,6 +854,7 @@ def affinity_json ():
 
 
 if __name__ == "__main__":
+    from werkzeug.routing import Map, Rule
     from werkzeug.wsgi import DispatcherMiddleware
     from werkzeug.serving import run_simple
 
@@ -876,10 +875,27 @@ if __name__ == "__main__":
 
     instances = collections.OrderedDict ()
 
+    static_app.url_map.add (Rule ('/', endpoint = 'index'))
+
     for fn in glob.glob (args.config_path.rstrip ('/') + '/*.conf'):
         sub_app = flask.Flask (__name__)
         sub_app.config.from_pyfile (fn)
-        sub_app.register_blueprint (app) # , url_prefix = sub_app.config['APPLICATION_ROOT'])
+        sub_app.register_blueprint (app)
+
+        sub_app.url_map = Map ([
+            Rule ('/',                                         endpoint = 'links'),
+            Rule ('/coherence',                                endpoint = 'coherence'),
+            Rule ('/affinity.json',                            endpoint = 'affinity.json'),
+            Rule ('/passage.json/<passage_or_id>',             endpoint = 'passage.json'),
+            Rule ('/ms_attesting/<passage_or_id>/<labez>',     endpoint = 'ms_attesting'),
+            Rule ('/relatives/<passage_or_id>/<hs_hsnr_id>',   endpoint = 'relatives'),
+            Rule ('/ancestors/<passage_or_id>/<hs_hsnr_id>',   endpoint = 'relatives'),
+            Rule ('/descendants/<passage_or_id>/<hs_hsnr_id>', endpoint = 'relatives'),
+            Rule ('/textflow.dot/<passage_or_id>/attestation/<varnew>', endpoint = 'textflow.dot'),
+            Rule ('/apparatus.json/<passage_or_id>',           endpoint = 'apparatus.json'),
+            Rule ('/attestation.json/<passage_or_id>',         endpoint = 'attestation.json'),
+            Rule ('/stemma.dot/<passage_or_id>',               endpoint = 'stemma.dot'),
+        ])
 
         tools.message (3, "{name} at {path} from conf {conf}".format (
             name = sub_app.config['APPLICATION_NAME'],
@@ -902,4 +918,4 @@ if __name__ == "__main__":
         translations = ', '.join ([l.get_display_name () for l in babel.list_translations ()])), True)
 
     dispatcher = DispatcherMiddleware (static_app, instances)
-    run_simple ('127.0.0.1', 5000, dispatcher)
+    run_simple ('localhost', 5000, dispatcher)
