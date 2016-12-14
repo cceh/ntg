@@ -38,6 +38,7 @@ function ($, _) {
             switch (name) {
             case 'include':
             case 'fragments':
+            case 'splits':
                 opts[name] = [];
                 $group.find ('input:checked').each (function (i, btn) {
                     opts[name].push ($ (btn).attr ('data-opt'));
@@ -72,6 +73,7 @@ function ($, _) {
             switch (key) {
             case 'include':
             case 'fragments':
+            case 'splits':
                 $input = $panel.find ('input[name="' + key  + '"]');
                 $group = $input.closest ('.btn-group');
                 $group.find ('label.btn').removeClass ('active');

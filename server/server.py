@@ -635,7 +635,8 @@ def apparatus_json (passage_or_id):
         for k in readings.keys ():
             if k in LABEZ_I18N:
                 readings[k] = LABEZ_I18N[k]
-        readings['zz'] = LABEZ_I18N['zz']
+        for k in LABEZ_I18N.keys ():
+            readings[k]  = LABEZ_I18N[k]
 
         # list of varnew => manuscripts
         res = execute (conn, """

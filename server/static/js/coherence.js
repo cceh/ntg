@@ -22,7 +22,7 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
      * @param {Object} json - The new passage object from the server.
      */
     function set_passage (json) {
-        module.apparatus.load_passage (json.id);
+        module.apparatus.load_passage (json);
         module.local_stemma.load_dot ('stemma.dot/' + json.id);
         module.textflow.load_passage (json, 'a');
         window.location.hash = '#' + json.passage;
@@ -43,9 +43,9 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
         $.fn.bootstrapTooltip = $.fn.tooltip.noConflict ();
 
         module.navigator    = navigator.init ();
-        module.apparatus    = apparatus.init ('#apparatus-wrapper',    'app_');
+        module.apparatus    = apparatus.init ('#apparatus-wrapper',    'app_', 'div.toolbar-apparatus');
         module.local_stemma = d3stemma.init  ('#local-stemma-wrapper', 'ls_');
-        module.textflow     = textflow.init  ('#textflow-wrapper',     'tf_', 'div.toolbar-textflow');
+        module.textflow     = textflow.init  ('#textflow-wrapper',     'tf_',  'div.toolbar-textflow');
         module.affinity     = affinity.init  ('#affinity-wrapper',     'aff_');
         relatives.init ();
 

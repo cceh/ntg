@@ -187,14 +187,24 @@ def step01c (dba, parameters):
         WHERE hs = 'L156s1'
         """, parameters)
 
-        fix (conn, "Wrong hsnr", """
+        fix (conn, "Wrong hsnr Ph3", """
         SELECT DISTINCT hs, hsnr, kapanf
         FROM {att}
-        WHERE hs ~ 'L1188s2.*' AND hsnr = 411881
+        WHERE hs ~ '^L1188s2' AND hsnr = 411881
         """, """
-        UPDATE {att}
-        SET hsnr = 411882
-        WHERE hs ~ 'L1188s2.*'
+        UPDATE {att} SET hsnr = 411881 WHERE hs ~ '^L1188s1';
+        UPDATE {att} SET hsnr = 411882 WHERE hs ~ '^L1188s2';
+        """, parameters)
+
+        fix (conn, "Wrong hsnr Ph5", """
+        SELECT DISTINCT hs, hsnr, kapanf
+        FROM {att}
+        WHERE hs = 'L1188' AND hsnr != 411880
+        """, """
+        UPDATE {att} SET hsnr = 411881 WHERE hs ~ '^L1188s';
+        UPDATE {att} SET hsnr = 411880 WHERE hs = 'L1188';
+        UPDATE {lac} SET hsnr = 411881, hs = REPLACE (hs, 's2', 's') WHERE hs ~ '^L1188s2';
+        UPDATE {lac} SET hsnr = 411880, hs = REPLACE (hs, 's1', '')  WHERE hs ~ '^L1188s1';
         """, parameters)
 
         fix (conn, "Attestation of A != 'a'", """
@@ -613,7 +623,10 @@ def step06b (dba, parameters):
         """, """
         DELETE FROM {att}
         WHERE (hs, anfadr, endadr) = ('L156s*', 50405022, 50405034) OR
-              (hs, anfadr, endadr) = ('1891*V', 52716012, 52716012)
+              (hs, anfadr, endadr) = ('1891*V', 52716012, 52716012) OR
+              (hs, anfadr, endadr) = ('P74V',   51535022, 51535028) OR
+              (hs, anfadr, endadr) = ('02*V',   52101008, 52101010)
+
         """, parameters)
 
         for t in (parameters['att'], parameters['lac']):
@@ -1154,10 +1167,9 @@ def copy_genealogical_data (dbsrc, dbsrcvg, dbdest, parameters):
             # defined in chapter XX we must put in the 'zz' readings ourselves.
             execute (dest, """
             UPDATE {var}
-            SET varid = 'z', varnew = 'zz'
+            SET varid = 'zz', varnew = 'zz'
             WHERE labez = 'zz' AND varnew = ''
             """, parameters)
-
 
             fix (dest, "Bogus varnew", """
             SELECT *
@@ -1171,7 +1183,6 @@ def copy_genealogical_data (dbsrc, dbsrcvg, dbdest, parameters):
             DELETE FROM {locstemed}
             WHERE ord_labez (varid) != ord_labez (varnew)
             """, parameters)
-
 
 
 def build_byzantine_text (dba, parameters):
