@@ -38,11 +38,13 @@ function ($, _, tools) {
         this.data.passage = passage;
 
         var that = this;
+        var new_list;
+        var json_deferred = new $.Deferred ();
 
         $.getJSON ('apparatus.json/' + passage.id, function (json) {
-            var html = [];
             var grouper = _.includes (that.data.splits, 'splits') ? 'varnew' : 'varid';
             var groups  = _.groupBy (json.manuscripts, grouper);
+            var html = [];
 
             _.forEach (groups, function (group) {
                 var data = {
@@ -69,7 +71,22 @@ function ($, _, tools) {
                 html.push ('</ul>');
                 html.push ('</li>');
             });
-            that.wrapper.html ($ (html.join ('')));
+            new_list = $ (html.join (''));
+            json_deferred.resolve ();
+        });
+
+        var faded_promise = this.wrapper.animate ({ 'opacity' : 0.0 }, 300);
+
+        $.when (json_deferred.promise (), faded_promise).done (function () {
+            var wrapper = that.wrapper;
+            var old_height = wrapper.get(0).scrollHeight;
+            wrapper.html (new_list);
+            var new_height = wrapper.get(0).scrollHeight;
+            wrapper.height (old_height);
+            wrapper.animate ({ 'height' : new_height }, 300, function () {
+                wrapper.height ('auto');
+                wrapper.animate ({ 'opacity' : 1.0 }, 300);
+            });
             tools.set_toolbar_buttons (that.toolbar, that.data);
             changed ();
         });
