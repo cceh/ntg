@@ -261,8 +261,9 @@ class PostgreSQLEngine (object):
         params = ('host', 'port', 'database', 'user') # order must match ~/.pgpass
         res = {}
 
-        for param in params:
-            res[param] = args.get (param) or os.environ.get ('PG' + param.upper ()) or defaults[param]
+        for p in params:
+            pu = 'PG' + p.upper ()
+            res[p] = args.get (p) or args.get (pu) or os.environ.get (pu) or defaults[p]
 
         # scan ~/.pgpass for password
         pgpass = os.path.expanduser ("~/.pgpass")

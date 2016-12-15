@@ -42,6 +42,7 @@ import operator
 import os
 import re
 import sys
+import types
 
 import networkx as nx
 import numpy as np
@@ -1833,26 +1834,46 @@ def print_stats (dba, parameters):
         message (1, "chap * ms * pas    = {cnt}".format (cnt = pas))
 
 
+def config_from_pyfile (filename):
+    """Mimic Flask config files.
+
+    Emulate the Flask config file parser so we can use the same config files for both,
+    the server and this script.
+
+    """
+
+    d = types.ModuleType ('config')
+    d.__file__ = filename
+    try:
+        with open (filename) as config_file:
+            exec (compile (config_file.read (), filename, 'exec'), d.__dict__)
+    except IOError as e:
+        e.strerror = 'Unable to load configuration file (%s)' % e.strerror
+        raise
+
+    conf = {}
+    for key in dir (d):
+        if key.isupper ():
+            conf[key] = getattr (d, key)
+    return conf
+
+
 if __name__ == '__main__':
 
     logging.basicConfig ()
 
-    parser = argparse.ArgumentParser (description='Prepare a new database for CBGM')
+    parser = argparse.ArgumentParser (description='Prepare a database for CBGM')
 
-    parser.add_argument ('source_db', metavar='SOURCE_DB', help='the source ECM database (required)')
-    parser.add_argument ('target_db', metavar='TARGET_DB', help='the target ECM database (required)')
-    parser.add_argument ('src_vg_db', metavar='SRC_VG_DB', help='the source VarGenAtt database (required)')
+    parser.add_argument ('profile', metavar='PROFILE', help="the database profile file (required)")
 
-    parser.add_argument ('-r', '--range', default='',
-                         help='range of steps (default: all)')
     parser.add_argument ('-v', '--verbose', dest='verbose', action='count',
                          help='increase output verbosity', default=0)
-    parser.add_argument ('-c', '--chapter', dest='chapter', type=int, default=0,
-                         help='the chapter number (optional, default=all chapters)')
-    parser.add_argument ('-p', '--profile', dest='profile', default='ntg-local',
-                         metavar='PROFILE', help="the database profile (default='ntg-local')")
+    parser.add_argument ('-r', '--range', default='',
+                         help='range of steps (default: all)')
 
     parser.parse_args (namespace = args)
+
+    config = config_from_pyfile (args.profile)
 
     if not re.match ('^[-0-9]*$', args.range):
         print ("Error in range option")
@@ -1869,13 +1890,13 @@ if __name__ == '__main__':
 
     args.start_time = datetime.datetime.now ()
     parameters = tools.init_parameters (tools.DEFAULTS)
-    parameters['source_db'] = tools.quote (args.source_db)
-    parameters['target_db'] = tools.quote (args.target_db)
-    parameters['src_vg_db'] = tools.quote (args.src_vg_db)
+    parameters['target_db'] = tools.quote (config['PGDATABASE'])
+    parameters['source_db'] = tools.quote (config['MYSQL_ECM_DB'])
+    parameters['src_vg_db'] = tools.quote (config['MYSQL_VG_DB'])
 
-    dbsrc1 = db.MySQLEngine      (args.profile, args.source_db)
-    dbsrc2 = db.MySQLEngine      (args.profile, args.src_vg_db)
-    dbdest = db.PostgreSQLEngine (database = args.target_db)
+    dbsrc1 = db.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_ECM_DB'])
+    dbsrc2 = db.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_VG_DB'])
+    dbdest = db.PostgreSQLEngine (**config)
 
     logging.getLogger ('sqlalchemy.engine').setLevel (logging.ERROR)
 
