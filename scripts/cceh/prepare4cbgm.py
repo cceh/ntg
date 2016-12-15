@@ -1238,7 +1238,7 @@ def build_byzantine_text (dba, parameters):
         # Fill with labez 'zz' where MT is undefined
         execute (conn, """
         INSERT INTO {var} (ms_id, pass_id, labez, varid, varnew)
-        SELECT 2, p.id, 'zz', 'z', 'zz'
+        SELECT 2, p.id, 'zz', 'zz', 'zz'
         FROM {pass} p
         ON CONFLICT DO NOTHING
         """, parameters)
