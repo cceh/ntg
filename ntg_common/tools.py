@@ -6,7 +6,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import datetime
-import os
 import subprocess
 import sys
 
@@ -118,9 +117,9 @@ def message (level, s, hilite = False):
         delta = six.text_type (datetime.datetime.now () - args.start_time)
         print ('[' + delta + ']', end = " ")
         if hilite:
-            print ("\x1B[1m" + s + "\x1B[0m");
+            print ("\x1B[1m" + s + "\x1B[0m")
         else:
-            print (s);
+            print (s)
 
 
 def tabulate (res, stream = sys.stdout):

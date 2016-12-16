@@ -24,7 +24,7 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
     function set_passage (json) {
         module.apparatus.load_passage (json);
         module.local_stemma.load_dot ('stemma.dot/' + json.id);
-        module.textflow.load_passage (json, 'a');
+        module.textflow.load_passage (json, 'a', 'A');
         window.location.hash = '#' + json.passage;
 
         // make sure attestation gets set *after* the nodes are loaded

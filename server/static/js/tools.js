@@ -48,8 +48,9 @@ function ($, _) {
                 opts[name] = $target.bootstrapSlider ('getValue');
                 break;
             case 'labez':
+            case 'hyp_a':
                 opts[name] = $target.attr ('data-opt');
-                $group = $group.parent ().closest ('.btn-group'); // 2 levels deep
+                $group = $group.parent ().closest ('.btn-group'); // btn-group is 2 levels deep
                 var $dropdown = $group.find ('button[data-toggle="dropdown"]');
                 $dropdown.dropdown ('toggle'); // close
                 break;
@@ -68,13 +69,12 @@ function ($, _) {
         var $panel = $target.closest ('div.panel');
 
         _.forEach (opts, function (value, key) {
-            var $input;
+            var $input = $panel.find ('input[name="' + key  + '"]');
 
             switch (key) {
             case 'include':
             case 'fragments':
             case 'splits':
-                $input = $panel.find ('input[name="' + key  + '"]');
                 $group = $input.closest ('.btn-group');
                 $group.find ('label.btn').removeClass ('active');
                 $group.find ('input').prop ('checked', false);
@@ -86,14 +86,16 @@ function ($, _) {
                 });
                 break;
             case 'connectivity': // slider
-                $input = $panel.find ('input[name="' + key  + '"]');
                 $input.bootstrapSlider ('setValue', +value);
                 $panel.find ('span.connectivity-label').text (value);
                 break;
             case 'labez':
-                var $dropdown = $panel.find ('button.dropdown-toggle-labez');
+            case 'hyp_a':
+                $group = $input.closest ('.btn-group');
+                $group = $group.parent ().closest ('.btn-group'); // btn-group is 2 levels deep
+                var $dropdown = $group.find ('button[data-toggle="dropdown"]');
                 $dropdown.attr ('data-labez', value);
-                var labez_i18n = $.trim ($panel.find ('.btn-labez[data-labez="' + value + '"]').text ());
+                var labez_i18n = $.trim ($group.find ('.btn-labez[data-labez="' + value + '"]').text ());
                 $dropdown.find ('span.btn_text').text (labez_i18n);
                 break;
             default:
@@ -114,17 +116,18 @@ function ($, _) {
      *
      * @return {Deferred} - Promise, resolved when the buttons are loaded.
      */
-    function load_labez_dropdown ($group, pass_id) {
+    function load_labez_dropdown ($group, pass_id, name, prefixes) {
         var $menu = $group.find ('div[data-toggle="buttons"]');
 
         var promise = $.get ('passage.json/' + pass_id);
         promise.done (function (json) {
             $menu.empty ();
-            _.forEach (json.variants, function (value) {
-                var data = { 'labez': value[0], 'labez_i18n': value[1] };
+            var variants = prefixes.concat (json.variants);
+            _.forEach (variants, function (value) {
+                var data = { 'name': name, 'labez': value[0], 'labez_i18n': value[1] };
                 var $item = $ (format (
                     '<label class="btn btn-labez bg_labez" data-labez="{labez}">' +
-                        '<input type="radio" name="labez" data-opt="{labez}">{labez_i18n}</input></label>', data
+                        '<input type="radio" name="{name}" data-opt="{labez}">{labez_i18n}</input></label>', data
                 ));
                 $menu.append ($item);
             });

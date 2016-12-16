@@ -51,7 +51,7 @@ function ($, _, tools) {
                     'pass_id' : passage.id,
                     'labez'   : group[0].varnew[0],
                     'group'   : group[0][grouper],
-                    'reading' : _.get (json.readings, group[0].varnew, json.readings[group[0].varnew[0]])
+                    'reading' : _.get (json.readings, group[0].varnew, json.readings[group[0].varnew[0]]),
                 };
                 html.push ('<li class="list-group-item">');
                 html.push ('<h4 class="list-group-item-heading">');
@@ -75,17 +75,17 @@ function ($, _, tools) {
             json_deferred.resolve ();
         });
 
-        var faded_promise = this.wrapper.animate ({ 'opacity' : 0.0 }, 300);
+        var faded_promise = this.wrapper.animate ({ 'opacity': 0.0 }, 300);
 
         $.when (json_deferred.promise (), faded_promise).done (function () {
             var wrapper = that.wrapper;
-            var old_height = wrapper.get(0).scrollHeight;
+            var old_height = wrapper.get (0).scrollHeight;
             wrapper.html (new_list);
-            var new_height = wrapper.get(0).scrollHeight;
+            var new_height = wrapper.get (0).scrollHeight;
             wrapper.height (old_height);
-            wrapper.animate ({ 'height' : new_height }, 300, function () {
+            wrapper.animate ({ 'height': new_height }, 300, function () {
                 wrapper.height ('auto');
-                wrapper.animate ({ 'opacity' : 1.0 }, 300);
+                wrapper.animate ({ 'opacity': 1.0 }, 300);
             });
             tools.set_toolbar_buttons (that.toolbar, that.data);
             changed ();

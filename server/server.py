@@ -7,7 +7,6 @@ import argparse
 import collections
 import datetime
 import glob
-import itertools
 import math
 import re
 import sys
@@ -18,12 +17,9 @@ import flask
 from flask import request, current_app
 import flask_babel
 from flask_babel import gettext as _, ngettext as n_, lazy_gettext as l_
-import six
 import networkx as nx
 
 sys.path.append (os.path.abspath (os.path.dirname (__file__) + '/..'))
-
-instance_path = os.path.abspath (os.path.dirname (__file__) + '/instance')
 
 from ntg_common import db
 from ntg_common.db import execute
@@ -116,7 +112,7 @@ class Word (object):
     def parse (self, s):
         # Parse an address from the format: "Acts 1:2/3-4"
         m = Word.RE_HR_WORD.match (s)
-        if (m):
+        if m:
             self.book    = 5 # FIXME parse m.group (1)
             self.chapter = int (m.group (2) or '0')
             self.verse   = int (m.group (3) or '0')
@@ -129,13 +125,13 @@ class Word (object):
         if start is None:
             return "%s %d:%d/%d" % (tools.BOOKS[self.book - 1][1], self.chapter, self.verse, self.word)
 
-        if (start.book != self.book):
+        if start.book != self.book:
             return " - %s %d:%d/%d" % (tools.BOOKS[self.book - 1], self.chapter, self.verse, self.word)
-        if (start.chapter != self.chapter):
+        if start.chapter != self.chapter:
             return " - %d:%d/%d" % (self.chapter, self.verse, self.word)
-        if (start.verse != self.verse):
+        if start.verse != self.verse:
             return " - %d/%d" % (self.verse, self.word)
-        if (start.word != self.word):
+        if start.word != self.word:
             return "-%d" % self.word
         return ""
 
@@ -470,6 +466,7 @@ def textflow_dot (passage_or_id, varnew):
     mode         = request.args.get ('mode') or 'rec'
     include      = request.args.getlist ('include[]') or []
     fragments    = request.args.getlist ('fragments[]') or []
+    hyp_a        = request.args.get ('hyp_a') or 'A'
 
     prefix = '' if mode == 'rec' else 'p_'
 
@@ -477,6 +474,11 @@ def textflow_dot (passage_or_id, varnew):
         f_where = ''
     else:
         f_where = 'AND a.common > c.length / 2'
+
+    if hyp_a != 'A':
+        hyp_where = ' OR (v.ms_id = 1 AND :hyp_a ~ :varnew)'
+    else:
+        hyp_where = ''
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -502,10 +504,11 @@ def textflow_dot (passage_or_id, varnew):
         # get nodes attesting varnew
         res = execute (conn, """
         SELECT ms_id
-        FROM {var}
-        WHERE pass_id = :pass_id AND varnew ~ :varnew AND ms_id NOT IN :exclude
+        FROM {var} v
+        WHERE pass_id = :pass_id AND (v.varnew ~ :varnew {hyp_where}) AND ms_id NOT IN :exclude
         """, dict (parameters, exclude = tuple (exclude),
-                   pass_id = passage.pass_id, varnew = '^' + varnew))
+                   pass_id = passage.pass_id, varnew = '^' + varnew,
+                   hyp_a = hyp_a, hyp_where = hyp_where))
 
         nodes = list (map (Nodes._make, res))
 
@@ -513,7 +516,6 @@ def textflow_dot (passage_or_id, varnew):
             G.add_node (n.ms_id)
 
         # FIXME: why do we get a different result if we remove the inner ORDER BY clauses?
-        # FIXME: change this query to give a sorted graph. How?
 
         res = execute (conn, """
         /* get the :connectivity closest ancestors for every node */
@@ -531,7 +533,7 @@ def textflow_dot (passage_or_id, varnew):
         (SELECT DISTINCT ON (id1) 1 as u, id1, id2, rank, affinity
         FROM ranks r
         JOIN {var} v
-          ON v.ms_id = id2 AND v.pass_id = :pass_id AND v.varnew ~ :varnew
+          ON v.ms_id = id2 AND v.pass_id = :pass_id AND (v.varnew ~ :varnew {hyp_where})
         WHERE r.rank <= :connectivity AND r.id2 NOT IN :exclude
         ORDER BY id1, affinity DESC)
 
@@ -550,7 +552,8 @@ def textflow_dot (passage_or_id, varnew):
         ORDER BY u, id1, affinity DESC, id2
         """, dict (parameters, nodes = tuple (G.nodes ()), exclude = tuple (exclude),
                    chapter = chapter, pass_id = passage.pass_id, prefix = prefix,
-                   varnew = '^' + varnew, connectivity = connectivity, f_where = f_where))
+                   varnew = '^' + varnew, connectivity = connectivity,
+                   f_where = f_where, hyp_a = hyp_a, hyp_where = hyp_where))
 
         Ranks = collections.namedtuple ('Ranks', 'u ms_id1 ms_id2 rank affinity')
         ranks = list (map (Ranks._make, res))
@@ -585,6 +588,10 @@ def textflow_dot (passage_or_id, varnew):
             attrs['labez']  = ms.varnew[0]
             attrs['ms_id']  = ms.ms_id - 1
             attrs['label']  = ms.hs
+            if ms.ms_id == 1 and hyp_a != 'A':
+                attrs['varid']  = hyp_a[0]
+                attrs['varnew'] = hyp_a
+                attrs['labez']  = hyp_a[0]
 
         for n in G:
             # Use a different label if the parent's varnew differs from this
@@ -632,10 +639,10 @@ def apparatus_json (passage_or_id):
 
         # dict of labez: lesart
         readings = { row[0]: row[1] for row in res }
-        for k in readings.keys ():
+        for k in readings:
             if k in LABEZ_I18N:
                 readings[k] = LABEZ_I18N[k]
-        for k in LABEZ_I18N.keys ():
+        for k in LABEZ_I18N:
             readings[k]  = LABEZ_I18N[k]
 
         # list of varnew => manuscripts
@@ -730,9 +737,11 @@ def nx_to_dot (nxg):
                rankdir=BT,
                ranksep=0.4,
                size=10.0,
+               fontsize=8.0,
+               concentrate=true,
                ratio=compress
         ];
-        node [fixedsize=shape,
+        node [fixedsize=true,
               shape=circle,
               width=0.6
         ];
@@ -859,6 +868,8 @@ if __name__ == "__main__":
     from werkzeug.wsgi import DispatcherMiddleware
     from werkzeug.serving import run_simple
 
+    instance_path = os.path.abspath (os.path.dirname (__file__) + '/instance')
+
     parser = argparse.ArgumentParser (description='An application server for CBGM')
 
     parser.add_argument ('-v', '--verbose', dest='verbose', action='count',
@@ -903,12 +914,7 @@ if __name__ == "__main__":
             path = sub_app.config['APPLICATION_ROOT'],
             conf = fn), True)
 
-        sub_app.config.dba = db.PostgreSQLEngine (
-            host     = sub_app.config['PGHOST'],
-            port     = sub_app.config['PGPORT'],
-            database = sub_app.config['PGDATABASE'],
-            user     = sub_app.config['PGUSER']
-        )
+        sub_app.config.dba = db.PostgreSQLEngine (**sub_app.config)
 
         # tools.message (3, "URL Map {urlmap}".format (urlmap = sub_app.url_map))
 

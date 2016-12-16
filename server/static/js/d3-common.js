@@ -42,10 +42,8 @@ define (['jquery', 'd3', 'lodash'], function ($, d3, _) {
                 '.bg_labez[data-labez="' + code + '"] { background-color: ' +
                 pair[1] + ' !important; }';
         });
-        style.push ('.fg_labez[data-labez="all"] { color: black !important; fill: black; }');
-        style.push ('.bg_labez[data-labez="all"] { background-color: black !important; }');
-        style.push ('.fg_labez[data-labez="all+lac"] { color: black !important; fill: black; }');
-        style.push ('.bg_labez[data-labez="all+lac"] { background-color: black !important; }');
+        style.unshift ('.fg_labez { color: black !important; fill: black; }');
+        style.unshift ('.bg_labez { background-color: black !important; }');
         return style.join ('\n');
     }
 

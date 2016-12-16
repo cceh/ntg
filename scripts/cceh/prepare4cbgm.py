@@ -44,7 +44,6 @@ import re
 import sys
 import types
 
-import networkx as nx
 import numpy as np
 import six
 import sqlalchemy
@@ -73,7 +72,7 @@ def ord_labez (labez):
 
 
 def char_labez (labez):
-    return chr (labez + 96);
+    return chr (labez + 96)
 
 
 def step01 (dba, dbb, parameters):
@@ -862,7 +861,7 @@ def create_ms_pass_tables (dba, parameters):
 
         # The Readings Table
 
-        res = execute (conn, """
+        execute (conn, """
         INSERT INTO {read} (pass_id, labez, labezsuf, lesart)
         SELECT p.id AS pass_id, labez, labezsuf,
                MODE () WITHIN GROUP (ORDER BY lesart) AS lesart
@@ -1035,7 +1034,7 @@ def copy_genealogical_data (dbsrc, dbsrcvg, dbdest, parameters):
             def create_debug_table (dest_table, source_tables):
                 """Copy 28 tables into one for easier debugging."""
 
-                rows = execute (src, """
+                execute (src, """
                 CREATE OR REPLACE TABLE {dest_table} LIKE {source_table}
                 """, dict (parameters, dest_table = dest_table, source_table = source_tables + '01'))
 
@@ -1216,7 +1215,7 @@ def build_byzantine_text (dba, parameters):
         DELETE FROM {var} WHERE ms_id = 2
         """, parameters)
 
-        res = execute (conn, """
+        execute (conn, """
         INSERT INTO {var} (ms_id, pass_id, labez, varid, varnew)
           SELECT 2, pass_id, varid, varid, varid
           FROM (
@@ -1273,7 +1272,7 @@ def preprocess_local_stemmas (dba, parameters):
         # question comes up.  So we add a field to the LocStemEd table that
         # contains an array of all ancestral readings for every reading.
 
-        res = execute (conn, """
+        execute (conn, """
         WITH mask AS (
           SELECT pass_id, varnew,
                  1 << (row_number () OVER (PARTITION BY pass_id ORDER BY varnew))::integer AS mask
@@ -1286,7 +1285,7 @@ def preprocess_local_stemmas (dba, parameters):
         WHERE (l.pass_id, l.varnew) = (m.pass_id, m.varnew);
         """, parameters)
 
-        res = execute (conn, """
+        execute (conn, """
         WITH mask AS (
           SELECT pass_id, varnew,
                  1 << (row_number () OVER (PARTITION BY pass_id ORDER BY varnew))::integer AS mask
@@ -1299,7 +1298,7 @@ def preprocess_local_stemmas (dba, parameters):
         WHERE (l.pass_id, l.s1) = (m.pass_id, m.varnew);
         """, parameters)
 
-        res = execute (conn, """
+        execute (conn, """
         WITH mask AS (
           SELECT pass_id, varnew,
                  1 << (row_number () OVER (PARTITION BY pass_id ORDER BY varnew))::integer AS mask
@@ -1312,12 +1311,12 @@ def preprocess_local_stemmas (dba, parameters):
         WHERE (l.pass_id, l.s2) = (m.pass_id, m.varnew);
         """, parameters)
 
-        res = execute (conn, """
+        execute (conn, """
         UPDATE {locstemed} l
         SET parents = s1mask + s2mask
         """, parameters)
 
-        res = execute (conn, """
+        execute (conn, """
         WITH RECURSIVE tree AS (
           SELECT pass_id, varnew, 0 AS ancestors
           FROM {locstemed}
@@ -1337,7 +1336,7 @@ def preprocess_local_stemmas (dba, parameters):
         """, parameters)
 
         # These are the passages where A could not be established.
-        res = execute (conn, """
+        execute (conn, """
         DELETE FROM  {locstemed} l
         WHERE varnew = 'zz' and s1 = '?'
         """, parameters)
@@ -1451,46 +1450,44 @@ def calculate_mss_similarity_preco (dba, parameters, val):
 
     """
 
-    with dba.engine.begin () as conn:
+    # Matrix chapter x ms x ms with count of the passages that are defined in both mss
+    val.and_matrix = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
 
-        # Matrix chapter x ms x ms with count of the passages that are defined in both mss
-        val.and_matrix = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
+    # Matrix chapter x ms x ms with count of the passages that are equal in both mss
+    val.eq_matrix  = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
 
-        # Matrix chapter x ms x ms with count of the passages that are equal in both mss
-        val.eq_matrix  = np.zeros ((val.n_chapters, val.n_mss, val.n_mss), dtype = np.uint16)
+    # Matrix chapter x ms of chapter lengths
+    val.chapter_len_matrix = np.zeros ((val.n_chapters, val.n_mss), dtype = np.uint16)
 
-        # Matrix chapter x ms of chapter lengths
-        val.chapter_len_matrix = np.zeros ((val.n_chapters, val.n_mss), dtype = np.uint16)
+    # ch.end is the end of a range index, so it is actually one behind the
+    # item we want to know
+    val.chapter_ends = [ch.end - 1 for ch in val.chapters[1:]]
 
-        # ch.end is the end of a range index, so it is actually one behind the
-        # item we want to know
-        val.chapter_ends = [ch.end - 1 for ch in val.chapters[1:]]
+    # pre-genealogical coherence outputs symmetrical matrices
+    # loop over all mss O(n_mss² * n_chapters * n_passages)
 
-        # pre-genealogical coherence outputs symmetrical matrices
-        # loop over all mss O(n_mss² * n_chapters * n_passages)
+    for j in range (0, val.n_mss):
+        varidj = val.varid_matrix[j]
+        defj   = val.def_matrix[j]
 
-        for j in range (0, val.n_mss):
-            varidj = val.varid_matrix[j]
-            defj   = val.def_matrix[j]
+        for k in range (j + 1, val.n_mss):
+            varidk = val.varid_matrix[k]
+            defk   = val.def_matrix[k]
 
-            for k in range (j + 1, val.n_mss):
-                varidk = val.varid_matrix[k]
-                defk   = val.def_matrix[k]
+            def_and  = np.logical_and (defj, defk)
+            varid_eq = np.logical_and (def_and, np.equal (varidj, varidk))
 
-                def_and  = np.logical_and (defj, defk)
-                varid_eq = np.logical_and (def_and, np.equal (varidj, varidk))
+            val.and_matrix[:,j,k] = val.and_matrix[:,k,j] = count_by_chapter (def_and, val.chapter_ends)
+            val.eq_matrix[:,j,k]  = val.eq_matrix[:,k,j]  = count_by_chapter (varid_eq, val.chapter_ends)
 
-                val.and_matrix[:,j,k] = val.and_matrix[:,k,j] = count_by_chapter (def_and, val.chapter_ends)
-                val.eq_matrix[:,j,k]  = val.eq_matrix[:,k,j]  = count_by_chapter (varid_eq, val.chapter_ends)
+    # calculate quotient
+    with np.errstate (divide = 'ignore', invalid = 'ignore'):
+        val.quotient_matrix = val.eq_matrix / val.and_matrix
+        val.quotient_matrix[val.and_matrix == 0] = 0.0
 
-        # calculate quotient
-        with np.errstate (divide = 'ignore', invalid = 'ignore'):
-            val.quotient_matrix = val.eq_matrix / val.and_matrix
-            val.quotient_matrix[val.and_matrix == 0] = 0.0
-
-        # calculate chapter lengths
-        for j in range (0, val.n_mss):
-            val.chapter_len_matrix[:,j] = count_by_chapter (val.def_matrix[j], val.chapter_ends)
+    # calculate chapter lengths
+    for j in range (0, val.n_mss):
+        val.chapter_len_matrix[:,j] = count_by_chapter (val.def_matrix[j], val.chapter_ends)
 
 
 def calculate_mss_similarity_postco (dba, parameters, val):

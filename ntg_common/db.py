@@ -48,7 +48,7 @@ import os.path
 import sqlalchemy
 import sqlalchemy.types
 
-from sqlalchemy import *
+from sqlalchemy import String, Integer, Float, Boolean, DateTime, Column, Index, UniqueConstraint, ForeignKey
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext import compiler
 from sqlalchemy.ext.declarative import declarative_base
@@ -177,7 +177,7 @@ class DBA (object):
 
         message (3, "Connecting to db and reading init group: {group}".format (group = group), True)
 
-        self.engine = create_engine (
+        self.engine = sqlalchemy.create_engine (
             "mysql:///{db}?read_default_group={group}".format (db = db, group = group))
 
         sqlalchemy.event.listen (self.engine, 'connect', on_connect)
@@ -210,7 +210,7 @@ class MySQLEngine (object):
         message (3, "MySQLEngine: Reading init group: {group}".format (group = group), True)
         message (3, "MySQLEngine: Connecting to db: {db}".format (db = db), True)
 
-        self.engine = create_engine (
+        self.engine = sqlalchemy.create_engine (
             "mysql:///{db}?read_default_group={group}".format (db = db, group = group))
 
         self.connection = self.connect ()
@@ -231,14 +231,14 @@ class PostgreSQLEngine (object):
 
         url = "postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}?sslmode=disable".format (**args)
 
-        if (not sqlalchemy_utils.functions.database_exists (url)):
+        if not sqlalchemy_utils.functions.database_exists (url):
             message (3, "PostgreSQLEngine: Creating database '{database}'".format (**args), True)
             sqlalchemy_utils.functions.create_database (url)
 
         message (3, "PostgreSQLEngine: Connecting to postgres database '{database}' as user '{user}'"
                  .format (**args), True)
 
-        self.engine = create_engine (url + "?server_side_cursors")
+        self.engine = sqlalchemy.create_engine (url + "?server_side_cursors")
 
 
     def connect (self):

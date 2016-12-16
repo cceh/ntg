@@ -15,7 +15,7 @@ div.panel-relatives-header .close {
 div.panel-heading.panel-relatives-toolbar {
   border-bottom-width: 0;
 }
-div.dropdown-menu-labez {
+div.dropdown-menu-horiz {
   position: absolute;
   top: 100%;
   left: 0;
@@ -27,7 +27,7 @@ div.dropdown-menu-labez {
   width: -webkit-max-content;
   width: max-content;
 }
-.btn-labez {
+div.dropdown-menu-horiz .btn-labez {
   color: white;
   border-color: black;
 }

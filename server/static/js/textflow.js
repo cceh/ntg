@@ -26,7 +26,7 @@ function ($, _, d3, d3stemma, relatives, tools) {
         event.data = data;
 
         tools.handle_toolbar_events (event);
-        instance.load_passage (data.passage, data.labez);
+        instance.load_passage (data.passage, data.labez, data.hyp_a);
         event.stopPropagation ();
     }
 
@@ -39,15 +39,16 @@ function ($, _, d3, d3stemma, relatives, tools) {
      *
      * @param {string} labez - The labez to display.
      */
-    function load_passage (passage, labez) {
+    function load_passage (passage, labez, hyp_a) {
         this.data.passage = passage;
         this.data.labez = labez;
+        this.data.hyp_a = hyp_a;
 
         this.graph.load_dot (
             'textflow.dot/' + passage.id + '/attestation/' + labez + '?' +
-                $.param (_.pick (this.data, ['connectivity', 'chapter', 'include', 'fragments', 'mode']))
+                $.param (_.pick (this.data, ['connectivity', 'chapter', 'include', 'fragments', 'mode', 'hyp_a']))
         );
-        var promise = tools.load_labez_dropdown (this.toolbar.find ('div.textflow-labez'), passage.id);
+        var promise = tools.load_labez_dropdown (this.toolbar.find ('div.textflow-labez'), passage.id, 'labez', []);
         var that = this;
         promise.done (function () {
             tools.set_toolbar_buttons (that.toolbar, that.data);
@@ -55,6 +56,7 @@ function ($, _, d3, d3stemma, relatives, tools) {
             that.toolbar.find ('div.textflow-chapter input[data-opt != "0"]').attr ('data-opt', passage.chapter);
             changed ();
         });
+        tools.load_labez_dropdown (this.toolbar.find ('div.textflow-hyp_a'), passage.id, 'hyp_a', [['A', 'A']]);
     }
 
     /**
@@ -85,6 +87,7 @@ function ($, _, d3, d3stemma, relatives, tools) {
             'include'      : [],
             'fragments'    : [],
             'mode'         : 'rec',
+            'hyp_a'        : 'A',
         };
 
         // Init toolbar.

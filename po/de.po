@@ -47,11 +47,11 @@ msgstr "Verwandte von"
 
 #: server/server.py:306
 msgid "Ancestors for"
-msgstr "Ahnen von"
+msgstr "Vorfahren von"
 
 #: server/server.py:309
 msgid "Descendants for"
-msgstr "Nachkommen von"
+msgstr "Nachfahren von"
 
 #: server/templates/coherence.html:9
 #, python-format
