@@ -6,14 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <script src="/static/bower_components/requirejs/require.js"></script>
-    <script src="/static/js/config.require.js"></script>
+    <script type="text/javascript">server_start_time = '{{config['server_start_time']}}';</script>
+    <script src="/static/bower_components/requirejs/require.js?bust={{config['server_start_time']}}"></script>
+    <script src="/static/js/config.require.js?bust={{config['server_start_time']}}"></script>
 
-    <link href="/static/bower_components/bootstrap/dist/css/bootstrap.css"
-          rel="stylesheet" type="text/css">
-    <link href="/static/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"
-          rel="stylesheet" type="text/css">
-    <link href="/static/css/site.css" rel="stylesheet" type="text/css" />
     {% block head %}
     {% endblock %}
   </head>

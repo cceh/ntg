@@ -26,6 +26,15 @@ function ($, _) {
         });
     }
 
+    function query_params () {
+        var query = {}
+        location.search.substr (1).split ('&').forEach (function (item) {
+            var s = item.split ('=');
+            query [s[0]] = s[1]
+        })
+        return query;
+    }
+
     function handle_toolbar_events (event) {
         // change opts according to event
 

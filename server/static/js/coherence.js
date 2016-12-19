@@ -7,7 +7,14 @@
  */
 
 define (['jquery', 'lodash', 'tools', 'd3', 'd3-common', 'd3-stemma', 'affinity',
-         'apparatus', 'navigator', 'relatives', 'textflow', 'bootstrap'],
+         'apparatus', 'navigator', 'relatives', 'textflow', 'bootstrap',
+         'css!bootstrap-css',
+         'css!bootstrap-slider-css',
+         'css!jquery-ui-css',
+         'css!site-css',
+         'css!coherence-css',
+         'css!relatives-css',
+         'css!textflow-css'],
 
 function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, relatives, textflow) {
     'use strict';

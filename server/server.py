@@ -932,6 +932,7 @@ if __name__ == "__main__":
     for fn in glob.glob (args.config_path.rstrip ('/') + '/*.conf'):
         sub_app = flask.Flask (__name__)
         sub_app.config.from_pyfile (fn)
+        sub_app.config['server_start_time'] = str (int (args.start_time.timestamp ()))
         sub_app.register_blueprint (app)
 
         sub_app.url_map = Map ([

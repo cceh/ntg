@@ -16,16 +16,17 @@
   ],
   "dependencies": {
     "requirejs": "^2.2.0",
+    "require-css": "^0.1.8",
     "requirejs-text": "^2.0.15",
     "jquery": "^3.1.1",
     "jquery-ui": "^1.12.0",
     "d3": "^4.3.0",
+    "d3.promise": "^2.0.0",
     "lodash": "^4.17.2",
     "pegjs": "^0.10.0",
     "rsvp.js": "rsvp#^3.3.3",
-    "seiyria-bootstrap-slider": "^9.4.1",
     "bootstrap": "^3.3.6",
-    "d3.promise": "^2.0.0"
+    "seiyria-bootstrap-slider": "^9.4.1"
   },
   "devDependencies": {}
 }

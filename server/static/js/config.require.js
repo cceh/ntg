@@ -1,4 +1,5 @@
 requirejs.config ({
+    'urlArgs' : 'bust=' + server_start_time,
     'paths' : {
         // public libs
         'bootstrap'        : '/static/bower_components/bootstrap/dist/js/bootstrap',
@@ -11,6 +12,7 @@ requirejs.config ({
         'pegjs'            : '/static/bower_components/pegjs/peg-0.10.0',
         'rsvp'             : '/static/bower_components/rsvp.js/rsvp',
         'text'             : '/static/bower_components/requirejs-text/text',
+        'css'              : '/static/bower_components/require-css/css',
         // private libs
         'coherence'        : '/static/js/coherence',
         'navigator'        : '/static/js/navigator',
@@ -21,6 +23,16 @@ requirejs.config ({
         'textflow'         : '/static/js/textflow',
         'relatives'        : '/static/js/relatives',
         'tools'            : '/static/js/tools',
+        // public css
+        'bootstrap-css'        : '/static/bower_components/bootstrap/dist/css/bootstrap',
+        'bootstrap-slider-css' : '/static/bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider',
+        'jquery-ui-css'        : '/static/bower_components/jquery-ui/themes/smoothness/jquery-ui',
+        // private css
+        'site-css'         : '/static/css/site',
+        'coherence-css'    : '/static/css/coherence',
+        'relatives-css'    : '/static/css/relatives',
+        'textflow-css'     : '/static/css/textflow',
+        'ms_attesting-css' : '/static/css/ms_attesting',
     },
     'shim' : {
         'bootstrap' : {

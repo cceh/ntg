@@ -3,11 +3,15 @@
 {% block page_class %}ms_attesting{% endblock %}
 
 {% block head %}
-<link href="/static/css/relatives.css" rel="stylesheet" type="text/css" />
-<link href="/static/css/ms_attesting.css" rel="stylesheet" type="text/css" />
+
 <title>{{_('Attestation for %(passage)s %(labez)s', passage = passage.to_hr (), labez = labez)}}</title>
+
 <script>
-  require (["jquery"], function ($) {
+  require ([
+    'jquery',
+    'css!relatives-css',
+    'css!ms_attesting-css'
+  ], function ($) {
     $ (function () {
       $ ("div.relatives").each (function () {
         var a = $ (this);
