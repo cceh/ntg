@@ -43,6 +43,7 @@ define (['jquery'], function ($) {
             $.getJSON ('passage.json/0?' + $.param (q), function (json) {
                 module.passage = json;
                 $ (document).trigger ('ntg.passage.changed', json);
+                window.location.hash = '#' + json.passage;
             });
         });
 
@@ -52,6 +53,15 @@ define (['jquery'], function ($) {
             $form.find ('input[name="dest"]').attr ('placeholder', json.hr);
             $ ('h1 span.passage').text (json.hr);
             $ ('title').text ($ ('h1').text ());
+        });
+
+        // User hit back-button, etc.
+        $ (window).on ('hashchange', function () {
+            var hash = window.location.hash.substring (1);
+            $.getJSON ('passage.json/' + hash, function (json) {
+                module.passage = json;
+                $ (document).trigger ('ntg.passage.changed', json);
+            });
         });
 
         return module;

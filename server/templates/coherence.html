@@ -1,5 +1,7 @@
 {% extends "site.html" %}
 
+{% import 'textflow-toolbar.html' as tt %}
+
 {% block head %}
 <link href="/static/bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css" rel="stylesheet" type="text/css" />
 <link href="/static/css/coherence.css" rel="stylesheet" type="text/css" />
@@ -45,16 +47,29 @@
     </div>
   </div>
 
-  <div class="panel panel-default panel-textflow">
-    <div class="panel-heading panel-textflow-caption">
+  <div class="panel panel-default panel-textflow panel-local-textflow">
+    <div class="panel-heading panel-local-textflow-caption">
       {{_('Textual Flow Diagram')}}
     </div>
 
-    {% include 'textflow-toolbar.html' %}
+    {{ tt.toolbar ('local') }}
 
-    <div id="textflow-wrapper">
+    <div id="local-textflow-wrapper">
     </div>
   </div>
+
+  <div class="panel panel-default panel-textflow panel-global-textflow">
+    <div class="panel-heading panel-global-textflow-caption">
+      {{_('Global Textual Flow Diagram')}}
+    </div>
+
+    {{ tt.toolbar ('global') }}
+
+    <div id="global-textflow-wrapper">
+    </div>
+  </div>
+
+  {% include 'navigator.html' %}
 
   <div class="panel panel-default panel-affinity">
     <div class="panel-heading panel-affinity-caption">

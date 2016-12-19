@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NTG 2.0\n"
 "Report-Msgid-Bugs-To: marcello@perathoner.de\n"
-"POT-Creation-Date: 2016-12-09 10:58+0100\n"
-"PO-Revision-Date: 2016-12-09 10:59+0100\n"
+"POT-Creation-Date: 2016-12-19 16:12+0100\n"
+"PO-Revision-Date: 2016-12-19 16:19+0100\n"
 "Last-Translator: Marcello Perathoner <marcello@perathoner.de>\n"
 "Language-Team: German <>\n"
 "Language: de\n"
@@ -33,7 +33,7 @@ msgid "Dub"
 msgstr "Zweifelhaft"
 
 #: server/server.py:41 server/templates/relatives.html:34
-#: server/templates/relatives.html:49 server/templates/textflow-toolbar.html:25
+#: server/templates/relatives.html:49 server/templates/textflow-toolbar.html:29
 msgid "All"
 msgstr "Alle"
 
@@ -41,40 +41,43 @@ msgstr "Alle"
 msgid "All+Lac"
 msgstr "Alle+Lac"
 
-#: server/server.py:302
+#: server/server.py:363
 msgid "Relatives for"
 msgstr "Verwandte von"
 
-#: server/server.py:306
+#: server/server.py:367
 msgid "Ancestors for"
 msgstr "Vorfahren von"
 
-#: server/server.py:309
+#: server/server.py:370
 msgid "Descendants for"
 msgstr "Nachfahren von"
 
-#: server/templates/coherence.html:9
-#, python-format
-msgid "Attestation for %(passage)s"
-msgstr "Bezeugung von %(passage)s"
+#: server/templates/apparatus-toolbar.html:6
+msgid "Splits"
+msgstr "Splitts"
 
-#: server/templates/coherence.html:17 server/templates/coherence.html:27
+#: server/templates/coherence.html:22
 msgid "Attestation for"
 msgstr "Bezeugung von"
 
-#: server/templates/coherence.html:37
+#: server/templates/coherence.html:32
 msgid "Apparatus"
 msgstr "Apparat"
 
-#: server/templates/coherence.html:46
+#: server/templates/coherence.html:43
 msgid "Local Stemma"
 msgstr "Lokales Stemma"
 
-#: server/templates/coherence.html:55
+#: server/templates/coherence.html:52
 msgid "Textual Flow Diagram"
 msgstr "Textfluss-Diagramm"
 
-#: server/templates/coherence.html:66
+#: server/templates/coherence.html:63
+msgid "Global Textual Flow Diagram"
+msgstr "Globales Textfluss-Diagramm"
+
+#: server/templates/coherence.html:76
 msgid "Affinity Cloud"
 msgstr "Affinitäts-Cloud"
 
@@ -100,29 +103,32 @@ msgstr "Vor"
 msgid "Des"
 msgstr "Nach"
 
-#: server/templates/relatives.html:37 server/templates/textflow-toolbar.html:28
+#: server/templates/relatives.html:37 server/templates/textflow-toolbar.html:32
 msgid "Ch"
 msgstr "Kap"
 
-#: server/templates/relatives.html:55 server/templates/textflow-toolbar.html:34
+#: server/templates/relatives.html:55 server/templates/textflow-toolbar.html:38
 msgid "A"
 msgstr "A"
 
-#: server/templates/relatives.html:58 server/templates/textflow-toolbar.html:37
+#: server/templates/relatives.html:58 server/templates/textflow-toolbar.html:41
 msgid "MT"
 msgstr "MT"
 
-#: server/templates/relatives.html:64 server/templates/textflow-toolbar.html:43
+#: server/templates/relatives.html:64 server/templates/textflow-toolbar.html:48
 msgid "Frag"
 msgstr "Frag"
 
-#: server/templates/relatives.html:70 server/templates/textflow-toolbar.html:49
+#: server/templates/relatives.html:70 server/templates/textflow-toolbar.html:55
 msgid "Rec"
 msgstr "Rek"
 
-#: server/templates/relatives.html:73 server/templates/textflow-toolbar.html:52
+#: server/templates/relatives.html:73 server/templates/textflow-toolbar.html:58
 msgid "Sim"
 msgstr "Sim"
+
+#~ msgid "Attestation for %(passage)s"
+#~ msgstr "Bezeugung von %(passage)s"
 
 #~ msgid "zz"
 #~ msgstr "zz"

@@ -1,6 +1,9 @@
-<div class="panel-heading panel-textflow-toolbar">
-  <div class="btn-toolbar toolbar-textflow" role="toolbar">
+{% macro toolbar(mode) -%}
 
+<div class="panel-heading panel-textflow-toolbar">
+  <div class="btn-toolbar {{mode}}-toolbar-textflow" role="toolbar">
+
+    {% if mode == 'local' %}
     <div class="textflow-labez btn-group btn-group-xs">
       <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-labez bg_labez"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -19,6 +22,7 @@
         <input type="text" name="connectivity" />
       </label>
     </div>
+    {% endif %}
 
     <div class="textflow-chapter btn-group btn-group-xs" data-toggle="buttons">
       <label class="btn btn-primary">
@@ -38,11 +42,13 @@
       </label>
     </div>
 
+    {% if mode == 'local' %}
     <div class="coherence-fragments btn-group btn-group-xs" data-toggle="buttons">
 	  <label class="btn btn-primary">
         <input type="checkbox" name="fragments" data-opt="1">{{_('Frag')}}</input>
 	  </label>
     </div>
+    {% endif %}
 
     <div class="textflow-mode btn-group btn-group-xs" data-toggle="buttons">
       <label class="btn btn-primary">
@@ -53,6 +59,7 @@
       </label>
     </div>
 
+    {% if mode == 'local' %}
     <div class="textflow-hyp_a btn-group btn-group-xs">
       <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-hyp_a bg_labez"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -64,6 +71,9 @@
         </div>
       </div>
     </div>
+    {% endif %}
 
   </div>
 </div>
+
+{%- endmacro %}

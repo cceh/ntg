@@ -42,9 +42,12 @@ Replace <username> and <password> with your own username and password.
 
 """
 
+import datetime
+import logging
 import os
 import os.path
 
+import six
 import sqlalchemy
 import sqlalchemy.types
 
@@ -60,7 +63,7 @@ from sqlalchemy_utils import IntRangeType
 
 # import pandas as pd
 
-from .tools import message, tabulate
+from .tools import log, tabulate
 from .config import args
 
 MYSQL_DEFAULT_GROUP  = "ntg-local"
@@ -101,41 +104,41 @@ def view (name, metadata, sql):
     DropView (name).execute_at ('before-drop', metadata)
 
 
-def execute (conn, sql, parameters, debug_level = 3):
+def execute (conn, sql, parameters, debug_level = logging.INFO):
     sql = sql.strip ().format (**parameters)
-    message (debug_level, sql.rstrip () + ';')
+    start_time = datetime.datetime.now ()
     result = conn.execute (text (sql), parameters)
-    message (debug_level, "%d rows" % result.rowcount)
+    log (debug_level, "%d rows in %.3fs", result.rowcount, (datetime.datetime.now () - start_time).total_seconds ())
     return result
 
 
-def executemany (conn, sql, parameters, param_array, debug_level = 3):
+def executemany (conn, sql, parameters, param_array, debug_level = logging.INFO):
     sql = sql.strip ().format (**parameters)
-    message (debug_level, sql.rstrip () + ';')
+    start_time = datetime.datetime.now ()
     result = conn.execute (text (sql), param_array)
-    message (debug_level, "%d rows" % result.rowcount)
+    log (debug_level, "%d rows in %.3fs", result.rowcount, (datetime.datetime.now () - start_time).total_seconds ())
     return result
 
 
-def executemany_raw (conn, sql, parameters, param_array, debug_level = 3):
+def executemany_raw (conn, sql, parameters, param_array, debug_level = logging.INFO):
     sql = sql.strip ().format (**parameters)
-    message (debug_level, sql.rstrip () + ';')
+    start_time = datetime.datetime.now ()
     result = conn.execute (sql, param_array)
-    message (debug_level, "%d rows" % result.rowcount)
+    log (debug_level, "%d rows in %.3fs", result.rowcount, (datetime.datetime.now () - start_time).total_seconds ())
     return result
 
 
-# def execute_pandas (conn, sql, parameters, debug_level = 3):
+# def execute_pandas (conn, sql, parameters, debug_level = logging.INFO):
 #     sql = sql.format (**parameters)
-#     message (debug_level, sql.rstrip () + ';')
+#     log (debug_level, sql.rstrip () + ';')
 #     return pd.read_sql_query (text (sql), conn, parameters)
 
 def debug (conn, msg, sql, parameters):
     # print values
-    if args.verbose >= 3:
+    if args.log_level <= logging.INFO:
         result = execute (conn, sql, parameters)
         if result.rowcount > 0:
-            message (3, "*** DEBUG: {msg} ***".format (msg = msg), True)
+            log (logging.DEBUG, msg)
             tabulate (result)
 
 
@@ -154,15 +157,15 @@ def fix (conn, msg, check_sql, fix_sql, parameters):
     result = execute (conn, check_sql, parameters)
     if result.rowcount > 0:
         # apply fix
-        if args.verbose >= 3:
-            message (3, "*** WARNING: {msg} ***".format (msg = msg), True)
+        if args.log_level <= logging.INFO:
+            log (logging.WARNING, msg)
             tabulate (result)
         if fix_sql:
             execute (conn, fix_sql, parameters)
             # print fixed values
             result = execute (conn, check_sql, parameters)
             if result.rowcount > 0:
-                message (0, "*** ERROR: {msg} ***".format (msg = msg), True)
+                log (logging.ERROR, msg)
                 tabulate (result)
 
 
@@ -175,7 +178,7 @@ class DBA (object):
         if db is None:
             db = ''
 
-        message (3, "Connecting to db and reading init group: {group}".format (group = group), True)
+        log (logging.INFO, "Connecting to db and reading init group: {group}".format (group = group))
 
         self.engine = sqlalchemy.create_engine (
             "mysql:///{db}?read_default_group={group}".format (db = db, group = group))
@@ -207,8 +210,8 @@ class MySQLEngine (object):
         if db is None:
             db = ''
 
-        message (3, "MySQLEngine: Reading init group: {group}".format (group = group), True)
-        message (3, "MySQLEngine: Connecting to db: {db}".format (db = db), True)
+        log (logging.INFO, "MySQLEngine: Reading init group: {group}".format (group = group))
+        log (logging.INFO, "MySQLEngine: Connecting to db: {db}".format (db = db))
 
         self.engine = sqlalchemy.create_engine (
             "mysql:///{db}?read_default_group={group}".format (db = db, group = group))
@@ -232,11 +235,10 @@ class PostgreSQLEngine (object):
         url = "postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}?sslmode=disable".format (**args)
 
         if not sqlalchemy_utils.functions.database_exists (url):
-            message (3, "PostgreSQLEngine: Creating database '{database}'".format (**args), True)
+            log (logging.INFO, "PostgreSQLEngine: Creating database '{database}'".format (**args))
             sqlalchemy_utils.functions.create_database (url)
 
-        message (3, "PostgreSQLEngine: Connecting to postgres database '{database}' as user '{user}'"
-                 .format (**args), True)
+        log (logging.INFO, "PostgreSQLEngine: Connecting to postgres database '{database}' as user '{user}'".format (**args))
 
         self.engine = sqlalchemy.create_engine (url + "?server_side_cursors")
 

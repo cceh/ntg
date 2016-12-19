@@ -40,14 +40,21 @@ function ($, _, d3, d3stemma, relatives, tools) {
      * @param {string} labez - The labez to display.
      */
     function load_passage (passage, labez, hyp_a) {
+        var that = this;
         this.data.passage = passage;
         this.data.labez = labez;
         this.data.hyp_a = hyp_a;
+        this.data.width = this.wrapper.width ()
 
-        this.graph.load_dot (
-            'textflow.dot/' + passage.id + '/attestation/' + labez + '?' +
-                $.param (_.pick (this.data, ['connectivity', 'chapter', 'include', 'fragments', 'mode', 'hyp_a']))
+        var params = ['labez', 'connectivity', 'chapter', 'include', 'fragments', 'mode', 'hyp_a', 'width'];
+        var load_dot_promise = this.graph.load_dot (
+            'textflow.dot/' + passage.id + '?' + $.param (_.pick (this.data, params))
         );
+        load_dot_promise.done (function () {
+            var panel = that.wrapper.closest ('div.panel');
+            panel.animate ( {'width': that.graph.bbox.width + 'px'} );
+        });
+
         var promise = tools.load_labez_dropdown (this.toolbar.find ('div.textflow-labez'), passage.id, 'labez', []);
         var that = this;
         promise.done (function () {

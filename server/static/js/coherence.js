@@ -24,8 +24,8 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
     function set_passage (json) {
         module.apparatus.load_passage (json);
         module.local_stemma.load_dot ('stemma.dot/' + json.id);
-        module.textflow.load_passage (json, 'a', 'A');
-        window.location.hash = '#' + json.passage;
+        module.ltextflow.load_passage (json, 'a', 'A');
+        module.gtextflow.load_passage (json, null, null);
 
         // make sure attestation gets set *after* the nodes are loaded
         module.affinity_promise.done (function () {
@@ -43,10 +43,11 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
         $.fn.bootstrapTooltip = $.fn.tooltip.noConflict ();
 
         module.navigator    = navigator.init ();
-        module.apparatus    = apparatus.init ('#apparatus-wrapper',    'app_', 'div.toolbar-apparatus');
-        module.local_stemma = d3stemma.init  ('#local-stemma-wrapper', 'ls_');
-        module.textflow     = textflow.init  ('#textflow-wrapper',     'tf_',  'div.toolbar-textflow');
-        module.affinity     = affinity.init  ('#affinity-wrapper',     'aff_');
+        module.apparatus    = apparatus.init ('#apparatus-wrapper',       'app_', 'div.toolbar-apparatus');
+        module.local_stemma = d3stemma.init  ('#local-stemma-wrapper',    'ls_');
+        module.ltextflow    = textflow.init  ('#local-textflow-wrapper',  'tf_',  'div.local-toolbar-textflow');
+        module.gtextflow    = textflow.init  ('#global-textflow-wrapper', 'gtf_', 'div.global-toolbar-textflow');
+        module.affinity     = affinity.init  ('#affinity-wrapper',        'aff_');
         relatives.init ();
 
         module.affinity_promise = module.affinity.load_json ('affinity.json');
@@ -65,7 +66,7 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
         });
 
         // Click on a node in the textflow diagram.
-        $ (document).on ('click', '#textflow-wrapper g.node', function (event) {
+        $ (document).on ('click', 'div.panel-textflow g.node', function (event) {
             var $target = $ (event.currentTarget); // the g.node, not the circle
             $target.relatives_svg_tooltip ({ 'items': 'g.node' });
             $target.relatives_svg_tooltip ('open');

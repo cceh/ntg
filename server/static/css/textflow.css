@@ -1,3 +1,6 @@
+div.panel-textflow {
+  min-width: 100%;
+}
 div.btn-toolbar {
   margin-top: -5px;
 }

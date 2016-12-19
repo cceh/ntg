@@ -40,7 +40,7 @@ function ($, d3, _, peg, parser_src) {
 
             // shrinkwrap
             var bb = attrs.graph.attrs.bb.split (',');
-            var bbox = {
+            that.bbox = {
                 'x'      : bb[0],
                 'y'      : bb[1],
                 'width'  : bb[2],
@@ -48,16 +48,15 @@ function ($, d3, _, peg, parser_src) {
             };
             var g = svg.append ('g');
 
-            svg.attr ('width',  bbox.width).style ('opacity', 0.0);
+            svg.style ('opacity', 0.0);
 
-            svg.transition ()
+            svg.transition ('svg')
                 .duration (300)
-                .attr ('height', bbox.height)
+                .attr ('height', that.bbox.height)
+                .attr ('width',  that.bbox.width)
                 .transition ()
                 .duration (300)
                 .style ('opacity', 1.0);
-
-            // g.attr ('transform', 'translate(' + -bbox.x + ',' + -bbox.y + ')');
 
             // replace ids with node objects
             _.forEach (links, function (link, i) {
@@ -138,9 +137,9 @@ function ($, d3, _, peg, parser_src) {
      * @returns {Graph} - A graph instance.
      */
     function init (wrapper_selector, id_prefix) {
-        var root = d3.select (wrapper_selector);
-        root.selectAll ('*').remove ();
-        var svg = root.append ('svg');
+        var wrapper = d3.select (wrapper_selector);
+        wrapper.selectAll ('*').remove ();
+        var svg = wrapper.append ('svg');
 
         svg
             .append ('defs')
@@ -158,10 +157,17 @@ function ($, d3, _, peg, parser_src) {
 
         return {
             'id_prefix' : id_prefix,
+            'wrapper'   : wrapper,
             'svg'       : svg,
             'load_dot'  : load_dot,
             'parser'    : dot_parser,
             'radius'    : 15,
+            'bbox'      : {
+                'x'      : 0,
+                'y'      : 0,
+                'width'  : 0,
+                'height' : 0,
+            },
         };
     }
 

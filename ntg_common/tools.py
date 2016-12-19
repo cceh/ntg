@@ -6,6 +6,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import datetime
+import logging
 import subprocess
 import sys
 
@@ -91,6 +92,12 @@ they are not included in the text of manuscript 'A'.
 """
 
 
+logger = logging.getLogger ('server')
+
+LOG_HILITE = {
+    logging.ERROR : ('\x1B[1m', '\x1B[0m')
+}
+
 def quote (s):
     if ' ' in s:
         return '"' + s + '"'
@@ -109,17 +116,16 @@ def init_parameters (defaults):
     return parameters
 
 
-def message (level, s, hilite = False):
+def log (level, msg, *aargs, **kwargs):
     """
-    Print information if needed.
+    Low level log function
     """
-    if args.verbose >= level:
-        delta = six.text_type (datetime.datetime.now () - args.start_time)
-        print ('[' + delta + ']', end = " ")
-        if hilite:
-            print ("\x1B[1m" + s + "\x1B[0m")
-        else:
-            print (s)
+
+    d = {
+        'delta': six.text_type (datetime.datetime.now () - args.start_time),
+        'hilite' : LOG_HILITE.get (level, ('', ''))
+    }
+    logger.log (level, msg, *aargs, extra = d)
 
 
 def tabulate (res, stream = sys.stdout):
@@ -196,6 +202,6 @@ def graphviz_layout (dot):
             'Program terminated with status: %d. stderr is: %s' % (
                 p.returncode, errs))
     elif errs:
-        message (3, errs)
+        log (logging.ERROR, errs)
 
     return outs

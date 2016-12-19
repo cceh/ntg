@@ -54,7 +54,7 @@ from ntg_common import db
 from ntg_common import tools
 from ntg_common import plot
 from ntg_common.db import execute, executemany, executemany_raw, debug, fix
-from ntg_common.tools import message
+from ntg_common.tools import log
 from ntg_common.config import args
 
 PLOT = 0 # plot pretty pictures
@@ -83,7 +83,7 @@ def step01 (dba, dbb, parameters):
 
     """
 
-    message (1, "Step  1 : Copying tables ...")
+    log (logging.INFO, "Step  1 : Copying tables ...")
 
     att_model = sqlalchemy.Table (parameters['att'], db.Base.metadata)
     lac_model = sqlalchemy.Table (parameters['lac'], db.Base.metadata)
@@ -131,7 +131,7 @@ def step01 (dba, dbb, parameters):
                 parameters['field_placeholders']  = ', '.join (['%s'] * len (common_columns))
                 parameters['created'] = datetime.date.today().strftime ("%Y-%m-%d")
 
-                message (2, 'Step  1 : Copying table {source_table}'.format (**parameters))
+                log (logging.INFO, '          Copying table {source_table}'.format (**parameters))
 
                 rows = execute (src, """
                 SELECT {fields}, anfadr, endadr + 1
@@ -172,7 +172,7 @@ def step01c (dba, parameters):
 
     """
 
-    message (1, "Step  1c: Data entry fixes ...")
+    log (logging.INFO, "Step  1c: Data entry fixes ...")
 
     with dba.engine.begin () as conn:
 
@@ -359,7 +359,7 @@ def step02 (dba, parameters):
 
     """
 
-    message (1, "Step  2 : Cleanup korr and lekt ...")
+    log (logging.INFO, "Step  2 : Cleanup korr and lekt ...")
 
     with dba.engine.begin () as conn:
 
@@ -481,7 +481,7 @@ def step05 (dba, parameters):
 
     """
 
-    message (1, "Step  5: Processing Duplicated Readings (T1, T2) ...")
+    log (logging.INFO, "Step  5: Processing Duplicated Readings (T1, T2) ...")
 
     with dba.engine.begin () as conn:
 
@@ -561,7 +561,7 @@ def step06 (dba, parameters):
 
     """
 
-    message (1, "Step  6 : Delete later hands ...")
+    log (logging.INFO, "Step  6 : Delete later hands ...")
 
     with dba.engine.begin () as conn:
 
@@ -611,7 +611,7 @@ def step06b (dba, parameters):
 
     """
 
-    message (1, "Step  6b: Delete [CLTV*] from HS ...")
+    log (logging.INFO, "Step  6b: Delete [CLTV*] from HS ...")
 
     with dba.engine.begin () as conn:
 
@@ -702,7 +702,7 @@ def step07 (dba, parameters):
 
     """
 
-    message (1, "Step  7 : Fix 'zw' ...")
+    log (logging.INFO, "Step  7 : Fix 'zw' ...")
 
     with dba.engine.begin () as conn:
 
@@ -720,7 +720,7 @@ def step07 (dba, parameters):
                 """, dict (parameters, id = row[0], labez = unique_labez_suffixes[0]), 4)
                 updated += 1
 
-    message (2, "          %d zw labez updated" % updated)
+    log (logging.DEBUG, "          %d zw labez updated" % updated)
 
 
 def delete_passages_without_variants (dba, parameters):
@@ -1042,7 +1042,7 @@ def copy_genealogical_data (dbsrc, dbsrcvg, dbdest, parameters):
                 for source_table in sorted (dbsrcvg_meta.tables.keys ()):
                     if not table_mask.match (source_table):
                         continue
-                    message (1, "        : Copying table %s" % source_table)
+                    log (logging.INFO, "        : Copying table %s" % source_table)
 
                     source_model = sqlalchemy.Table (source_table, dbsrcvg_meta, autoload = True)
                     source_columns = ['`' + column.name.lower () + '`'
@@ -1070,7 +1070,7 @@ def copy_genealogical_data (dbsrc, dbsrcvg, dbdest, parameters):
             for table_name in sorted (dbsrcvg_meta.tables.keys ()):
                 if not table_mask.match (table_name):
                     continue
-                message (1, "        : Copying table %s" % table_name)
+                log (logging.INFO, "        : Copying table %s" % table_name)
 
                 parameters['source_table'] = table_name
 
@@ -1136,7 +1136,7 @@ def copy_genealogical_data (dbsrc, dbsrcvg, dbdest, parameters):
             for table_name in sorted (dbsrcvg_meta.tables.keys ()):
                 if not table_mask.match (table_name):
                     continue
-                message (1, "        : Copying table %s" % table_name)
+                log (logging.INFO, "        : Copying table %s" % table_name)
 
                 parameters['source_table'] = table_name
 
@@ -1558,7 +1558,7 @@ def calculate_mss_similarity_postco (dba, parameters, val):
                     varidk_is_older = np.bitwise_and (mask_matrix[k], anc_matrix[j]) > 0
 
                     if j == 0 and k > 0 and varidk_is_older.any ():
-                        message (1, "Error: found varid older than A in msid: %d = %s"
+                        log (logging.INFO, "Error: found varid older than A in msid: %d = %s"
                                  % (k, np.nonzero (varidk_is_older)))
 
                     # error check for loops
@@ -1583,7 +1583,7 @@ def calculate_mss_similarity_postco (dba, parameters, val):
                     unclear_matrix[:,j,k]  = count_by_chapter (unclear, val.chapter_ends)
 
             if local_stemmas_with_loops:
-                message (1, "Error: found loops in local stemmata: %s" % sorted (local_stemmas_with_loops))
+                log (logging.INFO, "Error: found loops in local stemmata: %s" % sorted (local_stemmas_with_loops))
 
             return ancestor_matrix, unclear_matrix
 
@@ -1594,14 +1594,14 @@ def calculate_mss_similarity_postco (dba, parameters, val):
 
         # varid older than ms A
         if val.ancestor_matrix[0,:,0].any ():
-            message (1, "Error: found varid older than A in msids: %s"
+            log (logging.INFO, "Error: found varid older than A in msids: %s"
                      % (np.nonzero (val.ancestor_matrix[0,:,0])))
 
         # norel < 0
         norel_matrix = (val.and_matrix - val.eq_matrix - val.ancestor_matrix -
                         np.transpose (val.ancestor_matrix, (0, 2, 1)) - val.unclear_ancestor_matrix)
         if np.less (norel_matrix, 0).any ():
-            message (1, "Error: norel < 0 in mss. %s"
+            log (logging.INFO, "Error: norel < 0 in mss. %s"
                      % (np.nonzero (np.less (norel_matrix, 0))))
 
         # debug
@@ -1610,7 +1610,7 @@ def calculate_mss_similarity_postco (dba, parameters, val):
 
             for i, chapter in enumerate (val.chapters):
                 plot.plt.figure (dpi = 1200) # figsize = (15, 10), dpi = 300)
-                message (2, "          Plotting Affinity of Chapter %d ..." % i)
+                log (logging.DEBUG, "          Plotting Affinity of Chapter %d ..." % i)
                 plot.heat_matrix (val.quotient_matrix[i],
                                   "Similarity of Manuscripts - Chapter %d" % chapter.n,
                                   ticks_labels, ticks_labels, plot.colormap_affinity ())
@@ -1618,7 +1618,7 @@ def calculate_mss_similarity_postco (dba, parameters, val):
                 plot.plt.close ()
 
                 plot.plt.figure (dpi = 1200) # figsize = (15, 10), dpi = 300)
-                message (2, "          Plotting Ancestry of Chapter %d ..." % i)
+                log (logging.DEBUG, "          Plotting Ancestry of Chapter %d ..." % i)
                 tmp = val.quotient_matrix.copy ()
                 tmp[mask] = 0
                 plot.heat_matrix (tmp[i],
@@ -1630,7 +1630,7 @@ def calculate_mss_similarity_postco (dba, parameters, val):
         # np.fill_diagonal (val.quotient_matrix, 0.0) # remove affinity to self
 
 
-        message (2, "          Updating length in Manuscripts and Chapters tables ...")
+        log (logging.INFO, "          Updating length in Manuscripts and Chapters tables ...")
 
         values_mss = []
         values_chapters = []
@@ -1655,7 +1655,7 @@ def calculate_mss_similarity_postco (dba, parameters, val):
         """, parameters, values_chapters)
 
 
-        message (2, "          Filling Affinity table ...")
+        log (logging.INFO, "          Filling Affinity table ...")
         execute (conn, "TRUNCATE {aff}", parameters)
 
         for i, chapter in enumerate (val.chapters):
@@ -1716,7 +1716,7 @@ def affinity_to_gephi (dba, parameters, val):
 
     """
 
-    message (1, "        : Exporting to Gephi ...")
+    log (logging.INFO, "        : Exporting to Gephi ...")
 
     with dba.engine.begin () as conn:
 
@@ -1796,21 +1796,21 @@ def print_stats (dba, parameters):
 
         res = execute (conn, "SELECT count (distinct hs) FROM {att}", parameters)
         hs = res.scalar ()
-        message (1, "hs       = {cnt}".format (cnt = hs))
+        log (logging.INFO, "hs       = {cnt}".format (cnt = hs))
 
         res = execute (conn, "SELECT count (*) FROM (SELECT DISTINCT anfadr, endadr FROM {att}) AS sq", parameters)
         passages = res.scalar ()
-        message (1, "passages = {cnt}".format (cnt = passages))
+        log (logging.INFO, "passages = {cnt}".format (cnt = passages))
 
-        message (1, "hs * passages      = {cnt}".format (cnt = hs * passages))
+        log (logging.INFO, "hs * passages      = {cnt}".format (cnt = hs * passages))
 
         res = execute (conn, "SELECT count(*) FROM {att}", parameters)
         att = res.scalar ()
         res = execute (conn, "SELECT count(*) FROM {lac}", parameters)
         lac = res.scalar ()
 
-        message (1, "rows in att        = {cnt}".format (cnt = att))
-        message (1, "rows in lac        = {cnt}".format (cnt = lac))
+        log (logging.INFO, "rows in att        = {cnt}".format (cnt = att))
+        log (logging.INFO, "rows in lac        = {cnt}".format (cnt = lac))
 
         # sum (passages in chapter * mss with chapter)
 
@@ -1828,7 +1828,7 @@ def print_stats (dba, parameters):
         """, parameters)
         pas = res.scalar ()
 
-        message (1, "chap * ms * pas    = {cnt}".format (cnt = pas))
+        log (logging.INFO, "chap * ms * pas    = {cnt}".format (cnt = pas))
 
 
 def config_from_pyfile (filename):
@@ -1891,6 +1891,10 @@ if __name__ == '__main__':
     parameters['source_db'] = tools.quote (config['MYSQL_ECM_DB'])
     parameters['src_vg_db'] = tools.quote (config['MYSQL_VG_DB'])
 
+    logging.basicConfig (format = '%(relativeCreated)d - %(levelname)s - %(message)s')
+    logging.getLogger ('sqlalchemy.engine').setLevel (args.log_level)
+    logging.getLogger ('server').setLevel (args.log_level)
+
     dbsrc1 = db.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_ECM_DB'])
     dbsrc2 = db.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_VG_DB'])
     dbdest = db.PostgreSQLEngine (**config)
@@ -1901,7 +1905,7 @@ if __name__ == '__main__':
     try:
         for step in range (args.range[0], args.range[1] + 1):
             if step == 1:
-                message (1, "Step  1 : Creating tables ...")
+                log (logging.INFO, "Step  1 : Creating tables ...")
 
                 db.Base.metadata.drop_all (dbdest.engine)
                 db.Base.metadata.create_all (dbdest.engine)
@@ -1932,54 +1936,54 @@ if __name__ == '__main__':
                     print_stats (dbdest, parameters)
                 continue
             if step == 8:
-                message (1, "Step  8 : Deleting passages without variants ...")
+                log (logging.INFO, "Step  8 : Deleting passages without variants ...")
                 delete_passages_without_variants (dbdest, parameters)
                 if args.verbose >= 1:
                     print_stats (dbdest, parameters)
                 continue
 
             if step == 31:
-                message (1, "Step 31 : Dropping tables ...")
+                log (logging.INFO, "Step 31 : Dropping tables ...")
                 db.Base2.metadata.drop_all   (dbdest.engine)
-                message (1, "        : Creating tables ...")
+                log (logging.INFO, "        : Creating tables ...")
                 db.Base2.metadata.create_all (dbdest.engine)
-                message (1, "        : Creating functions ...")
+                log (logging.INFO, "        : Creating functions ...")
                 with dbdest.engine.begin () as dest:
                     db.create_functions (dest, parameters)
 
-                message (1, "        : Filling the Manuscripts and Passages tables ...")
+                log (logging.INFO, "        : Filling the Manuscripts and Passages tables ...")
                 create_ms_pass_tables (dbdest, parameters)
 
-                message (1, "        : Filling the Var table ...")
+                log (logging.INFO, "        : Filling the Var table ...")
                 create_var_table (dbdest, parameters)
                 continue
 
             if step == 32:
-                message (1, "Step 32 : Copying genealogical data ...")
+                log (logging.INFO, "Step 32 : Copying genealogical data ...")
                 copy_genealogical_data (dbsrc1, dbsrc2, dbdest, parameters)
 
-                message (1, "        : Building Byzantine text ...")
+                log (logging.INFO, "        : Building Byzantine text ...")
                 build_byzantine_text (dbdest, parameters)
 
-                message (1, "        : Preprocessing local stemmas ...")
+                log (logging.INFO, "        : Preprocessing local stemmas ...")
                 preprocess_local_stemmas (dbdest, parameters)
                 continue
 
             if step == 33:
-                message (1, "Step 33 : Creating the varid matrix ...")
+                log (logging.INFO, "Step 33 : Creating the varid matrix ...")
                 create_varid_matrix (dbdest, parameters, v)
 
-                message (1, "        : Calculating mss similarity pre-co ...")
+                log (logging.INFO, "        : Calculating mss similarity pre-co ...")
                 calculate_mss_similarity_preco (dbdest, parameters, v)
 
-                message (1, "        : Calculating mss similarity post-co ...")
+                log (logging.INFO, "        : Calculating mss similarity post-co ...")
                 calculate_mss_similarity_postco (dbdest, parameters, v)
 
-                message (1, "        : Exporting Gephi Tables ...")
+                log (logging.INFO, "        : Exporting Gephi Tables ...")
                 affinity_to_gephi (dbdest, parameters, v)
                 continue
 
     except KeyboardInterrupt:
         pass
 
-    message (1, "          Done")
+    log (logging.INFO, "          Done")

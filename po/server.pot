@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NTG 2.0\n"
 "Report-Msgid-Bugs-To: marcello@perathoner.de\n"
-"POT-Creation-Date: 2016-12-09 11:12+0100\n"
+"POT-Creation-Date: 2016-12-19 16:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgid "Dub"
 msgstr ""
 
 #: server/server.py:41 server/templates/relatives.html:34
-#: server/templates/relatives.html:49 server/templates/textflow-toolbar.html:25
+#: server/templates/relatives.html:49 server/templates/textflow-toolbar.html:29
 msgid "All"
 msgstr ""
 
@@ -39,40 +39,43 @@ msgstr ""
 msgid "All+Lac"
 msgstr ""
 
-#: server/server.py:302
+#: server/server.py:363
 msgid "Relatives for"
 msgstr ""
 
-#: server/server.py:306
+#: server/server.py:367
 msgid "Ancestors for"
 msgstr ""
 
-#: server/server.py:309
+#: server/server.py:370
 msgid "Descendants for"
 msgstr ""
 
-#: server/templates/coherence.html:9
-#, python-format
-msgid "Attestation for %(passage)s"
+#: server/templates/apparatus-toolbar.html:6
+msgid "Splits"
 msgstr ""
 
-#: server/templates/coherence.html:17 server/templates/coherence.html:27
+#: server/templates/coherence.html:22
 msgid "Attestation for"
 msgstr ""
 
-#: server/templates/coherence.html:37
+#: server/templates/coherence.html:32
 msgid "Apparatus"
 msgstr ""
 
-#: server/templates/coherence.html:46
+#: server/templates/coherence.html:43
 msgid "Local Stemma"
 msgstr ""
 
-#: server/templates/coherence.html:55
+#: server/templates/coherence.html:52
 msgid "Textual Flow Diagram"
 msgstr ""
 
-#: server/templates/coherence.html:66
+#: server/templates/coherence.html:63
+msgid "Global Textual Flow Diagram"
+msgstr ""
+
+#: server/templates/coherence.html:76
 msgid "Affinity Cloud"
 msgstr ""
 
@@ -98,27 +101,27 @@ msgstr ""
 msgid "Des"
 msgstr ""
 
-#: server/templates/relatives.html:37 server/templates/textflow-toolbar.html:28
+#: server/templates/relatives.html:37 server/templates/textflow-toolbar.html:32
 msgid "Ch"
 msgstr ""
 
-#: server/templates/relatives.html:55 server/templates/textflow-toolbar.html:34
+#: server/templates/relatives.html:55 server/templates/textflow-toolbar.html:38
 msgid "A"
 msgstr ""
 
-#: server/templates/relatives.html:58 server/templates/textflow-toolbar.html:37
+#: server/templates/relatives.html:58 server/templates/textflow-toolbar.html:41
 msgid "MT"
 msgstr ""
 
-#: server/templates/relatives.html:64 server/templates/textflow-toolbar.html:43
+#: server/templates/relatives.html:64 server/templates/textflow-toolbar.html:48
 msgid "Frag"
 msgstr ""
 
-#: server/templates/relatives.html:70 server/templates/textflow-toolbar.html:49
+#: server/templates/relatives.html:70 server/templates/textflow-toolbar.html:55
 msgid "Rec"
 msgstr ""
 
-#: server/templates/relatives.html:73 server/templates/textflow-toolbar.html:52
+#: server/templates/relatives.html:73 server/templates/textflow-toolbar.html:58
 msgid "Sim"
 msgstr ""
 

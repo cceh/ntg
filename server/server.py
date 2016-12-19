@@ -244,6 +244,53 @@ class Passage (object):
         return list (map (Variants._make, ((k, v) for k, v in d.items ())))
 
 
+def nx_to_dot (nxg, width = 0):
+    """Convert an nx graph into a dot file.
+
+    We'd like to sort the nodes in the graph, but nx internally uses
+    dictionaries "all the way down".  Thus the only chance to sort nodes and
+    edges is while writing the file.  This function is a lightweight
+    re-implementation of nx.nx_pydot.to_pydot ().
+
+    """
+
+    width = width or 10.0
+
+    dot = ["""strict digraph G {{
+        graph [dpi=100,
+               nodesep=0.2,
+               ordering=out,
+               rankdir=BT,
+               ranksep=0.4,
+               size={size:.2f},
+               fontsize=8.0,
+               concentrate=true
+        ];
+        node [fixedsize=true,
+              shape=circle,
+              width=0.6
+        ];
+        edge [arrowhead=none,
+              arrowtail=none,
+              headclip=false,
+              tailclip=false
+        ];""".format (size = width / 100)]
+
+    # Copy nodes and sort them.  (Sorting nodes is important too.)
+    for n, nodedata in sorted (nxg.nodes (data = True)):
+        dot.append ("\"%s\" [%s];" %
+                    (n, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in nodedata.items ()])))
+
+    # Copy edges and sort them.
+    for u, v, edgedata in sorted (nxg.edges_iter (data = True)):
+        dot.append ("\"%s\" -> \"%s\" [%s];" %
+                    (u, v, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in edgedata.items ()])))
+
+    dot.append ('}\n')
+
+    return '\n'.join (dot)
+
+
 @static_app.endpoint ('index')
 def index ():
     return flask.render_template ('index.html')
@@ -459,14 +506,17 @@ def relatives (hs_hsnr_id, passage_or_id):
 
 
 @app.endpoint ('textflow.dot')
-def textflow_dot (passage_or_id, varnew):
+def textflow_dot (passage_or_id):
+    """ Output a stemma of manuscripts. """
 
+    varnew       = request.args.get ('labez') or ''
+    hyp_a        = request.args.get ('hyp_a')  or 'A'
     chapter      = request.args.get ('chapter') or 0
     connectivity = int (request.args.get ('connectivity') or 10)
     mode         = request.args.get ('mode') or 'rec'
     include      = request.args.getlist ('include[]') or []
     fragments    = request.args.getlist ('fragments[]') or []
-    hyp_a        = request.args.get ('hyp_a') or 'A'
+    width        = float (request.args.get ('width') or 0.0)
 
     prefix = '' if mode == 'rec' else 'p_'
 
@@ -475,10 +525,11 @@ def textflow_dot (passage_or_id, varnew):
     else:
         f_where = 'AND a.common > c.length / 2'
 
-    if hyp_a != 'A':
-        hyp_where = ' OR (v.ms_id = 1 AND :hyp_a ~ :varnew)'
-    else:
-        hyp_where = ''
+    var_where = ''
+    if varnew != '':
+        var_where = 'AND v.varnew ~ :varnew'
+        if hyp_a != 'A':
+            var_where = 'AND (v.varnew ~ :varnew OR (v.ms_id = 1 AND :hyp_a ~ :varnew))'
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -505,10 +556,10 @@ def textflow_dot (passage_or_id, varnew):
         res = execute (conn, """
         SELECT ms_id
         FROM {var} v
-        WHERE pass_id = :pass_id AND (v.varnew ~ :varnew {hyp_where}) AND ms_id NOT IN :exclude
+        WHERE pass_id = :pass_id {var_where} AND ms_id NOT IN :exclude
         """, dict (parameters, exclude = tuple (exclude),
                    pass_id = passage.pass_id, varnew = '^' + varnew,
-                   hyp_a = hyp_a, hyp_where = hyp_where))
+                   hyp_a = hyp_a, var_where = var_where))
 
         nodes = list (map (Nodes._make, res))
 
@@ -517,10 +568,21 @@ def textflow_dot (passage_or_id, varnew):
 
         # FIXME: why do we get a different result if we remove the inner ORDER BY clauses?
 
-        res = execute (conn, """
-        /* get the :connectivity closest ancestors for every node */
+        order = 'affinity DESC, common, older, newer DESC, id2' # id2 is a tiebreaker
+
+        old_query_not_varnew = """
+        /* get the closest ancestor */
+
+        (SELECT DISTINCT ON (id1) 1 AS u, id1, id2, rank
+        FROM ranks r
+        WHERE r.rank <= 1 AND r.id2 NOT IN :exclude
+        ORDER BY id1, rank)
+        """
+
+        query_varnew = """
+        /* get the closest ancestors for every node */
         WITH ranks AS (
-          SELECT id1, id2, rank () OVER (PARTITION BY id1 ORDER BY affinity DESC) AS rank, affinity
+          SELECT id1, id2, rank () OVER (PARTITION BY id1 ORDER BY {order}) AS rank
           FROM {aff} a
           JOIN {chap} c
             ON c.ms_id = a.id1 AND c.chapter = a.chapter
@@ -530,32 +592,47 @@ def textflow_dot (passage_or_id, varnew):
 
         /* get the closest ancestor attesting varnew */
 
-        (SELECT DISTINCT ON (id1) 1 as u, id1, id2, rank, affinity
+        (SELECT DISTINCT ON (id1) 1 as u, id1, id2, rank
         FROM ranks r
         JOIN {var} v
-          ON v.ms_id = id2 AND v.pass_id = :pass_id AND (v.varnew ~ :varnew {hyp_where})
+          ON v.ms_id = id2 AND v.pass_id = :pass_id {var_where}
         WHERE r.rank <= :connectivity AND r.id2 NOT IN :exclude
-        ORDER BY id1, affinity DESC)
+        ORDER BY id1, rank)
 
         UNION
 
         /* get the closest ancestor attesting anything (as fallback if the query
            above fails to get a result) */
 
-        (SELECT DISTINCT ON (id1) 2 as u, id1, id2, rank, affinity
+        (SELECT DISTINCT ON (id1) 2 as u, id1, id2, rank
         FROM ranks r
         JOIN {var} v
           ON v.ms_id = r.id2 AND v.pass_id = :pass_id AND v.varnew !~ '^z'
         WHERE r.id2 NOT IN :exclude
-        ORDER BY id1, affinity DESC)
+        ORDER BY id1, rank)
 
-        ORDER BY u, id1, affinity DESC, id2
-        """, dict (parameters, nodes = tuple (G.nodes ()), exclude = tuple (exclude),
-                   chapter = chapter, pass_id = passage.pass_id, prefix = prefix,
-                   varnew = '^' + varnew, connectivity = connectivity,
-                   f_where = f_where, hyp_a = hyp_a, hyp_where = hyp_where))
+        ORDER BY u, id1, rank
+        """
 
-        Ranks = collections.namedtuple ('Ranks', 'u ms_id1 ms_id2 rank affinity')
+        query_not_varnew = """
+        SELECT 1 AS u, r.* FROM (
+          SELECT id1, id2, row_number () OVER (PARTITION BY id1 ORDER BY {order}) AS rank
+          FROM {aff} a
+          JOIN {chap} c
+            ON c.ms_id = a.id1 AND c.chapter = a.chapter
+          WHERE id1 IN :nodes AND a.chapter = :chapter AND id2 NOT IN :exclude
+            AND {prefix}newer > {prefix}older AND a.common > c.length / 2
+        ) AS r
+        WHERE rank = 1
+        """
+
+        res = execute (conn, query_varnew if varnew != '' else query_not_varnew,
+                       dict (parameters, nodes = tuple (G.nodes ()), exclude = tuple (exclude),
+                             chapter = chapter, pass_id = passage.pass_id, prefix = prefix,
+                             varnew = '^' + varnew, connectivity = connectivity, order = order,
+                             f_where = f_where, hyp_a = hyp_a, var_where = var_where))
+
+        Ranks = collections.namedtuple ('Ranks', 'u ms_id1 ms_id2 rank')
         ranks = list (map (Ranks._make, res))
 
         # Add nodes to the graph.  Add each node only once.
@@ -603,7 +680,7 @@ def textflow_dot (passage_or_id, varnew):
                 if pred:
                     G.edge[pred[0]][n]['broken'] = True
 
-    dot = nx_to_dot (G)
+    dot = nx_to_dot (G, width)
     dot = tools.graphviz_layout (dot)
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
 
@@ -720,52 +797,6 @@ def local_stemma (passage_or_id):
         return G
 
 
-def nx_to_dot (nxg):
-    """Convert an nx graph into a dot file.
-
-    We'd like to sort the nodes in the graph, but nx internally uses
-    dictionaries "all the way down".  Thus the only chance to sort nodes and
-    edges is while writing the file.  This function is a lightweight
-    re-implementation of nx.nx_pydot.to_pydot ().
-
-    """
-
-    dot = ["""strict digraph G {
-        graph [dpi=100,
-               nodesep=0.2,
-               ordering=out,
-               rankdir=BT,
-               ranksep=0.4,
-               size=10.0,
-               fontsize=8.0,
-               concentrate=true,
-               ratio=compress
-        ];
-        node [fixedsize=true,
-              shape=circle,
-              width=0.6
-        ];
-        edge [arrowhead=none,
-              arrowtail=none,
-              headclip=false,
-              tailclip=false
-        ];"""]
-
-    # Copy nodes and sort them.  (Sorting nodes is important too.)
-    for n, nodedata in sorted (nxg.nodes (data = True)):
-        dot.append ("\"%s\" [%s];" %
-                    (n, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in nodedata.items ()])))
-
-    # Copy edges and sort them.
-    for u, v, edgedata in sorted (nxg.edges_iter (data = True)):
-        dot.append ("\"%s\" -> \"%s\" [%s];" %
-                    (u, v, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in edgedata.items ()])))
-
-    dot.append ('}\n')
-
-    return '\n'.join (dot)
-
-
 @app.endpoint ('stemma.dot')
 def stemma_dot (passage_or_id):
     """Serve a local stemma in dot format.
@@ -788,7 +819,9 @@ def stemma_dot (passage_or_id):
 
     """
 
-    dot = nx_to_dot (local_stemma (passage_or_id))
+    width = float (request.args.get ('width') or 0.0)
+
+    dot = nx_to_dot (local_stemma (passage_or_id), width)
     dot = tools.graphviz_layout (dot)
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
 
@@ -867,6 +900,7 @@ if __name__ == "__main__":
     from werkzeug.routing import Map, Rule
     from werkzeug.wsgi import DispatcherMiddleware
     from werkzeug.serving import run_simple
+    import logging
 
     instance_path = os.path.abspath (os.path.dirname (__file__) + '/instance')
 
@@ -880,10 +914,16 @@ if __name__ == "__main__":
 
     args = parser.parse_args (namespace = args)
     args.start_time = datetime.datetime.now ()
+    LOG_LEVELS = { 0: logging.CRITICAL, 1: logging.ERROR, 2: logging.WARN, 3: logging.INFO, 4: logging.DEBUG }
+    args.log_level = LOG_LEVELS.get (args.verbose, logging.CRITICAL)
     parameters = tools.init_parameters (tools.DEFAULTS)
 
     babel = flask_babel.Babel ()
     babel.localeselector (get_locale)
+
+    logging.basicConfig (format = '%(asctime)s - %(levelname)s - %(message)s')
+    logging.getLogger ('sqlalchemy.engine').setLevel (args.log_level)
+    logging.getLogger ('server').setLevel (args.log_level)
 
     instances = collections.OrderedDict ()
 
@@ -903,26 +943,26 @@ if __name__ == "__main__":
             Rule ('/relatives/<passage_or_id>/<hs_hsnr_id>',   endpoint = 'relatives'),
             Rule ('/ancestors/<passage_or_id>/<hs_hsnr_id>',   endpoint = 'relatives'),
             Rule ('/descendants/<passage_or_id>/<hs_hsnr_id>', endpoint = 'relatives'),
-            Rule ('/textflow.dot/<passage_or_id>/attestation/<varnew>', endpoint = 'textflow.dot'),
             Rule ('/apparatus.json/<passage_or_id>',           endpoint = 'apparatus.json'),
             Rule ('/attestation.json/<passage_or_id>',         endpoint = 'attestation.json'),
             Rule ('/stemma.dot/<passage_or_id>',               endpoint = 'stemma.dot'),
+            Rule ('/textflow.dot/<passage_or_id>',             endpoint = 'textflow.dot'),
         ])
 
-        tools.message (3, "{name} at {path} from conf {conf}".format (
+        tools.log (logging.INFO, "{name} at {path} from conf {conf}".format (
             name = sub_app.config['APPLICATION_NAME'],
             path = sub_app.config['APPLICATION_ROOT'],
-            conf = fn), True)
+            conf = fn))
 
         sub_app.config.dba = db.PostgreSQLEngine (**sub_app.config)
 
-        # tools.message (3, "URL Map {urlmap}".format (urlmap = sub_app.url_map))
+        # tools.log (logging.DEBUG, "URL Map {urlmap}".format (urlmap = sub_app.url_map))
 
         babel.init_app (sub_app)
         instances[sub_app.config['APPLICATION_ROOT']] = sub_app
 
-    tools.message (3, "Found translations for: {translations}".format (
-        translations = ', '.join ([l.get_display_name () for l in babel.list_translations ()])), True)
+    tools.log (logging.INFO, "Found translations for: {translations}".format (
+        translations = ', '.join ([l.get_display_name () for l in babel.list_translations ()])))
 
     dispatcher = DispatcherMiddleware (static_app, instances)
     run_simple ('localhost', 5000, dispatcher)
