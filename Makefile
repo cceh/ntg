@@ -16,8 +16,8 @@ TRANSLATIONS := de			 # space-separated list of translations we have eg. de fr
 NTG_SERVER := $(NTG_USER)@$(NTG_VM):$(NTG_ROOT)/$(SERVER)
 NTG_STATIC := $(NTG_USER)@$(NTG_VM):$(NTG_ROOT)/$(STATIC)
 
-LESS	   := $(STATIC)/css/*.less
-CSS		   := $(patsubst %.less, %.css, $(LESS))
+LESS	   := $(wildcard $(STATIC)/css/*.less)
+CSS		   := $(LESS:.less=.css)
 CSS_GZ	   := $(patsubst %, %.gzip, $(CSS))
 
 JS		   := $(STATIC)/js/*.js
@@ -30,8 +30,11 @@ PY_SOURCES := scripts/cceh/*.py ntg_common/*.py server/*.py
 
 restart: js css server
 
-server:
+server: css js
 	server/server.py -vvv
+
+clean:
+	find . -depth -name "*~" -delete
 
 psql:
 	ssh -f -L 1$(PSQL_PORT):localhost:$(PSQL_PORT) $(NTG_USER)@$(NTG_VM) sleep 120
@@ -47,7 +50,7 @@ pylint:
 jslint:
 	./node_modules/.bin/eslint -f unix Gruntfile.js $(JS)
 
-csslint:
+csslint: css
 	csslint --ignore="adjoining-classes,box-sizing,ids,order-alphabetical,overqualified-elements,qualified-headings" $(CSS)
 
 jsdoc:

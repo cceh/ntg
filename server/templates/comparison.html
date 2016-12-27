@@ -1,0 +1,67 @@
+{% extends "site.html" %}
+
+{% block page_class %}comparison{% endblock %}
+
+{% block head %}
+
+<title></title>
+
+<script>
+  require (['comparison'], function (comp) { comp.init () });
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="bs-docs-header">
+  <div class="container">
+    <h1>{{_('Comparison of')}} <span class="ms1"></span> {{_('and')}} <span class="ms2"></span>
+      <span class="appname">{{config['APPLICATION_NAME']}}</span>
+    </h1>
+  </div>
+</div>
+
+<div class="container bs-docs-container">
+
+  <div class="navigator">
+    <form class="manuscripts-selector form-inline">
+      <div class="form-group">
+        <label>{{_('Witness')}} 1:</label>
+        <input type="text" class="form-control" name="ms1" />
+        <label>{{_('Witness')}} 2:</label>
+        <input type="text" class="form-control" name="ms2" />
+      </div>
+      <button type="submit" data="Go" class="btn btn-primary">{{_('Go')}}</button>
+    </form>
+  </div>
+
+  <div class="panel panel-default panel-comparison">
+    <div class="panel-heading panel-comparison-header">
+    </div>
+
+    <table class="comparison table table-bordered table-condensed table-hover" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="details-control"></th>
+          <th class="chapter">{{_('Chapter')}}</th>
+          <th class="ms ms1">{{_('W1')}}</th>
+          <th class="direction">{{_('Dir')}}</th>
+          <th class="ms ms2">{{_('W2')}}</th>
+          <th class="rank">{{_('Rank')}}</th>
+          <th class="perc">{{_('Perc')}}</th>
+          <th class="eq">{{_('Eq')}}</th>
+          <th class="pass">{{_('Pass')}}</th>
+          <th class="w1w2">{{_('W1&lt;W2')}}</th>
+          <th class="w2w1">{{_('W1&gt;W2')}}</th>
+          <th class="uncl">{{_('Uncl')}}</th>
+          <th class="norel">{{_('Norel')}}</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NTG 2.0\n"
 "Report-Msgid-Bugs-To: marcello@perathoner.de\n"
-"POT-Creation-Date: 2016-12-19 16:12+0100\n"
-"PO-Revision-Date: 2016-12-19 16:19+0100\n"
+"POT-Creation-Date: 2016-12-27 17:24+0100\n"
+"PO-Revision-Date: 2016-12-27 17:27+0100\n"
 "Last-Translator: Marcello Perathoner <marcello@perathoner.de>\n"
 "Language-Team: German <>\n"
 "Language: de\n"
@@ -19,37 +19,37 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Gtranslator 2.91.7\n"
 
-#: server/server.py:35 server/server.py:37 server/server.py:39
-#: server/server.py:40
+#: server/server.py:37 server/server.py:39 server/server.py:41
+#: server/server.py:42
 msgid "Lac"
 msgstr "Lac"
 
-#: server/server.py:36
+#: server/server.py:38
 msgid "Overlap"
 msgstr "Überlappt"
 
-#: server/server.py:38
+#: server/server.py:40
 msgid "Dub"
 msgstr "Zweifelhaft"
 
-#: server/server.py:41 server/templates/relatives.html:34
+#: server/server.py:43 server/templates/relatives.html:34
 #: server/templates/relatives.html:49 server/templates/textflow-toolbar.html:29
 msgid "All"
 msgstr "Alle"
 
-#: server/server.py:42
+#: server/server.py:44
 msgid "All+Lac"
 msgstr "Alle+Lac"
 
-#: server/server.py:363
+#: server/server.py:389
 msgid "Relatives for"
 msgstr "Verwandte von"
 
-#: server/server.py:367
+#: server/server.py:393
 msgid "Ancestors for"
 msgstr "Vorfahren von"
 
-#: server/server.py:370
+#: server/server.py:396
 msgid "Descendants for"
 msgstr "Nachfahren von"
 
@@ -57,31 +57,95 @@ msgstr "Nachfahren von"
 msgid "Splits"
 msgstr "Splitts"
 
-#: server/templates/coherence.html:22
+#: server/templates/coherence.html:18
 msgid "Attestation for"
 msgstr "Bezeugung von"
 
-#: server/templates/coherence.html:32
+#: server/templates/coherence.html:28
 msgid "Apparatus"
 msgstr "Apparat"
 
-#: server/templates/coherence.html:43
+#: server/templates/coherence.html:39
 msgid "Local Stemma"
 msgstr "Lokales Stemma"
 
-#: server/templates/coherence.html:52
+#: server/templates/coherence.html:48
 msgid "Textual Flow Diagram"
 msgstr "Textfluss-Diagramm"
 
-#: server/templates/coherence.html:63
+#: server/templates/coherence.html:59
 msgid "Global Textual Flow Diagram"
 msgstr "Globales Textfluss-Diagramm"
 
-#: server/templates/coherence.html:76
+#: server/templates/coherence.html:72
 msgid "Affinity Cloud"
 msgstr "Affinitäts-Cloud"
 
-#: server/templates/ms_attesting.html:8 server/templates/ms_attesting.html:25
+#: server/templates/comparison.html:19
+msgid "Comparison of"
+msgstr "Vergleich von"
+
+#: server/templates/comparison.html:19
+msgid "and"
+msgstr "und"
+
+#: server/templates/comparison.html:30 server/templates/comparison.html:32
+msgid "Witness"
+msgstr "Zeuge"
+
+#: server/templates/comparison.html:35
+msgid "Go"
+msgstr "Los"
+
+#: server/templates/comparison.html:47
+msgid "Chapter"
+msgstr "Kapitel"
+
+#: server/templates/comparison.html:48
+msgid "W1"
+msgstr "Z1"
+
+#: server/templates/comparison.html:49
+msgid "Dir"
+msgstr "Ri"
+
+#: server/templates/comparison.html:50
+msgid "W2"
+msgstr "Z2"
+
+#: server/templates/comparison.html:51
+msgid "Rank"
+msgstr "Rang"
+
+#: server/templates/comparison.html:52
+msgid "Perc"
+msgstr "Perz"
+
+#: server/templates/comparison.html:53
+msgid "Eq"
+msgstr "Eq"
+
+#: server/templates/comparison.html:54
+msgid "Pass"
+msgstr "Pass"
+
+#: server/templates/comparison.html:55
+msgid "W1&lt;W2"
+msgstr "Z1&lt;Z2"
+
+#: server/templates/comparison.html:56
+msgid "W1&gt;W2"
+msgstr "Z1&gt;Z2"
+
+#: server/templates/comparison.html:57
+msgid "Uncl"
+msgstr "Unkl"
+
+#: server/templates/comparison.html:58
+msgid "Norel"
+msgstr "NV"
+
+#: server/templates/ms_attesting.html:7 server/templates/ms_attesting.html:29
 #, python-format
 msgid "Attestation for %(passage)s %(labez)s"
 msgstr "Bezeugung von %(passage)s %(labez)s"

@@ -1,0 +1,24 @@
+<table class="comparison-detail table table-condensed">
+  <thead>
+    <tr>
+      <th class="passage">Passage</th>
+      <th class="ms ms1">W1</th>
+      <th class="var">Var1</th>
+      <th class="direction">Dir</th>
+      <th class="var">Var2</th>
+      <th class="ms ms2">W2</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+    <tr>
+      <td class="passage">{{r.pass_hr}}</td>
+      <td class="ms ms1">{{ms1.hs}}</td>
+      <td class="var">{{r.var1}}</td>
+      <td class="direction">{{r.direction}}</td>
+      <td class="var">{{r.var2}}</td>
+      <td class="ms ms2">{{ms2.hs}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

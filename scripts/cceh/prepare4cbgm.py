@@ -1271,40 +1271,35 @@ def preprocess_local_stemmas (dba, parameters):
         # We don't want to traverse the graph back to the root every time this
         # question comes up.  So we add a field to the LocStemEd table that
         # contains an array of all ancestral readings for every reading.
+        #
+        # mask: 1 = '?'
+        #       2, 3, ...  = 'a', 'a1', ...
+        #
+        # Note: the assignment differs at evey passage!
 
-        execute (conn, """
+        maskgen = """
         WITH mask AS (
           SELECT pass_id, varnew,
-                 1 << (row_number () OVER (PARTITION BY pass_id ORDER BY varnew))::integer AS mask
+                 1 << ((row_number () OVER (PARTITION BY pass_id ORDER BY varnew))::integer + 1) AS mask
           FROM {locstemed}
         )
+        """
 
+        execute (conn, maskgen + """
         UPDATE {locstemed} l
         SET varnewmask = m.mask
         FROM mask m
         WHERE (l.pass_id, l.varnew) = (m.pass_id, m.varnew);
         """, parameters)
 
-        execute (conn, """
-        WITH mask AS (
-          SELECT pass_id, varnew,
-                 1 << (row_number () OVER (PARTITION BY pass_id ORDER BY varnew))::integer AS mask
-          FROM {locstemed}
-        )
-
+        execute (conn, maskgen + """
         UPDATE {locstemed} l
         SET s1mask = m.mask
         FROM mask m
         WHERE (l.pass_id, l.s1) = (m.pass_id, m.varnew);
         """, parameters)
 
-        execute (conn, """
-        WITH mask AS (
-          SELECT pass_id, varnew,
-                 1 << (row_number () OVER (PARTITION BY pass_id ORDER BY varnew))::integer AS mask
-          FROM {locstemed}
-        )
-
+        execute (conn, maskgen + """
         UPDATE {locstemed} l
         SET s2mask = m.mask
         FROM mask m
@@ -1316,9 +1311,10 @@ def preprocess_local_stemmas (dba, parameters):
         SET parents = s1mask + s2mask
         """, parameters)
 
+        # Build tree starting from '*' and '?'
         execute (conn, """
         WITH RECURSIVE tree AS (
-          SELECT pass_id, varnew, 0 AS ancestors
+          SELECT pass_id, varnew, CASE WHEN s1 = '?' THEN 1 ELSE 0 END AS ancestors
           FROM {locstemed}
           WHERE s1 IN ('*', '?')
         UNION
@@ -1506,14 +1502,13 @@ def calculate_mss_similarity_postco (dba, parameters, val):
                v.pass_id - 1 AS pass_id,
                l.varnewmask,
                l.parents,
-               l.ancestors,
-               s1 = '?' as unclear
+               l.ancestors
         FROM {var} v
         JOIN {locstemed} l
           ON (v.pass_id, v.varnew) = (l.pass_id, l.varnew) AND l.varnew !~ '^z'
         """, parameters)
 
-        LocStemEd = collections.namedtuple ('LocStemEd', 'ms_id pass_id varnewmask parents ancestors unclear')
+        LocStemEd = collections.namedtuple ('LocStemEd', 'ms_id pass_id varnewmask parents ancestors')
         rows = list (map (LocStemEd._make, res))
 
         # Matrix mss x passages containing the bitmask of the current reading
@@ -1532,7 +1527,7 @@ def calculate_mss_similarity_postco (dba, parameters, val):
             mask_matrix     [row.ms_id, row.pass_id] = row.varnewmask
             parent_matrix   [row.ms_id, row.pass_id] = row.parents
             ancestor_matrix [row.ms_id, row.pass_id] = row.ancestors
-            quest_matrix    [row.ms_id, row.pass_id] = row.unclear
+            quest_matrix    [row.ms_id, row.pass_id] = row.parents & 1
 
         print (mask_matrix)
         print (parent_matrix)

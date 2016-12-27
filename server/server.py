@@ -5,8 +5,10 @@
 
 import argparse
 import collections
+import csv
 import datetime
 import glob
+import io
 import math
 import re
 import sys
@@ -58,9 +60,9 @@ class Bag (object):
 class Manuscript (object):
     """ Represent one manuscript. """
 
-    RE_HSNR = re.compile (r'^\d{6}$')
-    RE_MSID = re.compile (r'^\d+$')
-    RE_HS   = re.compile (r'^[PL]?[s\d]+[.]?$')
+    RE_HSNR = re.compile (r'^\d{6}$')             # 123456
+    RE_MSID = re.compile (r'^\d+$')               # 123
+    RE_HS   = re.compile (r'^[PL]?[s\d]+[.]?$|^A$|^MT$')   # 01.
 
     def __init__ (self, conn, manuscript_id_or_hs_or_hsnr):
         """ Initialize passage struct from manuscript id or hs or hsnr. """
@@ -89,8 +91,16 @@ class Manuscript (object):
         self.ms_id, self.hs, self.hsnr = res.first ()
 
 
+    def to_json (self):
+        return flask.json.jsonify ({
+            'id'   : self.ms_id,
+            'hs'   : self.hs,
+            'hsnr' : self.hsnr,
+        })
+
+
 class Word (object):
-    """ Represents on word address. """
+    """ Represents one word address. """
 
     RE_HR_WORD = re.compile (r'^(?:(\w+)\s)?(?:(\d+):)?(?:(\d+)/)?(\d+)$')
 
@@ -161,13 +171,19 @@ class Passage (object):
         self.pass_id, self.start, self.end, self.chapter = res.first ()
 
 
+    @staticmethod
+    def _to_hr (start, end):
+        # return passage in human-readable format
+        s = Word (start)
+        if start == end:
+            return s.format ()
+        e = Word (end)
+        return s.format () + e.format (s)
+
+
     def to_hr (self):
         # return passage in human-readable format
-        s = Word (self.start).format ()
-
-        if self.start == self.end:
-            return s
-        return s + Word (self.end).format (Word (self.start))
+        return Passage._to_hr (self.start, self.end)
 
 
     def to_json (self):
@@ -320,6 +336,16 @@ def passage_json (passage_or_id):
 
         passage = Passage (conn, passage_or_id)
         return passage.to_json ()
+
+
+@app.endpoint ('manuscript.json')
+def manuscript_json (hs_hsnr_id):
+
+    hs_hsnr_id = request.args.get ('ms_id') or hs_hsnr_id
+
+    with current_app.config.dba.engine.begin () as conn:
+        ms = Manuscript (conn, hs_hsnr_id)
+        return ms.to_json ()
 
 
 @app.endpoint ('ms_attesting')
@@ -685,6 +711,15 @@ def textflow_dot (passage_or_id):
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
 
 
+def csvify (fields, rows):
+    fp = io.StringIO ()
+    writer = csv.DictWriter (fp, fields, restval='', extrasaction='raise', dialect='excel')
+    writer.writeheader ()
+    for r in rows:
+        writer.writerow (r._asdict ())
+    return fp.getvalue ()
+
+
 @app.endpoint ('coherence')
 def coherence ():
     """The main page of the user interface.
@@ -695,6 +730,142 @@ def coherence ():
     """
 
     return flask.render_template ('coherence.html')
+
+
+@app.endpoint ('comparison')
+def comparison ():
+    """ Comparison of 2 witnesses. """
+
+    with current_app.config.dba.engine.begin () as conn:
+        ms1 = Manuscript (conn, request.args.get ('ms1') or 'A')
+        ms2 = Manuscript (conn, request.args.get ('ms2') or 'A')
+
+        return flask.render_template ('comparison.html', ms1 = ms1, ms2 = ms2)
+
+
+ComparisonRow = collections.namedtuple (
+    'Comparison', 'chapter, id1, id2, common, equal, older, newer, unclear, affinity, rank')
+
+ComparisonDetailRow = collections.namedtuple (
+    'ComparisonDetailRowBase', 'pass_id anfadr endadr var1 mask1 anc1 par1 lesart1 var2 mask2 anc2 par2 lesart2')
+
+class ComparisonDetailRowCalcFields (ComparisonDetailRow):
+    __slots__ = ()
+
+    _fields = ComparisonDetailRow._fields + ('direction', 'pass_hr')
+
+    @property
+    def direction (self):
+        if self.mask1 & self.anc2:
+            return '>'
+        if self.mask2 & self.anc1:
+            return '<'
+        if (self.par1 & 1) or (self.par2 & 1):
+            return 'U'
+        return 'N'
+
+    @property
+    def pass_hr (self):
+        return Passage._to_hr (self.anfadr, self.endadr)
+
+    def _asdict (self):
+        return collections.OrderedDict (zip (self._fields, self + (self.direction, self.pass_hr)))
+
+
+def _comparison ():
+    """ Comparison of 2 witnesses. Returns CSV. """
+
+    with current_app.config.dba.engine.begin () as conn:
+        ms1 = Manuscript (conn, request.args.get ('ms1') or 'A')
+        ms2 = Manuscript (conn, request.args.get ('ms2') or 'A')
+
+        res = execute (conn, """
+        (WITH ranks AS (
+          SELECT id1, id2, aff.chapter, rank () OVER (PARTITION BY aff.chapter ORDER BY affinity DESC) AS rank, affinity
+          FROM {aff} aff
+          JOIN {chap} ch
+            ON ch.ms_id = aff.id1 AND ch.chapter = aff.chapter
+          WHERE id1 = :ms_id1
+            AND {prefix}newer > {prefix}older AND aff.common > ch.length / 2
+          ORDER BY affinity DESC
+        )
+
+        SELECT a.chapter, a.id1, a.id2, a.common, a.equal,
+               a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, r.rank
+        FROM {aff} a
+        JOIN ranks r
+          ON r.id1 = a.id1 AND r.id2 = a.id2 AND r.chapter = a.chapter
+        WHERE a.id1 = :ms_id1 AND a.id2 = :ms_id2
+        )
+
+        UNION
+
+        (WITH ranks2 AS (
+          SELECT id1, id2, aff.chapter, rank () OVER (PARTITION BY aff.chapter ORDER BY affinity DESC) AS rank, affinity
+          FROM {aff} aff
+          JOIN {chap} ch
+            ON ch.ms_id = aff.id2 AND ch.chapter = aff.chapter
+          WHERE id2 = :ms_id2
+            AND {prefix}newer < {prefix}older AND aff.common > ch.length / 2
+          ORDER BY affinity DESC
+        )
+
+        SELECT a.chapter, a.id1, a.id2, a.common, a.equal,
+               a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, r.rank
+        FROM {aff} a
+        JOIN ranks2 r
+          ON r.id1 = a.id1 AND r.id2 = a.id2 AND r.chapter = a.chapter
+        WHERE a.id1 = :ms_id1 AND a.id2 = :ms_id2
+        )
+
+        UNION
+
+        SELECT a.chapter, a.id1, a.id2, a.common, a.equal,
+               a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, NULL
+        FROM {aff} a
+        WHERE a.id1 = :ms_id1 AND a.id2 = :ms_id2 AND a.{prefix}newer = a.{prefix}older
+
+        ORDER BY chapter
+        """, dict (parameters, ms_id1 = ms1.ms_id + 1, ms_id2 = ms2.ms_id + 1, prefix = 'p_'))
+
+        return list (map (ComparisonRow._make, res))
+
+
+def _comparison_detail ():
+    """Comparison of 2 witnesses, chapter detail"""
+
+    with current_app.config.dba.engine.begin () as conn:
+        ms1 = Manuscript (conn, request.args.get ('ms1') or 'A')
+        ms2 = Manuscript (conn, request.args.get ('ms2') or 'A')
+        chapter = request.args.get ('chapter') or 0
+
+        res = execute (conn, """
+        SELECT p.id, p.anfadr, p.endadr,
+          v1.varnew, l1.varnewmask, l1.ancestors, l1.parents, r1.lesart,
+          v2.varnew, l2.varnewmask, l2.ancestors, l2.parents, r2.lesart
+        FROM (SELECT * FROM {pass} WHERE kapanf = :chapter) p
+          JOIN {var} v1 ON v1.pass_id = p.id AND v1.ms_id = :ms1
+          JOIN {var} v2 ON v2.pass_id = p.id AND v2.ms_id = :ms2
+          JOIN {locstemed} l1 ON l1.pass_id = p.id AND l1.varnew = v1.varnew
+          JOIN {locstemed} l2 ON l2.pass_id = p.id AND l2.varnew = v2.varnew
+          JOIN {read} r1 ON r1.pass_id = p.id AND r1.labez = v1.labez AND r1.labezsuf = v1.labezsuf
+          JOIN {read} r2 ON r2.pass_id = p.id AND r2.labez = v2.labez AND r2.labezsuf = v2.labezsuf
+        WHERE v1.varnew != v2.varnew AND v1.varnew !~ '^z' AND v2.varnew !~ '^z'
+        ORDER BY p.id
+        """, dict (parameters, ms1 = ms1.ms_id + 1, ms2 = ms2.ms_id + 1, chapter = chapter))
+
+        return list (map (ComparisonDetailRowCalcFields._make, res))
+
+
+@app.endpoint ('comparison.csv')
+def comparison_csv ():
+    return csvify (ComparisonRow._fields, _comparison ())
+
+
+@app.endpoint ('comparison-detail.csv')
+def comparison_detail_csv ():
+    # tools.log (logging.INFO, ComparisonDetailRow._source)
+    return csvify (ComparisonDetailRowCalcFields._fields, _comparison_detail ())
 
 
 @app.endpoint ('apparatus.json')
@@ -938,7 +1109,11 @@ if __name__ == "__main__":
         sub_app.url_map = Map ([
             Rule ('/',                                         endpoint = 'links'),
             Rule ('/coherence',                                endpoint = 'coherence'),
+            Rule ('/comparison',                               endpoint = 'comparison'),
+            Rule ('/comparison.csv',                           endpoint = 'comparison.csv'),
+            Rule ('/comparison-detail.csv',                    endpoint = 'comparison-detail.csv'),
             Rule ('/affinity.json',                            endpoint = 'affinity.json'),
+            Rule ('/manuscript.json/<hs_hsnr_id>',             endpoint = 'manuscript.json'),
             Rule ('/passage.json/<passage_or_id>',             endpoint = 'passage.json'),
             Rule ('/ms_attesting/<passage_or_id>/<labez>',     endpoint = 'ms_attesting'),
             Rule ('/relatives/<passage_or_id>/<hs_hsnr_id>',   endpoint = 'relatives'),

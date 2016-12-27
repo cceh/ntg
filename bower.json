@@ -26,7 +26,10 @@
     "pegjs": "^0.10.0",
     "rsvp.js": "rsvp#^3.3.3",
     "bootstrap": "^3.3.6",
-    "seiyria-bootstrap-slider": "^9.4.1"
+    "seiyria-bootstrap-slider": "^9.4.1",
+    "datatables.net": "^1.10.13",
+    "datatables.net-bs": "^1.10.13",
+    "jquery-csv": "^0.8.2"
   },
   "devDependencies": {}
 }

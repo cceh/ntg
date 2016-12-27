@@ -1,0 +1,107 @@
+@import "../bower_components/bootstrap/less/variables.less";
+@import "../bower_components/bootstrap/less/mixins.less";
+
+div.navigator {
+    margin-bottom: 1em;
+    input[type=text] {
+        width: 6em;
+    }
+}
+
+div.panel-comparison {
+    background-color: @panel-default-heading-bg;
+    table.dataTable {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        thead {
+            background-color: @panel-default-heading-bg;
+            tr th {
+                &.sorting:after,
+                &.sorting_asc:after,
+                &.sorting_desc:after {
+                    position: absolute;
+                    bottom: 8px;
+                    right: 8px;
+                    display: block;
+                    padding-left: 8px;
+                    font-family: 'Glyphicons Halflings';
+                    opacity: 1.0;
+                    cursor: pointer;
+                }
+                &.sorting:after {
+                    content: "\e114";
+                    color: green;
+                }
+                &.sorting_asc:after {
+                    content: "\e114";
+                    color: red;
+                }
+                &.sorting_desc:after {
+                    content: "\e113";
+                    color: red;
+                }
+            }
+        }
+        tbody {
+            background-color: @panel-bg;
+            td.sorting_1 {
+                background: @panel-default-heading-bg;
+            }
+        }
+    }
+}
+
+table.comparison {
+    margin-bottom: 0;
+    border-width: 0px;
+    text-align: right;
+    th, td {
+        &.ms {
+            text-align: left;
+        }
+        &.direction {
+            text-align: center;
+        }
+    }
+    div.slider {
+        background-color: @panel-default-heading-bg;
+        display: none;
+    }
+    td.no-padding {
+        padding: 0;
+    }
+    tr .details-control {
+        width: 24px;
+        text-align: center;
+    }
+    tr td.details-control:after {
+        font-family: 'Glyphicons Halflings';
+        content: "\e081";
+        color: green;
+        cursor: pointer;
+    }
+    tr.shown td.details-control:after {
+        content: "\e082";
+        color: red;
+    }
+    tr[data-chapter="0"] td.details-control:after {
+        content: "";
+    }
+}
+
+table.comparison-detail {
+    text-align: left;
+    border-width: 0;
+    th, td {
+        &.passage {
+            width: 15%;
+        }
+        &.direction {
+            text-align: center;
+            width: 5%;
+        }
+        &.lesart {
+            width: 35%;
+        }
+    }
+}

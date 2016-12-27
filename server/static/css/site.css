@@ -6,3 +6,6 @@ div.bs-docs-header {
 div.bs-docs-header h1 {
   color: white;
 }
+div.bs-docs-header h1 span.appname {
+  float: right;
+}

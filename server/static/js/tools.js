@@ -26,12 +26,12 @@ function ($, _) {
         });
     }
 
-    function query_params () {
-        var query = {}
+    function get_query_params () {
+        var query = {};
         location.search.substr (1).split ('&').forEach (function (item) {
             var s = item.split ('=');
-            query [s[0]] = s[1]
-        })
+            query[s[0]] = s[1];
+        });
         return query;
     }
 
@@ -146,6 +146,7 @@ function ($, _) {
 
     return {
         'format'                : format,
+        'get_query_params'      : get_query_params,
         'handle_toolbar_events' : handle_toolbar_events,
         'set_toolbar_buttons'   : set_toolbar_buttons,
         'load_labez_dropdown'   : load_labez_dropdown,
