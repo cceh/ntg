@@ -1280,7 +1280,7 @@ def preprocess_local_stemmas (dba, parameters):
         maskgen = """
         WITH mask AS (
           SELECT pass_id, varnew,
-                 1 << ((row_number () OVER (PARTITION BY pass_id ORDER BY varnew))::integer + 1) AS mask
+                 1 << (row_number () OVER (PARTITION BY pass_id ORDER BY varnew))::integer AS mask
           FROM {locstemed}
         )
         """
@@ -1308,7 +1308,7 @@ def preprocess_local_stemmas (dba, parameters):
 
         execute (conn, """
         UPDATE {locstemed} l
-        SET parents = s1mask + s2mask
+        SET parents = s1mask + s2mask + CASE WHEN s1 = '?' THEN 1 ELSE 0 END
         """, parameters)
 
         # Build tree starting from '*' and '?'
@@ -1852,8 +1852,6 @@ def config_from_pyfile (filename):
 
 if __name__ == '__main__':
 
-    logging.basicConfig ()
-
     parser = argparse.ArgumentParser (description='Prepare a database for CBGM')
 
     parser.add_argument ('profile', metavar='PROFILE', help="the database profile file (required)")
@@ -1881,6 +1879,8 @@ if __name__ == '__main__':
     args.range[1] = int (args.range[1] or 99)
 
     args.start_time = datetime.datetime.now ()
+    LOG_LEVELS = { 0: logging.CRITICAL, 1: logging.ERROR, 2: logging.WARN, 3: logging.INFO, 4: logging.DEBUG }
+    args.log_level = LOG_LEVELS.get (args.verbose, logging.CRITICAL)
     parameters = tools.init_parameters (tools.DEFAULTS)
     parameters['target_db'] = tools.quote (config['PGDATABASE'])
     parameters['source_db'] = tools.quote (config['MYSQL_ECM_DB'])
@@ -1893,8 +1893,6 @@ if __name__ == '__main__':
     dbsrc1 = db.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_ECM_DB'])
     dbsrc2 = db.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_VG_DB'])
     dbdest = db.PostgreSQLEngine (**config)
-
-    logging.getLogger ('sqlalchemy.engine').setLevel (logging.ERROR)
 
     v = Bag ()
     try:

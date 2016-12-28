@@ -65,7 +65,6 @@ table.comparison td.no-padding {
   padding: 0;
 }
 table.comparison tr .details-control {
-  width: 24px;
   text-align: center;
 }
 table.comparison tr td.details-control:after {

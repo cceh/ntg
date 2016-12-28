@@ -756,9 +756,9 @@ class ComparisonDetailRowCalcFields (ComparisonDetailRow):
 
     @property
     def direction (self):
-        if self.mask1 & self.anc2:
+        if self.mask1 & self.par2:
             return '>'
-        if self.mask2 & self.anc1:
+        if self.mask2 & self.par1:
             return '<'
         if (self.par1 & 1) or (self.par2 & 1):
             return 'U'

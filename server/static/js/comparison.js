@@ -32,21 +32,26 @@ function ($) {
 
     function create_child_table (ms1, ms2) {
         return $ (
-            '<div class="slider">' +
-              '<table cellspacing="0" width="100%" ' +
-                'class="comparison-detail table table-bordered table-condensed table-hover">' +
-                '<thead>' +
-                  '<tr>' +
-                    '<th class="passage">Passage</th>' +
-                    '<th class="lesart lesart1">Lesart</th>' +
-                    '<th class="ms ms1">' + ms1 + '</th>' +
-                    '<th class="direction">Dir</th>' +
-                    '<th class="ms ms2">' + ms2 + '</th>' +
-                    '<th class="lesart lesart2">Lesart</th>' +
-                  '</tr>' +
-                '</thead>' +
-              '</table>' +
-            '</div>'
+            '<tr class="no-padding">' +
+              '<td class="no-padding"></td>' +
+              '<td class="no-padding" colspan="12">' +
+                '<div class="slider">' +
+                  '<table cellspacing="0" width="100%" ' +
+                          'class="comparison-detail table table-bordered table-condensed table-hover">' +
+                    '<thead>' +
+                      '<tr>' +
+                        '<th class="passage">Passage</th>' +
+                        '<th class="lesart lesart1">Lesart</th>' +
+                        '<th class="ms ms1">' + ms1 + '</th>' +
+                        '<th class="direction">Dir</th>' +
+                        '<th class="ms ms2">' + ms2 + '</th>' +
+                        '<th class="lesart lesart2">Lesart</th>' +
+                      '</tr>' +
+                    '</thead>' +
+                  '</table>' +
+                '</div>' +
+              '</td>' +
+            '</tr>'
         );
     }
 
@@ -171,7 +176,7 @@ function ($) {
                                         if (type === 'sort') {
                                             return 1000000 + Number (r.pass_id);
                                         }
-                                        return r.pass_hr;
+                                        return '<a href="coherence#' + r.pass_id + '">' + r.pass_hr + '</a>';
                                     },
                                     'class' : 'passage',
                                 },
