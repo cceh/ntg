@@ -10,6 +10,9 @@ div.navigator {
 
 div.panel-comparison {
     background-color: @panel-default-heading-bg;
+    div.toolbar-comparison {
+        float: right;
+    }
     table.dataTable {
         margin-top: 0 !important;
         margin-bottom: 0 !important;
@@ -63,6 +66,14 @@ table.comparison {
             text-align: center;
         }
     }
+    tbody {
+        tr.older td.direction {
+            background-color: #cfc;
+        }
+        tr.newer td.direction {
+            background-color: #fcc;
+        }
+    }
     div.slider {
         background-color: @panel-default-heading-bg;
         display: none;
@@ -101,6 +112,14 @@ table.comparison-detail {
         }
         &.lesart {
             width: 35%;
+        }
+    }
+    tbody {
+        tr.older td.direction {
+            background-color: #cfc;
+        }
+        tr.newer td.direction {
+            background-color: #fcc;
         }
     }
 }

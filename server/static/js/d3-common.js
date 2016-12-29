@@ -26,7 +26,7 @@ define (['jquery', 'd3', 'lodash'], function ($, d3, _) {
      *
      * @function generate_css_palette
      *
-     * @param {d3.scale} - The color palette as D3 scale.
+     * @param d3_scale {d3.scale} - The color palette as D3 scale.
      *
      * @return {string} - The color palette as CSS
      */
@@ -52,7 +52,7 @@ define (['jquery', 'd3', 'lodash'], function ($, d3, _) {
      *
      * @function insert_css_palette
      *
-     * @param css - The color palette as CSS.
+     * @param css {string} - The color palette as CSS.
      */
     function insert_css_palette (css) {
         $ ('<style type="text/css">' + css + '</style>').appendTo ('head');

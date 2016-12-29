@@ -717,7 +717,7 @@ def csvify (fields, rows):
     writer.writeheader ()
     for r in rows:
         writer.writerow (r._asdict ())
-    return fp.getvalue ()
+    return flask.Response (fp.getvalue (), mimetype = 'text/csv')
 
 
 @app.endpoint ('coherence')
@@ -746,8 +746,27 @@ def comparison ():
 ComparisonRow = collections.namedtuple (
     'Comparison', 'chapter, id1, id2, common, equal, older, newer, unclear, affinity, rank')
 
+class ComparisonRowCalcFields (ComparisonRow):
+    __slots__ = ()
+
+    _fields = ComparisonRow._fields + ('direction', )
+
+    @property
+    def direction (self):
+        if self.older > self.newer:
+            return '>'
+        if self.older < self.newer:
+            return '<'
+        return '='
+
+    def _asdict (self):
+        return collections.OrderedDict (zip (self._fields, self + (self.direction, )))
+
+
 ComparisonDetailRow = collections.namedtuple (
-    'ComparisonDetailRowBase', 'pass_id anfadr endadr var1 mask1 anc1 par1 lesart1 var2 mask2 anc2 par2 lesart2')
+    'ComparisonDetailRowBase',
+    'pass_id anfadr endadr var1 mask1 anc1 par1 lesart1 var2 mask2 anc2 par2 lesart2 older newer'
+)
 
 class ComparisonDetailRowCalcFields (ComparisonDetailRow):
     __slots__ = ()
@@ -828,7 +847,7 @@ def _comparison ():
         ORDER BY chapter
         """, dict (parameters, ms_id1 = ms1.ms_id + 1, ms_id2 = ms2.ms_id + 1, prefix = 'p_'))
 
-        return list (map (ComparisonRow._make, res))
+        return list (map (ComparisonRowCalcFields._make, res))
 
 
 def _comparison_detail ():
@@ -842,7 +861,9 @@ def _comparison_detail ():
         res = execute (conn, """
         SELECT p.id, p.anfadr, p.endadr,
           v1.varnew, l1.varnewmask, l1.ancestors, l1.parents, r1.lesart,
-          v2.varnew, l2.varnewmask, l2.ancestors, l2.parents, r2.lesart
+          v2.varnew, l2.varnewmask, l2.ancestors, l2.parents, r2.lesart,
+          l1.varnewmask & l2.parents > 0 AS older,
+          l2.varnewmask & l1.parents > 0 AS newer
         FROM (SELECT * FROM {pass} WHERE kapanf = :chapter) p
           JOIN {var} v1 ON v1.pass_id = p.id AND v1.ms_id = :ms1
           JOIN {var} v2 ON v2.pass_id = p.id AND v2.ms_id = :ms2
@@ -859,7 +880,7 @@ def _comparison_detail ():
 
 @app.endpoint ('comparison.csv')
 def comparison_csv ():
-    return csvify (ComparisonRow._fields, _comparison ())
+    return csvify (ComparisonRowCalcFields._fields, _comparison ())
 
 
 @app.endpoint ('comparison-detail.csv')

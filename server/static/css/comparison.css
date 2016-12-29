@@ -7,6 +7,9 @@ div.navigator input[type=text] {
 div.panel-comparison {
   background-color: #f5f5f5;
 }
+div.panel-comparison div.toolbar-comparison {
+  float: right;
+}
 div.panel-comparison table.dataTable {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
@@ -57,6 +60,12 @@ table.comparison th.direction,
 table.comparison td.direction {
   text-align: center;
 }
+table.comparison tbody tr.older td.direction {
+  background-color: #cfc;
+}
+table.comparison tbody tr.newer td.direction {
+  background-color: #fcc;
+}
 table.comparison div.slider {
   background-color: #f5f5f5;
   display: none;
@@ -96,4 +105,10 @@ table.comparison-detail td.direction {
 table.comparison-detail th.lesart,
 table.comparison-detail td.lesart {
   width: 35%;
+}
+table.comparison-detail tbody tr.older td.direction {
+  background-color: #cfc;
+}
+table.comparison-detail tbody tr.newer td.direction {
+  background-color: #fcc;
 }

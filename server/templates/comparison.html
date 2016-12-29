@@ -16,7 +16,11 @@
 
 <div class="bs-docs-header">
   <div class="container">
-    <h1>{{_('Comparison of')}} <span class="ms1"></span> {{_('and')}} <span class="ms2"></span>
+    <h1>
+      <span class="caption">
+        {{_('Comparison of')}}
+        <span class="ms1"></span> {{_('and')}} <span class="ms2"></span>
+      </span>
       <span class="appname">{{config['APPLICATION_NAME']}}</span>
     </h1>
   </div>
@@ -28,16 +32,27 @@
     <form class="manuscripts-selector form-inline">
       <div class="form-group">
         <label>{{_('Witness')}} 1:</label>
-        <input type="text" class="form-control" name="ms1" />
+        <input type="text" class="form-control" name="ms1"
+               title="{{_('Enter the Gregory-Aland no. of the first witness (\'A\' for the initial text).')}}" />
         <label>{{_('Witness')}} 2:</label>
-        <input type="text" class="form-control" name="ms2" />
+        <input type="text" class="form-control" name="ms2"
+               title="{{_('Enter the Gregory-Aland no. of the second witness (\'A\' for the initial text).')}}" />
       </div>
-      <button type="submit" data="Go" class="btn btn-primary">{{_('Go')}}</button>
+      <button type="submit" data="Go" class="btn btn-primary"
+              title="{{_('Start the comparison.')}}">{{_('Go')}}</button>
     </form>
   </div>
 
   <div class="panel panel-default panel-comparison">
+
     <div class="panel-heading panel-comparison-header">
+      <span class="caption"></span>
+      <div class="btn-toolbar toolbar-comparison" role="toolbar">
+        <div class="btn-group btn-group-xs comparison-csv" role="group">
+          <a class="btn btn-primary btn-csv-download" href=""
+                  title="{{_('Download this table as CSV-File.')}}">{{_('CSV')}}</a>
+        </div>
+      </div>
     </div>
 
     <table class="comparison table table-bordered table-condensed table-hover" cellspacing="0">

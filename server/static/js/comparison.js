@@ -1,5 +1,8 @@
 /**
- * Comparison of 2 witnesses
+ * Comparison of 2 witnesses.  This module shows a table with a global
+ * comparison of two witnesses: in how many passages do they differ, how many
+ * are older / younger? There is also a drill-down table for each chapter with
+ * more detail about the differing passages.
  *
  * @module comparison
  * @author Marcello Perathoner
@@ -30,6 +33,17 @@ function ($) {
         'searching'    : false,
     };
 
+    /**
+     * Return a skeleton for a drill-down table.
+     *
+     * @function create_child_table
+     *
+     * @param ms1 {string} Name of the first manuscript to compare.
+     * @param ms2 {string} Name of the second manuscript to compare.
+     *
+     * @return {jQuery} The HTML skeleton.
+     */
+
     function create_child_table (ms1, ms2) {
         return $ (
             '<tr class="no-padding">' +
@@ -58,9 +72,11 @@ function ($) {
     /**
      * The inverse of the jQuery.param () function.
      *
-     * @param s
+     * @function deparam
      *
-     * @return array
+     * @param s {string} A string in the form "p=1&q=2"
+     *
+     * @return {Object} { p : 1, q : 2 }
      */
 
     function deparam (s) {
@@ -72,6 +88,13 @@ function ($) {
             return params;
         }, {});
     }
+
+    /**
+     * Initialize the table structure.  This has to be done only once.  On
+     * navigation we only replace the table data.
+     *
+     * @function init_table
+     */
 
     function init_table () {
         var $table = $ ('table.comparison');
@@ -95,18 +118,9 @@ function ($) {
                     'render'    : function () { return module.ms1.hs; },
                     'orderable' : false,
                 },
-                { /* dir */
-                    'data'   : null,
-                    'class'  : 'direction',
-                    'render' : function (r /* , type, full, meta */) {
-                        if (r.older > r.newer) {
-                            return '-->';
-                        }
-                        if (r.older === r.newer) {
-                            return '';
-                        }
-                        return '<--';
-                    },
+                {
+                    'data'  : 'direction',
+                    'class' : 'direction',
                 },
                 { /* ms2 */
                     'data'      : null,
@@ -114,20 +128,40 @@ function ($) {
                     'render'    : function () { return module.ms2.hs; },
                     'orderable' : false,
                 },
-                { 'data': 'rank' },
+                {
+                    'data'  : 'rank',
+                    'class' : 'equal',
+                },
                 { /* affinity */
                     'data'   : null,
+                    'class'  : 'equal',
                     'render' : function (r /* , type, full, meta */) {
                         return Math.round (r.affinity * 100000) / 1000;
                     },
                 },
-                { 'data': 'equal' },
-                { 'data': 'common' },
-                { 'data': 'newer' },
-                { 'data': 'older' },
-                { 'data': 'unclear' },
+                {
+                    'data'  : 'equal',
+                    'class' : 'equal',
+                },
+                {
+                    'data'  : 'common',
+                    'class' : 'common',
+                },
+                {
+                    'data'  : 'newer',
+                    'class' : 'newer',
+                },
+                {
+                    'data'  : 'older',
+                    'class' : 'older',
+                },
+                {
+                    'data'  : 'unclear',
+                    'class' : 'unclear',
+                },
                 { /* norel */
                     'data'   : null,
+                    'class'  : 'norel',
                     'render' : function (r /* , type, full, meta */) {
                         return (r.common - r.equal - r.older - r.newer - r.unclear);
                     },
@@ -135,7 +169,10 @@ function ($) {
             ],
             'order'      : [[1, 'asc']],
             'createdRow' : function (row, data, dummy_index) {
-                $ (row).attr ('data-chapter', data.chapter);
+                var $row = $ (row);
+                $row.attr ('data-chapter', data.chapter);
+                $row.toggleClass ('older', data.older > data.newer);
+                $row.toggleClass ('newer', data.older < data.newer);
             },
         }));
 
@@ -165,11 +202,11 @@ function ($) {
                     'chapter' : $tr.attr ('data-chapter'),
                 };
 
-                $.get ('comparison-detail.csv?' + $.param (params2), function (detail_csv) {
+                $.get ('comparison-detail.csv?' + $.param (params2), function (csv) {
                     $tr.addClass ('csv-loaded');
                     $childTable.find ('table').dataTable (
                         $.extend ({}, default_table_options, {
-                            'data'    : $.csv.toObjects (detail_csv),
+                            'data'    : $.csv.toObjects (csv),
                             'columns' : [
                                 {
                                     'data' : function (r, type /* , val, meta */) {
@@ -201,7 +238,12 @@ function ($) {
                                     'class' : 'lesart lesart2',
                                 },
                             ],
-                            'order' : [[0, 'asc']],
+                            'order'      : [[0, 'asc']],
+                            'createdRow' : function (r, data /* , index */) {
+                                var $row = $ (r);
+                                $row.toggleClass ('older', data.older > data.newer);
+                                $row.toggleClass ('newer', data.older < data.newer);
+                            },
                         })
                     );
                     $ ('div.slider', row.child ()).slideDown ();
@@ -210,30 +252,68 @@ function ($) {
         });
     }
 
-    function load_table () {
-        var $table = $ ('table.comparison');
+    /**
+     * Called after navigation.  Redraws the whole page.
+     *
+     * @function on_navigation
+     */
 
-        var params = {
-            'ms1' : module.ms1.hsnr,
-            'ms2' : module.ms2.hsnr,
-        };
+    function on_navigation () {
+        var hash = window.location.hash.substring (1);
+        if (hash) {
+            var p = deparam (hash);
 
-        $.get ('comparison.csv?' + $.param (params), function (comparison_csv) {
-            var table = $table.DataTable (); // eslint-disable-line new-cap
-            table.clear ().rows.add ($.csv.toObjects (comparison_csv)).draw ();
-        });
-    }
+            var p1 = $.getJSON ('manuscript.json/' + p.ms1, function (json) {
+                module.ms1 = json;
+            });
+            var p2 = $.getJSON ('manuscript.json/' + p.ms2, function (json) {
+                module.ms2 = json;
+            });
 
-    function fix (s) {
-        var re = /^\d+$/;
-        s = s + '';
-        if (re.test (s) && s.length < 6) {
-            return s + '.'
+            $.when (p1, p2).done (function () {
+                var $form = $ ('form.manuscripts-selector');
+                $ ('input[name="ms1"]', $form).val (p.ms1);
+                $ ('input[name="ms2"]', $form).val (p.ms2);
+
+                var $h1 = $ ('h1');
+                $ ('span.ms1', $h1).text (p.ms1);
+                $ ('span.ms2', $h1).text (p.ms2);
+
+                var caption = $ ('span.caption', $h1).text ();
+                $ ('div.panel-comparison-header span.caption').text (caption);
+                $ ('title').text (caption);
+
+                // reload table
+                var url = 'comparison.csv?' + $.param ({
+                    'ms1' : module.ms1.hsnr,
+                    'ms2' : module.ms2.hsnr,
+                });
+                $ ('a.btn-csv-download').attr ('href', url);
+
+                $.get (url, function (csv) {
+                    var table = $ ('table.comparison').DataTable (); // eslint-disable-line new-cap
+                    table.clear ().rows.add ($.csv.toObjects (csv)).draw ();
+                });
+            });
         }
-        return s;
     }
+
+    /**
+     * Init the navigation elements.  Also listen for hashtag events.
+     *
+     * @function init_nav
+     */
 
     function init_nav () {
+        function fix (s) {
+            var re = /^\d+$/;
+            s += '';
+            if (re.test (s) && s.length < 6) {
+                return s + '.';
+            }
+            return s;
+        }
+
         // User hit 'Go'
         $ ('form.manuscripts-selector').on ('submit', function (event) {
             var q = $ (event.currentTarget).serializeArray ();
@@ -248,33 +328,9 @@ function ($) {
             $ (document).trigger ('ntg.comparison.changed');
         });
 
+        // Hook
         $ (document).on ('ntg.comparison.changed', function (/* event */) {
-            var hash = window.location.hash.substring (1);
-            if (hash) {
-                var p = deparam (hash);
-
-                var p1 = $.getJSON ('manuscript.json/' + p.ms1, function (json) {
-                    module.ms1 = json;
-                });
-                var p2 = $.getJSON ('manuscript.json/' + p.ms2, function (json) {
-                    module.ms2 = json;
-                });
-
-                $.when (p1, p2).done (function () {
-                    var $form = $ ('form.manuscripts-selector');
-                    $ ('input[name="ms1"]', $form).val (p.ms1);
-                    $ ('input[name="ms2"]', $form).val (p.ms2);
-
-                    var $h1 = $ ('h1');
-                    $ ('span.ms1', $h1).text (p.ms1);
-                    $ ('span.ms2', $h1).text (p.ms2);
-
-                    $ ('div.panel-comparison-header').text ($h1.text ());
-                    $ ('title').text ($h1.text ());
-
-                    load_table ();
-                });
-            }
+            on_navigation ();
         });
     }
 
@@ -286,7 +342,7 @@ function ($) {
     function init () {
         init_nav ();
         init_table ();
-        $ (document).trigger ('ntg.comparison.changed');
+        on_navigation ();
     }
 
     module.init = init;

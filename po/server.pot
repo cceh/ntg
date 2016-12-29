@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NTG 2.0\n"
 "Report-Msgid-Bugs-To: marcello@perathoner.de\n"
-"POT-Creation-Date: 2016-12-27 17:24+0100\n"
+"POT-Creation-Date: 2016-12-29 17:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,67 +79,87 @@ msgstr ""
 msgid "Affinity Cloud"
 msgstr ""
 
-#: server/templates/comparison.html:19
+#: server/templates/comparison.html:21
 msgid "Comparison of"
 msgstr ""
 
-#: server/templates/comparison.html:19
+#: server/templates/comparison.html:22
 msgid "and"
 msgstr ""
 
-#: server/templates/comparison.html:30 server/templates/comparison.html:32
+#: server/templates/comparison.html:34 server/templates/comparison.html:37
 msgid "Witness"
 msgstr ""
 
-#: server/templates/comparison.html:35
+#: server/templates/comparison.html:36
+msgid "Enter the Gregory-Aland no. of the first witness ('A' for the initial text)."
+msgstr ""
+
+#: server/templates/comparison.html:39
+msgid "Enter the Gregory-Aland no. of the second witness ('A' for the initial text)."
+msgstr ""
+
+#: server/templates/comparison.html:42
+msgid "Start the comparison."
+msgstr ""
+
+#: server/templates/comparison.html:42
 msgid "Go"
 msgstr ""
 
-#: server/templates/comparison.html:47
-msgid "Chapter"
-msgstr ""
-
-#: server/templates/comparison.html:48
-msgid "W1"
-msgstr ""
-
-#: server/templates/comparison.html:49
-msgid "Dir"
-msgstr ""
-
-#: server/templates/comparison.html:50
-msgid "W2"
-msgstr ""
-
-#: server/templates/comparison.html:51
-msgid "Rank"
-msgstr ""
-
-#: server/templates/comparison.html:52
-msgid "Perc"
+#: server/templates/comparison.html:53
+msgid "Download this table as CSV-File."
 msgstr ""
 
 #: server/templates/comparison.html:53
+msgid "CSV"
+msgstr ""
+
+#: server/templates/comparison.html:62
+msgid "Chapter"
+msgstr ""
+
+#: server/templates/comparison.html:63
+msgid "W1"
+msgstr ""
+
+#: server/templates/comparison.html:64
+msgid "Dir"
+msgstr ""
+
+#: server/templates/comparison.html:65
+msgid "W2"
+msgstr ""
+
+#: server/templates/comparison.html:66
+msgid "Rank"
+msgstr ""
+
+#: server/templates/comparison.html:67
+msgid "Perc"
+msgstr ""
+
+#: server/templates/comparison.html:68
 msgid "Eq"
 msgstr ""
 
-#: server/templates/comparison.html:54
+#: server/templates/comparison.html:69
 msgid "Pass"
 msgstr ""
 
-#: server/templates/comparison.html:55
+#: server/templates/comparison.html:70
 msgid "W1&lt;W2"
 msgstr ""
 
-#: server/templates/comparison.html:56
+#: server/templates/comparison.html:71
 msgid "W1&gt;W2"
 msgstr ""
 
-#: server/templates/comparison.html:57
+#: server/templates/comparison.html:72
 msgid "Uncl"
 msgstr ""
 
-#: server/templates/comparison.html:58
+#: server/templates/comparison.html:73
 msgid "Norel"
 msgstr ""
 
