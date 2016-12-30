@@ -48,10 +48,6 @@
     <div class="panel-heading panel-comparison-header">
       <span class="caption"></span>
       <div class="btn-toolbar toolbar-comparison" role="toolbar">
-        <div class="btn-group btn-group-xs comparison-csv" role="group">
-          <a class="btn btn-primary btn-csv-download" href=""
-                  title="{{_('Download this table as CSV-File.')}}">{{_('CSV')}}</a>
-        </div>
       </div>
     </div>
 
@@ -59,18 +55,18 @@
       <thead>
         <tr>
           <th class="details-control"></th>
-          <th class="chapter">{{_('Chapter')}}</th>
-          <th class="ms ms1">{{_('W1')}}</th>
-          <th class="direction">{{_('Dir')}}</th>
-          <th class="ms ms2">{{_('W2')}}</th>
-          <th class="rank">{{_('Rank')}}</th>
-          <th class="perc">{{_('Perc')}}</th>
-          <th class="eq">{{_('Eq')}}</th>
-          <th class="pass">{{_('Pass')}}</th>
-          <th class="w1w2">{{_('W1&lt;W2')}}</th>
-          <th class="w2w1">{{_('W1&gt;W2')}}</th>
-          <th class="uncl">{{_('Uncl')}}</th>
-          <th class="norel">{{_('Norel')}}</th>
+          <th class="chapter exportable">{{_('Chapter')}}</th>
+          <th class="ms ms1 exportable">{{_('W1')}}</th>
+          <th class="direction exportable">{{_('Dir')}}</th>
+          <th class="ms ms2 exportable">{{_('W2')}}</th>
+          <th class="rank exportable">{{_('Rank')}}</th>
+          <th class="perc exportable">{{_('Perc')}}</th>
+          <th class="eq exportable">{{_('Eq')}}</th>
+          <th class="pass exportable">{{_('Pass')}}</th>
+          <th class="w1w2 exportable">{{_('W1&lt;W2')}}</th>
+          <th class="w2w1 exportable">{{_('W1&gt;W2')}}</th>
+          <th class="uncl exportable">{{_('Uncl')}}</th>
+          <th class="norel exportable">{{_('Norel')}}</th>
         </tr>
       </thead>
       <tbody>

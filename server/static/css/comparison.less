@@ -10,7 +10,13 @@ div.navigator {
 
 div.panel-comparison {
     background-color: @panel-default-heading-bg;
-    div.toolbar-comparison {
+    div.panel-comparison-header {
+        span.caption {
+            font-weight: bold;
+        }
+    }
+    div.toolbar-comparison,
+    div.toolbar-comparison-detail {
         float: right;
     }
     table.dataTable {
@@ -102,6 +108,12 @@ table.comparison {
 table.comparison-detail {
     text-align: left;
     border-width: 0;
+    caption {
+        font-weight: bold;
+        padding: @table-condensed-cell-padding;
+        border-bottom: 1px solid @table-border-color;
+        color: inherit;
+    }
     th, td {
         &.passage {
             width: 15%;
@@ -122,4 +134,8 @@ table.comparison-detail {
             background-color: #fcc;
         }
     }
+}
+
+body.dt-print-view table {
+    font-size: 12px;
 }

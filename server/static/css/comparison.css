@@ -7,7 +7,11 @@ div.navigator input[type=text] {
 div.panel-comparison {
   background-color: #f5f5f5;
 }
-div.panel-comparison div.toolbar-comparison {
+div.panel-comparison div.panel-comparison-header span.caption {
+  font-weight: bold;
+}
+div.panel-comparison div.toolbar-comparison,
+div.panel-comparison div.toolbar-comparison-detail {
   float: right;
 }
 div.panel-comparison table.dataTable {
@@ -93,6 +97,12 @@ table.comparison-detail {
   text-align: left;
   border-width: 0;
 }
+table.comparison-detail caption {
+  font-weight: bold;
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+  color: inherit;
+}
 table.comparison-detail th.passage,
 table.comparison-detail td.passage {
   width: 15%;
@@ -111,4 +121,7 @@ table.comparison-detail tbody tr.older td.direction {
 }
 table.comparison-detail tbody tr.newer td.direction {
   background-color: #fcc;
+}
+body.dt-print-view table {
+  font-size: 12px;
 }

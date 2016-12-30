@@ -133,7 +133,7 @@ function ($, _) {
             $menu.empty ();
             var variants = prefixes.concat (json.variants);
             _.forEach (variants, function (value) {
-                var data = { 'name': name, 'labez': value[0], 'labez_i18n': value[1] };
+                var data = { 'name' : name, 'labez' : value[0], 'labez_i18n' : value[1] };
                 var $item = $ (format (
                     '<label class="btn btn-labez bg_labez" data-labez="{labez}">' +
                         '<input type="radio" name="{name}" data-opt="{labez}">{labez_i18n}</input></label>', data

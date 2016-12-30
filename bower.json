@@ -29,7 +29,9 @@
     "seiyria-bootstrap-slider": "^9.4.1",
     "datatables.net": "^1.10.13",
     "datatables.net-bs": "^1.10.13",
-    "jquery-csv": "^0.8.2"
+    "jquery-csv": "^0.8.2",
+    "datatables.net-buttons": "^1.2.4",
+    "datatables.net-buttons-bs": "^1.2.4"
   },
   "devDependencies": {}
 }

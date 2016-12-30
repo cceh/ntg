@@ -52,7 +52,7 @@ function ($, _, d3, d3stemma, relatives, tools) {
         );
         load_dot_promise.done (function () {
             var panel = that.wrapper.closest ('div.panel');
-            panel.animate ({ 'width': that.graph.bbox.width + 'px' });
+            panel.animate ({ 'width' : that.graph.bbox.width + 'px' });
         });
 
         var promise = tools.load_labez_dropdown (this.toolbar.find ('div.textflow-labez'), passage.id, 'labez', []);

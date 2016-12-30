@@ -38,7 +38,7 @@ define (['jquery'], function ($) {
             var $target = $ (event.target);
             var data = $target.attr ('data');
             var q = $ (event.currentTarget).serializeArray ();
-            q.push ({ 'name': 'button', 'value': data });
+            q.push ({ 'name' : 'button', 'value' : data });
 
             $.getJSON ('passage.json/0?' + $.param (q), function (json) {
                 module.passage = json;

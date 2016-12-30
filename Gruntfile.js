@@ -29,7 +29,7 @@ module.exports = function (grunt) {
             'options' : {
                 'banner'  : '/* Generated file. Do not edit. */\n',
                 'plugins' : [
-                    new (Autoprefix) ({ 'browsers': ['last 2 versions'] }),
+                    new (Autoprefix) ({ 'browsers' : ['last 2 versions'] }),
                 ],
             },
             'production' : {

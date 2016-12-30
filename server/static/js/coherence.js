@@ -68,21 +68,21 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
         // Click on a ms. in the apparatus or in a relatives popup.
         $ (document).on ('click', '.ms[data-ms-id]', function (event) {
             var $target = $ (event.target);
-            $target.relatives_tooltip ({ 'items': '.ms[data-ms-id]' });
+            $target.relatives_tooltip ({ 'items' : '.ms[data-ms-id]' });
             $target.relatives_tooltip ('open');
         });
 
         // Click on a node in the textflow diagram.
         $ (document).on ('click', 'div.panel-textflow g.node', function (event) {
             var $target = $ (event.currentTarget); // the g.node, not the circle
-            $target.relatives_svg_tooltip ({ 'items': 'g.node' });
+            $target.relatives_svg_tooltip ({ 'items' : 'g.node' });
             $target.relatives_svg_tooltip ('open');
         });
 
         // Click on a node in the affinity cloud.
         $ (document).on ('click', '#affinity-wrapper g.node', function (event) {
             var $target = $ (event.currentTarget); // the g.node, not the circle
-            $target.relatives_svg_tooltip ({ 'items': 'g.node' });
+            $target.relatives_svg_tooltip ({ 'items' : 'g.node' });
             $target.relatives_svg_tooltip ('open');
         });
 

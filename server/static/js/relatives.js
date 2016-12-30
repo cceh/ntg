@@ -38,8 +38,8 @@ function ($, _, d3, d3c, tools, nav) {
 
     $.widget ('custom.relatives_tooltip', $.ui.tooltip, {
         'options' : {
-            'classes'  : { 'ui-tooltip': 'tooltip-relatives tooltip-relatives-data' },
-            'position' : { 'my': 'center bottom-3' },
+            'classes'  : { 'ui-tooltip' : 'tooltip-relatives tooltip-relatives-data' },
+            'position' : { 'my' : 'center bottom-3' },
             'open'     : function (event, ui) {
                 var $el = ui.tooltip;
                 var $panel = $el.find ('div.panel');

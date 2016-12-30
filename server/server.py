@@ -744,51 +744,25 @@ def comparison ():
 
 
 ComparisonRow = collections.namedtuple (
-    'Comparison', 'chapter, id1, id2, common, equal, older, newer, unclear, affinity, rank')
-
-class ComparisonRowCalcFields (ComparisonRow):
-    __slots__ = ()
-
-    _fields = ComparisonRow._fields + ('direction', )
-
-    @property
-    def direction (self):
-        if self.older > self.newer:
-            return '>'
-        if self.older < self.newer:
-            return '<'
-        return '='
-
-    def _asdict (self):
-        return collections.OrderedDict (zip (self._fields, self + (self.direction, )))
+    'Comparison', 'chapter, common, equal, older, newer, unclear, affinity, rank')
 
 
 ComparisonDetailRow = collections.namedtuple (
-    'ComparisonDetailRowBase',
-    'pass_id anfadr endadr var1 mask1 anc1 par1 lesart1 var2 mask2 anc2 par2 lesart2 older newer'
+    'ComparisonDetailRow',
+    'pass_id anfadr endadr var1 mask1 anc1 par1 lesart1 var2 mask2 anc2 par2 lesart2'
 )
 
 class ComparisonDetailRowCalcFields (ComparisonDetailRow):
     __slots__ = ()
 
-    _fields = ComparisonDetailRow._fields + ('direction', 'pass_hr')
-
-    @property
-    def direction (self):
-        if self.mask1 & self.par2:
-            return '>'
-        if self.mask2 & self.par1:
-            return '<'
-        if (self.par1 & 1) or (self.par2 & 1):
-            return 'U'
-        return 'N'
+    _fields = ComparisonDetailRow._fields + ('pass_hr', )
 
     @property
     def pass_hr (self):
         return Passage._to_hr (self.anfadr, self.endadr)
 
     def _asdict (self):
-        return collections.OrderedDict (zip (self._fields, self + (self.direction, self.pass_hr)))
+        return collections.OrderedDict (zip (self._fields, self + (self.pass_hr, )))
 
 
 def _comparison ():
@@ -809,7 +783,7 @@ def _comparison ():
           ORDER BY affinity DESC
         )
 
-        SELECT a.chapter, a.id1, a.id2, a.common, a.equal,
+        SELECT a.chapter, a.common, a.equal,
                a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, r.rank
         FROM {aff} a
         JOIN ranks r
@@ -829,7 +803,7 @@ def _comparison ():
           ORDER BY affinity DESC
         )
 
-        SELECT a.chapter, a.id1, a.id2, a.common, a.equal,
+        SELECT a.chapter, a.common, a.equal,
                a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, r.rank
         FROM {aff} a
         JOIN ranks2 r
@@ -839,7 +813,7 @@ def _comparison ():
 
         UNION
 
-        SELECT a.chapter, a.id1, a.id2, a.common, a.equal,
+        SELECT a.chapter, a.common, a.equal,
                a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, NULL
         FROM {aff} a
         WHERE a.id1 = :ms_id1 AND a.id2 = :ms_id2 AND a.{prefix}newer = a.{prefix}older
@@ -847,7 +821,7 @@ def _comparison ():
         ORDER BY chapter
         """, dict (parameters, ms_id1 = ms1.ms_id + 1, ms_id2 = ms2.ms_id + 1, prefix = 'p_'))
 
-        return list (map (ComparisonRowCalcFields._make, res))
+        return list (map (ComparisonRow._make, res))
 
 
 def _comparison_detail ():
@@ -861,9 +835,7 @@ def _comparison_detail ():
         res = execute (conn, """
         SELECT p.id, p.anfadr, p.endadr,
           v1.varnew, l1.varnewmask, l1.ancestors, l1.parents, r1.lesart,
-          v2.varnew, l2.varnewmask, l2.ancestors, l2.parents, r2.lesart,
-          l1.varnewmask & l2.parents > 0 AS older,
-          l2.varnewmask & l1.parents > 0 AS newer
+          v2.varnew, l2.varnewmask, l2.ancestors, l2.parents, r2.lesart
         FROM (SELECT * FROM {pass} WHERE kapanf = :chapter) p
           JOIN {var} v1 ON v1.pass_id = p.id AND v1.ms_id = :ms1
           JOIN {var} v2 ON v2.pass_id = p.id AND v2.ms_id = :ms2
@@ -880,7 +852,7 @@ def _comparison_detail ():
 
 @app.endpoint ('comparison.csv')
 def comparison_csv ():
-    return csvify (ComparisonRowCalcFields._fields, _comparison ())
+    return csvify (ComparisonRow._fields, _comparison ())
 
 
 @app.endpoint ('comparison-detail.csv')

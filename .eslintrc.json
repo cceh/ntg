@@ -30,7 +30,7 @@
         }],
         "key-spacing"       : ["error", {
             "singleLine" : {
-                "beforeColon" : false,
+                "beforeColon" : true,
                 "afterColon"  : true
             },
             "multiLine" : {

@@ -11,9 +11,14 @@
 define (['jquery',
          'jquery-csv',
          'datatables.net',
-         'datatables-bs',
+         'datatables.net-bs',
+         'datatables.net-buttons',
+         'datatables.net-buttons-bs',
+         'datatables.net-buttons-html5',
+         'datatables.net-buttons-print',
          'css!bootstrap-css',
          'css!datatables-bs-css',
+         'css!datatables-buttons-bs-css',
          'css!site-css',
          'css!comparison-css'],
 
@@ -33,18 +38,38 @@ function ($) {
         'searching'    : false,
     };
 
+    var default_buttons = [
+        {
+            'extend'        : 'copy',
+            'className'     : 'btn btn-primary btn-comparison-copy',
+            'exportOptions' : { 'columns' : '.exportable' },
+        },
+        {
+            'extend'        : 'csv',
+            'className'     : 'btn btn-primary btn-comparison-csv',
+            'exportOptions' : { 'columns' : '.exportable' },
+        },
+        {
+            'extend'        : 'print',
+            'className'     : 'btn btn-primary btn-comparison-print',
+            'exportOptions' : { 'columns' : '.exportable' },
+            'autoPrint'     : false,
+        },
+    ];
+
     /**
      * Return a skeleton for a drill-down table.
      *
-     * @function create_child_table
+     * @function create_details_table
      *
      * @param ms1 {string} Name of the first manuscript to compare.
      * @param ms2 {string} Name of the second manuscript to compare.
+     * @param chapter {string} The chapter to compare.
      *
      * @return {jQuery} The HTML skeleton.
      */
 
-    function create_child_table (ms1, ms2) {
+    function create_details_table (ms1, ms2, chapter) {
         return $ (
             '<tr class="no-padding">' +
               '<td class="no-padding"></td>' +
@@ -52,14 +77,21 @@ function ($) {
                 '<div class="slider">' +
                   '<table cellspacing="0" width="100%" ' +
                           'class="comparison-detail table table-bordered table-condensed table-hover">' +
+                    '<caption>' +
+                      '<span class="caption">' +
+                        'Comparison of ' + ms1 + ' and ' + ms2 + ' in Chapter ' + chapter +
+                      '</span>' +
+                      '<div class="btn-toolbar toolbar-comparison-detail">' +
+                      '</div>' +
+                    '</caption>' +
                     '<thead>' +
                       '<tr>' +
-                        '<th class="passage">Passage</th>' +
-                        '<th class="lesart lesart1">Lesart</th>' +
-                        '<th class="ms ms1">' + ms1 + '</th>' +
-                        '<th class="direction">Dir</th>' +
-                        '<th class="ms ms2">' + ms2 + '</th>' +
-                        '<th class="lesart lesart2">Lesart</th>' +
+                        '<th class="passage exportable">Passage</th>' +
+                        '<th class="lesart lesart1 exportable">Lesart</th>' +
+                        '<th class="ms ms1 exportable">' + ms1 + '</th>' +
+                        '<th class="direction exportable">Dir</th>' +
+                        '<th class="ms ms2 exportable">' + ms2 + '</th>' +
+                        '<th class="lesart lesart2 exportable">Lesart</th>' +
                       '</tr>' +
                     '</thead>' +
                   '</table>' +
@@ -90,15 +122,142 @@ function ($) {
     }
 
     /**
-     * Initialize the table structure.  This has to be done only once.  On
+     * Initialize the details table structure.  This has to be done only once.
+     * On navigation we'll throw all detail tables away.
+     *
+     * @function init_details_table
+     *
+     * @param $detailsTable {jQuery} The details table root node, which is not
+     * really a table node but a tr node containing a table further down.
+     */
+
+    function init_details_table ($detailsTable) {
+        var buttons = default_buttons.slice ();
+        var caption = $ ('caption span.caption', $detailsTable).text ().replace (/\s+/g, ' ');
+        buttons[1].filename = caption;
+        buttons[2].title    = caption;
+        var details_table = $detailsTable.find ('table').DataTable ( // eslint-disable-line new-cap
+            $.extend ({}, default_table_options, {
+                'columns' : [
+                    {
+                        'data' : function (r, type /* , val, meta */) {
+                            if (type === 'sort') {
+                                return 1000000 + Number (r.pass_id);
+                            }
+                            return '<a href="coherence#' + r.pass_id + '">' + r.pass_hr + '</a>';
+                        },
+                        'class' : 'passage',
+                    },
+                    {
+                        'data'  : 'lesart1',
+                        'class' : 'lesart lesart1',
+                    },
+                    {
+                        'data'  : 'var1',
+                        'class' : 'ms ms1',
+                    },
+                    {
+                        'data'   : null,
+                        'class'  : 'direction',
+                        'render' : function (r) {
+                            if (r.mask1 & r.par2) {
+                                return '>';
+                            }
+                            if (r.mask2 & r.par1) {
+                                return '<';
+                            }
+                            if ((r.par1 & 1) || (r.par2 & 1)) {
+                                return 'U';
+                            }
+                            return 'N';
+                        },
+                    },
+                    {
+                        'data'  : 'var2',
+                        'class' : 'ms ms2',
+                    },
+                    {
+                        'data'  : 'lesart2',
+                        'class' : 'lesart lesart2',
+                    },
+                ],
+                'order'      : [[0, 'asc']],
+                'createdRow' : function (r, d /* , index */) {
+                    var $row = $ (r);
+                    $row.toggleClass ('older', (d.mask1 & d.par2) > 0);
+                    $row.toggleClass ('newer', (d.mask2 & d.par1) > 0);
+                },
+                'buttons' : {
+                    'buttons' : buttons,
+                    'dom'     : {
+                        'container' : {
+                            'className' : 'btn-group btn-group-xs',
+                        },
+                    },
+                },
+            })
+        );
+
+        details_table.buttons ().container ().appendTo (
+            $ ('div.toolbar-comparison-detail', $detailsTable)
+        );
+        return details_table;
+    }
+
+    /**
+     * Opens a table containing a detailed view of one chapter.
+     *
+     * @function toggle_details_table
+     */
+
+    function toggle_details_table () {
+        var $tr    = $ (this).closest ('tr');
+        var $table = $tr.closest ('table');
+        var table  = $table.DataTable (); // eslint-disable-line new-cap
+        var row    = table.row ($tr);
+
+        if (row.child.isShown ()) {
+            $ ('div.slider', row.child ()).slideUp (function () {
+                row.child.hide ();
+                $tr.removeClass ('shown');
+            });
+        } else {
+            if ($tr.hasClass ('csv-loaded')) {
+                $tr.addClass ('shown');
+                row.child.show ();
+                $ ('div.slider', row.child ()).slideDown ();
+                return;
+            }
+
+            var params2 = {
+                'ms1'     : module.ms1.hsnr,
+                'ms2'     : module.ms2.hsnr,
+                'chapter' : $tr.attr ('data-chapter'),
+            };
+
+            var $detailsTable = create_details_table (module.ms1.hs, module.ms2.hs, params2.chapter);
+            row.child ($detailsTable, 'no-padding').show ();
+            $tr.addClass ('shown');
+
+            $.get ('comparison-detail.csv?' + $.param (params2), function (csv) {
+                $tr.addClass ('csv-loaded');
+                var details_table = init_details_table ($detailsTable);
+                details_table.clear ().rows.add ($.csv.toObjects (csv)).draw ();
+                $ ('div.slider', row.child ()).slideDown ();
+            });
+        }
+    }
+
+    /**
+     * Initialize the main table structure.  This has to be done only once.  On
      * navigation we only replace the table data.
      *
      * @function init_table
      */
 
     function init_table () {
-        var $table = $ ('table.comparison');
-        var $tbody = $ ('tbody', $table);
+        var $table  = $ ('table.comparison');
+        var $tbody  = $ ('tbody', $table);
 
         var table = $table.DataTable ($.extend ({}, default_table_options, { // eslint-disable-line new-cap
             'columns' : [
@@ -119,8 +278,17 @@ function ($) {
                     'orderable' : false,
                 },
                 {
-                    'data'  : 'direction',
-                    'class' : 'direction',
+                    'data'   : null,
+                    'class'  : 'direction',
+                    'render' : function (r) {
+                        if (r.older > r.newer) {
+                            return '>';
+                        }
+                        if (r.older < r.newer) {
+                            return '<';
+                        }
+                        return '=';
+                    },
                 },
                 { /* ms2 */
                     'data'      : null,
@@ -174,82 +342,19 @@ function ($) {
                 $row.toggleClass ('older', data.older > data.newer);
                 $row.toggleClass ('newer', data.older < data.newer);
             },
+            'buttons' : {
+                'buttons' : default_buttons,
+                'dom'     : {
+                    'container' : {
+                        'className' : 'btn-group btn-group-xs',
+                    },
+                },
+            },
         }));
 
-        $tbody.on ('click', 'td.details-control', function () {
-            var $tr = $ (this).closest ('tr');
-            var row = table.row ($tr);
+        table.buttons ().container ().appendTo ($ ('div.toolbar-comparison'));
 
-            if (row.child.isShown ()) {
-                $ ('div.slider', row.child ()).slideUp (function () {
-                    row.child.hide ();
-                    $tr.removeClass ('shown');
-                });
-            } else {
-                if ($tr.hasClass ('csv-loaded')) {
-                    $tr.addClass ('shown');
-                    row.child.show ();
-                    $ ('div.slider', row.child ()).slideDown ();
-                    return;
-                }
-                var $childTable = create_child_table (module.ms1.hs, module.ms2.hs);
-                row.child ($childTable, 'no-padding').show ();
-                $tr.addClass ('shown');
-
-                var params2 = {
-                    'ms1'     : module.ms1.hsnr,
-                    'ms2'     : module.ms2.hsnr,
-                    'chapter' : $tr.attr ('data-chapter'),
-                };
-
-                $.get ('comparison-detail.csv?' + $.param (params2), function (csv) {
-                    $tr.addClass ('csv-loaded');
-                    $childTable.find ('table').dataTable (
-                        $.extend ({}, default_table_options, {
-                            'data'    : $.csv.toObjects (csv),
-                            'columns' : [
-                                {
-                                    'data' : function (r, type /* , val, meta */) {
-                                        if (type === 'sort') {
-                                            return 1000000 + Number (r.pass_id);
-                                        }
-                                        return '<a href="coherence#' + r.pass_id + '">' + r.pass_hr + '</a>';
-                                    },
-                                    'class' : 'passage',
-                                },
-                                {
-                                    'data'  : 'lesart1',
-                                    'class' : 'lesart lesart1',
-                                },
-                                {
-                                    'data'  : 'var1',
-                                    'class' : 'ms ms1',
-                                },
-                                {
-                                    'data'  : 'direction',
-                                    'class' : 'direction',
-                                },
-                                {
-                                    'data'  : 'var2',
-                                    'class' : 'ms ms2',
-                                },
-                                {
-                                    'data'  : 'lesart2',
-                                    'class' : 'lesart lesart2',
-                                },
-                            ],
-                            'order'      : [[0, 'asc']],
-                            'createdRow' : function (r, data /* , index */) {
-                                var $row = $ (r);
-                                $row.toggleClass ('older', data.older > data.newer);
-                                $row.toggleClass ('newer', data.older < data.newer);
-                            },
-                        })
-                    );
-                    $ ('div.slider', row.child ()).slideDown ();
-                });
-            }
-        });
+        $tbody.on ('click', 'td.details-control', toggle_details_table);
     }
 
     /**
@@ -279,7 +384,7 @@ function ($) {
                 $ ('span.ms1', $h1).text (p.ms1);
                 $ ('span.ms2', $h1).text (p.ms2);
 
-                var caption = $ ('span.caption', $h1).text ();
+                var caption = $ ('span.caption', $h1).text ().replace (/\s+/g, ' ');
                 $ ('div.panel-comparison-header span.caption').text (caption);
                 $ ('title').text (caption);
 
@@ -288,8 +393,6 @@ function ($) {
                     'ms1' : module.ms1.hsnr,
                     'ms2' : module.ms2.hsnr,
                 });
-                $ ('a.btn-csv-download').attr ('href', url);
-
                 $.get (url, function (csv) {
                     var table = $ ('table.comparison').DataTable (); // eslint-disable-line new-cap
                     table.clear ().rows.add ($.csv.toObjects (csv)).draw ();

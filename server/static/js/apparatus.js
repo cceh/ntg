@@ -75,7 +75,7 @@ function ($, _, tools) {
             json_deferred.resolve ();
         });
 
-        var faded_promise = this.wrapper.animate ({ 'opacity': 0.0 }, 300);
+        var faded_promise = this.wrapper.animate ({ 'opacity' : 0.0 }, 300);
 
         $.when (json_deferred.promise (), faded_promise).done (function () {
             var wrapper = that.wrapper;
@@ -83,9 +83,9 @@ function ($, _, tools) {
             wrapper.html (new_list);
             var new_height = wrapper.get (0).scrollHeight;
             wrapper.height (old_height);
-            wrapper.animate ({ 'height': new_height }, 300, function () {
+            wrapper.animate ({ 'height' : new_height }, 300, function () {
                 wrapper.height ('auto');
-                wrapper.animate ({ 'opacity': 1.0 }, 300);
+                wrapper.animate ({ 'opacity' : 1.0 }, 300);
             });
             tools.set_toolbar_buttons (that.toolbar, that.data);
             changed ();
