@@ -9,7 +9,9 @@ import csv
 import datetime
 import glob
 import io
+import itertools
 import math
+import operator
 import re
 import sys
 import os
@@ -260,7 +262,30 @@ class Passage (object):
         return list (map (Variants._make, ((k, v) for k, v in d.items ())))
 
 
-def nx_to_dot (nxg, width = 0):
+DOT_SKELETON = """
+strict digraph G {{
+        graph [dpi=72,
+               nodesep=0.2,
+               ordering=out,
+               rankdir=BT,
+               ranksep=0.5,
+               size={size:.2f},
+               fontsize=10.0,
+               concentrate=true
+        ];
+        node [fixedsize=true,
+              shape=circle,
+              height=0.5,
+              width=0.5
+        ];
+        edge [arrowhead=none,
+              arrowtail=none,
+              headclip=true,
+              tailclip=true
+        ];
+"""
+
+def nx_to_dot (nxg, width = 960.0):
     """Convert an nx graph into a dot file.
 
     We'd like to sort the nodes in the graph, but nx internally uses
@@ -270,32 +295,44 @@ def nx_to_dot (nxg, width = 0):
 
     """
 
-    width = width or 10.0
-
-    dot = ["""strict digraph G {{
-        graph [dpi=100,
-               nodesep=0.2,
-               ordering=out,
-               rankdir=BT,
-               ranksep=0.4,
-               size={size:.2f},
-               fontsize=8.0,
-               concentrate=true
-        ];
-        node [fixedsize=true,
-              shape=circle,
-              width=0.6
-        ];
-        edge [arrowhead=none,
-              arrowtail=none,
-              headclip=false,
-              tailclip=false
-        ];""".format (size = width / 100)]
+    dot = [DOT_SKELETON.format (size = width / 72)]
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
     for n, nodedata in sorted (nxg.nodes (data = True)):
         dot.append ("\"%s\" [%s];" %
                     (n, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in nodedata.items ()])))
+
+    # Copy edges and sort them.
+    for u, v, edgedata in sorted (nxg.edges_iter (data = True)):
+        dot.append ("\"%s\" -> \"%s\" [%s];" %
+                    (u, v, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in edgedata.items ()])))
+
+    dot.append ('}\n')
+
+    return '\n'.join (dot)
+
+
+def nx_to_dot_subgraphs (nxg, width = 960.0):
+    """Convert an nx graph into a dot file.
+
+    We'd like to sort the nodes in the graph, but nx internally uses
+    dictionaries "all the way down".  Thus the only chance to sort nodes and
+    edges is while writing the file.  This function is a lightweight
+    re-implementation of nx.nx_pydot.to_pydot ().
+
+    """
+
+    dot = [DOT_SKELETON.format (size = width / 72)]
+
+    # Copy nodes and sort them.  (Sorting nodes is important too.)
+    sorted_nodes = sorted (nxg, key = lambda n: (nxg.node[n]['labez'], nxg.node[n]['hsnr']))
+    for key, nodes_for_key in itertools.groupby (sorted_nodes, key = lambda n: nxg.node[n]['labez']):
+        dot.append ("subgraph cluster_%s {" % key)
+        for n in nodes_for_key:
+            attr = nxg.node[n]
+            dot.append ("\"%s\" [%s];" %
+                        (n, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in attr.items ()])))
+        dot.append ("}")
 
     # Copy edges and sort them.
     for u, v, edgedata in sorted (nxg.edges_iter (data = True)):
@@ -543,6 +580,7 @@ def textflow_dot (passage_or_id):
     include      = request.args.getlist ('include[]') or []
     fragments    = request.args.getlist ('fragments[]') or []
     width        = float (request.args.get ('width') or 0.0)
+    var_only     = request.args.get ('var_only') == 'true'
 
     prefix = '' if mode == 'rec' else 'p_'
 
@@ -551,11 +589,11 @@ def textflow_dot (passage_or_id):
     else:
         f_where = 'AND a.common > c.length / 2'
 
-    var_where = ''
+    varnew_where = ''
     if varnew != '':
-        var_where = 'AND v.varnew ~ :varnew'
+        varnew_where = 'AND v.varnew ~ :varnew'
         if hyp_a != 'A':
-            var_where = 'AND (v.varnew ~ :varnew OR (v.ms_id = 1 AND :hyp_a ~ :varnew))'
+            varnew_where = 'AND (v.varnew ~ :varnew OR (v.ms_id = 1 AND :hyp_a ~ :varnew))'
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -578,32 +616,21 @@ def textflow_dot (passage_or_id):
         exclude = set (include) ^ set (['1', '2'])
         exclude.add (-1) # a non-existing id to avoid SQL error
 
-        # get nodes attesting varnew
+        # get all nodes or all nodes (hypothetically) attesting varnew
         res = execute (conn, """
         SELECT ms_id
         FROM {var} v
-        WHERE pass_id = :pass_id {var_where} AND ms_id NOT IN :exclude
+        WHERE pass_id = :pass_id {varnew_where} AND ms_id NOT IN :exclude
         """, dict (parameters, exclude = tuple (exclude),
                    pass_id = passage.pass_id, varnew = '^' + varnew,
-                   hyp_a = hyp_a, var_where = var_where))
+                   hyp_a = hyp_a, varnew_where = varnew_where))
 
         nodes = list (map (Nodes._make, res))
 
         for n in nodes:
             G.add_node (n.ms_id)
 
-        # FIXME: why do we get a different result if we remove the inner ORDER BY clauses?
-
         order = 'affinity DESC, common, older, newer DESC, id2' # id2 is a tiebreaker
-
-        old_query_not_varnew = """
-        /* get the closest ancestor */
-
-        (SELECT DISTINCT ON (id1) 1 AS u, id1, id2, rank
-        FROM ranks r
-        WHERE r.rank <= 1 AND r.id2 NOT IN :exclude
-        ORDER BY id1, rank)
-        """
 
         query_varnew = """
         /* get the closest ancestors for every node */
@@ -621,7 +648,7 @@ def textflow_dot (passage_or_id):
         (SELECT DISTINCT ON (id1) 1 as u, id1, id2, rank
         FROM ranks r
         JOIN {var} v
-          ON v.ms_id = id2 AND v.pass_id = :pass_id {var_where}
+          ON v.ms_id = id2 AND v.pass_id = :pass_id {varnew_where}
         WHERE r.rank <= :connectivity AND r.id2 NOT IN :exclude
         ORDER BY id1, rank)
 
@@ -656,7 +683,7 @@ def textflow_dot (passage_or_id):
                        dict (parameters, nodes = tuple (G.nodes ()), exclude = tuple (exclude),
                              chapter = chapter, pass_id = passage.pass_id, prefix = prefix,
                              varnew = '^' + varnew, connectivity = connectivity, order = order,
-                             f_where = f_where, hyp_a = hyp_a, var_where = var_where))
+                             f_where = f_where, hyp_a = hyp_a, varnew_where = varnew_where))
 
         Ranks = collections.namedtuple ('Ranks', 'u ms_id1 ms_id2 rank')
         ranks = list (map (Ranks._make, res))
@@ -696,6 +723,25 @@ def textflow_dot (passage_or_id):
                 attrs['varnew'] = hyp_a
                 attrs['labez']  = hyp_a[0]
 
+        if var_only:
+            # Eventually remove non-variant links
+            # remove nodes attesting z and link the children up
+            for n in G:
+                if G.node[n]['labez'] == 'z':
+                    pred = G.predecessors (n)
+                    if pred:
+                        G.remove_edge (pred[0], n)
+                    for succ in G.successors (n):
+                        G.remove_edge (n, succ)
+                        if pred:
+                            G.add_edge (pred[0], succ)
+            # remove edges between nodes attesting the same thing
+            for u, v in G.edges ():
+                if G.node[u]['labez'] == G.node[v]['labez']:
+                    G.remove_edge (u, v)
+            # remove now isolated nodes
+            G.remove_nodes_from (nx.isolates (G))
+
         for n in G:
             # Use a different label if the parent's varnew differs from this
             # node's varnew.
@@ -706,7 +752,10 @@ def textflow_dot (passage_or_id):
                 if pred:
                     G.edge[pred[0]][n]['broken'] = True
 
-    dot = nx_to_dot (G, width)
+    if var_only:
+        dot = nx_to_dot_subgraphs (G, width)
+    else:
+        dot = nx_to_dot (G, width)
     dot = tools.graphviz_layout (dot)
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
 

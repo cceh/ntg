@@ -26,7 +26,7 @@ function ($, _, d3, d3stemma, relatives, tools) {
         event.data = data;
 
         tools.handle_toolbar_events (event);
-        instance.load_passage (data.passage, data.labez, data.hyp_a);
+        instance.load_passage (data.passage, data.labez, data.hyp_a, data.var_only);
         event.stopPropagation ();
     }
 
@@ -35,24 +35,27 @@ function ($, _, d3, d3stemma, relatives, tools) {
      *
      * @function load_passage
      *
-     * @param {Object} passage - The passage to display.
-     *
-     * @param {string} labez - The labez to display.
+     * @param {Object} passage  - The passage to display.
+     * @param {string} labez    - The labez to display.
+     * @param {string} hyp_a    - The hypothetical reading to assume for A.
+     * @param {bool}   var_only - Display only nodes and links between different readings.
      */
-    function load_passage (passage, labez, hyp_a) {
+    function load_passage (passage, labez, hyp_a, var_only) {
         var that = this;
-        this.data.passage = passage;
-        this.data.labez = labez;
-        this.data.hyp_a = hyp_a;
-        this.data.width = this.wrapper.width ();
+        this.data.passage  = passage;
+        this.data.labez    = labez;
+        this.data.hyp_a    = hyp_a;
+        this.data.var_only = var_only;
+        this.data.width    = this.wrapper.width ();
 
-        var params = ['labez', 'connectivity', 'chapter', 'include', 'fragments', 'mode', 'hyp_a', 'width'];
+        var params = ['labez', 'connectivity', 'chapter', 'include', 'fragments',
+                      'mode', 'hyp_a', 'var_only', 'width'];
         var load_dot_promise = this.graph.load_dot (
             'textflow.dot/' + passage.id + '?' + $.param (_.pick (this.data, params))
         );
         load_dot_promise.done (function () {
             var panel = that.wrapper.closest ('div.panel');
-            panel.animate ({ 'width' : that.graph.bbox.width + 'px' });
+            panel.animate ({ 'width' : (that.graph.bbox.width + 20) + 'px' });
         });
 
         var promise = tools.load_labez_dropdown (this.toolbar.find ('div.textflow-labez'), passage.id, 'labez', []);
@@ -71,9 +74,7 @@ function ($, _, d3, d3stemma, relatives, tools) {
      * @function init
      *
      * @param {string} wrapper_selector - The element that should contain the apparatus table.
-     *
-     * @param {string} id_prefix - Prefix to use for all for the ids. (currently unused)
-     *
+     * @param {string} id_prefix        - Prefix to use for all for the ids.
      * @param {string} toolbar_selector - The toolbar to initialize and use.
      *
      * @returns {dict} - The module instance object.
@@ -94,6 +95,7 @@ function ($, _, d3, d3stemma, relatives, tools) {
             'fragments'    : [],
             'mode'         : 'rec',
             'hyp_a'        : 'A',
+            'var_only'     : false,
         };
 
         // Init toolbar.

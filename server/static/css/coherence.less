@@ -1,3 +1,9 @@
+@import "../bower_components/bootstrap/less/variables.less";
+@import "../bower_components/bootstrap/less/mixins.less";
+
+@link-color: #ccc;
+@link-opacity: 0.6;
+
 form.passage-selector {
     margin-bottom: 20px;
     input[type=text] {
@@ -52,12 +58,13 @@ a.selected, span.selected {
     outline: 2px solid #f00;
 }
 
+/* links */
 
 path, line {
     &.link {
-        stroke: #ccc;
+        stroke: @link-color;
         stroke-width: 2px;
-        stroke-opacity: .6;
+        stroke-opacity: @link-opacity;
         fill: none;
         &.broken {
             stroke-dasharray: 4 4;
@@ -65,19 +72,43 @@ path, line {
     }
 }
 
+marker.link {
+    stroke: @link-color;
+    stroke-opacity: @link-opacity;
+    fill: #000;
+    fill-opacity: 1.0;
+    stroke-dasharray: none;
+    visibility: hidden;
+}
+
+div.variant-textflow-wrapper {
+    path.link {
+        stroke-dasharray: none;
+    }
+    marker.link {
+        visibility: visible;
+    }
+}
+
+/* nodes */
+
 circle.node {
     stroke: #fff;
-    stroke-width: 2px;
+    stroke-width: 0px;
     transition: fill 2s linear;
     cursor: pointer;
 }
 
-circle.node.hsnr_0 {
-    stroke: #000;
-}
-
-circle.node.hsnr_1 {
-    stroke: #000;
+div.affinity-wrapper {
+    circle.node {
+        stroke-width: 2px;
+        &.hsnr_0 {
+            stroke: #000;
+        }
+        &.hsnr_1 {
+            stroke: #000;
+        }
+    }
 }
 
 line.link.highlight,
@@ -93,7 +124,6 @@ g.selected circle.node {
 }
 
 text.node {
-    font-size: 11px;
     dominant-baseline: middle;
     fill: #000;
     stroke: #fff;
@@ -107,7 +137,19 @@ text.node {
     }
 }
 
-#local-textflow-wrapper, #global-textflow-wrapper, #local-stemma-wrapper {
+/* subgraphs */
+
+rect.subgraph {
+    stroke: @panel-default-border;
+    stroke-width: 1px;
+    fill: @panel-default-heading-bg;
+    rx: 5px;
+    ry: 5px;
+}
+
+/* wrapper */
+
+div.svg-wrapper {
     width: 100%;
     svg {
         display: block;

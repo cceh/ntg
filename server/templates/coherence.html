@@ -30,7 +30,7 @@
 
     {% include 'apparatus-toolbar.html' %}
 
-    <ul id="apparatus-wrapper" class="list-group">
+    <ul id="apparatus-wrapper" class="list-group apparatus-wrapper">
     </ul>
   </div>
 
@@ -39,7 +39,18 @@
       {{_('Local Stemma')}}
     </div>
 
-    <div id="local-stemma-wrapper">
+    <div id="local-stemma-wrapper" class="svg-wrapper stemma-wrapper local-stemma-wrapper">
+    </div>
+  </div>
+
+  <div class="panel panel-default panel-textflow panel-variant-textflow">
+    <div class="panel-heading panel-variant-textflow-caption">
+      {{_('Coherence at Variant Passages')}}
+    </div>
+
+    {{ tt.toolbar ('variant') }}
+
+    <div id="variant-textflow-wrapper" class="svg-wrapper textflow-wrapper variant-textflow-wrapper">
     </div>
   </div>
 
@@ -50,7 +61,7 @@
 
     {{ tt.toolbar ('local') }}
 
-    <div id="local-textflow-wrapper">
+    <div id="local-textflow-wrapper" class="svg-wrapper textflow-wrapper local-textflow-wrapper">
     </div>
   </div>
 
@@ -61,7 +72,7 @@
 
     {{ tt.toolbar ('global') }}
 
-    <div id="global-textflow-wrapper">
+    <div id="global-textflow-wrapper" class="svg-wrapper textflow-wrapper global-textflow-wrapper">
     </div>
   </div>
 
@@ -72,7 +83,7 @@
       {{_('Affinity Cloud')}}
     </div>
 
-    <div id="affinity-wrapper">
+    <div id="affinity-wrapper" class="svg-wrapper affinity-wrapper">
     </div>
   </div>
 </div>

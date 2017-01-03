@@ -30,27 +30,32 @@ define (['jquery'], function ($) {
      *
      * @function init
      *
-     * @returns {dict} - The module object.
+     * @returns {Object} - The module object.
      */
     function init () {
-        // Tape recorder controls
-        $ ('form.passage-selector').on ('click', function (event) {
+        function on_nav (event) {
             var $target = $ (event.target);
-            var data = $target.attr ('data');
-            var q = $ (event.currentTarget).serializeArray ();
+            var data = $target.attr ('data') || 'Go';
+            var q = $ (event.delegateTarget).serializeArray (); // the <form>
             q.push ({ 'name' : 'button', 'value' : data });
 
             $.getJSON ('passage.json/0?' + $.param (q), function (json) {
                 module.passage = json;
-                $ (document).trigger ('ntg.passage.changed', json);
                 window.location.hash = '#' + json.passage;
             });
-        });
+            return false;
+        }
+
+        // Tape recorder controls
+        $ ('form.passage-selector').on ('click', 'button', on_nav);
+        $ ('form.passage-selector').on ('submit', on_nav);
 
         $ (document).on ('ntg.passage.changed', function (event, json) {
             var $form = $ ('form.passage-selector');
             $form.find ('input[name="pass_id"]').val (json.id);
-            $form.find ('input[name="dest"]').attr ('placeholder', json.hr);
+            var $input = $form.find ('input[name="dest"]');
+            $input.attr ('placeholder', json.hr);
+            $input.val (json.hr);
             $ ('h1 span.passage').text (json.hr);
             $ ('title').text ($ ('h1').text ());
         });

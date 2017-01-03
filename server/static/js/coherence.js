@@ -31,8 +31,9 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
     function set_passage (json) {
         module.apparatus.load_passage (json);
         module.local_stemma.load_dot ('stemma.dot/' + json.id);
-        module.ltextflow.load_passage (json, 'a', 'A');
-        module.gtextflow.load_passage (json, null, null);
+        module.ltextflow.load_passage (json, 'a', 'A',   false);
+        module.vtextflow.load_passage (json, null, null, true);
+        module.gtextflow.load_passage (json, null, null, false);
 
         // make sure attestation gets set *after* the nodes are loaded
         module.affinity_promise.done (function () {
@@ -50,11 +51,12 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
         $.fn.bootstrapTooltip = $.fn.tooltip.noConflict ();
 
         module.navigator    = navigator.init ();
-        module.apparatus    = apparatus.init ('#apparatus-wrapper',       'app_', 'div.toolbar-apparatus');
-        module.local_stemma = d3stemma.init  ('#local-stemma-wrapper',    'ls_');
-        module.ltextflow    = textflow.init  ('#local-textflow-wrapper',  'tf_',  'div.local-toolbar-textflow');
-        module.gtextflow    = textflow.init  ('#global-textflow-wrapper', 'gtf_', 'div.global-toolbar-textflow');
-        module.affinity     = affinity.init  ('#affinity-wrapper',        'aff_');
+        module.apparatus    = apparatus.init ('#apparatus-wrapper',        'app_', 'div.toolbar-apparatus');
+        module.local_stemma = d3stemma.init  ('#local-stemma-wrapper',     'ls_');
+        module.ltextflow    = textflow.init  ('#local-textflow-wrapper',   'tf_',  'div.local-toolbar-textflow');
+        module.vtextflow    = textflow.init  ('#variant-textflow-wrapper', 'vtf_', 'div.variant-toolbar-textflow');
+        module.gtextflow    = textflow.init  ('#global-textflow-wrapper',  'gtf_', 'div.global-toolbar-textflow');
+        module.affinity     = affinity.init  ('#affinity-wrapper',         'aff_');
         relatives.init ();
 
         module.affinity_promise = module.affinity.load_json ('affinity.json');

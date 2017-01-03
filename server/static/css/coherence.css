@@ -44,27 +44,46 @@ a.selected,
 span.selected {
   outline: 2px solid #f00;
 }
+/* links */
 path.link,
 line.link {
   stroke: #ccc;
   stroke-width: 2px;
-  stroke-opacity: .6;
+  stroke-opacity: 0.6;
   fill: none;
 }
 path.link.broken,
 line.link.broken {
   stroke-dasharray: 4 4;
 }
+marker.link {
+  stroke: #ccc;
+  stroke-opacity: 0.6;
+  fill: #000;
+  fill-opacity: 1.0;
+  stroke-dasharray: none;
+  visibility: hidden;
+}
+div.variant-textflow-wrapper path.link {
+  stroke-dasharray: none;
+}
+div.variant-textflow-wrapper marker.link {
+  visibility: visible;
+}
+/* nodes */
 circle.node {
   stroke: #fff;
-  stroke-width: 2px;
+  stroke-width: 0px;
   transition: fill 2s linear;
   cursor: pointer;
 }
-circle.node.hsnr_0 {
+div.affinity-wrapper circle.node {
+  stroke-width: 2px;
+}
+div.affinity-wrapper circle.node.hsnr_0 {
   stroke: #000;
 }
-circle.node.hsnr_1 {
+div.affinity-wrapper circle.node.hsnr_1 {
   stroke: #000;
 }
 line.link.highlight,
@@ -79,7 +98,6 @@ g.selected circle.node {
   stroke-opacity: 1.0;
 }
 text.node {
-  font-size: 11px;
   dominant-baseline: middle;
   fill: #000;
   stroke: #fff;
@@ -92,14 +110,19 @@ text.node {
 text.node:hover {
   text-decoration: underline;
 }
-#local-textflow-wrapper,
-#global-textflow-wrapper,
-#local-stemma-wrapper {
+/* subgraphs */
+rect.subgraph {
+  stroke: #ddd;
+  stroke-width: 1px;
+  fill: #f5f5f5;
+  rx: 5px;
+  ry: 5px;
+}
+/* wrapper */
+div.svg-wrapper {
   width: 100%;
 }
-#local-textflow-wrapper svg,
-#global-textflow-wrapper svg,
-#local-stemma-wrapper svg {
+div.svg-wrapper svg {
   display: block;
   margin: 1em auto;
 }

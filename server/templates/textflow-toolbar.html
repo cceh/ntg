@@ -15,7 +15,9 @@
         </div>
       </div>
     </div>
+    {% endif %}
 
+    {% if mode in ('local', 'variant') %}
     <div class="textflow-connectivity btn-group btn-group-xs" data-toggle="buttons">
       <label class="btn btn-primary">
         <span class="connectivity-label"></span>
@@ -59,7 +61,7 @@
       </label>
     </div>
 
-    {% if mode == 'local' %}
+    {% if mode in ('local', 'variant') %}
     <div class="textflow-hyp_a btn-group btn-group-xs">
       <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-hyp_a bg_labez"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
