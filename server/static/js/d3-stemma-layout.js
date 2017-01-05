@@ -86,10 +86,13 @@ function ($, d3, _, peg, parser_src) {
                 .duration (300)
                 .style ('opacity', 1.0);
 
-            // replace ids with node objects
+            // put id also inside node attrs
+            _.forEach (nodes, function (v, k) {
+                v.attrs.id = k;
+            });
+
+            // give all links an id
             _.forEach (links, function (link, i) {
-                link.source = nodes[link.elems[0].id];
-                link.target = nodes[link.elems[1].id];
                 link.id = instance.id_prefix + 'link_' + i;
             });
 
@@ -106,7 +109,7 @@ function ($, d3, _, peg, parser_src) {
                 .attr ('y',      function (d) { return d.y; })
                 .attr ('width',  function (d) { return d.width; })
                 .attr ('height', function (d) { return d.height; })
-                .attr ('class', 'subgraph')
+                .attr ('class', 'subgraph');
 
             // draw the links: a path and a text
 
@@ -119,7 +122,10 @@ function ($, d3, _, peg, parser_src) {
             link.append ('path')
                 .attr ('id', function (d) { return d.id; })
                 .attr ('class', function (d) {
-                    return 'link' + (d.attrs.broken ? ' broken' : '');
+                    return 'link ' +
+                        instance.id_prefix + 'sid-' + d.elems[0].id + ' ' +
+                        instance.id_prefix + 'tid-' + d.elems[1].id +
+                        (d.attrs.broken ? ' broken' : '');
                 })
                 .attr ('marker-end', 'url(#' + instance.id_prefix + 'triangle)')
                 .attr ('d', function (d) {
@@ -163,7 +169,13 @@ function ($, d3, _, peg, parser_src) {
             node.append ('circle')
                 .attr ('class', 'node fg_labez')
                 .attr ('data-labez', function (d) { return d.labez; })
-                .attr ('r', function (d) { return (d.width || node_width) * graph_attrs.dpi / 2; });
+                .attr ('r', function (d) { return (d.width || node_width) * graph_attrs.dpi / 2; })
+                .on ('mouseenter', function (d) {
+                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover', true);
+                })
+                .on ('mouseleave', function (d) {
+                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover', false);
+                });
 
             node.append ('text')
                 .attr ('class', 'node')

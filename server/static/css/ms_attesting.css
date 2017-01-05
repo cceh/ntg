@@ -2,15 +2,9 @@ div.relatives {
   display: inline-block;
   padding-right: 1em;
 }
-div.panel {
-  display: inline-block;
-}
 div.panel-relatives-toolbar {
   display: none;
 }
-div.panel-relatives-header {
+div.panel-relatives-caption {
   border-bottom-width: 0;
-}
-div.panel-relatives-header .close {
-  display: none;
 }

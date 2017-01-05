@@ -20,7 +20,6 @@
 
         // style.js
         "comma-dangle"      : ["error", "always-multiline"],
-        "consistent-this"   : ["error", "that"],
         "func-call-spacing" : ["error", "always"],
         "indent" : ["error", 4, {
             "SwitchCase"         : 0,

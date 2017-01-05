@@ -1,6 +1,6 @@
-<div class="panel panel-default panel-relatives" data-ms-id="{{ms.ms_id}}">
+<div class="panel panel-closable panel-default panel-relatives" data-ms-id="{{ms.ms_id}}">
 
-  <div class="panel-heading panel-relatives-header">
+  <div class="panel-heading panel-caption panel-relatives-caption">
     <span>{{caption}}</span>
     <span data-labez="{{ms.varnew[0]}}" class="fg_labez ms hilite-source"
           data-ms-id="{{ms.ms_id}}">{{ms.hs}} ({{ms.labez}}{{ms.labezsuf}})</span>
@@ -9,13 +9,9 @@
     <span data-labez="{{mt.varnew[0]}}" class="fg_labez">{{_('(MT %(perc)s %(labez)s)',
     perc = "{:.2%}".format (mt.aff), labez = mt.labez + mt.labezsuf)}}</span>
     {% endif %}
-
-    <a class="close tooltip-close"   ><span class="glyphicon glyphicon-remove"></span></a>
-    <a class="close tooltip-minimize"><span class="glyphicon glyphicon-collapse-up"></span></a>
-    <a class="close tooltip-maximize"><span class="glyphicon glyphicon-collapse-down"></span></a>
   </div>
 
-  <div class="panel-heading panel-relatives-toolbar">
+  <div class="panel-heading panel-slidable panel-toolbar panel-relatives-toolbar">
     <div class="btn-toolbar toolbar-relatives" role="toolbar">
       <div class="relatives-type btn-group btn-group-xs" data-toggle="buttons">
         <label class="btn btn-primary">
@@ -93,7 +89,7 @@
     </div>
   </div>
 
-  <div class="panel-relatives-content">
+  <div class="panel-slidable panel-relatives-content">
     <table class="relatives table table-condensed">
       {% for r in rows %}
       <tr data-labez="{{r.varnew[0]}}" class="fg_labez{% if loop.first %} first{% endif %}">

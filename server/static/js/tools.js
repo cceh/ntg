@@ -120,6 +120,8 @@ function ($, _) {
     /**
      * Loads the buttons in the labez dropdown with the labez of the passage.
      *
+     * @function load_labez_dropdown
+     *
      * @param {jQuery} $group - The button group
      * @param {int|string} pass_id - The passage id
      *
@@ -144,11 +146,79 @@ function ($, _) {
         return promise;
     }
 
+    /**
+     * Put min-max and close buttons onto panels.
+     *
+     * Put min-max buttons on panels that contain div.panel-slidable panes.
+     * Put close buttons on panels that contain div.panel-closable panes.
+     *
+     * @param $panels {jQuery Selector}  The panels to consider.
+     *
+     * @function create_panel_controls
+     */
+    function create_panel_controls ($panels) {
+        $panels.each (function () {
+            var $panel = $ (this);
+            // append the buttons in inverse order because they float right
+            if ($panel.hasClass ('panel-closable')) {
+                $panel.find ('div.panel-caption').append (
+                    '<a class="close panel-close"><span class="glyphicon glyphicon-remove"></span></a>'
+                );
+            }
+            if ($panel.find ('div.panel-slidable').length > 0) {
+                $panel.find ('div.panel-caption').append (
+                    '<a class="close panel-minimize"><span class="glyphicon glyphicon-collapse-up"></span></a>' +
+                    '<a class="close panel-maximize"><span class="glyphicon glyphicon-collapse-down"></span></a>'
+                );
+            }
+        });
+    }
+
+    /**
+     * Init panel button events
+     *
+     * @function init_panel_events
+     */
+    function init_panel_events () {
+        // Click on minimize icon
+        $ (document).on ('click', 'a.panel-minimize', function (event) {
+            var $this = $ (this);
+            var $panel = $this.closest ('div.panel');
+            $panel.find ('.panel-slidable').slideUp (function () {
+                $panel.trigger ('ntg.popup.visibility');
+            });
+            event.stopPropagation ();
+        });
+
+        // Click on maximize icon
+        $ (document).on ('click', 'a.panel-maximize', function (event) {
+            var $this = $ (this);
+            var $panel = $this.closest ('div.panel');
+            $panel.find ('.panel-slidable').slideDown (function () {
+                $panel.trigger ('ntg.popup.visibility');
+            });
+            event.stopPropagation ();
+        });
+
+        // Click on close icon
+        $ (document).on ('click', 'a.panel-close', function (event) {
+            var $this = $ (this);
+            var $panel = $this.closest ('div.panel');
+            $panel.fadeOut (function () {
+                $panel.trigger ('ntg.popup.visibility');
+                $panel.remove ();
+            });
+            event.stopPropagation ();
+        });
+    }
+
     return {
         'format'                : format,
         'get_query_params'      : get_query_params,
         'handle_toolbar_events' : handle_toolbar_events,
         'set_toolbar_buttons'   : set_toolbar_buttons,
         'load_labez_dropdown'   : load_labez_dropdown,
+        'create_panel_controls' : create_panel_controls,
+        'init_panel_events'     : init_panel_events,
     };
 });

@@ -1,4 +1,5 @@
 div.panel-relatives {
+  z-index: 10;
   width: 36em;
 }
 div.panel-relatives span.ms {
@@ -8,7 +9,7 @@ div.panel-relatives div.panel-relatives-content {
   max-height: 50em;
   overflow: auto;
 }
-div.panel-relatives-header .close {
+div.panel-relatives-caption .close {
   padding-left: 4px;
   font-size: 1.1em;
 }

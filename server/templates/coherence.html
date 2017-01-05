@@ -24,66 +24,66 @@
   {% include 'navigator.html' %}
 
   <div class="panel panel-default panel-apparatus">
-    <div class="panel-heading panel-apparatus-caption">
+    <div class="panel-heading panel-caption panel-apparatus-caption">
       {{_('Apparatus')}}
     </div>
 
     {% include 'apparatus-toolbar.html' %}
 
-    <ul id="apparatus-wrapper" class="list-group apparatus-wrapper">
+    <ul id="apparatus-wrapper" class="list-group panel-slidable apparatus-wrapper">
     </ul>
   </div>
 
   <div class="panel panel-default panel-local-stemma">
-    <div class="panel-heading panel-local-stemma-caption">
+    <div class="panel-heading panel-caption panel-local-stemma-caption">
       {{_('Local Stemma')}}
     </div>
 
-    <div id="local-stemma-wrapper" class="svg-wrapper stemma-wrapper local-stemma-wrapper">
+    <div id="local-stemma-wrapper" class="svg-wrapper panel-slidable stemma-wrapper local-stemma-wrapper">
     </div>
   </div>
 
   <div class="panel panel-default panel-textflow panel-variant-textflow">
-    <div class="panel-heading panel-variant-textflow-caption">
+    <div class="panel-heading panel-caption panel-variant-textflow-caption">
       {{_('Coherence at Variant Passages')}}
     </div>
 
     {{ tt.toolbar ('variant') }}
 
-    <div id="variant-textflow-wrapper" class="svg-wrapper textflow-wrapper variant-textflow-wrapper">
+    <div id="variant-textflow-wrapper" class="svg-wrapper panel-slidable textflow-wrapper variant-textflow-wrapper">
     </div>
   </div>
 
   <div class="panel panel-default panel-textflow panel-local-textflow">
-    <div class="panel-heading panel-local-textflow-caption">
+    <div class="panel-heading panel-caption panel-local-textflow-caption">
       {{_('Textual Flow Diagram')}}
     </div>
 
     {{ tt.toolbar ('local') }}
 
-    <div id="local-textflow-wrapper" class="svg-wrapper textflow-wrapper local-textflow-wrapper">
+    <div id="local-textflow-wrapper" class="svg-wrapper panel-slidable textflow-wrapper local-textflow-wrapper">
     </div>
   </div>
 
   <div class="panel panel-default panel-textflow panel-global-textflow">
-    <div class="panel-heading panel-global-textflow-caption">
+    <div class="panel-heading panel-caption panel-global-textflow-caption">
       {{_('Global Textual Flow Diagram')}}
     </div>
 
     {{ tt.toolbar ('global') }}
 
-    <div id="global-textflow-wrapper" class="svg-wrapper textflow-wrapper global-textflow-wrapper">
+    <div id="global-textflow-wrapper" class="svg-wrapper panel-slidable textflow-wrapper global-textflow-wrapper">
     </div>
   </div>
 
   {% include 'navigator.html' %}
 
   <div class="panel panel-default panel-affinity">
-    <div class="panel-heading panel-affinity-caption">
+    <div class="panel-heading panel-caption panel-affinity-caption">
       {{_('Affinity Cloud')}}
     </div>
 
-    <div id="affinity-wrapper" class="svg-wrapper affinity-wrapper">
+    <div id="affinity-wrapper" class="svg-wrapper panel-slidable affinity-wrapper">
     </div>
   </div>
 </div>

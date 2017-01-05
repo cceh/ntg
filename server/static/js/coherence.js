@@ -41,6 +41,7 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
         });
     }
 
+
     /**
      * Initialize the module.
      *
@@ -48,7 +49,6 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
      */
     function init () {
         $ (document).off ('.data-api');
-        $.fn.bootstrapTooltip = $.fn.tooltip.noConflict ();
 
         module.navigator    = navigator.init ();
         module.apparatus    = apparatus.init ('#apparatus-wrapper',        'app_', 'div.toolbar-apparatus');
@@ -67,25 +67,25 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
             )
         );
 
+        tools.create_panel_controls ($ ('div.panel'));
+        tools.init_panel_events ();
+
         // Click on a ms. in the apparatus or in a relatives popup.
         $ (document).on ('click', '.ms[data-ms-id]', function (event) {
-            var $target = $ (event.target);
-            $target.relatives_tooltip ({ 'items' : '.ms[data-ms-id]' });
-            $target.relatives_tooltip ('open');
+            var ms_id = $ (event.target).attr ('data-ms-id');
+            relatives.create_panel (ms_id, event.target);
         });
 
         // Click on a node in the textflow diagram.
         $ (document).on ('click', 'div.panel-textflow g.node', function (event) {
-            var $target = $ (event.currentTarget); // the g.node, not the circle
-            $target.relatives_svg_tooltip ({ 'items' : 'g.node' });
-            $target.relatives_svg_tooltip ('open');
+            var ms_id = $ (event.currentTarget).attr ('data-ms-id'); // the g.node, not the circle
+            relatives.create_panel (ms_id, event.currentTarget);
         });
 
         // Click on a node in the affinity cloud.
         $ (document).on ('click', '#affinity-wrapper g.node', function (event) {
-            var $target = $ (event.currentTarget); // the g.node, not the circle
-            $target.relatives_svg_tooltip ({ 'items' : 'g.node' });
-            $target.relatives_svg_tooltip ('open');
+            var ms_id = $ (event.currentTarget).attr ('data-ms-id'); // the g.node, not the circle
+            relatives.create_panel (ms_id, event.currentTarget);
         });
 
         // Content of popup changed.  Redo force graph highlighting.

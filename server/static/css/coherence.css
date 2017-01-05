@@ -4,24 +4,6 @@ form.passage-selector {
 form.passage-selector input[type=text] {
   width: 12em;
 }
-div.ui-tooltip.tooltip-relatives {
-  padding: 0;
-  border: none;
-  max-width: 100%;
-  font-size: 1em;
-}
-div.ui-tooltip.tooltip-relatives div.panel {
-  margin: 0;
-}
-.popover {
-  max-width: 100%;
-}
-div.popover-relatives div.popover-content {
-  padding: 0;
-}
-div.popover-relatives table.table {
-  margin-bottom: 1px;
-}
 #apparatus-wrapper {
   font-size: smaller;
 }
@@ -55,6 +37,11 @@ line.link {
 path.link.broken,
 line.link.broken {
   stroke-dasharray: 4 4;
+}
+path.link.hover,
+line.link.hover {
+  stroke: red;
+  stroke-opacity: 1.0;
 }
 marker.link {
   stroke: #ccc;

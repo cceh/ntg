@@ -11,29 +11,6 @@ form.passage-selector {
     }
 }
 
-div.ui-tooltip.tooltip-relatives {
-    padding: 0;
-    border: none;
-    max-width: 100%;
-    font-size: 1em;
-    div.panel {
-        margin: 0;
-    }
-}
-
-.popover {
-    max-width: 100%;
-}
-
-div.popover-relatives {
-    div.popover-content {
-        padding: 0;
-    }
-    table.table {
-        margin-bottom: 1px;
-    }
-}
-
 #apparatus-wrapper {
     font-size: smaller;
     h4.list-group-item-heading {
@@ -68,6 +45,10 @@ path, line {
         fill: none;
         &.broken {
             stroke-dasharray: 4 4;
+        }
+        &.hover {
+            stroke: red;
+            stroke-opacity: 1.0;
         }
     }
 }

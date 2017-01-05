@@ -268,7 +268,7 @@ strict digraph G {{
                nodesep=0.2,
                ordering=out,
                rankdir=BT,
-               ranksep=0.5,
+               ranksep={ranksep},
                size={size:.2f},
                fontsize=10.0,
                concentrate=true
@@ -295,7 +295,7 @@ def nx_to_dot (nxg, width = 960.0):
 
     """
 
-    dot = [DOT_SKELETON.format (size = width / 72)]
+    dot = [DOT_SKELETON.format (ranksep = 0.5, size = width / 72)]
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
     for n, nodedata in sorted (nxg.nodes (data = True)):
@@ -322,7 +322,7 @@ def nx_to_dot_subgraphs (nxg, width = 960.0):
 
     """
 
-    dot = [DOT_SKELETON.format (size = width / 72)]
+    dot = [DOT_SKELETON.format (ranksep = 1.0, size = width / 72)]
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
     sorted_nodes = sorted (nxg, key = lambda n: (nxg.node[n]['labez'], nxg.node[n]['hsnr']))

@@ -197,11 +197,11 @@ def graphviz_layout (dot):
         p.kill ()
         outs, errs = p.communicate ()
 
-    if p.returncode != 0:
-        raise subprocess.CalledProcessError (
-            'Program terminated with status: %d. stderr is: %s' % (
-                p.returncode, errs))
-    elif errs:
-        log (logging.ERROR, errs)
+    #if p.returncode != 0:
+    #    raise subprocess.CalledProcessError (
+    #        'Program terminated with status: %d. stderr is: %s' % (
+    #            p.returncode, errs))
+    #elif errs:
+    #    log (logging.ERROR, errs)
 
     return outs
