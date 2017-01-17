@@ -4,6 +4,10 @@
 @link-color: #ccc;
 @link-opacity: 0.6;
 
+#floating-panels {
+    position: relative;
+}
+
 form.passage-selector {
     margin-bottom: 20px;
     input[type=text] {
@@ -11,7 +15,7 @@ form.passage-selector {
     }
 }
 
-#apparatus-wrapper {
+ul.apparatus-wrapper {
     font-size: smaller;
     h4.list-group-item-heading {
         display: inline;
@@ -60,6 +64,10 @@ marker.link {
     fill-opacity: 1.0;
     stroke-dasharray: none;
     visibility: hidden;
+    /* path {
+        stroke: context-stroke;
+        fill: context-stroke;
+    } */
 }
 
 div.variant-textflow-wrapper {
@@ -104,7 +112,7 @@ g.selected circle.node {
     stroke-opacity: 1.0;
 }
 
-text.node {
+text {
     dominant-baseline: middle;
     fill: #000;
     stroke: #fff;
@@ -113,6 +121,9 @@ text.node {
     text-anchor: middle;
     pointer-events: none;
     paint-order: stroke;
+    &.group {
+        font-size: 120%;
+    }
     &:hover {
         text-decoration: underline;
     }

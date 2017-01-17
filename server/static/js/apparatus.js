@@ -7,9 +7,9 @@
  * @author Marcello Perathoner
  */
 
-define (['jquery', 'lodash', 'tools', 'bootstrap'],
+define (['jquery', 'lodash', 'tools', 'panel', 'bootstrap'],
 
-function ($, _, tools) {
+function ($, _, tools, panel) {
     'use strict';
 
     function changed () {
@@ -17,22 +17,12 @@ function ($, _, tools) {
         $ (document).trigger ('ntg.apparatus.changed');
     }
 
-    function options (event) {
-        var instance = event.data;
-        var data = instance.data;
-        event.data = data;
-
-        tools.handle_toolbar_events (event);
-        instance.load_passage (data.passage);
-        event.stopPropagation ();
-    }
-
     /**
      * Load a new passage.
      *
      * @function load_passage
      *
-     * @param {int} pass_id - The passage id
+     * @param {Object} passage - Which passage to load.
      */
     function load_passage (passage) {
         this.data.passage = passage;
@@ -75,19 +65,19 @@ function ($, _, tools) {
             json_deferred.resolve ();
         });
 
-        var faded_promise = this.wrapper.animate ({ 'opacity' : 0.0 }, 300);
+        var faded_promise = this.$wrapper.animate ({ 'opacity' : 0.0 }, 300);
 
         $.when (json_deferred.promise (), faded_promise).done (function () {
-            var wrapper = that.wrapper;
-            var old_height = wrapper.get (0).scrollHeight;
-            wrapper.html (new_list);
-            var new_height = wrapper.get (0).scrollHeight;
-            wrapper.height (old_height);
-            wrapper.animate ({ 'height' : new_height }, 300, function () {
-                wrapper.height ('auto');
-                wrapper.animate ({ 'opacity' : 1.0 }, 300);
+            var $wrapper = that.$wrapper;
+            var old_height = $wrapper.get (0).scrollHeight;
+            $wrapper.html (new_list);
+            var new_height = $wrapper.get (0).scrollHeight;
+            $wrapper.height (old_height);
+            $wrapper.animate ({ 'height' : new_height }, 300, function () {
+                $wrapper.height ('auto');
+                $wrapper.animate ({ 'opacity' : 1.0 }, 300);
             });
-            tools.set_toolbar_buttons (that.toolbar, that.data);
+            panel.set_toolbar_buttons (that.toolbar, that.data);
             changed ();
         });
     }
@@ -97,28 +87,18 @@ function ($, _, tools) {
      *
      * @function init
      *
-     * @param {string} wrapper_selector - The element that should contain the apparatus table.
+     * @param {Object} instance - The panel module instance to inherit from.
      *
-     * @param {string} id_prefix - Prefix to use for all for the ids. (currently unused)
-     *
-     * @param {string} toolbar_selector - The toolbar to initialize and use.
-     *
-     * @returns {dict} - The module instance object.
+     * @returns {Object} - The module instance object.
      */
-    function init (wrapper_selector, id_prefix, toolbar_selector) {
-        var instance = {};
-        instance.wrapper      = $ (wrapper_selector);
-        instance.toolbar      = $ (toolbar_selector);
-        instance.id_prefix    = $ (id_prefix);
+    function init (instance) {
         instance.load_passage = load_passage;
-        instance.data         = {
+        instance.$wrapper = instance.$panel.find ('.panel-content');
+        $.extend (instance.data, {
             'passage' : null,
             /* Show splits or not. */
             'splits'  : ['splits'],
-        };
-
-        // Answer toolbar activity.
-        $ (document).on ('click', toolbar_selector + ' input', instance, options);
+        });
 
         return instance;
     }

@@ -1,16 +1,19 @@
+#floating-panels {
+  position: relative;
+}
 form.passage-selector {
   margin-bottom: 20px;
 }
 form.passage-selector input[type=text] {
   width: 12em;
 }
-#apparatus-wrapper {
+ul.apparatus-wrapper {
   font-size: smaller;
 }
-#apparatus-wrapper h4.list-group-item-heading {
+ul.apparatus-wrapper h4.list-group-item-heading {
   display: inline;
 }
-#apparatus-wrapper ul.list-group-item-text {
+ul.apparatus-wrapper ul.list-group-item-text {
   display: inline;
   padding-left: 2em;
 }
@@ -50,6 +53,10 @@ marker.link {
   fill-opacity: 1.0;
   stroke-dasharray: none;
   visibility: hidden;
+  /* path {
+        stroke: context-stroke;
+        fill: context-stroke;
+    } */
 }
 div.variant-textflow-wrapper path.link {
   stroke-dasharray: none;
@@ -84,7 +91,7 @@ g.selected circle.node {
   stroke-width: 3px;
   stroke-opacity: 1.0;
 }
-text.node {
+text {
   dominant-baseline: middle;
   fill: #000;
   stroke: #fff;
@@ -94,7 +101,10 @@ text.node {
   pointer-events: none;
   paint-order: stroke;
 }
-text.node:hover {
+text.group {
+  font-size: 120%;
+}
+text:hover {
   text-decoration: underline;
 }
 /* subgraphs */

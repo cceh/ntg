@@ -6,17 +6,30 @@
  * @author Marcello Perathoner
  */
 
-define (['jquery', 'lodash', 'tools', 'd3', 'd3-common', 'd3-stemma', 'affinity',
-         'apparatus', 'navigator', 'relatives', 'textflow', 'bootstrap',
+define (['jquery',
+         'lodash',
+         'tools',
+         'd3',
+         'd3-common',
+         'd3-stemma',
+         'd3-chord',
+         'affinity',
+         'apparatus',
+         'navigator',
+         'panel',
+         'relatives',
+         'textflow',
+         'local-stemma',
+         'bootstrap',
          'css!bootstrap-css',
          'css!bootstrap-slider-css',
          'css!jquery-ui-css',
          'css!site-css',
          'css!coherence-css',
-         'css!relatives-css',
-         'css!textflow-css'],
+        ],
 
-function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, relatives, textflow) {
+function ($, _, tools, d3, d3common, d3stemma, d3chord,
+          affinity, apparatus, navigator, panel, relatives, textflow, locstem) {
     'use strict';
 
     var module = {}; // singleton
@@ -28,19 +41,21 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
      *
      * @param {Object} json - The new passage object from the server.
      */
-    function set_passage (json) {
-        module.apparatus.load_passage (json);
-        module.local_stemma.load_dot ('stemma.dot/' + json.id);
-        module.ltextflow.load_passage (json, 'a', 'A',   false);
-        module.vtextflow.load_passage (json, null, null, true);
-        module.gtextflow.load_passage (json, null, null, false);
+    function set_passage (passage) {
+        module.apparatus.load (passage);
+        module.local_stemma.load (passage);
+        module.ltextflow.data.labez = 'a';
+        module.ltextflow.data.hyp_a = 'A';
+        module.ltextflow.load  (passage);
+        module.vtextflow.load  (passage);
+        module.vtextflow2.load (passage);
+        module.gtextflow.load  (passage);
 
         // make sure attestation gets set *after* the nodes are loaded
         module.affinity_promise.done (function () {
-            module.affinity.set_attestation ('attestation.json/' + json.id);
+            module.affinity.load (passage);
         });
     }
-
 
     /**
      * Initialize the module.
@@ -51,13 +66,47 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
         $ (document).off ('.data-api');
 
         module.navigator    = navigator.init ();
-        module.apparatus    = apparatus.init ('#apparatus-wrapper',        'app_', 'div.toolbar-apparatus');
-        module.local_stemma = d3stemma.init  ('#local-stemma-wrapper',     'ls_');
-        module.ltextflow    = textflow.init  ('#local-textflow-wrapper',   'tf_',  'div.local-toolbar-textflow');
-        module.vtextflow    = textflow.init  ('#variant-textflow-wrapper', 'vtf_', 'div.variant-toolbar-textflow');
-        module.gtextflow    = textflow.init  ('#global-textflow-wrapper',  'gtf_', 'div.global-toolbar-textflow');
-        module.affinity     = affinity.init  ('#affinity-wrapper',         'aff_');
-        relatives.init ();
+
+        module.apparatus    = apparatus.init (panel.init ($ ('div.panel-apparatus')));
+
+        module.local_stemma = locstem.init  (
+            panel.init ($ ('div.panel-local-stemma')),
+            d3stemma,
+            'ls_'
+        );
+
+        module.ltextflow    = textflow.init  (
+            panel.init ($ ('div.panel-local-textflow')),
+            d3stemma,
+            'tf_',
+            false
+        );
+
+        module.vtextflow    = textflow.init  (
+            panel.init ($ ('div.panel-variant-textflow')),
+            d3stemma,
+            'vtf_',
+            true
+        );
+
+        module.vtextflow2   = textflow.init  (
+            panel.init ($ ('div.panel-variant-textflow-2')),
+            d3chord,
+            'vtf2_',
+            true
+        );
+
+        module.gtextflow    = textflow.init  (
+            panel.init ($ ('div.panel-global-textflow')),
+            d3stemma,
+            'gtf_',
+            false
+        );
+
+        module.affinity     = affinity.init (
+            panel.init ($ ('div.panel-affinity')),
+            'aff_'
+        );
 
         module.affinity_promise = module.affinity.load_json ('affinity.json');
 
@@ -67,8 +116,11 @@ function ($, _, tools, d3, d3common, d3stemma, affinity, apparatus, navigator, r
             )
         );
 
-        tools.create_panel_controls ($ ('div.panel'));
-        tools.init_panel_events ();
+        panel.create_panel_controls ($ ('div.panel'));
+        panel.init_panel_events ();
+
+        $ ('div.panel-variant-textflow-2 .panel-slidable').slideUp ();
+        module.vtextflow2.visible = false;
 
         // Click on a ms. in the apparatus or in a relatives popup.
         $ (document).on ('click', '.ms[data-ms-id]', function (event) {

@@ -271,7 +271,7 @@ strict digraph G {{
                ranksep={ranksep},
                size={size:.2f},
                fontsize=10.0,
-               concentrate=true
+               remincross=true
         ];
         node [fixedsize=true,
               shape=circle,
@@ -312,7 +312,7 @@ def nx_to_dot (nxg, width = 960.0):
     return '\n'.join (dot)
 
 
-def nx_to_dot_subgraphs (nxg, width = 960.0):
+def nx_to_dot_subgraphs (nxg, field, width = 960.0):
     """Convert an nx graph into a dot file.
 
     We'd like to sort the nodes in the graph, but nx internally uses
@@ -325,9 +325,13 @@ def nx_to_dot_subgraphs (nxg, width = 960.0):
     dot = [DOT_SKELETON.format (ranksep = 1.0, size = width / 72)]
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
-    sorted_nodes = sorted (nxg, key = lambda n: (nxg.node[n]['labez'], nxg.node[n]['hsnr']))
-    for key, nodes_for_key in itertools.groupby (sorted_nodes, key = lambda n: nxg.node[n]['labez']):
+    sorted_nodes = sorted (nxg, key = lambda n: (nxg.node[n][field], nxg.node[n]['hsnr']))
+    for key, nodes_for_key in itertools.groupby (sorted_nodes, key = lambda n: nxg.node[n][field]):
         dot.append ("subgraph cluster_%s {" % key)
+        dot.append ("labeljust=l")
+        dot.append ("labelloc=c")
+        dot.append ("rank=%s" % ('source' if key in ('a', 'a1') else 'same'))
+        dot.append ("label=%s" % key)
         for n in nodes_for_key:
             attr = nxg.node[n]
             dot.append ("\"%s\" [%s];" %
@@ -375,6 +379,26 @@ def passage_json (passage_or_id):
         return passage.to_json ()
 
 
+@app.endpoint ('chapters.json')
+def chapters_json ():
+
+    with current_app.config.dba.engine.begin () as conn:
+        res = execute (conn, """
+        SELECT DISTINCT chapter, chapter
+        FROM {chap}
+        WHERE chapter > 0
+        ORDER BY chapter
+        """, parameters)
+
+        Chapters = collections.namedtuple ('Chapters', 'chapter i18n')
+        chapters = list (map (Chapters._make, res))
+        # chapters = [ Chapters._make (r)._asdict () for r in res ]
+
+        return flask.json.jsonify ({
+            'chapters' : chapters,
+        })
+
+
 @app.endpoint ('manuscript.json')
 def manuscript_json (hs_hsnr_id):
 
@@ -409,6 +433,62 @@ def ms_attesting (passage_or_id, labez):
 
 @app.endpoint ('relatives')
 def relatives (hs_hsnr_id, passage_or_id):
+    """The relatives popup skeleton.
+
+    A convenience method that serves an empty skeleton for the relatives popup.
+
+    """
+
+    chapter = request.args.get ('chapter') or 0
+    caption = _('Relatives for')
+
+    with current_app.config.dba.engine.begin () as conn:
+
+        passage = Passage (conn, passage_or_id)
+        ms      = Manuscript (conn, hs_hsnr_id)
+
+        # Get the attestation (labez) of the manuscript
+        res = execute (conn, """
+        SELECT labez, labezsuf, varid, varnew
+        FROM {var}
+        WHERE ms_id = :ms_id AND pass_id = :pass_id
+        """, dict (parameters, ms_id = ms.ms_id + 1, pass_id = passage.pass_id))
+        ms.labez, ms.labezsuf, ms.varid, ms.varnew = res.fetchone ()
+
+        # Get the passage
+        res = execute (conn, """
+        SELECT kapanf FROM {pass} WHERE id = :pass_id
+        """, dict (parameters, pass_id = passage.pass_id))
+        pass_chapter, = res.fetchone ()
+
+        # Get the affinity of the manuscript to MT
+        #
+        # For the reason we don't simply use affinity.affinity, see the comment
+        # in: ActsMsListValPh3.pl
+        mt = Bag ()
+        res = execute (conn, """
+        SELECT a.equal::float / c.length as affinity
+        FROM {aff} a
+        JOIN {chap} c
+          ON (a.id1, a.chapter) = (c.ms_id, c.chapter)
+        WHERE a.id1 = :id1 AND a.id2 = 2 AND a.chapter = :chapter
+        """, dict (parameters, id1 = ms.ms_id + 1, chapter = chapter))
+        mt.aff = res.scalar ()
+
+        # Get the attestation (labez) of MT
+        res = execute (conn, """
+        SELECT labez, labezsuf, varid, varnew
+        FROM {var}
+        WHERE ms_id = 2 AND pass_id = :pass_id
+        """, dict (parameters, pass_id = passage.pass_id))
+        mt.labez, mt.labezsuf, mt.varid, mt.varnew = res.fetchone ()
+
+    # convert tuples to lists
+    return flask.render_template ('relatives-skeleton.html', caption = caption, ms = ms, mt = mt)
+
+
+@app.endpoint ('relatives.json')
+def relatives_json (hs_hsnr_id, passage_or_id):
     """Output a table of the nearest relatives of a manuscript.
 
     Output a table of the nearest relatives/ancestors/descendants of a
@@ -416,6 +496,7 @@ def relatives (hs_hsnr_id, passage_or_id):
 
     """
 
+    type_     = request.args.get ('type') or 'rel'
     chapter   = request.args.get ('chapter') or 0
     limit     = int (request.args.get ('limit') or 10)
     labez     = request.args.get ('labez') or 'all'
@@ -425,10 +506,10 @@ def relatives (hs_hsnr_id, passage_or_id):
 
     caption = _('Relatives for')
     where = ''
-    if 'ancestors' in request.url_rule.rule:
+    if type_ == 'anc':
         where =  ' AND older <= newer'
         caption = _('Ancestors for')
-    if 'descendants' in request.url_rule.rule:
+    if type_ == 'des':
         where =  ' AND older >= newer'
         caption = _('Descendants for')
 
@@ -561,11 +642,7 @@ def relatives (hs_hsnr_id, passage_or_id):
         )
         relatives = list (map (Relatives._make, res))
 
-        variants = passage.variants (prefix = ('all', ), suffix = ('all+lac', ))
-
-        # convert tuples to lists
-        return flask.render_template ("relatives.html", passage = passage, caption = caption,
-                                      ms = ms, mt = mt, variants = variants, rows = relatives)
+        return flask.render_template ('relatives.html', mt = mt, rows = relatives)
 
 
 @app.endpoint ('textflow.dot')
@@ -576,15 +653,21 @@ def textflow_dot (passage_or_id):
     hyp_a        = request.args.get ('hyp_a')  or 'A'
     chapter      = request.args.get ('chapter') or 0
     connectivity = int (request.args.get ('connectivity') or 10)
-    mode         = request.args.get ('mode') or 'rec'
-    include      = request.args.getlist ('include[]') or []
-    fragments    = request.args.getlist ('fragments[]') or []
     width        = float (request.args.get ('width') or 0.0)
-    var_only     = request.args.get ('var_only') == 'true'
+    mode         = request.args.get ('mode') or 'rec'
+
+    include      = request.args.getlist ('include[]')   or []
+    fragments    = request.args.getlist ('fragments[]') or []
+    var_only     = request.args.getlist ('var_only[]')  or []
+    splits       = request.args.getlist ('splits[]')    or []
+
+    fragments = 'fragments' in fragments
+    var_only  = 'var_only'  in var_only
+    splits    = 'splits'    in splits
 
     prefix = '' if mode == 'rec' else 'p_'
 
-    if '1' in fragments:
+    if fragments:
         f_where = ''
     else:
         f_where = 'AND a.common > c.length / 2'
@@ -594,6 +677,8 @@ def textflow_dot (passage_or_id):
         varnew_where = 'AND v.varnew ~ :varnew'
         if hyp_a != 'A':
             varnew_where = 'AND (v.varnew ~ :varnew OR (v.ms_id = 1 AND :hyp_a ~ :varnew))'
+
+    group_field = 'varnew' if splits else 'labez'
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -724,7 +809,8 @@ def textflow_dot (passage_or_id):
                 attrs['labez']  = hyp_a[0]
 
         if var_only:
-            # Eventually remove non-variant links
+            # Remove non-variant links
+            #
             # remove nodes attesting z and link the children up
             for n in G:
                 if G.node[n]['labez'] == 'z':
@@ -735,12 +821,27 @@ def textflow_dot (passage_or_id):
                         G.remove_edge (n, succ)
                         if pred:
                             G.add_edge (pred[0], succ)
-            # remove edges between nodes attesting the same thing
+
+            # contract edges between nodes attesting the same
+            if 0:
+                for n in G:
+                    for succ in G.successors (n):
+                        if G.node[n][group_field] == G.node[succ][group_field]:
+                            for succ_succ in G.successors (succ):
+                                G.remove_edge (succ, succ_succ)
+                                G.add_edge (n, succ_succ)
+
+            # remove edges between nodes attesting the same
             for u, v in G.edges ():
-                if G.node[u]['labez'] == G.node[v]['labez']:
+                if G.node[u][group_field] == G.node[v][group_field]:
                     G.remove_edge (u, v)
+
             # remove now isolated nodes
             G.remove_nodes_from (nx.isolates (G))
+            # unconstrain backward edges
+            for u, v in G.edges ():
+                if G.node[u][group_field] > G.node[v][group_field]:
+                    G.edge[u][v]['constraint'] = 'false'
 
         for n in G:
             # Use a different label if the parent's varnew differs from this
@@ -750,10 +851,10 @@ def textflow_dot (passage_or_id):
             if not pred or attrs['varnew'] != G.node[pred[0]]['varnew']:
                 attrs['label'] = "%s: %s" % (attrs['varnew'], attrs['hs'])
                 if pred:
-                    G.edge[pred[0]][n]['broken'] = True
+                    G.edge[pred[0]][n]['broken'] = 'true'
 
     if var_only:
-        dot = nx_to_dot_subgraphs (G, width)
+        dot = nx_to_dot_subgraphs (G, group_field, width)
     else:
         dot = nx_to_dot (G, width)
     dot = tools.graphviz_layout (dot)
@@ -1144,6 +1245,7 @@ if __name__ == "__main__":
 
     for fn in glob.glob (args.config_path.rstrip ('/') + '/*.conf'):
         sub_app = flask.Flask (__name__)
+        sub_app.logger.setLevel (args.log_level)
         sub_app.config.from_pyfile (fn)
         sub_app.config['server_start_time'] = str (int (args.start_time.timestamp ()))
         sub_app.register_blueprint (app)
@@ -1155,12 +1257,12 @@ if __name__ == "__main__":
             Rule ('/comparison.csv',                           endpoint = 'comparison.csv'),
             Rule ('/comparison-detail.csv',                    endpoint = 'comparison-detail.csv'),
             Rule ('/affinity.json',                            endpoint = 'affinity.json'),
+            Rule ('/chapters.json',                            endpoint = 'chapters.json'),
             Rule ('/manuscript.json/<hs_hsnr_id>',             endpoint = 'manuscript.json'),
             Rule ('/passage.json/<passage_or_id>',             endpoint = 'passage.json'),
             Rule ('/ms_attesting/<passage_or_id>/<labez>',     endpoint = 'ms_attesting'),
             Rule ('/relatives/<passage_or_id>/<hs_hsnr_id>',   endpoint = 'relatives'),
-            Rule ('/ancestors/<passage_or_id>/<hs_hsnr_id>',   endpoint = 'relatives'),
-            Rule ('/descendants/<passage_or_id>/<hs_hsnr_id>', endpoint = 'relatives'),
+            Rule ('/relatives.json/<passage_or_id>/<hs_hsnr_id>', endpoint = 'relatives.json'),
             Rule ('/apparatus.json/<passage_or_id>',           endpoint = 'apparatus.json'),
             Rule ('/attestation.json/<passage_or_id>',         endpoint = 'attestation.json'),
             Rule ('/stemma.dot/<passage_or_id>',               endpoint = 'stemma.dot'),

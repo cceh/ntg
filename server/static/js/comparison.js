@@ -9,7 +9,7 @@
  */
 
 define (['jquery',
-         'jquery-csv',
+         'd3',
          'datatables.net',
          'datatables.net-bs',
          'datatables.net-buttons',
@@ -22,7 +22,7 @@ define (['jquery',
          'css!site-css',
          'css!comparison-css'],
 
-function ($) {
+function ($, d3) {
     'use strict';
 
     var module = {};
@@ -81,7 +81,7 @@ function ($) {
                       '<span class="caption">' +
                         'Comparison of ' + ms1 + ' and ' + ms2 + ' in Chapter ' + chapter +
                       '</span>' +
-                      '<div class="btn-toolbar toolbar-comparison-detail">' +
+                      '<div class="btn-toolbar toolbar toolbar-comparison-detail" role="toolbar">' +
                       '</div>' +
                     '</caption>' +
                     '<thead>' +
@@ -239,10 +239,13 @@ function ($) {
             row.child ($detailsTable, 'no-padding').show ();
             $tr.addClass ('shown');
 
-            $.get ('comparison-detail.csv?' + $.param (params2), function (csv) {
+            d3.csv ('comparison-detail.csv?' + $.param (params2), function (error, csv) {
+                if (error) {
+                    throw error;
+                }
                 $tr.addClass ('csv-loaded');
                 var details_table = init_details_table ($detailsTable);
-                details_table.clear ().rows.add ($.csv.toObjects (csv)).draw ();
+                details_table.clear ().rows.add (csv).draw ();
                 $ ('div.slider', row.child ()).slideDown ();
             });
         }
@@ -393,9 +396,12 @@ function ($) {
                     'ms1' : module.ms1.hsnr,
                     'ms2' : module.ms2.hsnr,
                 });
-                $.get (url, function (csv) {
+                d3.csv (url, function (error, csv) {
+                    if (error) {
+                        throw error;
+                    }
                     var table = $ ('table.comparison').DataTable (); // eslint-disable-line new-cap
-                    table.clear ().rows.add ($.csv.toObjects (csv)).draw ();
+                    table.clear ().rows.add (csv).draw ();
                 });
             });
         }

@@ -5,7 +5,6 @@ requirejs.config ({
         'bootstrap'                    : '/static/bower_components/bootstrap/dist/js/bootstrap',
         'jquery'                       : '/static/bower_components/jquery/dist/jquery',
         'jquery-ui'                    : '/static/bower_components/jquery-ui/jquery-ui',
-        'jquery-csv'                   : '/static/bower_components/jquery-csv/src/jquery.csv',
         'd3'                           : '/static/bower_components/d3/d3',
         'd3-promise'                   : '/static/bower_components/d3.promise/dist/d3.promise',
         'bootstrap-slider'             : '/static/bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider',
@@ -27,8 +26,11 @@ requirejs.config ({
         'apparatus'                    : '/static/js/apparatus',
         'affinity'                     : '/static/js/affinity',
         'd3-stemma'                    : '/static/js/d3-stemma-layout',
+        'd3-chord'                     : '/static/js/d3-chord-layout',
         'd3-common'                    : '/static/js/d3-common',
+        'panel'                        : '/static/js/panel',
         'textflow'                     : '/static/js/textflow',
+        'local-stemma'                 : '/static/js/local-stemma',
         'relatives'                    : '/static/js/relatives',
         'tools'                        : '/static/js/tools',
         // public css
@@ -41,6 +43,7 @@ requirejs.config ({
         'site-css'                     : '/static/css/site',
         'coherence-css'                : '/static/css/coherence',
         'comparison-css'               : '/static/css/comparison',
+        'panel-css'                    : '/static/css/panel',
         'relatives-css'                : '/static/css/relatives',
         'textflow-css'                 : '/static/css/textflow',
         'ms_attesting-css'             : '/static/css/ms_attesting',
@@ -51,7 +54,13 @@ requirejs.config ({
             // going to use noConflict () to remove bootstrap functions
             'deps' : ['jquery', 'jquery-ui'],
         },
-        'jquery-csv' : ['jquery'],
+        'relatives-css' : {
+            'deps' : ['panel-css'],
+        },
+        'textflow-css' : {
+            'deps' : ['panel-css'],
+        },
+
     },
     // scripts/cceh/sri_hash <url>
     'sri' : {

@@ -1,14 +1,14 @@
 # Translations template for NTG.
 # Copyright (C) 2016 ORGANIZATION
 # This file is distributed under the same license as the NTG project.
-# Marcello Perathoner <marcello@perathoner.de>, 2016.
+# Marcello Perathoner <marcello@perathoner.de>, 2016, 2017.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: NTG 2.0\n"
 "Report-Msgid-Bugs-To: marcello@perathoner.de\n"
-"POT-Creation-Date: 2016-12-29 17:45+0100\n"
-"PO-Revision-Date: 2016-12-30 08:37+0100\n"
+"POT-Creation-Date: 2017-01-17 14:49+0100\n"
+"PO-Revision-Date: 2017-01-17 14:49+0100\n"
 "Last-Translator: Marcello Perathoner <marcello@perathoner.de>\n"
 "Language-Team: German <>\n"
 "Language: de\n"
@@ -19,43 +19,38 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Gtranslator 2.91.7\n"
 
-#: server/server.py:37 server/server.py:39 server/server.py:41
-#: server/server.py:42
+#: server/server.py:39 server/server.py:41 server/server.py:43
+#: server/server.py:44
 msgid "Lac"
 msgstr "Lac"
 
-#: server/server.py:38
+#: server/server.py:40
 msgid "Overlap"
 msgstr "Überlappt"
 
-#: server/server.py:40
+#: server/server.py:42
 msgid "Dub"
 msgstr "Zweifelhaft"
 
-#: server/server.py:43 server/templates/relatives.html:34
-#: server/templates/relatives.html:49 server/templates/textflow-toolbar.html:29
+#: server/server.py:45 server/templates/toolbar.html:27
 msgid "All"
 msgstr "Alle"
 
-#: server/server.py:44
+#: server/server.py:46
 msgid "All+Lac"
 msgstr "Alle+Lac"
 
-#: server/server.py:389
+#: server/server.py:443 server/server.py:507
 msgid "Relatives for"
 msgstr "Verwandte von"
 
-#: server/server.py:393
+#: server/server.py:511
 msgid "Ancestors for"
 msgstr "Vorfahren von"
 
-#: server/server.py:396
+#: server/server.py:514
 msgid "Descendants for"
 msgstr "Nachfahren von"
-
-#: server/templates/apparatus-toolbar.html:6
-msgid "Splits"
-msgstr "Splitts"
 
 #: server/templates/coherence.html:18
 msgid "Attestation for"
@@ -69,15 +64,27 @@ msgstr "Apparat"
 msgid "Local Stemma"
 msgstr "Lokales Stemma"
 
+#: server/templates/coherence.html:48 server/templates/coherence.html:59
+msgid "Coherence at Variant Passages"
+msgstr "Kohärenz an Varianten Stellen"
+
 #: server/templates/coherence.html:48
+msgid "(GraphViz)"
+msgstr "(GraphViz)"
+
+#: server/templates/coherence.html:59
+msgid "(Chord)"
+msgstr "(Chord)"
+
+#: server/templates/coherence.html:70
 msgid "Textual Flow Diagram"
 msgstr "Textfluss-Diagramm"
 
-#: server/templates/coherence.html:59
+#: server/templates/coherence.html:81
 msgid "Global Textual Flow Diagram"
 msgstr "Globales Textfluss-Diagramm"
 
-#: server/templates/coherence.html:72
+#: server/templates/coherence.html:94
 msgid "Affinity Cloud"
 msgstr "Affinitäts-Cloud"
 
@@ -113,107 +120,116 @@ msgstr "Den Vergleich starten."
 msgid "Go"
 msgstr "Los"
 
-#: server/templates/comparison.html:53
-msgid "Download this table as CSV-File."
-msgstr "Diese Tabelle im CSV-Format herunterladen."
-
-#: server/templates/comparison.html:53
-msgid "CSV"
-msgstr "CSV"
-
-#: server/templates/comparison.html:62
+#: server/templates/comparison.html:58 server/templates/toolbar.html:69
 msgid "Chapter"
 msgstr "Kapitel"
 
-#: server/templates/comparison.html:63
+#: server/templates/comparison.html:59
 msgid "W1"
 msgstr "Z1"
 
-#: server/templates/comparison.html:64
+#: server/templates/comparison.html:60
 msgid "Dir"
 msgstr "Ri"
 
-#: server/templates/comparison.html:65
+#: server/templates/comparison.html:61
 msgid "W2"
 msgstr "Z2"
 
-#: server/templates/comparison.html:66
+#: server/templates/comparison.html:62
 msgid "Rank"
 msgstr "Rang"
 
-#: server/templates/comparison.html:67
+#: server/templates/comparison.html:63
 msgid "Perc"
 msgstr "Proz"
 
-#: server/templates/comparison.html:68
+#: server/templates/comparison.html:64
 msgid "Eq"
 msgstr "Eq"
 
-#: server/templates/comparison.html:69
+#: server/templates/comparison.html:65
 msgid "Pass"
 msgstr "Pass"
 
-#: server/templates/comparison.html:70
+#: server/templates/comparison.html:66
 msgid "W1&lt;W2"
 msgstr "Z1&lt;Z2"
 
-#: server/templates/comparison.html:71
+#: server/templates/comparison.html:67
 msgid "W1&gt;W2"
 msgstr "Z1&gt;Z2"
 
-#: server/templates/comparison.html:72
+#: server/templates/comparison.html:68
 msgid "Uncl"
 msgstr "Unkl"
 
-#: server/templates/comparison.html:73
+#: server/templates/comparison.html:69
 msgid "Norel"
 msgstr "NV"
 
-#: server/templates/ms_attesting.html:7 server/templates/ms_attesting.html:29
+#: server/templates/ms_attesting.html:7 server/templates/ms_attesting.html:30
 #, python-format
 msgid "Attestation for %(passage)s %(labez)s"
 msgstr "Bezeugung von %(passage)s %(labez)s"
 
-#: server/templates/relatives.html:9
+#: server/templates/relatives-skeleton.html:11
 #, python-format
 msgid "(MT %(perc)s %(labez)s)"
 msgstr "(MT %(perc)s %(labez)s)"
 
-#: server/templates/relatives.html:22
+#: server/templates/toolbar.html:9
 msgid "Rel"
 msgstr "Alle"
 
-#: server/templates/relatives.html:25
+#: server/templates/toolbar.html:12
 msgid "Anc"
 msgstr "Vor"
 
-#: server/templates/relatives.html:28
+#: server/templates/toolbar.html:15
 msgid "Des"
 msgstr "Nach"
 
-#: server/templates/relatives.html:37 server/templates/textflow-toolbar.html:32
-msgid "Ch"
-msgstr "Kap"
+#: server/templates/toolbar.html:35
+msgid "Splits"
+msgstr "Splitts"
 
-#: server/templates/relatives.html:55 server/templates/textflow-toolbar.html:38
+#: server/templates/toolbar.html:44
+msgid "Variant"
+msgstr "Variante"
+
+#: server/templates/toolbar.html:58
+msgid "Conn:"
+msgstr "Konn:"
+
+#: server/templates/toolbar.html:81
 msgid "A"
 msgstr "A"
 
-#: server/templates/relatives.html:58 server/templates/textflow-toolbar.html:41
+#: server/templates/toolbar.html:84
 msgid "MT"
 msgstr "MT"
 
-#: server/templates/relatives.html:64 server/templates/textflow-toolbar.html:48
+#: server/templates/toolbar.html:92
 msgid "Frag"
 msgstr "Frag"
 
-#: server/templates/relatives.html:70 server/templates/textflow-toolbar.html:55
+#: server/templates/toolbar.html:100
 msgid "Rec"
 msgstr "Rek"
 
-#: server/templates/relatives.html:73 server/templates/textflow-toolbar.html:58
+#: server/templates/toolbar.html:103
 msgid "Sim"
 msgstr "Sim"
+
+#~ msgid "Ch"
+#~ msgstr "Kap"
+
+#~ msgid "Download this table as CSV-File."
+#~ msgstr "Diese Tabelle im CSV-Format herunterladen."
+
+#~ msgid "CSV"
+#~ msgstr "CSV"
 
 #~ msgid "Attestation for %(passage)s"
 #~ msgstr "Bezeugung von %(passage)s"

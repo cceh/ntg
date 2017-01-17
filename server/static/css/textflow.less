@@ -1,27 +1,16 @@
-div.panel-textflow {
-    min-width: 100%;
-}
+@import "../bower_components/bootstrap/less/variables.less";
+@import "../bower_components/bootstrap/less/mixins.less";
 
-div.btn-toolbar {
-    margin-top: -5px;
-    > div.btn-group {
-	margin-top: 5px;
+div.toolbar-connectivity {
+    .slider {
+        margin-left: 1em;
+        margin-right: 1em;
     }
-}
-
-div.dropdown-menu div.btn-group {
-    margin-top: 0;
-}
-
-div.textflow-connectivity .slider {
-    margin-left: 1.5em;
-    margin-right: 1em;
-}
-
-span.textflow-connectivity-label {
-    float: left;
-    width: 1.5em;
-    text-align: right;
+    span.connectivity-label {
+        display: inline-block;
+        width: 1.5em;
+        text-align: right;
+    }
 }
 
 .slider.slider-horizontal {
@@ -29,22 +18,22 @@ span.textflow-connectivity-label {
     height: 16px;
 
     .slider-handle {
-	top:         50%;
-	margin-top:  -6px;
-	margin-left: -6px;
+        top:         50%;
+        margin-top:  -6px;
+        margin-left: -6px;
     }
     .slider-tick {
-	top:         50%;
-	margin-top:  -4px;
-	margin-left: -4px;
+        top:         50%;
+        margin-top:  -4px;
+        margin-left: -4px;
     }
     .slider-track {
-	top:         50%;
-	height:      4px;
-	margin-top: -2px;
+        top:         50%;
+        height:      4px;
+        margin-top: -2px;
     }
     .slider-tick-container {
-	top: 50%;
+        top: 50%;
     }
 }
 

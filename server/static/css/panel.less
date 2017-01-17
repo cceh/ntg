@@ -1,0 +1,30 @@
+@import "../bower_components/bootstrap/less/variables.less";
+@import "../bower_components/bootstrap/less/mixins.less";
+
+div.panel {
+    min-width: 100%;
+}
+
+div.btn-toolbar {
+    margin-top: -5px;
+    > div.btn-group {
+        margin-top: 5px;
+    }
+}
+
+div.dropdown-menu div.btn-group {
+    margin-top: 0;
+}
+
+div.dropdown-menu-horiz {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    border-width: 0;
+    padding: 0;
+    min-width: 20px;
+    width: 160px;
+    width: -moz-max-content;
+    width: -webkit-max-content;
+    width: max-content;
+}

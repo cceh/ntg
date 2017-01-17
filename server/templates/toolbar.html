@@ -1,0 +1,124 @@
+{% macro toolbar(name, mode) -%}
+
+<div class="panel-heading panel-slidable panel-toolbar panel-{{name}}-toolbar">
+  <div class="btn-toolbar toolbar {{name}}-toolbar" role="toolbar">
+
+    {% if mode == 'relatives' %}
+    <div class="relatives-type btn-group btn-group-xs" data-toggle="buttons">
+      <label class="btn btn-primary">
+        <input type="radio" name="type" data-opt="rel">{{_('Rel')}}</input>
+      </label>
+      <label class="btn btn-primary">
+        <input type="radio" name="type" data-opt="anc">{{_('Anc')}}</input>
+      </label>
+      <label class="btn btn-primary">
+        <input type="radio" name="type" data-opt="des">{{_('Des')}}</input>
+      </label>
+    </div>
+
+    <div class="relatives-limit btn-group btn-group-xs" data-toggle="buttons">
+      <label class="btn btn-primary">
+        <input type="radio" name="limit" data-opt="10">10</input>
+      </label>
+      <label class="btn btn-primary">
+        <input type="radio" name="limit" data-opt="20">20</input>
+      </label>
+      <label class="btn btn-primary">
+        <input type="radio" name="limit" data-opt="0">{{_('All')}}</input>
+      </label>
+    </div>
+    {% endif %}
+
+    {% if mode in ('apparatus', 'variant') %}
+    <div class="apparatus-splits btn-group btn-group-xs" data-toggle="buttons">
+	  <label class="btn btn-primary">
+        <input type="checkbox" name="splits" data-opt="splits">{{_('Splits')}}</input>
+	  </label>
+    </div>
+    {% endif %}
+
+    {% if mode in ('local', 'relatives') %}
+    <div class="toolbar-labez btn-group btn-group-xs">
+      <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-labez bg_labez"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{_('Variant')}}:
+        <span class="btn_text"></span> <span class="caret"></span>
+      </button>
+      <div class="dropdown-menu dropdown-menu-horiz dropdown-menu-labez">
+        <div class="btn-group btn-group-xs" data-toggle="buttons">
+          <!-- filled by textflow.js -->
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if mode in ('local', 'variant') %}
+    <div class="toolbar-connectivity btn-group btn-group-xs" data-toggle="buttons">
+      <label class="btn btn-primary">
+        {{_('Conn:')}}
+        <span class="connectivity-label"></span>
+        <input type="text" data-type="slider" name="connectivity" />
+      </label>
+    </div>
+    {% endif %}
+
+    {% if mode in ('global', 'local', 'variant', 'relatives') %}
+    <div class="toolbar-chapter btn-group btn-group-xs">
+      <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-chapter"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{_('Chapter')}}:
+        <span class="btn_text"></span> <span class="caret"></span>
+      </button>
+      <div class="dropdown-menu dropdown-menu-horiz dropdown-menu-chapter">
+        <div class="btn-group btn-group-xs" data-toggle="buttons">
+          <!-- filled by textflow.js -->
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar-include btn-group btn-group-xs" data-toggle="buttons">
+      <label class="btn btn-primary">
+        <input type="checkbox" name="include" data-opt="A">{{_('A')}}</input>
+      </label>
+      <label class="btn btn-primary">
+        <input type="checkbox" name="include" data-opt="MT">{{_('MT')}}</input>
+      </label>
+    </div>
+    {% endif %}
+
+    {% if mode in ('local', 'relatives') %}
+    <div class="coherence-fragments btn-group btn-group-xs" data-toggle="buttons">
+	  <label class="btn btn-primary">
+        <input type="checkbox" name="fragments" data-opt="fragments">{{_('Frag')}}</input>
+	  </label>
+    </div>
+    {% endif %}
+
+    {% if mode in ('global', 'local', 'variant', 'relatives') %}
+    <div class="toolbar-mode btn-group btn-group-xs" data-toggle="buttons">
+      <label class="btn btn-primary">
+        <input type="radio" name="mode" data-opt="rec">{{_('Rec')}}</input>
+      </label>
+      <label class="btn btn-primary">
+        <input type="radio" name="mode" data-opt="sim">{{_('Sim')}}</input>
+      </label>
+    </div>
+    {% endif %}
+
+    {% if mode in ('local', 'variant') %}
+    <div class="toolbar-hyp_a btn-group btn-group-xs">
+      <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-hyp_a bg_labez"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span>A =</span> <span class="btn_text"></span> <span class="caret"></span>
+      </button>
+      <div class="dropdown-menu dropdown-menu-horiz dropdown-menu-hyp_a">
+        <div class="btn-group btn-group-xs" data-toggle="buttons">
+          <!-- filled by coherence.js -->
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{%- endmacro %}

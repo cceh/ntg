@@ -4,26 +4,18 @@
  * @module relatives
  * @author Marcello Perathoner
  */
-define (['jquery', 'lodash', 'd3', 'd3-common', 'tools', 'navigator'],
+define (['jquery',
+         'lodash',
+         'd3',
+         'd3-common',
+         'tools',
+         'panel',
+         'navigator',
+         'css!relatives-css',
+],
 
-function ($, _, d3, d3c, tools, nav) {
+function ($, _, d3, d3c, tools, panel, nav) {
     'use strict';
-
-    var DEFAULTS = {
-        'type'      : 'rel',
-        'chapter'   : '0',
-        'limit'     : '10',
-        'include'   : [],
-        'fragments' : [],
-        'mode'      : 'rec',
-        'labez'     : 'all+lac',
-    };
-
-    var URLS = {
-        'rel' : 'relatives/',
-        'anc' : 'ancestors/',
-        'des' : 'descendants/',
-    };
 
     function changed () {
         $ (document).trigger ('ntg.popup.changed');
@@ -53,29 +45,55 @@ function ($, _, d3, d3c, tools, nav) {
     }
 
     /**
-     * Handle toolbar events
+     * Load new data.
      *
-     * @function handle_toolbar_events
-     *
-     * @param event {Object} jQuery event
+     * @function load_passage
      */
-    function handle_toolbar_events (event) {
-        var $panel = $ (event.target).closest ('div.panel');
-
-        event.data = $panel.data ('options');
-        tools.handle_toolbar_events (event);
-        tools.set_toolbar_buttons ($panel, event.data);
+    function load_passage (dummy_passage) {
+        var instance = this;
 
         // replace content
-        var ms_id    = $panel.attr ('data-ms-id');
-        var url      = URLS[event.data.type] + nav.passage.id + '/' + ms_id
-            + '?' + $.param (event.data); // we must use GET, not POST
-        var $content = $panel.find ('div.panel-relatives-content');
-        $content.load (url + ' div.panel-relatives-content', function () {
+        var ms_id = instance.$panel.attr ('data-ms-id');
+        var url   = 'relatives.json/' + nav.passage.id + '/' + ms_id
+            + '?' + $.param (instance.data); // we must use GET, not POST
+        var $content = instance.$panel.find ('div.panel-relatives-content');
+        $content.load (url + ' table.relatives', function () {
             changed ();
         });
 
-        event.stopPropagation ();
+        var p1 = panel.load_labez_dropdown (
+            instance.$toolbar.find ('div.toolbar-labez'),
+            nav.passage.id, 'labez', [['all', 'All'], ['all+lac', 'All+Lac']]);
+        var p2 = panel.load_chapter_dropdown (
+            instance.$toolbar.find ('div.toolbar-chapter'),
+            'chapter', [['0', 'All'], ['x', 'This']]);
+        $.when (p1, p2).done (function () {
+            panel.set_toolbar_buttons (instance.$toolbar, instance.data);
+            // Maybe we changed chapter while navigating.  Set a new chapter.
+            instance.$toolbar.find ('div.toolbar-chapter input[data-opt = "x"]')
+                .attr ('data-opt', nav.passage.chapter);
+            changed ();
+        });
+    }
+
+    /**
+     * Initialize the module.
+     *
+     * @function init
+     */
+    function init (instance) {
+        instance.load_passage = load_passage;
+        $.extend (instance.data, {
+            'type'      : 'rel',
+            'chapter'   : '0',
+            'limit'     : '10',
+            'include'   : [],
+            'fragments' : [],
+            'mode'      : 'rec',
+            'labez'     : 'all+lac',
+        });
+
+        return instance;
     }
 
     /**
@@ -87,20 +105,16 @@ function ($, _, d3, d3c, tools, nav) {
      * @param elem {DOM} A DOM element relative to which to position the popup.
      */
     function create_panel (ms_id, target) {
-        $.get (URLS[DEFAULTS.type] + nav.passage.id + '/' + ms_id, DEFAULTS, function (html) {
+        $.get ('relatives/' + nav.passage.id + '/' + ms_id, function (html) {
             // create
             var $popup = $ (html).hide ();
-            $popup.appendTo ('body');
-            $popup.fadeIn (function () {
-                $popup.on ('ntg.popup.visibility', changed);
-            });
+            $popup.appendTo ('#floating-panels');
+            $popup.fadeIn ();
+            $popup.on ('changed.panel.visibility', changed);
 
-            // initialize buttons
-            var data = $.extend ({}, DEFAULTS);
-            $popup.data ('options', data);
-            tools.set_toolbar_buttons ($popup, data);
-            $popup.find ('.dropdown-toggle').dropdown ();
-            tools.create_panel_controls ($popup);
+            var instance = init (panel.init ($popup));
+            instance.load_passage ();
+            panel.create_panel_controls ($popup);
 
             // position popup
             var rect = target.getBoundingClientRect ();
@@ -117,22 +131,12 @@ function ($, _, d3, d3c, tools, nav) {
             // make draggable
             $popup.draggable ();
             $popup.on ('dragstart', function () {
-                $popup.appendTo ('body'); // bring to top
+                // FIXME: $popup.appendTo ('#floating-panels'); // bring to top
             });
 
             // notify others
             changed ();
         });
-    }
-
-    /**
-     * Initialize the module.
-     *
-     * @function init
-     */
-    function init () {
-        // click on buttons in toolbar
-        $ (document).on ('click', 'div.toolbar-relatives input', handle_toolbar_events);
     }
 
     return {

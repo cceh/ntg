@@ -14,7 +14,7 @@ function ($, d3, _) {
     var force = d3.forceSimulation ().alphaMin (0.01);
 
     function node_class (d) {
-        return 'node group_' + d.group + ' hsnr_' + d.hsnr + ' fg_labez';
+        return 'node group_' + d.group + ' hsnr_' + d.hsnr + ' bg_labez';
     }
 
     function dragged (d) {
@@ -44,14 +44,15 @@ function ($, d3, _) {
      * a passage.  If the graph topology does not change between passages
      * (currently it does not), we only need to change node colors.
      *
-     * @function set_attestation
+     * @function load_passage
      *
-     * @param {string} url - The url of the json.
+     * @param {Object} passage - Which passage to load.
      */
-    function set_attestation (url) {
-        var wrapper = d3.select (this.wrapper_selector);
 
-        d3.json (url, function (error, json) {
+    function load_passage (passage) {
+        var wrapper = d3.select (this.$wrapper.get (0));
+
+        d3.json ('attestation.json/' + passage.id, function (error, json) {
             if (error) {
                 throw error;
             }
@@ -92,13 +93,24 @@ function ($, d3, _) {
      *
      * @function load_json
      *
-     * @param {string} url - The url (must serve json format).
+     * @param {url} - The url of the JSON file.
      *
      * @returns {Promise} - A promise resolved when all SVG elements have been created.
      */
     function load_json (url) {
-        var that = this;
+        var instance = this;
         var deferred = new $.Deferred ();
+
+        var width  = instance.$wrapper.width ();
+        var height = width * 0.5;
+
+        instance.svg.attr ('width', width).attr ('height', height);
+
+        var g = instance.svg.append ('g')
+            .attr ('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')');
+
+        var g_links = g.append ('g').attr ('id', instance.id_prefix + 'links');
+        var g_nodes = g.append ('g').attr ('id', instance.id_prefix + 'nodes');
 
         d3.json (url, function (error, json) {
             if (error) {
@@ -109,9 +121,9 @@ function ($, d3, _) {
             // Fix A and MT on the horizontal center axis
             var A  = json.nodes[0];
             var MT = json.nodes[1];
-            A.fx = -that.width / 4;
+            A.fx = -width / 4;
             A.fy = 0;
-            MT.fx = that.width / 4;
+            MT.fx = width / 4;
             MT.fy = 0;
 
             force.nodes (json.nodes);
@@ -121,16 +133,16 @@ function ($, d3, _) {
                 .force ('x', d3.forceX (0).strength (0.2))
                 .force ('y', d3.forceY (0).strength (0.4));
 
-            var link = that.g_links.selectAll ('.link')
+            var link = g_links.selectAll ('.link')
                 .data (json.links)
                 .enter ().append ('line')
                 .attr ('data-id', function (d) { return d.source.id + '-' + d.target.id; })
                 .attr ('class', 'link');
 
-            var node = that.g_nodes.selectAll ('.node')
+            var node = g_nodes.selectAll ('.node')
                 .data (json.nodes)
                 .enter ().append ('g')
-                .attr ('id',         function (d) { return that.id_prefix + 'n' + d.ms_id; })
+                .attr ('id',         function (d) { return instance.id_prefix + 'n' + d.ms_id; })
                 .attr ('data-ms-id', function (d) { return d.ms_id; })
                 .attr ('class',   'node')
                 .call (d3.drag ()
@@ -173,41 +185,25 @@ function ($, d3, _) {
      *
      * @function init
      *
-     * @param {string} wrapper_selector - A d3|jQuery selector that points to
-     * the element inside of which the graph will be placed.
+     * @param {Object} instance  - The panel instance to inherit from.
      *
-     * @param {string} id_prefix - The prefix to add to all ids.  Use if you have
-     * more than one graph on a page.
+     * @param {string} id_prefix - The prefix to use for all generated ids.
      *
      * @returns {Graph} - The graph object.
      */
-    function init (wrapper_selector, id_prefix) {
-        var width  = $ (wrapper_selector).width ();
-        var height = width * 0.5;
+    function init (instance, id_prefix) {
+        var $wrapper = instance.$panel.find ('.panel-content');
+        var svg = d3.select ($wrapper.get (0)).append ('svg');
 
-        var svg = d3.select (wrapper_selector)
-            .append ('svg')
-            .attr ('width', width)
-            .attr ('height', height);
+        instance.$wrapper     = $wrapper;
+        instance.svg          = svg;
+        instance.id_prefix    = id_prefix;
+        instance.load_json    = load_json;
+        instance.load_passage = load_passage;
+        instance.highlight    = highlight;
+        instance.data         = {};
 
-        var g = svg.append ('g')
-            .attr ('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')');
-
-        var g_links = g.append ('g').attr ('id', id_prefix + 'links');
-        var g_nodes = g.append ('g').attr ('id', id_prefix + 'nodes');
-
-        return {
-            'wrapper_selector' : wrapper_selector,
-            'id_prefix'        : id_prefix,
-            'svg'              : svg,
-            'width'            : width,
-            'height'           : height,
-            'g_nodes'          : g_nodes,
-            'g_links'          : g_links,
-            'load_json'        : load_json,
-            'set_attestation'  : set_attestation,
-            'highlight'        : highlight,
-        };
+        return instance;
     }
 
     return /** @alias module:affinity */ {

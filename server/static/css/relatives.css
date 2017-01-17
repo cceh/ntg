@@ -1,36 +1,21 @@
 div.panel-relatives {
   z-index: 10;
   width: 36em;
+  min-width: auto;
 }
 div.panel-relatives span.ms {
   font-weight: bold;
 }
-div.panel-relatives div.panel-relatives-content {
-  max-height: 50em;
-  overflow: auto;
-}
-div.panel-relatives-caption .close {
+div.panel-relatives div.panel-relatives-caption .close {
   padding-left: 4px;
   font-size: 1.1em;
 }
-div.panel-heading.panel-relatives-toolbar {
+div.panel-relatives div.panel-relatives-toolbar {
   border-bottom-width: 0;
 }
-div.dropdown-menu-horiz {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  border-width: 0;
-  padding: 0;
-  min-width: 20px;
-  width: 160px;
-  width: -moz-max-content;
-  width: -webkit-max-content;
-  width: max-content;
-}
-div.dropdown-menu-horiz .btn-labez {
-  color: white;
-  border-color: black;
+div.panel-relatives div.panel-relatives-content {
+  max-height: 50em;
+  overflow: auto;
 }
 table.relatives {
   margin-bottom: 0;

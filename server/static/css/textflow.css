@@ -1,21 +1,9 @@
-div.panel-textflow {
-  min-width: 100%;
-}
-div.btn-toolbar {
-  margin-top: -5px;
-}
-div.btn-toolbar > div.btn-group {
-  margin-top: 5px;
-}
-div.dropdown-menu div.btn-group {
-  margin-top: 0;
-}
-div.textflow-connectivity .slider {
-  margin-left: 1.5em;
+div.toolbar-connectivity .slider {
+  margin-left: 1em;
   margin-right: 1em;
 }
-span.textflow-connectivity-label {
-  float: left;
+div.toolbar-connectivity span.connectivity-label {
+  display: inline-block;
   width: 1.5em;
   text-align: right;
 }

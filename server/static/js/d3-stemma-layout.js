@@ -7,32 +7,10 @@
  * @author Marcello Perathoner
  */
 
-define (['jquery', 'd3', 'lodash', 'pegjs', 'text!/static/js/dot-grammar.pegjs'],
+define (['jquery', 'd3', 'd3-common', 'lodash'],
 
-function ($, d3, _, peg, parser_src) {
+function ($, d3, d3_common, _) {
     'use strict';
-
-    var dot_parser = peg.generate (parser_src);
-
-    /**
-     * Parse bounding box coordinates from .dot format.
-     *
-     * @function parse_bbox
-     *
-     * @param commasep {string} The bbox as comma-separated values.
-     *
-     * @return {Object} The bbox as dictionary { x, y, width, height }
-     */
-
-    function parse_bbox (commasep) {
-        var bb = commasep.split (',');
-        return {
-            'x'      : bb[0],
-            'y'      : bb[1],
-            'width'  : bb[2] - bb[0],
-            'height' : bb[3] - bb[1],
-        };
-    }
 
     /**
      * Create an SVG graph from a dot file.
@@ -50,33 +28,25 @@ function ($, d3, _, peg, parser_src) {
             .remove ();
         var deferred = new $.Deferred ();
 
-        $.get (url, function (data) {
-            var graph = instance.parser.parse (data);
-            var stmts = graph[0].stmts;
-
-            var subgraphs = _.keyBy (_.filter (stmts, function (o) { return o.type === 'subgraph'; }), 'id');
-            var nodes     = _.keyBy (_.filter (stmts, function (o) { return o.type === 'node'; }), 'id');
-            var links     = _.filter (stmts, function (o) { return o.type === 'edge'; });
-            var attrs     = _.keyBy (_.filter (stmts, function (o) { return o.type === 'attr'; }), 'attrType');
-
+        d3_common.dot (url, function (graph) {
             // if we have subgraphs, retrieve their nodes too
-            _.forEach (subgraphs, function (subgraph) {
+            _.forEach (graph.subgraphs, function (subgraph) {
                 var subgraph_nodes = _.keyBy (_.filter (subgraph.stmts,
                                                         function (o) { return o.type === 'node'; }), 'id');
-                _.assign (nodes, subgraph_nodes);
-                var subgraph_attrs = _.keyBy (_.filter (subgraph.stmts,
-                                                        function (o) { return o.type === 'attr'; }), 'attrType');
-                subgraph.bbox = parse_bbox (subgraph_attrs.graph.attrs.bb);
+                _.assign (graph.nodes, subgraph_nodes); // copy
+                subgraph.attrs = _.keyBy (_.filter (subgraph.stmts,
+                                                    function (o) { return o.type === 'attr'; }), 'attrType');
+                subgraph.attrs.graph.attrs.bbox = d3_common.parse_bbox (subgraph.attrs.graph.attrs.bb);
+                subgraph.attrs.graph.attrs.lp   = d3_common.parse_pt   (subgraph.attrs.graph.attrs.lp);
             });
 
             // shrinkwrap
-            var graph_attrs = attrs.graph.attrs;
-            instance.bbox = parse_bbox (graph_attrs.bb);
+            instance.bbox = graph.attrs.graph.attrs.bbox;
 
-            var node_width = attrs.node.attrs.width;
+            var node_width = graph.attrs.node.attrs.width;
 
             svg.style ('opacity', 0.0);
-            svg.style ('font-size', graph_attrs.fontsize + 'pt');
+            svg.style ('font-size', graph.attrs.graph.attrs.fontsize + 'pt');
 
             svg.transition ('svg')
                 .duration (300)
@@ -87,55 +57,62 @@ function ($, d3, _, peg, parser_src) {
                 .style ('opacity', 1.0);
 
             // put id also inside node attrs
-            _.forEach (nodes, function (v, k) {
+            _.forEach (graph.nodes, function (v, k) {
                 v.attrs.id = k;
             });
 
             // give all links an id
-            _.forEach (links, function (link, i) {
+            _.forEach (graph.edges, function (link, i) {
                 link.id = instance.id_prefix + 'link_' + i;
             });
 
-            // draw the subgraphs: a rectangle
+            // draw the subgraphs: a rectangle with a label
 
             var sg = svg.append ('g').attr ('class', 'subgraphs');
 
             var subgraph = sg.selectAll ('.subgraph')
-                .data (_.map (subgraphs, 'bbox'))
+                .data (_.map (graph.subgraphs, 'attrs.graph.attrs'))
                 .enter ();
 
             subgraph.append ('rect')
-                .attr ('x',      function (d) { return d.x; })
-                .attr ('y',      function (d) { return d.y; })
-                .attr ('width',  function (d) { return d.width; })
-                .attr ('height', function (d) { return d.height; })
+                .attr ('x',      function (d) { return d.bbox.x; })
+                .attr ('y',      function (d) { return d.bbox.y; })
+                .attr ('width',  function (d) { return d.bbox.width; })
+                .attr ('height', function (d) { return d.bbox.height; })
                 .attr ('class', 'subgraph');
+
+            subgraph.append ('text')
+                .attr ('x', function (d) { return d.lp.x; })
+                .attr ('y', function (d) { return d.lp.y + (parseFloat (d.lheight) * graph.attrs.graph.attrs.dpi); })
+                .text (function (d) { return d.label; });
 
             // draw the links: a path and a text
 
             var lg = svg.append ('g').attr ('class', 'links');
 
             var link = lg.selectAll ('.link')
-                .data (links)
+                .data (graph.edges)
                 .enter ();
 
             link.append ('path')
                 .attr ('id', function (d) { return d.id; })
+                .attr ('data-labez', function (d) {
+                    return graph.nodes[d.elems[0].id].attrs.labez;
+                })
                 .attr ('class', function (d) {
-                    return 'link ' +
+                    return 'link fg_labez ' +
                         instance.id_prefix + 'sid-' + d.elems[0].id + ' ' +
                         instance.id_prefix + 'tid-' + d.elems[1].id +
                         (d.attrs.broken ? ' broken' : '');
                 })
                 .attr ('marker-end', 'url(#' + instance.id_prefix + 'triangle)')
                 .attr ('d', function (d) {
-                    var path = '';
-                    var arr = d.attrs.pos.split (' ');
-                    path += 'M' + arr.shift ();
-                    while (arr.length) {
-                        path += 'C' + arr.shift () + ' ' + arr.shift () + ' ' + arr.shift ();
-                    }
-                    return path;
+                    var pos = d.attrs.pos.replace ('\\\n', '');
+                    var arr = pos.split (/\s+/);
+                    arr[0] = 'M' + arr[0];
+                    arr[1] = 'C' + arr[1];
+                    // console.log (pos);
+                    return arr.join (' ');
                 });
 
             link.filter (function (d) { return d.attrs.rank; })
@@ -155,8 +132,8 @@ function ($, d3, _, peg, parser_src) {
 
             var ng = svg.append ('g').attr ('class', 'nodes');
 
-            var node = ng.selectAll ('.node')
-                .data (_.map (nodes, 'attrs'))
+            var node = ng.selectAll ('g.node')
+                .data (_.map (graph.nodes, 'attrs'))
                 .enter ().append ('g')
                 .attr ('data-ms-id', function (d) { return d.ms_id; })
                 .attr ('class', function (d) {
@@ -167,9 +144,9 @@ function ($, d3, _, peg, parser_src) {
                 });
 
             node.append ('circle')
-                .attr ('class', 'node fg_labez')
+                .attr ('class', 'node bg_labez')
                 .attr ('data-labez', function (d) { return d.labez; })
-                .attr ('r', function (d) { return (d.width || node_width) * graph_attrs.dpi / 2; })
+                .attr ('r', function (d) { return (d.width || node_width) * graph.attrs.graph.attrs.dpi / 2; })
                 .on ('mouseenter', function (d) {
                     d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover', true);
                 })
@@ -193,7 +170,7 @@ function ($, d3, _, peg, parser_src) {
      *
      * @function init
      *
-     * @param {string} wrapper_selector - A d3|jQuery selector that points to
+     * @param {jQuery} $wrapper - A jQuery selector that points to
      * the element inside of which the graph will be placed.
      *
      * @param {string} id_prefix - The prefix to add to all ids.  Use if you have
@@ -201,32 +178,16 @@ function ($, d3, _, peg, parser_src) {
      *
      * @returns {Graph} - A graph instance.
      */
-    function init (wrapper_selector, id_prefix) {
-        var wrapper = d3.select (wrapper_selector);
-        wrapper.selectAll ('*').remove ();
-        var svg = wrapper.append ('svg');
+    function init ($wrapper, id_prefix) {
+        var svg = d3.select ($wrapper.get (0)).append ('svg');
 
-        svg
-            .append ('defs')
-            .append ('marker')
-            .attr ('id',           id_prefix + 'triangle')
-            .attr ('viewBox',      '0 0 10 10')
-            .attr ('refX',         '10')
-            .attr ('refY',         '5')
-            .attr ('markerUnits',  'strokeWidth')
-            .attr ('markerWidth',  '4')
-            .attr ('markerHeight', '3')
-            .attr ('orient',       'auto')
-            .attr ('class',        'link')
-            .append ('path')
-            .attr ('d', 'M 0 0 L 10 5 L 0 10 z');
+        d3_common.append_marker (svg, id_prefix);
 
         return {
             'id_prefix' : id_prefix,
-            'wrapper'   : wrapper,
+            'wrapper'   : $wrapper,
             'svg'       : svg,
             'load_dot'  : load_dot,
-            'parser'    : dot_parser,
             'bbox'      : null,
         };
     }

@@ -6,13 +6,19 @@
  * the TD.
  *
  * @module textflow
- * @requires d3-stemma-layout
  * @author Marcello Perathoner
  */
 
-define (['jquery', 'lodash', 'd3', 'd3-stemma', 'relatives', 'tools', 'bootstrap', 'bootstrap-slider', 'jquery-ui'],
+define (['jquery',
+         'lodash',
+         'panel',
+         'bootstrap',
+         'bootstrap-slider',
+         'jquery-ui',
+         'css!textflow-css',
+        ],
 
-function ($, _, d3, d3stemma, relatives, tools) {
+function ($, _, panel) {
     'use strict';
 
     function changed () {
@@ -20,52 +26,43 @@ function ($, _, d3, d3stemma, relatives, tools) {
         $ (document).trigger ('ntg.textflow.changed');
     }
 
-    function options (event) {
-        var instance = event.data;
-        var data = instance.data;
-        event.data = data;
-
-        tools.handle_toolbar_events (event);
-        instance.load_passage (data.passage, data.labez, data.hyp_a, data.var_only);
-        event.stopPropagation ();
-    }
-
     /**
      * Load a new passage.
      *
      * @function load_passage
      *
-     * @param {Object} passage  - The passage to display.
-     * @param {string} labez    - The labez to display.
-     * @param {string} hyp_a    - The hypothetical reading to assume for A.
-     * @param {bool}   var_only - Display only nodes and links between different readings.
+     * @param {Object} passage - Which passage to load.
      */
-    function load_passage (passage, labez, hyp_a, var_only) {
-        var that = this;
-        this.data.passage  = passage;
-        this.data.labez    = labez;
-        this.data.hyp_a    = hyp_a;
-        this.data.var_only = var_only;
-        this.data.width    = this.wrapper.width ();
-
+    function load_passage (passage) {
+        var instance = this;
         var params = ['labez', 'connectivity', 'chapter', 'include', 'fragments',
-                      'mode', 'hyp_a', 'var_only', 'width'];
-        var load_dot_promise = this.graph.load_dot (
-            'textflow.dot/' + passage.id + '?' + $.param (_.pick (this.data, params))
-        );
-        load_dot_promise.done (function () {
-            var panel = that.wrapper.closest ('div.panel');
-            panel.animate ({ 'width' : (that.graph.bbox.width + 20) + 'px' });
+                      'mode', 'hyp_a', 'var_only', 'width', 'splits'];
+
+        // dirty hack! Make panel visible so SVG getBBox () will work.
+        instance.$wrapper.slideDown ();
+
+        // provide a width for GraphViz to format the graph in
+        instance.data.width = instance.$wrapper.width ();
+
+        instance.graph.load_dot (
+            'textflow.dot/' + passage.id + '?' + $.param (_.pick (instance.data, params))
+        ).done (function () {
+            instance.dirty = false;
+            instance.$panel.animate ({ 'width' : (instance.graph.bbox.width + 20) + 'px' });
         });
 
-        var promise = tools.load_labez_dropdown (this.toolbar.find ('div.textflow-labez'), passage.id, 'labez', []);
-        promise.done (function () {
-            tools.set_toolbar_buttons (that.toolbar, that.data);
+        var p1 = panel.load_labez_dropdown (
+            this.$toolbar.find ('div.toolbar-labez'), passage.id, 'labez', []);
+        var p2 = panel.load_labez_dropdown (
+            this.$toolbar.find ('div.toolbar-hyp_a'), passage.id, 'hyp_a', [['A', 'A']]);
+        var p3 = panel.load_chapter_dropdown (
+            this.$toolbar.find ('div.toolbar-chapter'), 'chapter', [['0', 'All'], ['x', 'This']]);
+        $.when (p1, p2, p3).done (function () {
+            panel.set_toolbar_buttons (instance.$toolbar, instance.data);
             // Maybe we changed chapter while navigating.  Set a new chapter.
-            that.toolbar.find ('div.textflow-chapter input[data-opt != "0"]').attr ('data-opt', passage.chapter);
+            instance.$toolbar.find ('div.toolbar-chapter input[data-opt = "x"]').attr ('data-opt', passage.chapter);
             changed ();
         });
-        tools.load_labez_dropdown (this.toolbar.find ('div.textflow-hyp_a'), passage.id, 'hyp_a', [['A', 'A']]);
     }
 
     /**
@@ -73,41 +70,36 @@ function ($, _, d3, d3stemma, relatives, tools) {
      *
      * @function init
      *
-     * @param {string} wrapper_selector - The element that should contain the apparatus table.
-     * @param {string} id_prefix        - Prefix to use for all for the ids.
-     * @param {string} toolbar_selector - The toolbar to initialize and use.
+     * @param {Object} instance     - The panel instance to inherit from.
+     * @param {Object} graph_module - The graph module to use.
+     * @param {string} id_prefix    - The prefix to use for all generated ids.
+     * @param {bool}   var_only     - Display only nodes and links between different readings.
      *
-     * @returns {dict} - The module instance object.
+     * @returns {Object} - The module instance object.
      */
-    function init (wrapper_selector, id_prefix, toolbar_selector) {
-        var instance = {};
-        instance.wrapper      = $ (wrapper_selector);
-        instance.toolbar      = $ (toolbar_selector);
-        instance.id_prefix    = id_prefix;
-        instance.graph        = d3stemma.init (wrapper_selector, id_prefix);
+    function init (instance, graph_module, id_prefix, var_only) {
         instance.load_passage = load_passage;
-        instance.data         = {
+        $.extend (instance.data, {
             'passage'      : null,
-            'labez'        : 'a',
+            'labez'        : '',
             'connectivity' : '10',
             'chapter'      : '0',
             'include'      : [],
             'fragments'    : [],
             'mode'         : 'rec',
             'hyp_a'        : 'A',
-            'var_only'     : false,
-        };
+            'var_only'     : var_only ? ['var_only'] : [],
+            'splits'       : [],
+        });
+        instance.$wrapper = instance.$panel.find ('.panel-content'); // see: dirty hack
+
+        instance.graph = graph_module.init (instance.$wrapper, id_prefix);
 
         // Init toolbar.
-        instance.toolbar.find ('.dropdown-toggle').dropdown ();
-        instance.toolbar.find ('input[name="connectivity"]').bootstrapSlider ({
+        instance.$toolbar.find ('input[name="connectivity"]').bootstrapSlider ({
             'value' : 10,
             'ticks' : [1, 5, 10, 20],
         });
-
-        // Answer toolbar activity.
-        $ (document).on ('click',     toolbar_selector + ' input', instance, options);
-        $ (document).on ('slideStop', toolbar_selector + ' input[name="connectivity"]', instance, options);
 
         return instance;
     }
