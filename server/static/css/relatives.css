@@ -1,19 +1,19 @@
-div.panel-relatives {
+div.panel.panel-relatives {
   z-index: 10;
   width: 36em;
   min-width: auto;
 }
-div.panel-relatives span.ms {
+div.panel.panel-relatives span.ms {
   font-weight: bold;
 }
-div.panel-relatives div.panel-relatives-caption .close {
+div.panel.panel-relatives div.panel-relatives-caption .close {
   padding-left: 4px;
   font-size: 1.1em;
 }
-div.panel-relatives div.panel-relatives-toolbar {
+div.panel.panel-relatives div.panel-relatives-toolbar {
   border-bottom-width: 0;
 }
-div.panel-relatives div.panel-relatives-content {
+div.panel.panel-relatives div.panel-relatives-content {
   max-height: 50em;
   overflow: auto;
 }
