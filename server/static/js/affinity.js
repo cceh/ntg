@@ -14,7 +14,7 @@ function ($, d3, _) {
     var force = d3.forceSimulation ().alphaMin (0.01);
 
     function node_class (d) {
-        return 'node group_' + d.group + ' hsnr_' + d.hsnr + ' bg_labez';
+        return 'node group_' + d.group + ' hsnr_' + d.hsnr + ' fg_labez';
     }
 
     function dragged (d) {

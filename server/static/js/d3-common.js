@@ -163,6 +163,25 @@ define ([
     }
 
     /**
+     * Inflate a bbox.
+     *
+     * @function inflate_bbox
+     *
+     * @param bbox The bbox as dictionary { x, y, width, height }
+     * @param len  The bbox will be twice this wider and taller.
+     *
+     * @return {Object} The bbox as dictionary { x, y, width, height }
+     */
+    function inflate_bbox (bbox, len) {
+        return {
+            'x'      : bbox.x - len,
+            'y'      : bbox.y - len,
+            'width'  : bbox.width + 2 * len,
+            'height' : bbox.height + 2 * len,
+        };
+    }
+
+    /**
      * Parse a .dot file.
      *
      * @function dot
@@ -201,6 +220,7 @@ define ([
         'to_d3'                : to_d3,
         'parse_pt'             : parse_pt,
         'parse_bbox'           : parse_bbox,
+        'inflate_bbox'         : inflate_bbox,
         'dot'                  : dot,
         'append_marker'        : append_marker,
     };

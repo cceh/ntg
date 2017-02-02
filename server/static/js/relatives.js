@@ -18,7 +18,7 @@ function ($, _, d3, d3c, tools, panel, nav) {
     'use strict';
 
     function changed () {
-        $ (document).trigger ('ntg.popup.changed');
+        $ (document).trigger ('changed.ntg.relatives');
     }
 
     /**
@@ -67,7 +67,7 @@ function ($, _, d3, d3c, tools, panel, nav) {
         var p2 = panel.load_chapter_dropdown (
             instance.$toolbar.find ('div.toolbar-chapter'),
             'chapter', [['0', 'All'], ['x', 'This']]);
-        $.when (p1, p2).done (function () {
+        return $.when (p1, p2).done (function () {
             panel.set_toolbar_buttons (instance.$toolbar, instance.data);
             // Maybe we changed chapter while navigating.  Set a new chapter.
             instance.$toolbar.find ('div.toolbar-chapter input[data-opt = "x"]')
@@ -113,21 +113,21 @@ function ($, _, d3, d3c, tools, panel, nav) {
             $popup.on ('changed.panel.visibility', changed);
 
             var instance = init (panel.init ($popup));
-            instance.load_passage ();
-            panel.create_panel_controls ($popup);
-
-            // position popup
-            var rect = target.getBoundingClientRect ();
-            var bodyRect = document.body.getBoundingClientRect (); // account for scrolling
-            var event = new $.Event ('click');
-            event.pageY = rect.top - bodyRect.top;
-            event.pageX = rect.left - bodyRect.left + (rect.width / 2.0);
-            $popup.position ({
-                'my'        : 'center bottom-3',
-                'collision' : 'flipfit flip',
-                'of'        : event,
+            instance.load_passage ().done (function () {
+                // position popup
+                var rect = target.getBoundingClientRect ();
+                var bodyRect = document.body.getBoundingClientRect (); // account for scrolling
+                var event = new $.Event ('click');
+                event.pageY = rect.top - bodyRect.top;
+                event.pageX = rect.left - bodyRect.left + (rect.width / 2.0);
+                $popup.position ({
+                    'my'        : 'center bottom-3',
+                    'collision' : 'flipfit flip',
+                    'of'        : event,
+                });
             });
 
+            panel.create_panel_controls ($popup);
             // make draggable
             $popup.draggable ();
             $popup.on ('dragstart', function () {

@@ -141,7 +141,7 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
         });
 
         // Content of popup changed.  Redo force graph highlighting.
-        $ (document).on ('ntg.popup.changed', function () {
+        $ (document).on ('changed.ntg.relatives', function () {
             var sources = relatives.get_ms_ids_from_popups ('source');
             var targets = relatives.get_ms_ids_from_popups ('target');
             module.affinity.highlight (sources, targets);

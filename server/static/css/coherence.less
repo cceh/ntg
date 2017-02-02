@@ -50,8 +50,15 @@ path, line {
         &.broken {
             stroke-dasharray: 4 4;
         }
-        &.hover {
+        &.hover,
+        &.hi-source {
+            stroke-width: 3px;
             stroke: red;
+            stroke-opacity: 1.0;
+        }
+        &.hi-target {
+            stroke-width: 3px;
+            stroke: green;
             stroke-opacity: 1.0;
         }
     }
@@ -82,47 +89,33 @@ div.variant-textflow-wrapper {
 /* nodes */
 
 circle.node {
-    stroke: #fff;
-    stroke-width: 0px;
+    stroke-width: 3px;
+    fill: #fff;
     transition: fill 2s linear;
     cursor: pointer;
 }
 
-div.affinity-wrapper {
-    circle.node {
-        stroke-width: 2px;
-        &.hsnr_0 {
-            stroke: #000;
-        }
-        &.hsnr_1 {
-            stroke: #000;
-        }
-    }
-}
-
 line.link.highlight,
 g.highlight circle.node {
-    stroke: #ff0;
-    stroke-width: 3px;
-    stroke-opacity: 1.0;
+    fill: #ff0;
 }
 g.selected circle.node {
-    stroke: #f00;
-    stroke-width: 3px;
-    stroke-opacity: 1.0;
+    fill: #f00;
 }
 
 text {
     dominant-baseline: middle;
     fill: #000;
-    stroke: #fff;
-    stroke-width: 3px;
-    stroke-linejoin: round;
     text-anchor: middle;
     pointer-events: none;
-    paint-order: stroke;
     &.group {
         font-size: 120%;
+    }
+    &.link {
+        stroke: #fff;
+        stroke-width: 2px;
+        stroke-linejoin: round;
+        paint-order: stroke;
     }
     &:hover {
         text-decoration: underline;

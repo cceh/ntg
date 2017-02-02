@@ -146,14 +146,16 @@ function ($, d3, d3_common, _) {
                 });
 
             node.append ('circle')
-                .attr ('class', 'node bg_labez')
+                .attr ('class', 'node fg_labez')
                 .attr ('data-labez', function (d) { return d.data.attrs.labez; })
                 .attr ('r', node_width / 2)
                 .on ('mouseenter', function (d) {
-                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover', true);
+                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hi-source', true);
+                    d3.selectAll ('path.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hi-target', true);
                 })
                 .on ('mouseleave', function (d) {
-                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover', false);
+                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hi-source', false);
+                    d3.selectAll ('path.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hi-target', false);
                 });
 
             node.append ('text')

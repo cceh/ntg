@@ -322,7 +322,7 @@ def nx_to_dot_subgraphs (nxg, field, width = 960.0):
 
     """
 
-    dot = [DOT_SKELETON.format (ranksep = 1.0, size = width / 72)]
+    dot = [DOT_SKELETON.format (ranksep = 1.5, size = width / 72)]
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
     sorted_nodes = sorted (nxg, key = lambda n: (nxg.node[n][field], nxg.node[n]['hsnr']))
@@ -843,15 +843,16 @@ def textflow_dot (passage_or_id):
                 if G.node[u][group_field] > G.node[v][group_field]:
                     G.edge[u][v]['constraint'] = 'false'
 
-        for n in G:
-            # Use a different label if the parent's varnew differs from this
-            # node's varnew.
-            pred = G.predecessors (n)
-            attrs = G.node[n]
-            if not pred or attrs['varnew'] != G.node[pred[0]]['varnew']:
-                attrs['label'] = "%s: %s" % (attrs['varnew'], attrs['hs'])
-                if pred:
-                    G.edge[pred[0]][n]['broken'] = 'true'
+        else:
+            for n in G:
+                # Use a different label if the parent's varnew differs from this
+                # node's varnew.
+                pred = G.predecessors (n)
+                attrs = G.node[n]
+                if not pred or attrs['varnew'] != G.node[pred[0]]['varnew']:
+                    attrs['label'] = "%s: %s" % (attrs['varnew'], attrs['hs'])
+                    if pred:
+                        G.edge[pred[0]][n]['broken'] = 'true'
 
     if var_only:
         dot = nx_to_dot_subgraphs (G, group_field, width)

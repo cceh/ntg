@@ -40,8 +40,8 @@ function ($, d3, d3_common, _) {
                 subgraph.attrs.graph.attrs.lp   = d3_common.parse_pt   (subgraph.attrs.graph.attrs.lp);
             });
 
-            // shrinkwrap
-            instance.bbox = graph.attrs.graph.attrs.bbox;
+            // shrinkwrap + accomodate for the thick borders of circles
+            instance.bbox = d3_common.inflate_bbox (graph.attrs.graph.attrs.bbox, 3);
 
             var node_width = graph.attrs.node.attrs.width;
 
@@ -66,9 +66,12 @@ function ($, d3, d3_common, _) {
                 link.id = instance.id_prefix + 'link_' + i;
             });
 
+            var g = svg.append ('g')
+                .attr ('transform', 'translate(' + -instance.bbox.x + ',' + -instance.bbox.y + ')');
+
             // draw the subgraphs: a rectangle with a label
 
-            var sg = svg.append ('g').attr ('class', 'subgraphs');
+            var sg = g.append ('g').attr ('class', 'subgraphs');
 
             var subgraph = sg.selectAll ('.subgraph')
                 .data (_.map (graph.subgraphs, 'attrs.graph.attrs'))
@@ -88,7 +91,7 @@ function ($, d3, d3_common, _) {
 
             // draw the links: a path and a text
 
-            var lg = svg.append ('g').attr ('class', 'links');
+            var lg = g.append ('g').attr ('class', 'links');
 
             var link = lg.selectAll ('.link')
                 .data (graph.edges)
@@ -130,7 +133,7 @@ function ($, d3, d3_common, _) {
 
             // draw the nodes: a circle and a text in a group
 
-            var ng = svg.append ('g').attr ('class', 'nodes');
+            var ng = g.append ('g').attr ('class', 'nodes');
 
             var node = ng.selectAll ('g.node')
                 .data (_.map (graph.nodes, 'attrs'))
@@ -144,14 +147,16 @@ function ($, d3, d3_common, _) {
                 });
 
             node.append ('circle')
-                .attr ('class', 'node bg_labez')
+                .attr ('class', 'node fg_labez')
                 .attr ('data-labez', function (d) { return d.labez; })
                 .attr ('r', function (d) { return (d.width || node_width) * graph.attrs.graph.attrs.dpi / 2; })
                 .on ('mouseenter', function (d) {
-                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover', true);
+                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hi-source', true);
+                    d3.selectAll ('path.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hi-target', true);
                 })
                 .on ('mouseleave', function (d) {
-                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover', false);
+                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hi-source', false);
+                    d3.selectAll ('path.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hi-target', false);
                 });
 
             node.append ('text')

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
 """Prepare a database for CBGM
@@ -1169,6 +1169,15 @@ def copy_genealogical_data (dbsrc, dbsrcvg, dbdest, parameters):
             UPDATE {var}
             SET varid = 'zz', varnew = 'zz'
             WHERE labez = 'zz' AND varnew = ''
+            """, parameters)
+
+            # Fix varid and varnew where A could not be reconstructed.
+            # These are the passages which have varnew = 'a' and s1 = '?' in locstemed.
+            execute (dest, """
+            UPDATE {var} v
+            SET varid = 'zz', varnew = 'zz'
+            FROM {locstemed} l
+            WHERE l.pass_id = v.pass_id AND v.ms_id = 1 AND l.varnew = 'a' AND l.s1 = '?'
             """, parameters)
 
             fix (dest, "Bogus varnew", """

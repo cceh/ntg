@@ -33,6 +33,13 @@ restart: js css server
 server: css js
 	server/server.py -vvv
 
+prepare:
+	scripts/cceh/prepare4cbgm.py -vvv server/instance/current.conf
+
+db_upload:
+	pg_dump --clean --if-exists ntg_current | bzip2 > /tmp/ntg_current.pg_dump.sql.bz2
+	scp /tmp/ntg_current.pg_dump.sql.bz2 $(NTG_USER)@$(NTG_VM):~/
+
 clean:
 	find . -depth -name "*~" -delete
 

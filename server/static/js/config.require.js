@@ -54,13 +54,6 @@ requirejs.config ({
             // going to use noConflict () to remove bootstrap functions
             'deps' : ['jquery', 'jquery-ui'],
         },
-        'relatives-css' : {
-            'deps' : ['panel-css'],
-        },
-        'textflow-css' : {
-            'deps' : ['panel-css'],
-        },
-
     },
     // scripts/cceh/sri_hash <url>
     'sri' : {

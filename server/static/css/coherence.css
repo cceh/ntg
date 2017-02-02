@@ -42,8 +42,17 @@ line.link.broken {
   stroke-dasharray: 4 4;
 }
 path.link.hover,
-line.link.hover {
+line.link.hover,
+path.link.hi-source,
+line.link.hi-source {
+  stroke-width: 3px;
   stroke: red;
+  stroke-opacity: 1.0;
+}
+path.link.hi-target,
+line.link.hi-target {
+  stroke-width: 3px;
+  stroke: green;
   stroke-opacity: 1.0;
 }
 marker.link {
@@ -66,43 +75,32 @@ div.variant-textflow-wrapper marker.link {
 }
 /* nodes */
 circle.node {
-  stroke: #fff;
-  stroke-width: 0px;
+  stroke-width: 3px;
+  fill: #fff;
   transition: fill 2s linear;
   cursor: pointer;
 }
-div.affinity-wrapper circle.node {
-  stroke-width: 2px;
-}
-div.affinity-wrapper circle.node.hsnr_0 {
-  stroke: #000;
-}
-div.affinity-wrapper circle.node.hsnr_1 {
-  stroke: #000;
-}
 line.link.highlight,
 g.highlight circle.node {
-  stroke: #ff0;
-  stroke-width: 3px;
-  stroke-opacity: 1.0;
+  fill: #ff0;
 }
 g.selected circle.node {
-  stroke: #f00;
-  stroke-width: 3px;
-  stroke-opacity: 1.0;
+  fill: #f00;
 }
 text {
   dominant-baseline: middle;
   fill: #000;
-  stroke: #fff;
-  stroke-width: 3px;
-  stroke-linejoin: round;
   text-anchor: middle;
   pointer-events: none;
-  paint-order: stroke;
 }
 text.group {
   font-size: 120%;
+}
+text.link {
+  stroke: #fff;
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  paint-order: stroke;
 }
 text:hover {
   text-decoration: underline;
