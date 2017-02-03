@@ -17,6 +17,18 @@ define ([
     var dot_parser = peg.generate (parser_src);
 
     /**
+     * Conversion factor from standard .dot resoolution to standard css resolution.
+     *
+     * Why 96? See: https://www.w3.org/TR/css3-values/#reference-pixel
+     *
+     * Why 72? All output of GraphViz assumes 72 dpi regardless of the value of
+     * the 'dpi' field.  The 'dpi' field is used only for bitmap and svg output.
+     *
+     * @var {float} dot2css
+     */
+    var dot2css = 96.0 / 72.0;
+
+    /**
      * A D3 color palette suitable for attestations.
      *
      * @var {d3.scale} attestation_palette
@@ -138,8 +150,8 @@ define ([
     function parse_pt (commasep) {
         var pt = commasep.split (',');
         return {
-            'x' : parseFloat (pt[0]),
-            'y' : parseFloat (pt[1]),
+            'x' : parseFloat (pt[0]) * dot2css,
+            'y' : parseFloat (pt[1]) * dot2css,
         };
     }
 
@@ -155,11 +167,46 @@ define ([
     function parse_bbox (commasep) {
         var bb = commasep.split (',');
         return {
-            'x'      : parseFloat (bb[0]),
-            'y'      : parseFloat (bb[1]),
-            'width'  : parseFloat (bb[2]) - parseFloat (bb[0]),
-            'height' : parseFloat (bb[3]) - parseFloat (bb[1]),
+            'x'      : parseFloat (bb[0] * dot2css),
+            'y'      : parseFloat (bb[1] * dot2css),
+            'width'  : (parseFloat (bb[2]) - parseFloat (bb[0])) * dot2css,
+            'height' : (parseFloat (bb[3]) - parseFloat (bb[1])) * dot2css,
         };
+    }
+
+    /**
+     * Parse edge path .dot format.
+     *
+     * @function parse_path
+     *
+     * @param path {string} The path in .dot format
+     *
+     * @return {Array} The path as array of objects  { x, y }
+     */
+    function parse_path (path) {
+        path = path.replace ('\\\n', '');
+        return _.map (path.split (/\s+/), function (point) {
+            return parse_pt (point);
+        });
+    }
+
+    /**
+     * Parse edge path .dot format.
+     *
+     * @function parse_path_svg
+     *
+     * @param path {string} The path in .dot format
+     *
+     * @return {string} The path as 'Mx,y Cx,y x,y x,y ...'
+     */
+
+    function parse_path_svg (path) {
+        path = parse_path (path);
+        var s = 'M' + path[0].x + ',' + path[0].y + 'C';
+
+        return s + _.map (path.slice (1), function (pt) {
+            return pt.x + ',' + pt.y;
+        }).join (' ');
     }
 
     /**
@@ -220,6 +267,8 @@ define ([
         'to_d3'                : to_d3,
         'parse_pt'             : parse_pt,
         'parse_bbox'           : parse_bbox,
+        'parse_path'           : parse_path,
+        'parse_path_svg'       : parse_path_svg,
         'inflate_bbox'         : inflate_bbox,
         'dot'                  : dot,
         'append_marker'        : append_marker,

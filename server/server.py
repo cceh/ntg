@@ -264,19 +264,18 @@ class Passage (object):
 
 DOT_SKELETON = """
 strict digraph G {{
-        graph [dpi=72,
-               nodesep=0.2,
+        graph [nodesep=0.1,
                ordering=out,
                rankdir=BT,
                ranksep={ranksep},
                size={size:.2f},
-               fontsize=10.0,
+               fontsize={fontsize},
                remincross=true
         ];
-        node [fixedsize=true,
-              shape=circle,
-              height=0.5,
-              width=0.5
+        node [shape=ellipse,
+              height=0.3,
+              width=0.3,
+              margin=0.005
         ];
         edge [arrowhead=none,
               arrowtail=none,
@@ -285,7 +284,23 @@ strict digraph G {{
         ];
 """
 
-def nx_to_dot (nxg, width = 960.0):
+def dot_skeleton (width = 960.0, fontsize = 10.0, ranksep = 0.4):
+    # We have to convert the values the browser sends (96 dpi) into
+    # values that GraphViz accepts (72 dpi).
+
+    # Why dpi = 96 ? See: https://www.w3.org/TR/css3-values/#reference-pixel
+
+    # All input to GraphViz assumes 72pt = 1 inch and 72 dpi regardless of the
+    # value of dpi. dpi is used only for bitmap and svg output.
+
+    return [DOT_SKELETON.format (
+        ranksep = ranksep,
+        size = width / 96,               # convert px => inch
+        fontsize = (fontsize / 96) * 72  # convert px => pt (72 pt = 1 inch)
+    )]
+
+
+def nx_to_dot (nxg, width = 960.0, fontsize = 10.0):
     """Convert an nx graph into a dot file.
 
     We'd like to sort the nodes in the graph, but nx internally uses
@@ -295,7 +310,7 @@ def nx_to_dot (nxg, width = 960.0):
 
     """
 
-    dot = [DOT_SKELETON.format (ranksep = 0.5, size = width / 72)]
+    dot = dot_skeleton (width = width, fontsize = fontsize);
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
     for n, nodedata in sorted (nxg.nodes (data = True)):
@@ -312,7 +327,7 @@ def nx_to_dot (nxg, width = 960.0):
     return '\n'.join (dot)
 
 
-def nx_to_dot_subgraphs (nxg, field, width = 960.0):
+def nx_to_dot_subgraphs (nxg, field, width = 960.0, fontsize = 10.0):
     """Convert an nx graph into a dot file.
 
     We'd like to sort the nodes in the graph, but nx internally uses
@@ -322,7 +337,7 @@ def nx_to_dot_subgraphs (nxg, field, width = 960.0):
 
     """
 
-    dot = [DOT_SKELETON.format (ranksep = 1.5, size = width / 72)]
+    dot = dot_skeleton (width = width, fontsize = fontsize, ranksep = 1.2);
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
     sorted_nodes = sorted (nxg, key = lambda n: (nxg.node[n][field], nxg.node[n]['hsnr']))
@@ -654,6 +669,7 @@ def textflow_dot (passage_or_id):
     chapter      = request.args.get ('chapter') or 0
     connectivity = int (request.args.get ('connectivity') or 10)
     width        = float (request.args.get ('width') or 0.0)
+    fontsize     = float (request.args.get ('fontsize') or 10.0)
     mode         = request.args.get ('mode') or 'rec'
 
     include      = request.args.getlist ('include[]')   or []
@@ -778,7 +794,7 @@ def textflow_dot (passage_or_id):
         for r in ranks:
             if not r.ms_id1 in nodes_seen:
                 if r.rank > 1:
-                    G.add_edge (r.ms_id2, r.ms_id1, rank = r.rank)
+                    G.add_edge (r.ms_id2, r.ms_id1, rank = r.rank, headlabel = r.rank)
                 else:
                     G.add_edge (r.ms_id2, r.ms_id1)
                 nodes_seen.add (r.ms_id1)
@@ -855,9 +871,9 @@ def textflow_dot (passage_or_id):
                         G.edge[pred[0]][n]['broken'] = 'true'
 
     if var_only:
-        dot = nx_to_dot_subgraphs (G, group_field, width)
+        dot = nx_to_dot_subgraphs (G, group_field, width, fontsize)
     else:
-        dot = nx_to_dot (G, width)
+        dot = nx_to_dot (G, width, fontsize)
     dot = tools.graphviz_layout (dot)
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
 
@@ -1134,9 +1150,10 @@ def stemma_dot (passage_or_id):
 
     """
 
-    width = float (request.args.get ('width') or 0.0)
+    width    = float (request.args.get ('width') or 0.0)
+    fontsize = float (request.args.get ('fontsize') or 10.0)
 
-    dot = nx_to_dot (local_stemma (passage_or_id), width)
+    dot = nx_to_dot (local_stemma (passage_or_id), width, fontsize)
     dot = tools.graphviz_layout (dot)
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
 

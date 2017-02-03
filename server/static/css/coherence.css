@@ -74,36 +74,35 @@ div.variant-textflow-wrapper marker.link {
   visibility: visible;
 }
 /* nodes */
-circle.node {
+circle.node,
+ellipse.node {
   stroke-width: 3px;
   fill: #fff;
   transition: fill 2s linear;
   cursor: pointer;
 }
 line.link.highlight,
-g.highlight circle.node {
+g.highlight ellipse.node {
   fill: #ff0;
 }
-g.selected circle.node {
+g.selected ellipse.node {
   fill: #f00;
 }
 text {
   dominant-baseline: middle;
-  fill: #000;
   text-anchor: middle;
+  fill: #000;
+  cursor: pointer;
   pointer-events: none;
 }
-text.group {
-  font-size: 120%;
+text.subgraph {
+  font-weight: bold;
 }
 text.link {
   stroke: #fff;
   stroke-width: 2px;
   stroke-linejoin: round;
   paint-order: stroke;
-}
-text:hover {
-  text-decoration: underline;
 }
 /* subgraphs */
 rect.subgraph {

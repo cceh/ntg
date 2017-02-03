@@ -21,6 +21,9 @@ function ($, d3, d3_common, _) {
      */
     function load_dot (url) {
         var instance = this;
+        var dot_dpi = 72;
+        var css_dpi = 96;
+
         var svg = instance.svg;
         svg.selectAll ('g').transition ().duration (300).style ('opacity', 0.0)
             .remove ();
@@ -43,13 +46,25 @@ function ($, d3, d3_common, _) {
             // down to the manuscripts.
 
             var data = [];
-            data.push ({ 'id' : 'root', 'parent_id' : null });
+            data.push ({
+                'id'        : 'root',
+                'parent_id' : null,
+                'attrs'     : {}
+            });
             _.forEach (graph.subgraphs, function (subgraph) {
-                data.push ({ 'id' : subgraph.id, 'parent_id' : 'root', 'attrs' : subgraph.attrs  });
+                data.push ({
+                    'id'        : subgraph.id,
+                    'parent_id' : 'root',
+                    'attrs'     : subgraph.attrs
+                });
                 var subgraph_nodes = _.filter (
                     subgraph.stmts, function (o) { return o.type === 'node'; });
                 _.forEach (subgraph_nodes, function (node) {
-                    data.push ({ 'id' : node.id, 'parent_id' : subgraph.id, 'attrs' : node.attrs });
+                    data.push ({
+                        'id'        : node.id,
+                        'parent_id' : subgraph.id,
+                        'attrs'     : node.attrs
+                    });
                 });
             });
 
@@ -90,18 +105,22 @@ function ($, d3, d3_common, _) {
 
             // calculate the radius, etc.
 
-            var node_width = graph.attrs.node.attrs.width * graph.attrs.graph.attrs.dpi;
+            var node_width  = graph.attrs.node.attrs.width;      // in inch
+            var node_height = graph.attrs.node.attrs.height;     // in pt
+            var font_size   = graph.attrs.graph.attrs.fontsize;  // in pt
+
+            var node_width_px  = node_width * css_dpi;
+            var node_height_px = node_width * css_dpi;
             var n_nodes = root.leaves ().length;
             var n_groups = root.children.length;
             var radius = 1.2 * Math.max (
-                (((n_nodes * node_width) + (n_groups * node_width / 2)) / (2 * Math.PI)),
-                2 * node_width
+                (((n_nodes * node_height_px) + (n_groups * node_height_px / 2)) / (2 * Math.PI)),
+                2 * node_height_px
             );
-            var link_radius  = radius - (0.5 * node_width);
-            var label_radius = radius + (1.5 * node_width);
+            var label_radius = radius + (1.5 * node_width_px);
 
             d3.cluster ()
-                .size ([360, link_radius])
+                .size ([360, radius])
                 .separation (function (a, b) {
                     return a.parent === b.parent ? 1 : 1.5;
                 }) (root);
@@ -112,11 +131,11 @@ function ($, d3, d3_common, _) {
             });
 
             svg.style ('opacity', 0.0);
-            svg.style ('font-size', graph.attrs.graph.attrs.fontsize + 'pt');
+            svg.style ('font-size', font_size + 'pt');
 
             var g = svg.append ('g');
 
-            // draw the nodes: a circle and a text in a group
+            // draw the nodes: an ellipse and a text in a group
 
             var ng = g.append ('g').attr ('class', 'nodes')
                 .attr ('transform', 'rotate(-90)'); // put origin at 12 hours
@@ -145,10 +164,15 @@ function ($, d3, d3_common, _) {
                     return 'rotate(' + d.x + ') translate(' + radius + ')';
                 });
 
-            node.append ('circle')
+            node.append ('ellipse')
                 .attr ('class', 'node fg_labez')
                 .attr ('data-labez', function (d) { return d.data.attrs.labez; })
-                .attr ('r', node_width / 2)
+                .attr ('rx', function (d) {
+                    return (d.data.attrs.width  || node_width) * css_dpi / 2;
+                })
+                .attr ('ry', function (d) {
+                    return (d.data.attrs.height || node_height) * css_dpi / 2;
+                })
                 .on ('mouseenter', function (d) {
                     d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hi-source', true);
                     d3.selectAll ('path.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hi-target', true);
@@ -176,10 +200,11 @@ function ($, d3, d3_common, _) {
                 });
 
             var line = d3.radialLine ()
-                .radius (function (d) { return d.y; })
+                .radius (function (d) {
+                    return d.y - (d.data.attrs.width || node_width) * css_dpi / 2;
+                })
                 .angle  (function (d) { return d.x / 180 * Math.PI; })
                 .curve (d3.curveBundle.beta (0.5));
-                // .curve (d3.curveLinear);
 
             link.append ('path')
                 .attr ('id', function (d) { return d.id; })
@@ -198,30 +223,8 @@ function ($, d3, d3_common, _) {
                     return line (d.source.path (d.target));
                 });
 
-            /* link.filter (function (d) { return d.attrs.rank; })
-                .append ('text')
-                .attr ('class', 'link')
-                .attr ('text-anchor', 'end')
-                .append ('textPath')
-                .attr ('startOffset', '100%')
-                .attr ('xlink:href', function (d) { return '#' + d.id; })
-                .append ('tspan')
-                .attr ('dy', '-5')
-                .attr ('dx', '-5')
-                .attr ('rotate', '-90')
-                .text (function (d) { return d.attrs.rank; });*/
-
             // WARNING: This works only if the <g> and all its parents are visible.
             var bbox = g.node ().getBBox ();
-
-            /* var bbox_radius = label_radius + 10;
-            bbox = {
-                'x'      : -bbox_radius,
-                'y'      : -bbox_radius,
-                'width'  : 2 * bbox_radius,
-                'height' : 2 * bbox_radius,
-            };*/
-
             g.attr ('transform', 'translate(' + (-bbox.x) + ', ' + (-bbox.y) + ')');
 
             svg.transition ('svg')

@@ -27,10 +27,15 @@ function ($) {
     function load_passage (passage) {
         var instance = this;
 
-        // provide a width for GraphViz to format the graph in
-        instance.data.width = instance.$wrapper.width ();
+        var params = ['width', 'fontsize'];
 
-        instance.graph.load_dot ('stemma.dot/' + passage.id).done (function () {
+        // provide a width and fontsize for GraphViz to format the graph
+        instance.data.width = instance.$wrapper.width ();                            // in px
+        instance.data.fontsize = parseFloat (instance.$wrapper.css ('font-size'));   // in px
+
+        instance.graph.load_dot (
+            'stemma.dot/' + passage.id + '?' + $.param (_.pick (instance.data, params))
+        ).done (function () {
             instance.dirty = false;
             instance.$panel.animate ({ 'width' : (instance.graph.bbox.width + 20) + 'px' });
         });

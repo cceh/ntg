@@ -36,13 +36,14 @@ function ($, _, panel) {
     function load_passage (passage) {
         var instance = this;
         var params = ['labez', 'connectivity', 'chapter', 'include', 'fragments',
-                      'mode', 'hyp_a', 'var_only', 'width', 'splits'];
+                      'mode', 'hyp_a', 'var_only', 'width', 'fontsize', 'splits'];
 
         // dirty hack! Make panel visible so SVG getBBox () will work.
         instance.$wrapper.slideDown ();
 
-        // provide a width for GraphViz to format the graph in
-        instance.data.width = instance.$wrapper.width ();
+        // provide a width and fontsize for GraphViz to format the graph
+        instance.data.width = instance.$wrapper.width ();                            // in px
+        instance.data.fontsize = parseFloat (instance.$wrapper.css ('font-size'));   // in px
 
         instance.graph.load_dot (
             'textflow.dot/' + passage.id + '?' + $.param (_.pick (instance.data, params))

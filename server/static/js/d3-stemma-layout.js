@@ -23,6 +23,9 @@ function ($, d3, d3_common, _) {
      */
     function load_dot (url) {
         var instance = this; // instance
+        var dot_dpi = 72;
+        var css_dpi = 96;
+
         var svg = this.svg;
         svg.selectAll ('g').transition ().duration (300).style ('opacity', 0.0)
             .remove ();
@@ -43,10 +46,12 @@ function ($, d3, d3_common, _) {
             // shrinkwrap + accomodate for the thick borders of circles
             instance.bbox = d3_common.inflate_bbox (graph.attrs.graph.attrs.bbox, 3);
 
-            var node_width = graph.attrs.node.attrs.width;
+            var node_width  = graph.attrs.node.attrs.width;     // in inches
+            var node_height = graph.attrs.node.attrs.height;    // in inches
+            var font_size   = graph.attrs.graph.attrs.fontsize; // in points
 
             svg.style ('opacity', 0.0);
-            svg.style ('font-size', graph.attrs.graph.attrs.fontsize + 'pt');
+            svg.style ('font-size', font_size + 'pt');
 
             svg.transition ('svg')
                 .duration (300)
@@ -71,7 +76,8 @@ function ($, d3, d3_common, _) {
 
             // draw the subgraphs: a rectangle with a label
 
-            var sg = g.append ('g').attr ('class', 'subgraphs');
+            var sg = g.append ('g')
+                .attr ('class', 'subgraphs');
 
             var subgraph = sg.selectAll ('.subgraph')
                 .data (_.map (graph.subgraphs, 'attrs.graph.attrs'))
@@ -85,8 +91,13 @@ function ($, d3, d3_common, _) {
                 .attr ('class', 'subgraph');
 
             subgraph.append ('text')
+                .attr ('class', 'subgraph')
+                // lp indicates the center of the label
                 .attr ('x', function (d) { return d.lp.x; })
-                .attr ('y', function (d) { return d.lp.y + (parseFloat (d.lheight) * graph.attrs.graph.attrs.dpi); })
+                .attr ('y', function (d) { return d.lp.y; })
+                .style ('font-size', function (d) {
+                    return (d.fontsize || font_size) + 'pt';
+                })
                 .text (function (d) { return d.label; });
 
             // draw the links: a path and a text
@@ -96,6 +107,11 @@ function ($, d3, d3_common, _) {
             var link = lg.selectAll ('.link')
                 .data (graph.edges)
                 .enter ();
+
+            link.filter (function (d) { return d.attrs && d.attrs.head_lp })
+                .each (function (d) {
+                    d.attrs.head_lp = d3_common.parse_pt (d.attrs.head_lp);
+                });
 
             link.append ('path')
                 .attr ('id', function (d) { return d.id; })
@@ -109,27 +125,14 @@ function ($, d3, d3_common, _) {
                         (d.attrs.broken ? ' broken' : '');
                 })
                 .attr ('marker-end', 'url(#' + instance.id_prefix + 'triangle)')
-                .attr ('d', function (d) {
-                    var pos = d.attrs.pos.replace ('\\\n', '');
-                    var arr = pos.split (/\s+/);
-                    arr[0] = 'M' + arr[0];
-                    arr[1] = 'C' + arr[1];
-                    // console.log (pos);
-                    return arr.join (' ');
-                });
+                .attr ('d', function (d) { return d3_common.parse_path_svg (d.attrs.pos); })
 
-            link.filter (function (d) { return d.attrs.rank; })
+            link.filter (function (d) { return d.attrs && d.attrs.head_lp && d.attrs.headlabel; })
                 .append ('text')
                 .attr ('class', 'link')
-                .attr ('text-anchor', 'end')
-                .append ('textPath')
-                .attr ('startOffset', '100%')
-                .attr ('xlink:href', function (d) { return '#' + d.id; })
-                .append ('tspan')
-                .attr ('dy', '-5')
-                .attr ('dx', '-5')
-                .attr ('rotate', '-90')
-                .text (function (d) { return d.attrs.rank; });
+                .attr ('x', function (d) { return d.attrs.head_lp.x; })
+                .attr ('y', function (d) { return d.attrs.head_lp.y; })
+                .text (function (d) { return d.attrs.headlabel; });
 
             // draw the nodes: a circle and a text in a group
 
@@ -137,19 +140,31 @@ function ($, d3, d3_common, _) {
 
             var node = ng.selectAll ('g.node')
                 .data (_.map (graph.nodes, 'attrs'))
-                .enter ().append ('g')
+                .enter ();
+
+            node.filter (function (d) { return d.pos })
+                .each (function (d) {
+                    d.pos = d3_common.parse_pt (d.pos);
+                });
+
+            var groups = node.append ('g')
                 .attr ('data-ms-id', function (d) { return d.ms_id; })
                 .attr ('class', function (d) {
                     return 'node node-' + (d.children ? 'internal' : 'leaf');
                 })
                 .attr ('transform', function (d) {
-                    return 'translate(' + d.pos + ')';
+                    return 'translate(' + d.pos.x + ',' + d.pos.y + ')';
                 });
 
-            node.append ('circle')
+            groups.append ('ellipse')
                 .attr ('class', 'node fg_labez')
                 .attr ('data-labez', function (d) { return d.labez; })
-                .attr ('r', function (d) { return (d.width || node_width) * graph.attrs.graph.attrs.dpi / 2; })
+                .attr ('rx', function (d) {
+                    return (d.width  || node_width) * css_dpi / 2;
+                })
+                .attr ('ry', function (d) {
+                    return (d.height || node_height) * css_dpi / 2;
+                })
                 .on ('mouseenter', function (d) {
                     d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hi-source', true);
                     d3.selectAll ('path.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hi-target', true);
@@ -159,9 +174,23 @@ function ($, d3, d3_common, _) {
                     d3.selectAll ('path.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hi-target', false);
                 });
 
-            node.append ('text')
+            groups.append ('text')
                 .attr ('class', 'node')
                 .text (function (d) { return d.label; });
+
+            /*
+            var r = node_width * css_dpi / 2;
+
+            groups.append ('foreignObject')
+                .attr ('x', -r)
+                .attr ('y', -r)
+                .attr ('width', 2 * r)
+                .attr ('height', 2 * r)
+                .append ('xhtml:body')
+                .append ('div')
+                .attr ('class', 'node')
+                .text (function (d) { return d.label; });
+            */
 
             // done
 
