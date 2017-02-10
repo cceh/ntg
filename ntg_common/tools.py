@@ -201,7 +201,7 @@ def graphviz_layout (dot):
     #    raise subprocess.CalledProcessError (
     #        'Program terminated with status: %d. stderr is: %s' % (
     #            p.returncode, errs))
-    #elif errs:
-    #    log (logging.ERROR, errs)
+    if errs:
+        log (logging.ERROR, errs)
 
     return outs

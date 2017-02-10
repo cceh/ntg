@@ -95,9 +95,6 @@ text {
   cursor: pointer;
   pointer-events: none;
 }
-text.subgraph {
-  font-weight: bold;
-}
 text.link {
   stroke: #fff;
   stroke-width: 2px;

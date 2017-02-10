@@ -1,20 +1,21 @@
+RSYNC   := /usr/bin/rsync -azv --exclude '*~'
 SHELL   := /bin/bash
 PYTHON  := /usr/bin/python3
-RSYNC   := /usr/bin/rsync -azv --exclude '*~'
 BROWSER := firefox
 
 NTG_VM	   := ntg.cceh.uni-koeln.de
 NTG_USER   := ntg
 NTG_DB     := ntg
-NTG_ROOT   := /home/$(NTG_USER)/prj/ntg/ntg
+NTG        := $(NTG_USER)@$(NTG_VM)
+NTG_ROOT   := $(NTG):/home/$(NTG_USER)/prj/ntg/ntg
 PSQL_PORT  := 5433
 SERVER     := server
 STATIC	   := $(SERVER)/static
 
 TRANSLATIONS := de			 # space-separated list of translations we have eg. de fr
 
-NTG_SERVER := $(NTG_USER)@$(NTG_VM):$(NTG_ROOT)/$(SERVER)
-NTG_STATIC := $(NTG_USER)@$(NTG_VM):$(NTG_ROOT)/$(STATIC)
+NTG_SERVER := $(NTG_ROOT)/$(SERVER)
+NTG_STATIC := $(NTG_ROOT)/$(STATIC)
 
 LESS	   := $(wildcard $(STATIC)/css/*.less)
 CSS		   := $(LESS:.less=.css)
@@ -31,7 +32,7 @@ PY_SOURCES := scripts/cceh/*.py ntg_common/*.py server/*.py
 restart: js css server
 
 server: css js
-	server/server.py -vvv
+	server/server.py -vv
 
 prepare:
 	scripts/cceh/prepare4cbgm.py -vvv server/instance/current.conf
@@ -67,9 +68,8 @@ bower_update:
 	bower install --update
 
 upload:
-	$(RSYNC) -n $(SERVER)/server.py $(NTG_SERVER)/
-	$(RSYNC) -n $(STATIC)/js $(NTG_STATIC)/js
-	$(RSYNC) -n $(STATIC)/css $(NTG_STATIC)/css
+	$(RSYNC) --exclude "**/__pycache__"  --exclude "*.pyc"  ntg_common $(NTG_ROOT)/
+	$(RSYNC) --exclude "**/instance/**"       server     $(NTG_ROOT)/
 
 css: $(CSS)
 

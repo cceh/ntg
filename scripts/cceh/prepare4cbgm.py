@@ -200,6 +200,7 @@ def step01c (dba, parameters):
         SELECT DISTINCT hs, hsnr, kapanf
         FROM {att}
         WHERE hs = 'L1188' AND hsnr != 411880
+           OR hs != 'L1188' AND hsnr = 411880
         """, """
         UPDATE {att} SET hsnr = 411881 WHERE hs ~ '^L1188s';
         UPDATE {att} SET hsnr = 411880 WHERE hs = 'L1188';
@@ -616,15 +617,20 @@ def step06b (dba, parameters):
     with dba.engine.begin () as conn:
 
         fix (conn, "Duplicate readings", """
-        SELECT hsnr, anfadr, endadr
-        FROM {att}
-        GROUP BY hsnr, anfadr, endadr
-        HAVING count (*) > 1
+        SELECT hs, hsnr, anfadr, endadr, labez, labezsuf, lesart FROM att
+        WHERE (hsnr, anfadr, endadr) IN (
+           SELECT hsnr, anfadr, endadr
+           FROM {att}
+           GROUP BY hsnr, anfadr, endadr
+           HAVING count (*) > 1
+        )
         """, """
         DELETE FROM {att}
         WHERE (hs, anfadr, endadr) = ('L156s*', 50405022, 50405034) OR
               (hs, anfadr, endadr) = ('1891*V', 52716012, 52716012) OR
               (hs, anfadr, endadr) = ('P74V',   51535022, 51535028) OR
+              (hs, anfadr, endadr) = ('P74V',   50124030, 50125002) OR
+              (hs, anfadr, endadr) = ('P74C*V', 50124030, 50125003) OR
               (hs, anfadr, endadr) = ('02*V',   52101008, 52101010)
 
         """, parameters)
@@ -642,6 +648,8 @@ def step06b (dba, parameters):
                 SET suffix2 = REGEXP_REPLACE (suffix2, '{regexp}', '')
                 WHERE suffix2 ~ '{regexp}'
                 """, dict (parameters, t = t, regexp = regexp))
+
+    with dba.engine.begin () as conn:
 
         debug (conn, "Hs with more than one hsnr", """
         SELECT hs FROM (
@@ -680,13 +688,10 @@ def step06b (dba, parameters):
         GROUP BY hsnr
         HAVING count (*) > 1
         """, """
-        UPDATE
-            {att} t
-        JOIN
-          (SELECT min(hs) AS minhs, hsnr FROM {att} GROUP BY hsnr ORDER BY hs) AS g
-        ON
-          t.hsnr = g.hsnr
-        SET t.hs = g.minhs
+        UPDATE {att} AS t
+        SET hs = g.minhs
+        FROM (SELECT min (hs) AS minhs, hsnr FROM att GROUP BY hs, hsnr ORDER BY hs) AS g
+        WHERE t.hsnr = g.hsnr
         """, parameters)
 
 

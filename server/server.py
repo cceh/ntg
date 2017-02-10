@@ -269,6 +269,7 @@ strict digraph G {{
                rankdir=BT,
                ranksep={ranksep},
                size={size:.2f},
+               fontname="LiberationSans-Regular", // like Arial
                fontsize={fontsize},
                remincross=true
         ];
@@ -1247,7 +1248,7 @@ if __name__ == "__main__":
     args = parser.parse_args (namespace = args)
     args.start_time = datetime.datetime.now ()
     LOG_LEVELS = { 0: logging.CRITICAL, 1: logging.ERROR, 2: logging.WARN, 3: logging.INFO, 4: logging.DEBUG }
-    args.log_level = LOG_LEVELS.get (args.verbose, logging.CRITICAL)
+    args.log_level = LOG_LEVELS.get (args.verbose + 1, logging.CRITICAL)
     parameters = tools.init_parameters (tools.DEFAULTS)
 
     babel = flask_babel.Babel ()
