@@ -6,20 +6,20 @@ Postgres
 MySQL Foreign Data Wrapper
 --------------------------
 
-As database superuser do:
+As database superuser do::
 
-$ psql -U postgres -h /var/run/postgresql/ -d ntg
+  $ psql -U postgres -h /var/run/postgresql/ -d ntg
 
-CREATE EXTENSION mysql_fdw;
-# CREATE FOREIGN DATA WRAPPER mysql_fdw;
-GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
+  CREATE EXTENSION mysql_fdw;
+  # CREATE FOREIGN DATA WRAPPER mysql_fdw;
+  GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
 
-then as user ntg do:
+then as user ntg do::
 
-$ psql
+  $ psql
 
-CREATE SERVER mysql_server FOREIGN DATA WRAPPER mysql_fdw OPTIONS (host '127.0.0.1', port '3306');
-CREATE USER MAPPING FOR ntg SERVER mysql_server OPTIONS (username 'user', password 'secret');
+  CREATE SERVER mysql_server FOREIGN DATA WRAPPER mysql_fdw OPTIONS (host '127.0.0.1', port '3306');
+  CREATE USER MAPPING FOR ntg SERVER mysql_server OPTIONS (username 'user', password 'secret');
 
-CREATE SCHEMA mysql;
-IMPORT FOREIGN SCHEMA "VarGenAtt_ActPh3_Initial" LIMIT TO (var) FROM SERVER mysql_server INTO mysql;
+  CREATE SCHEMA mysql;
+  IMPORT FOREIGN SCHEMA "VarGenAtt_ActPh3_Initial" LIMIT TO (var) FROM SERVER mysql_server INTO mysql;
