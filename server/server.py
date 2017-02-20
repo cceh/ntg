@@ -281,7 +281,9 @@ strict digraph G {{
         edge [arrowhead=none,
               arrowtail=none,
               headclip=true,
-              tailclip=true
+              tailclip=true,
+              labelangle=0.0,
+              labeldistance=1.0,
         ];
 """
 
@@ -695,7 +697,7 @@ def textflow_dot (passage_or_id):
         if hyp_a != 'A':
             varnew_where = 'AND (v.varnew ~ :varnew OR (v.ms_id = 1 AND :hyp_a ~ :varnew))'
 
-    group_field = 'varnew' if splits else 'labez'
+    group_field = 'varnew' if splits else 'varid'
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -734,7 +736,7 @@ def textflow_dot (passage_or_id):
 
         order = 'affinity DESC, common, older, newer DESC, id2' # id2 is a tiebreaker
 
-        query_varnew = """
+        query_restricted = """
         /* get the closest ancestors for every node */
         WITH ranks AS (
           SELECT id1, id2, rank () OVER (PARTITION BY id1 ORDER BY {order}) AS rank
@@ -750,26 +752,26 @@ def textflow_dot (passage_or_id):
         (SELECT DISTINCT ON (id1) 1 as u, id1, id2, rank
         FROM ranks r
         JOIN {var} v
-          ON v.ms_id = id2 AND v.pass_id = :pass_id {varnew_where}
+          ON v.ms_id = r.id2 AND v.pass_id = :pass_id {varnew_where}
         WHERE r.rank <= :connectivity AND r.id2 NOT IN :exclude
         ORDER BY id1, rank)
 
         UNION
 
-        /* get the closest ancestor attesting anything (as fallback if the query
+        /* get the closest ancestors attesting anything (as fallback if the query
            above fails to get a result) */
 
-        (SELECT DISTINCT ON (id1) 2 as u, id1, id2, rank
+        (SELECT 2 as u, id1, id2, rank
         FROM ranks r
         JOIN {var} v
           ON v.ms_id = r.id2 AND v.pass_id = :pass_id AND v.varnew !~ '^z'
-        WHERE r.id2 NOT IN :exclude
+        WHERE r.rank <= :connectivity AND r.id2 NOT IN :exclude
         ORDER BY id1, rank)
 
         ORDER BY u, id1, rank
         """
 
-        query_not_varnew = """
+        query_global = """
         SELECT 1 AS u, r.* FROM (
           SELECT id1, id2, row_number () OVER (PARTITION BY id1 ORDER BY {order}) AS rank
           FROM {aff} a
@@ -781,7 +783,7 @@ def textflow_dot (passage_or_id):
         WHERE rank = 1
         """
 
-        res = execute (conn, query_varnew if varnew != '' else query_not_varnew,
+        res = execute (conn, query_restricted if varnew != '' else query_global,
                        dict (parameters, nodes = tuple (G.nodes ()), exclude = tuple (exclude),
                              chapter = chapter, pass_id = passage.pass_id, prefix = prefix,
                              varnew = '^' + varnew, connectivity = connectivity, order = order,
@@ -790,29 +792,23 @@ def textflow_dot (passage_or_id):
         Ranks = collections.namedtuple ('Ranks', 'u ms_id1 ms_id2 rank')
         ranks = list (map (Ranks._make, res))
 
-        # Add nodes to the graph.  Add each node only once.
-        nodes_seen = set ()
-        for r in ranks:
-            if not r.ms_id1 in nodes_seen:
-                if r.rank > 1:
-                    G.add_edge (r.ms_id2, r.ms_id1, rank = r.rank, headlabel = r.rank)
-                else:
-                    G.add_edge (r.ms_id2, r.ms_id1)
-                nodes_seen.add (r.ms_id1)
+        # Initially build a graph with all nodes.  We will remove unused nodes
+        # later.
+        dest_nodes = set ([r.ms_id1 for r in ranks])
+        src_nodes  = set ([r.ms_id2 for r in ranks])
 
-        # Set the node labels.
         res = execute (conn, """
         SELECT ms.id, ms.hs, ms.hsnr, v.varid, v.varnew
         FROM {ms} ms
         JOIN {var} v
           ON ms.id = v.ms_id AND v.pass_id = :pass_id
         WHERE ms.id IN :ms_ids
-        """, dict (parameters, ms_ids = tuple (G.nodes ()), pass_id = passage.pass_id))
+        """, dict (parameters, ms_ids = tuple (src_nodes | dest_nodes), pass_id = passage.pass_id))
 
         Mss = collections.namedtuple ('Mss', 'ms_id hs hsnr varid varnew')
         mss = list (map (Mss._make, res))
         for ms in mss:
-            attrs = G.node[ms.ms_id]
+            attrs = {}
             attrs['hs']     = ms.hs
             attrs['hsnr']   = ms.hsnr
             attrs['varid']  = ms.varid
@@ -824,13 +820,37 @@ def textflow_dot (passage_or_id):
                 attrs['varid']  = hyp_a[0]
                 attrs['varnew'] = hyp_a
                 attrs['labez']  = hyp_a[0]
+            G.add_node (ms.ms_id, attrs)
+
+        # A node that has a parent in the same attestation keeps only that one
+        # parent.  Nodes without parents within the same attestation keep the
+        # topranked parent for every attestation.
+
+        tags = set ()
+        for r in ranks:
+            if r.ms_id1 in tags:
+                continue;
+            a1 = G.node[r.ms_id1];
+            a2 = G.node[r.ms_id2];
+            if str (r.ms_id1) + a2[group_field] in tags:
+                continue;
+            if r.rank > 1:
+                G.add_edge (r.ms_id2, r.ms_id1, rank = r.rank, headlabel = r.rank)
+            else:
+                G.add_edge (r.ms_id2, r.ms_id1)
+            if a1[group_field] == a2[group_field]:
+                tags.add (r.ms_id1)
+            else:
+                tags.add (str (r.ms_id1) + a2[group_field])
+
+        G.remove_nodes_from (nx.isolates (G))
 
         if var_only:
             # Remove non-variant links
             #
             # remove nodes attesting z and link the children up
             for n in G:
-                if G.node[n]['labez'] == 'z':
+                if G.node[n][group_field][0] == 'z':
                     pred = G.predecessors (n)
                     if pred:
                         G.remove_edge (pred[0], n)
@@ -866,10 +886,12 @@ def textflow_dot (passage_or_id):
                 # node's varnew.
                 pred = G.predecessors (n)
                 attrs = G.node[n]
-                if not pred or attrs['varnew'] != G.node[pred[0]]['varnew']:
+                if not pred:
                     attrs['label'] = "%s: %s" % (attrs['varnew'], attrs['hs'])
-                    if pred:
-                        G.edge[pred[0]][n]['broken'] = 'true'
+                for p in pred:
+                    if attrs['varnew'] != G.node[p]['varnew']:
+                        attrs['label'] = "%s: %s" % (attrs['varnew'], attrs['hs'])
+                        G.edge[p][n]['broken'] = 'true'
 
     if var_only:
         dot = nx_to_dot_subgraphs (G, group_field, width, fontsize)
