@@ -229,7 +229,7 @@ def step01c (dba, parameters):
         )
         """, """
         INSERT INTO {att} (buch, kapanf, versanf, wortanf, kapend, versend, wortend, hsnr, hs, anfadr, endadr, labez, irange)
-        VALUES (5, 15, 28, 17, 15, 28, 17, 0, 'A', 51528017, 51528017, 'zu', int4range (51528017, 51528017))
+        VALUES (5, 15, 28, 17, 15, 28, 17, 0, 'A', 51528017, 51528017, 'a', int4range (51528017, 51528017))
         """, parameters)
 
         # Alle Fehlverse in A mit labez 'zu'?
@@ -1799,6 +1799,16 @@ def affinity_to_gephi (dba, parameters, val):
         # np.savetxt ('affinity.csv', val.quotient_matrix)
 
 
+def vacuum (dba, parameters):
+    """Vacuum database
+
+    """
+
+    with dba.engine.begin () as conn:
+
+        res = execute (conn, """VACUUM FULL ANALYZE""", paramaters);
+
+
 def print_stats (dba, parameters):
 
     with dba.engine.begin () as conn:
@@ -1989,6 +1999,10 @@ if __name__ == '__main__':
                 log (logging.INFO, "        : Exporting Gephi Tables ...")
                 affinity_to_gephi (dbdest, parameters, v)
                 continue
+
+            if step == 99:
+                log (logging.INFO, "Step 99 : Vacuum ...")
+                vacuum (dbdest, parameters)
 
     except KeyboardInterrupt:
         pass
