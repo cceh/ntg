@@ -81,6 +81,12 @@ js:	$(JS)
 %.gzip : %
 	gzip < $? > $@
 
+install-prerequisites:
+	sudo apt-get install libpq-dev postgresql-9.6-python3-multicorn graphviz
+	pip3 install numpy six networkx matplotlib Pillow rtree
+	pip3 install psycopg2 mysqlclient sqlalchemy sqlalchemy-utils intervals multicorn
+	pip3 install flask babel flask-babel flask-sqlalchemy jinja2
+
 ### Localization ###
 
 define LOCALE_TEMPLATE
