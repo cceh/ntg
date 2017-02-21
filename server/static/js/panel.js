@@ -51,6 +51,10 @@ function ($, _, tools) {
         return $input.attr ('data-type') || $input.attr ('type') || 'button';
     }
 
+    function connectivity_formatter (s) {
+        return (s == 21) ? 'All' : s
+    }
+
     function handle_toolbar_events (event) {
         // change opts according to event
 
@@ -124,7 +128,7 @@ function ($, _, tools) {
                 break;
             case 'slider':
                 $input.bootstrapSlider ('setValue', +value);
-                $panel.find ('span.connectivity-label').text (value);
+                $panel.find ('span.connectivity-label').text (connectivity_formatter (value));
                 break;
             case 'dropdown':
                 if (key === 'hyp_a') {
@@ -308,12 +312,13 @@ function ($, _, tools) {
     }
 
     return {
-        'init'                  : init,
-        'handle_toolbar_events' : handle_toolbar_events,
-        'set_toolbar_buttons'   : set_toolbar_buttons,
-        'load_labez_dropdown'   : load_labez_dropdown,
-        'load_chapter_dropdown' : load_chapter_dropdown,
-        'create_panel_controls' : create_panel_controls,
-        'init_panel_events'     : init_panel_events,
+        'init'                   : init,
+        'handle_toolbar_events'  : handle_toolbar_events,
+        'connectivity_formatter' : connectivity_formatter,
+        'set_toolbar_buttons'    : set_toolbar_buttons,
+        'load_labez_dropdown'    : load_labez_dropdown,
+        'load_chapter_dropdown'  : load_chapter_dropdown,
+        'create_panel_controls'  : create_panel_controls,
+        'init_panel_events'      : init_panel_events,
     };
 });

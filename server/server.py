@@ -685,6 +685,8 @@ def textflow_dot (passage_or_id):
     splits    = 'splits'    in splits
 
     prefix = '' if mode == 'rec' else 'p_'
+    if connectivity == 21:
+        connectivity = 9999
 
     if fragments:
         f_where = ''
