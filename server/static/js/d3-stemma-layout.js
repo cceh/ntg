@@ -129,7 +129,14 @@ function ($, d3, d3_common, _) {
 
             link.filter (function (d) { return d.attrs && d.attrs.head_lp && d.attrs.headlabel; })
                 .append ('text')
-                .attr ('class', 'link')
+                .attr ('data-labez', function (d) {
+                    return graph.nodes[d.elems[0].id].attrs.labez;
+                })
+                .attr ('class', function (d) {
+                    return 'link bg_labez ' +
+                        instance.id_prefix + 'sid-' + d.elems[0].id + ' ' +
+                        instance.id_prefix + 'tid-' + d.elems[1].id;
+                })
                 .attr ('x', function (d) { return d.attrs.head_lp.x; })
                 .attr ('y', function (d) { return d.attrs.head_lp.y; })
                 .text (function (d) { return d.attrs.headlabel; });
@@ -166,12 +173,12 @@ function ($, d3, d3_common, _) {
                     return (d.height || node_height) * css_dpi / 2;
                 })
                 .on ('mouseenter', function (d) {
-                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hi-source', true);
-                    d3.selectAll ('path.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hi-target', true);
+                    d3.selectAll ('.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover hi-source', true);
+                    d3.selectAll ('.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hover hi-target', true);
                 })
                 .on ('mouseleave', function (d) {
-                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hi-source', false);
-                    d3.selectAll ('path.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hi-target', false);
+                    d3.selectAll ('.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover hi-source', false);
+                    d3.selectAll ('.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hover hi-target', false);
                 });
 
             groups.append ('text')

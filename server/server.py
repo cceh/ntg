@@ -283,7 +283,7 @@ strict digraph G {{
               headclip=true,
               tailclip=true,
               labelangle=0.0,
-              labeldistance=1.0,
+              labeldistance=1.5,
         ];
 """
 
@@ -736,60 +736,32 @@ def textflow_dot (passage_or_id):
 
         order = 'affinity DESC, common, older, newer DESC, id2' # id2 is a tiebreaker
 
-        query_restricted = """
-        /* get the closest ancestors for every node */
-        WITH ranks AS (
+        # query to get the closest ancestors for every node with rank <= connectivity
+        query = """
+        SELECT id1, id2, rank
+        FROM (
           SELECT id1, id2, rank () OVER (PARTITION BY id1 ORDER BY {order}) AS rank
           FROM {aff} a
           JOIN {chap} c
             ON c.ms_id = a.id1 AND c.chapter = a.chapter
           WHERE id1 IN :nodes AND a.chapter = :chapter AND id2 NOT IN :exclude
             AND {prefix}newer > {prefix}older AND a.common > c.length / 2
-        )
-
-        /* get the closest ancestor attesting varnew */
-
-        (SELECT DISTINCT ON (id1) 1 as u, id1, id2, rank
-        FROM ranks r
-        JOIN {var} v
-          ON v.ms_id = r.id2 AND v.pass_id = :pass_id {varnew_where}
-        WHERE r.rank <= :connectivity AND r.id2 NOT IN :exclude
-        ORDER BY id1, rank)
-
-        UNION
-
-        /* get the closest ancestors attesting anything (as fallback if the query
-           above fails to get a result) */
-
-        (SELECT 2 as u, id1, id2, rank
-        FROM ranks r
-        JOIN {var} v
-          ON v.ms_id = r.id2 AND v.pass_id = :pass_id AND v.varnew !~ '^z'
-        WHERE r.rank <= :connectivity AND r.id2 NOT IN :exclude
-        ORDER BY id1, rank)
-
-        ORDER BY u, id1, rank
-        """
-
-        query_global = """
-        SELECT 1 AS u, r.* FROM (
-          SELECT id1, id2, row_number () OVER (PARTITION BY id1 ORDER BY {order}) AS rank
-          FROM {aff} a
-          JOIN {chap} c
-            ON c.ms_id = a.id1 AND c.chapter = a.chapter
-          WHERE id1 IN :nodes AND a.chapter = :chapter AND id2 NOT IN :exclude
-            AND {prefix}newer > {prefix}older AND a.common > c.length / 2
         ) AS r
-        WHERE rank = 1
+        WHERE rank <= :connectivity
+        ORDER BY rank
         """
 
-        res = execute (conn, query_restricted if varnew != '' else query_global,
+        global_textflow = not ((varnew != '') or var_only)
+        if global_textflow:
+            connectivity = 1
+
+        res = execute (conn, query,
                        dict (parameters, nodes = tuple (G.nodes ()), exclude = tuple (exclude),
                              chapter = chapter, pass_id = passage.pass_id, prefix = prefix,
                              varnew = '^' + varnew, connectivity = connectivity, order = order,
                              f_where = f_where, hyp_a = hyp_a, varnew_where = varnew_where))
 
-        Ranks = collections.namedtuple ('Ranks', 'u ms_id1 ms_id2 rank')
+        Ranks = collections.namedtuple ('Ranks', 'ms_id1 ms_id2 rank')
         ranks = list (map (Ranks._make, res))
 
         # Initially build a graph with all nodes.  We will remove unused nodes
@@ -822,26 +794,41 @@ def textflow_dot (passage_or_id):
                 attrs['labez']  = hyp_a[0]
             G.add_node (ms.ms_id, attrs)
 
-        # A node that has a parent in the same attestation keeps only that one
-        # parent.  Nodes without parents within the same attestation keep the
-        # topranked parent for every attestation.
+        # Step 1: A node that has ancestors within the same attestation keeps
+        # only the top-ranked one as parent.
+        #
+        # Step 2: A node without ancestors within the same attestation keeps one
+        # top-ranked parent for every other attestation.
+        #
+        # Assumption: ranks are sorted top-ranked first
 
         tags = set ()
-        for r in ranks:
-            if r.ms_id1 in tags:
-                continue;
-            a1 = G.node[r.ms_id1];
-            a2 = G.node[r.ms_id2];
-            if str (r.ms_id1) + a2[group_field] in tags:
-                continue;
-            if r.rank > 1:
-                G.add_edge (r.ms_id2, r.ms_id1, rank = r.rank, headlabel = r.rank)
-            else:
-                G.add_edge (r.ms_id2, r.ms_id1)
-            if a1[group_field] == a2[group_field]:
-                tags.add (r.ms_id1)
-            else:
-                tags.add (str (r.ms_id1) + a2[group_field])
+        for step in (1, 2):
+            for r in ranks:
+                a1 = G.node[r.ms_id1];
+                a2 = G.node[r.ms_id2];
+                if not (global_textflow) and (a1[group_field][0] == 'z' or a2[group_field][0] == 'z'):
+                    # disregard lacunae
+                    continue
+                if step == 1 and a1[group_field] != a2[group_field]:
+                    # differing attestations are handled in step 2
+                    continue
+                if r.ms_id1 in tags:
+                    # the node's ancestor within the same attestation was
+                    # already seen.  we need not look into other attestations
+                    continue
+                if str (r.ms_id1) + a2[group_field] in tags:
+                    # the node's ancestor within this attestation was already
+                    # seen.  we need not look into further nodes
+                    continue;
+                if r.rank > 1:
+                    G.add_edge (r.ms_id2, r.ms_id1, rank = r.rank, headlabel = r.rank)
+                else:
+                    G.add_edge (r.ms_id2, r.ms_id1)
+                if a1[group_field] == a2[group_field]:
+                    tags.add (r.ms_id1)
+                else:
+                    tags.add (str (r.ms_id1) + a2[group_field])
 
         G.remove_nodes_from (nx.isolates (G))
 
@@ -859,22 +846,27 @@ def textflow_dot (passage_or_id):
                         if pred:
                             G.add_edge (pred[0], succ)
 
-            # contract edges between nodes attesting the same
-            if 0:
-                for n in G:
-                    for succ in G.successors (n):
-                        if G.node[n][group_field] == G.node[succ][group_field]:
-                            for succ_succ in G.successors (succ):
-                                G.remove_edge (succ, succ_succ)
-                                G.add_edge (n, succ_succ)
+            # remove a node's other edges if one edge is within attestation
+            for n in G:
+                within = False
+                attestation_n = G.node[n][group_field]
+                for p in G.predecessors (n):
+                    if G.node[p][group_field] == attestation_n:
+                        within = True
+                        break
+                if within:
+                    for p in G.predecessors (n):
+                        if G.node[p][group_field] != attestation_n:
+                            G.remove_edge (p, n)
 
-            # remove edges between nodes attesting the same
+            # remove edges between nodes within the same attestation
             for u, v in G.edges ():
                 if G.node[u][group_field] == G.node[v][group_field]:
                     G.remove_edge (u, v)
 
             # remove now isolated nodes
             G.remove_nodes_from (nx.isolates (G))
+
             # unconstrain backward edges
             for u, v in G.edges ():
                 if G.node[u][group_field] > G.node[v][group_field]:

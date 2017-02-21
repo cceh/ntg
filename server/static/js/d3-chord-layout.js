@@ -174,12 +174,12 @@ function ($, d3, d3_common, _) {
                     return (d.data.attrs.height || node_height) * css_dpi / 2;
                 })
                 .on ('mouseenter', function (d) {
-                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hi-source', true);
-                    d3.selectAll ('path.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hi-target', true);
+                    d3.selectAll ('.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover hi-source', true);
+                    d3.selectAll ('.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hover hi-target', true);
                 })
                 .on ('mouseleave', function (d) {
-                    d3.selectAll ('path.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hi-source', false);
-                    d3.selectAll ('path.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hi-target', false);
+                    d3.selectAll ('.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover hi-source', false);
+                    d3.selectAll ('.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hover hi-target', false);
                 });
 
             node.append ('text')

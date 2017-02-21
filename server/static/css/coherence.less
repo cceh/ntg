@@ -41,7 +41,7 @@ a.selected, span.selected {
 
 /* links */
 
-path, line {
+path, line, text {
     &.link {
         stroke: @link-color;
         stroke-width: 2px;
@@ -50,16 +50,31 @@ path, line {
         &.broken {
             stroke-dasharray: 4 4;
         }
-        &.hover,
-        &.hi-source {
-            stroke-width: 3px;
-            stroke: red;
+        &.hover {
             stroke-opacity: 1.0;
         }
+        &.hi-source {
+            stroke: red;
+        }
         &.hi-target {
-            stroke-width: 3px;
             stroke: green;
-            stroke-opacity: 1.0;
+        }
+    }
+}
+
+path, line {
+    &.link {
+        &.hover {
+            stroke-width: 3px;
+        }
+    }
+}
+
+text {
+    &.link {
+        &.hover {
+            stroke-width: 2px;
+            fill: black;
         }
     }
 }

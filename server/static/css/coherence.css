@@ -31,29 +31,40 @@ span.selected {
 }
 /* links */
 path.link,
-line.link {
+line.link,
+text.link {
   stroke: #ccc;
   stroke-width: 2px;
   stroke-opacity: 0.6;
   fill: none;
 }
 path.link.broken,
-line.link.broken {
+line.link.broken,
+text.link.broken {
   stroke-dasharray: 4 4;
 }
 path.link.hover,
 line.link.hover,
-path.link.hi-source,
-line.link.hi-source {
-  stroke-width: 3px;
-  stroke: red;
+text.link.hover {
   stroke-opacity: 1.0;
 }
+path.link.hi-source,
+line.link.hi-source,
+text.link.hi-source {
+  stroke: red;
+}
 path.link.hi-target,
-line.link.hi-target {
-  stroke-width: 3px;
+line.link.hi-target,
+text.link.hi-target {
   stroke: green;
-  stroke-opacity: 1.0;
+}
+path.link.hover,
+line.link.hover {
+  stroke-width: 3px;
+}
+text.link.hover {
+  stroke-width: 2px;
+  fill: black;
 }
 marker.link {
   stroke: #ccc;
