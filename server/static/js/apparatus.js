@@ -32,22 +32,35 @@ function ($, _, tools, panel) {
         var json_deferred = new $.Deferred ();
 
         $.getJSON ('apparatus.json/' + passage.id, function (json) {
-            var grouper = _.includes (that.data.splits, 'splits') ? 'varnew' : 'varid';
-            var groups  = _.groupBy (json.manuscripts, grouper);
+            var labez_grouper  = function (g) { return g.labez  + g.labezsuf; };
+            var varnew_grouper = function (g) { return g.varnew + g.labezsuf; };
+            var grouper = _.includes (that.data.splits, 'splits') ? varnew_grouper : labez_grouper;
+
+            var readings = [];
             var html = [];
 
-            _.forEach (groups, function (group) {
+            // load readings into dictionary for faster lookup
+            _.forEach (json.readings, function (reading) {
+                var key = reading.labez + reading.labezsuf;
+                readings[key] = reading.lesart;
+            });
+
+            // group manuscripts and loop over groups
+            _.forEach (_.groupBy (_.sortBy (json.manuscripts, grouper), grouper), function (group) {
                 var data = {
-                    'pass_id' : passage.id,
-                    'labez'   : group[0].varnew[0],
-                    'group'   : group[0][grouper],
-                    'reading' : _.get (json.readings, group[0].varnew, json.readings[group[0].varnew[0]]),
+                    'pass_id'  : passage.id,
+                    'labez'    : group[0].labez,
+                    'labezsuf' : group[0].labezsuf,
+                    'group'    : grouper (group[0]),
                 };
+
+                data.reading = _.get (readings, data.labez + data.labezsuf, 'Error: no reading found');
+
                 html.push ('<li class="list-group-item">');
                 html.push ('<h4 class="list-group-item-heading">');
                 html.push (tools.format (
                     '<a data-labez="{labez}" class="fg_labez" ' +
-                        'href="ms_attesting/{pass_id}/{group}">{group} {reading}</a></h4>',
+                        'href="ms_attesting/{pass_id}/{labez}">{group} {reading}</a></h4>',
                     data));
 
                 html.push ('<ul class="list-group-item-text attesting-mss list-inline">');
@@ -97,7 +110,7 @@ function ($, _, tools, panel) {
         $.extend (instance.data, {
             'passage' : null,
             /* Show splits or not. */
-            'splits'  : ['splits'],
+            'splits'  : [],
         });
 
         return instance;

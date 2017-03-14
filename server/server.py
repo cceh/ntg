@@ -1052,33 +1052,36 @@ def apparatus_json (passage_or_id):
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
 
-        # list of labez => lesart
+        Readings    = collections.namedtuple ('Readings',    'labez labezsuf lesart')
+        Manuscripts = collections.namedtuple ('Manuscripts', 'varid varnew labez labezsuf ms_id hs hsnr')
+
+        # list of labez, labezsuf => lesart
         res = execute (conn, """
-        SELECT labez, MODE () WITHIN GROUP (ORDER BY lesart) AS lesart
-        FROM {att} a
-        JOIN {pass} p
-          ON (a.anfadr, a.endadr) = (p.anfadr, p.endadr)
-        WHERE p.id = :pass_id
-        GROUP BY p.id, labez
+        SELECT labez, labezsuf, lesart
+        FROM {read}
+        WHERE pass_id = :pass_id
+        ORDER BY labez, labezsuf
         """, dict (parameters, pass_id = passage.pass_id))
 
-        # dict of labez: lesart
-        readings = { row[0]: row[1] for row in res }
-        for k in readings:
-            if k in LABEZ_I18N:
-                readings[k] = LABEZ_I18N[k]
+        def i18n (d):
+            if d['labez'] in LABEZ_I18N:
+                d['lesart'] = LABEZ_I18N[d['labez']]
+            return d
+
+        readings = [ i18n (Readings._make (r)._asdict ()) for r in res ]
+
         for k in LABEZ_I18N:
-            readings[k]  = LABEZ_I18N[k]
+            readings.append ({ 'labez': k, 'labezsuf': '', 'lesart': LABEZ_I18N[k] });
+
 
         # list of varnew => manuscripts
         res = execute (conn, """
-        SELECT varid, varnew, ms_id - 1 as ms_id, hs, hsnr
+        SELECT varid, varnew, labez, labezsuf, ms_id - 1 as ms_id, hs, hsnr
         FROM {var}_view
         WHERE pass_id = :pass_id
-        ORDER BY varnew, hsnr
+        ORDER BY varnew, labezsuf, hsnr
         """, dict (parameters, pass_id = passage.pass_id))
 
-        Manuscripts = collections.namedtuple ('Manuscripts', 'varid varnew ms_id hs hsnr')
         manuscripts = [ Manuscripts._make (r)._asdict () for r in res ]
 
         return flask.json.jsonify ({
