@@ -52,7 +52,7 @@ function ($, _, tools) {
     }
 
     function connectivity_formatter (s) {
-        return (s == 21) ? 'All' : s
+        return (s === 21) ? 'All' : s;
     }
 
     function handle_toolbar_events (event) {

@@ -23,7 +23,7 @@ function ($, d3, d3_common, _) {
      */
     function load_dot (url) {
         var instance = this; // instance
-        var dot_dpi = 72;
+        // var dot_dpi = 72;
         var css_dpi = 96;
 
         var svg = this.svg;
@@ -108,7 +108,7 @@ function ($, d3, d3_common, _) {
                 .data (graph.edges)
                 .enter ();
 
-            link.filter (function (d) { return d.attrs && d.attrs.head_lp })
+            link.filter (function (d) { return d.attrs && d.attrs.head_lp; })
                 .each (function (d) {
                     d.attrs.head_lp = d3_common.parse_pt (d.attrs.head_lp);
                 });
@@ -125,7 +125,7 @@ function ($, d3, d3_common, _) {
                         (d.attrs.broken ? ' broken' : '');
                 })
                 .attr ('marker-end', 'url(#' + instance.id_prefix + 'triangle)')
-                .attr ('d', function (d) { return d3_common.parse_path_svg (d.attrs.pos); })
+                .attr ('d', function (d) { return d3_common.parse_path_svg (d.attrs.pos); });
 
             link.filter (function (d) { return d.attrs && d.attrs.head_lp && d.attrs.headlabel; })
                 .append ('text')
@@ -149,7 +149,7 @@ function ($, d3, d3_common, _) {
                 .data (_.map (graph.nodes, 'attrs'))
                 .enter ();
 
-            node.filter (function (d) { return d.pos })
+            node.filter (function (d) { return d.pos; })
                 .each (function (d) {
                     d.pos = d3_common.parse_pt (d.pos);
                 });

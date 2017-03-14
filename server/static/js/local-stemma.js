@@ -6,10 +6,12 @@
  * @author Marcello Perathoner
  */
 
-define (['jquery',
-        ],
+define ([
+    'jquery',
+    'lodash',
+],
 
-function ($) {
+function ($, _) {
     'use strict';
 
     function changed () {

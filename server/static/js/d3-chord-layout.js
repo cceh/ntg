@@ -21,7 +21,7 @@ function ($, d3, d3_common, _) {
      */
     function load_dot (url) {
         var instance = this;
-        var dot_dpi = 72;
+        // var dot_dpi = 72;
         var css_dpi = 96;
 
         var svg = instance.svg;
@@ -49,13 +49,13 @@ function ($, d3, d3_common, _) {
             data.push ({
                 'id'        : 'root',
                 'parent_id' : null,
-                'attrs'     : {}
+                'attrs'     : {},
             });
             _.forEach (graph.subgraphs, function (subgraph) {
                 data.push ({
                     'id'        : subgraph.id,
                     'parent_id' : 'root',
-                    'attrs'     : subgraph.attrs
+                    'attrs'     : subgraph.attrs,
                 });
                 var subgraph_nodes = _.filter (
                     subgraph.stmts, function (o) { return o.type === 'node'; });
@@ -63,7 +63,7 @@ function ($, d3, d3_common, _) {
                     data.push ({
                         'id'        : node.id,
                         'parent_id' : subgraph.id,
-                        'attrs'     : node.attrs
+                        'attrs'     : node.attrs,
                     });
                 });
             });
@@ -201,7 +201,7 @@ function ($, d3, d3_common, _) {
 
             var line = d3.radialLine ()
                 .radius (function (d) {
-                    return d.y - (d.data.attrs.width || node_width) * css_dpi / 2;
+                    return d.y - ((d.data.attrs.width || node_width) * css_dpi / 2);
                 })
                 .angle  (function (d) { return d.x / 180 * Math.PI; })
                 .curve (d3.curveBundle.beta (0.5));

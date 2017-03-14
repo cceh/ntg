@@ -98,7 +98,7 @@ function ($, _, panel) {
 
         // Init toolbar.
         instance.$toolbar.find ('input[name="connectivity"]').bootstrapSlider ({
-            'value' : 10,
+            'value'           : 10,
             'ticks'           : [1,  5, 10, 20,  21],
             'ticks_positions' : [0, 25, 50, 90, 100],
             'formatter'       : panel.connectivity_formatter,

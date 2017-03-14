@@ -223,8 +223,8 @@ define ([
         return {
             'x'      : bbox.x - len,
             'y'      : bbox.y - len,
-            'width'  : bbox.width + 2 * len,
-            'height' : bbox.height + 2 * len,
+            'width'  : bbox.width  + (2 * len),
+            'height' : bbox.height + (2 * len),
         };
     }
 
