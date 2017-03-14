@@ -281,17 +281,8 @@ function ($, d3) {
                     'orderable' : false,
                 },
                 {
-                    'data'   : null,
-                    'class'  : 'direction',
-                    'render' : function (r) {
-                        if (r.older > r.newer) {
-                            return '>';
-                        }
-                        if (r.older < r.newer) {
-                            return '<';
-                        }
-                        return '=';
-                    },
+                    'data'  : 'direction',
+                    'class' : 'direction',
                 },
                 { /* ms2 */
                     'data'      : null,
@@ -303,12 +294,9 @@ function ($, d3) {
                     'data'  : 'rank',
                     'class' : 'equal',
                 },
-                { /* affinity */
-                    'data'   : null,
-                    'class'  : 'equal',
-                    'render' : function (r /* , type, full, meta */) {
-                        return Math.round (r.affinity * 100000) / 1000;
-                    },
+                {
+                    'data'  : 'affinity',
+                    'class' : 'equal',
                 },
                 {
                     'data'  : 'equal',
@@ -330,12 +318,9 @@ function ($, d3) {
                     'data'  : 'unclear',
                     'class' : 'unclear',
                 },
-                { /* norel */
-                    'data'   : null,
-                    'class'  : 'norel',
-                    'render' : function (r /* , type, full, meta */) {
-                        return (r.common - r.equal - r.older - r.newer - r.unclear);
-                    },
+                {
+                    'data'  : 'norel',
+                    'class' : 'norel',
                 },
             ],
             'order'      : [[1, 'asc']],
@@ -358,6 +343,51 @@ function ($, d3) {
         table.buttons ().container ().appendTo ($ ('div.toolbar-comparison'));
 
         $tbody.on ('click', 'td.details-control', toggle_details_table);
+    }
+
+    /**
+     * Return a direction marker, <, =, or >.
+     *
+     * @function dir
+     *
+     * @param older How many passages are older.
+     * @param newer How many passages are newer.
+     *
+     * @return Direction marker.
+     */
+
+    function dir (older, newer) {
+        if (older > newer) {
+            return '>';
+        }
+        if (older < newer) {
+            return '<';
+        }
+        return '=';
+    }
+
+    /**
+     * Row conversion function.  Convert numeric values to numeric types and add
+     * calculated fields.
+     *
+     * @function row_conversion
+     *
+     * @return The converted row
+     */
+
+    function row_conversion (d) {
+        return {
+            'chapter'   : d.chapter,
+            'common'    : +d.common,
+            'equal'     : +d.equal,
+            'older'     : +d.older,
+            'newer'     : +d.newer,
+            'unclear'   : +d.unclear,
+            'affinity'  : Math.round (d.affinity * 100000) / 1000,
+            'rank'      : +d.rank,
+            'norel'     : d.common - d.equal - d.older - d.newer - d.unclear,
+            'direction' : dir (+d.older, +d.newer),
+        };
     }
 
     /**
@@ -396,7 +426,7 @@ function ($, d3) {
                     'ms1' : module.ms1.hsnr,
                     'ms2' : module.ms2.hsnr,
                 });
-                d3.csv (url, function (error, csv) {
+                d3.csv (url, row_conversion, function (error, csv) {
                     if (error) {
                         throw error;
                     }
