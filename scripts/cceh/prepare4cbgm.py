@@ -172,9 +172,13 @@ def step01c (dba, parameters):
 
     """
 
-    log (logging.INFO, "Step  1c: Data entry fixes ...")
-
     with dba.engine.begin () as conn:
+
+        # make a backup of the original labez
+        execute (conn, """
+        UPDATE {att}
+        SET labezorig = labez, labezsuforig = labezsuf
+        """, parameters)
 
         fix (conn, "Wrong hs", """
         SELECT DISTINCT hs, hsnr, kapanf
@@ -196,7 +200,7 @@ def step01c (dba, parameters):
         UPDATE {att} SET hsnr = 411882 WHERE hs ~ '^L1188s2';
         """, parameters)
 
-        fix (conn, "Wrong hsnr Ph5", """
+        fix (conn, "Wrong hsnr Ph4", """
         SELECT DISTINCT hs, hsnr, kapanf
         FROM {att}
         WHERE hs = 'L1188' AND hsnr != 411880
@@ -206,6 +210,7 @@ def step01c (dba, parameters):
         UPDATE {att} SET hsnr = 411880 WHERE hs = 'L1188';
         UPDATE {lac} SET hsnr = 411881, hs = REPLACE (hs, 's2', 's') WHERE hs ~ '^L1188s2';
         UPDATE {lac} SET hsnr = 411880, hs = REPLACE (hs, 's1', '')  WHERE hs ~ '^L1188s1';
+        UPDATE {lac} SET hsnr = 411881, hs = 'L1188s' WHERE hs = 'L1188S';
         """, parameters)
 
         fix (conn, "Attestation of A != 'a'", """
@@ -360,8 +365,6 @@ def step02 (dba, parameters):
 
     """
 
-    log (logging.INFO, "Step  2 : Cleanup korr and lekt ...")
-
     with dba.engine.begin () as conn:
 
         execute (conn, """
@@ -482,8 +485,6 @@ def step05 (dba, parameters):
 
     """
 
-    log (logging.INFO, "Step  5: Processing Duplicated Readings (T1, T2) ...")
-
     with dba.engine.begin () as conn:
 
         # T1 or T2 but not both
@@ -562,8 +563,6 @@ def step06 (dba, parameters):
 
     """
 
-    log (logging.INFO, "Step  6 : Delete later hands ...")
-
     with dba.engine.begin () as conn:
 
         for t in (parameters['att'], parameters['lac']):
@@ -611,8 +610,6 @@ def step06b (dba, parameters):
         und 'C*'.
 
     """
-
-    log (logging.INFO, "Step  6b: Delete [CLTV*] from HS ...")
 
     with dba.engine.begin () as conn:
 
@@ -706,8 +703,6 @@ def step07 (dba, parameters):
         übergeordneten Variante in labez an die Stelle von 'zw'.
 
     """
-
-    log (logging.INFO, "Step  7 : Fix 'zw' ...")
 
     with dba.engine.begin () as conn:
 
@@ -1804,9 +1799,11 @@ def vacuum (dba, parameters):
 
     """
 
-    with dba.engine.begin () as conn:
-
-        res = execute (conn, """VACUUM FULL ANALYZE""", paramaters);
+    # turn off auto-transaction because vacuum won't work in a transaction
+    connection = dba.engine.raw_connection ()
+    connection.set_isolation_level (0)
+    connection.cursor ().execute ("VACUUM FULL ANALYZE")
+    log (logging.INFO, ''.join (connection.notices))
 
 
 def print_stats (dba, parameters):
@@ -1929,9 +1926,11 @@ if __name__ == '__main__':
 
                 step01  (dbsrc1, dbdest, parameters)
                 step01b (dbdest, parameters)
+                log (logging.INFO, "Step  1c: Data entry fixes ...")
                 step01c (dbdest, parameters)
                 continue
             if step == 2:
+                log (logging.INFO, "Step  2 : Cleanup korr and lekt ...")
                 step02 (dbdest, parameters)
                 continue
             if step == 3:
@@ -1941,13 +1940,17 @@ if __name__ == '__main__':
                 step04 (dbdest, parameters)
                 continue
             if step == 5:
+                log (logging.INFO, "Step  5: Processing Duplicated Readings (T1, T2) ...")
                 step05 (dbdest, parameters)
                 continue
             if step == 6:
+                log (logging.INFO, "Step  6 : Delete later hands ...")
                 step06 (dbdest, parameters)
+                log (logging.INFO, "Step  6b: Delete [CLTV*] from HS ...")
                 step06b (dbdest, parameters)
                 continue
             if step == 7:
+                log (logging.INFO, "Step  7 : Fix 'zw' ...")
                 step07 (dbdest, parameters)
                 if args.verbose >= 1:
                     print_stats (dbdest, parameters)
