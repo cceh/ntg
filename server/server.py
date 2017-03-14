@@ -663,6 +663,15 @@ def relatives_json (hs_hsnr_id, passage_or_id):
         return flask.render_template ('relatives.html', mt = mt, rows = relatives)
 
 
+def remove_z_leaves (G, group_field):
+    """ Removes leaves (recursively) if they read z. """
+
+    for n in nx.topological_sort (G, reverse = True):
+        atts = G.node[n]
+        if G.out_degree (n) == 0 and group_field in atts and atts[group_field][0] == 'z':
+            G.remove_node (n)
+
+
 @app.endpoint ('textflow.dot')
 def textflow_dot (passage_or_id):
     """ Output a stemma of manuscripts. """
@@ -675,7 +684,7 @@ def textflow_dot (passage_or_id):
     fontsize     = float (request.args.get ('fontsize') or 10.0)
     mode         = request.args.get ('mode') or 'rec'
 
-    include      = request.args.getlist ('include[]')   or []
+    include      = set (request.args.getlist ('include[]') or ['NONE'])
     fragments    = request.args.getlist ('fragments[]') or []
     var_only     = request.args.getlist ('var_only[]')  or []
     splits       = request.args.getlist ('splits[]')    or []
@@ -683,6 +692,7 @@ def textflow_dot (passage_or_id):
     fragments = 'fragments' in fragments
     var_only  = 'var_only'  in var_only
     splits    = 'splits'    in splits
+    show_z    = 'Z'         in include
 
     prefix = '' if mode == 'rec' else 'p_'
     if connectivity == 21:
@@ -708,19 +718,16 @@ def textflow_dot (passage_or_id):
 
         Nodes = collections.namedtuple ('Nodes', 'ms_id')
 
-        if include:
-            # get ids of nodes to include
-            res = execute (conn, """
-            SELECT id
-            FROM {ms}
-            WHERE (hs IN :include)
-            ORDER BY id
-            """, dict (parameters, include = tuple (include)))
+        # get ids of nodes to exclude
+        res = execute (conn, """
+        SELECT id
+        FROM {ms}
+        WHERE (hs IN ('A', 'MT')) AND (hs NOT IN :include)
+        ORDER BY id
+        """, dict (parameters, include = tuple (include)))
 
-            include = [str (n.ms_id) for n in map (Nodes._make, res)]
-
-        exclude = set (include) ^ set (['1', '2'])
-        exclude.add (-1) # a non-existing id to avoid SQL error
+        exclude = set ([str (n.ms_id) for n in map (Nodes._make, res)])
+        exclude.add (-1) # a non-existing id to avoid SQL syntax error if empty
 
         # get all nodes or all nodes (hypothetically) attesting varnew
         res = execute (conn, """
@@ -831,6 +838,9 @@ def textflow_dot (passage_or_id):
                     tags.add (r.ms_id1)
                 else:
                     tags.add (str (r.ms_id1) + a2[group_field])
+
+        if not show_z:
+            remove_z_leaves (G, group_field);
 
         G.remove_nodes_from (nx.isolates (G))
 

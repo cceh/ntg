@@ -83,6 +83,11 @@
       <label class="btn btn-primary">
         <input type="checkbox" name="include" data-opt="MT">{{_('MT')}}</input>
       </label>
+      {% if mode in ('global', ) %}
+      <label class="btn btn-primary">
+        <input type="checkbox" name="include" data-opt="Z">{{_('Z')}}</input>
+      </label>
+      {% endif %}
     </div>
     {% endif %}
 
