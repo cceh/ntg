@@ -26,10 +26,6 @@ function ($, _, d3, d3c, tools, panel, nav) {
      * the 'source' ms. -- the ms. the panel is all about -- or the target
      * mss. -- the mss. related to the 'source' ms.
      *
-     * N.B.  When you open a panel, the nodes listed in the panel are also
-     * highlighted in the affinity cloud.  The affinity cloud uses this function
-     * to find out which nodes to highlight.
-     *
      * @function get_ms_ids_from_popups
      *
      * @param {string} what - 'source' or 'target'

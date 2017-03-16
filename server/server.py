@@ -1193,76 +1193,6 @@ def stemma_dot (passage_or_id):
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
 
 
-@app.endpoint ('affinity.json')
-def affinity_json ():
-    """ Return manuscript affinities for D3.
-
-    Returns manuscript affinities in a json format suitable for D3.js.
-
-    """
-    chapter = request.args.get ('chapter') or 0
-    limit   = int (request.args.get ('limit') or 10)
-
-    nodes = []
-    edges = []
-
-    with current_app.config.dba.engine.begin () as conn:
-
-        res = execute (conn, """
-        SELECT id, hs, hsnr, length
-        FROM Manuscripts
-        ORDER BY id
-        """, {})
-
-        # Every ms gets to be a node.
-        for row in res:
-            id_, hs, hsnr, length = row
-            nodes.append ( {
-                'ms_id'  : id_ - 1,
-                'hs'     : hs,
-                'hsnr'   : hsnr,
-                'group'  : hsnr // 100000,
-                'radius' : 5 + math.log (length)
-            } )
-
-        # Build edges table.  Needs brains.  Creating an edge between every
-        # two mss will not give a very meaningful graph.  We have to keep only
-        # the most significant edges.  But what is significant?
-        #
-        # Currently we `edge´: for each manuscript the X most similar
-        # manuscripts that are at least half as long.
-
-        res = execute (conn, """
-        /* get the :limit closest relatives for every node */
-        SELECT id1, id2, common, equal, rank
-        FROM (
-          SELECT id1, id2, common, equal, rank () OVER (PARTITION BY id1 ORDER BY affinity DESC) AS rank, affinity
-          FROM {aff} a
-          JOIN {chap} c
-            ON a.id1 = c.ms_id AND a.chapter = c.chapter
-          WHERE a.chapter = :chapter AND a.common >= c.length / 2 AND a.newer >= a.older
-        ) AS r
-        WHERE r.rank <= :limit
-        ORDER BY id1, id2
-        """, dict (parameters, limit = limit, chapter = chapter))
-
-        for row in res:
-            id1, id2, common, equal, rank = row
-
-            edges.append ( {
-                'source' : id1 - 1,
-                'target' : id2 - 1,
-                'common' : common,
-                'equal'  : equal,
-                'rank'   : rank
-            } )
-
-        return flask.json.jsonify ({
-            'nodes': nodes,
-            'links': edges
-        })
-
-
 if __name__ == "__main__":
     from werkzeug.routing import Map, Rule
     from werkzeug.wsgi import DispatcherMiddleware
@@ -1309,7 +1239,6 @@ if __name__ == "__main__":
             Rule ('/comparison',                               endpoint = 'comparison'),
             Rule ('/comparison.csv',                           endpoint = 'comparison.csv'),
             Rule ('/comparison-detail.csv',                    endpoint = 'comparison-detail.csv'),
-            Rule ('/affinity.json',                            endpoint = 'affinity.json'),
             Rule ('/chapters.json',                            endpoint = 'chapters.json'),
             Rule ('/manuscript.json/<hs_hsnr_id>',             endpoint = 'manuscript.json'),
             Rule ('/passage.json/<passage_or_id>',             endpoint = 'passage.json'),

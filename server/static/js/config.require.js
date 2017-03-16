@@ -24,7 +24,6 @@ requirejs.config ({
         'comparison'                   : '/static/js/comparison',
         'navigator'                    : '/static/js/navigator',
         'apparatus'                    : '/static/js/apparatus',
-        'affinity'                     : '/static/js/affinity',
         'd3-stemma'                    : '/static/js/d3-stemma-layout',
         'd3-chord'                     : '/static/js/d3-chord-layout',
         'd3-common'                    : '/static/js/d3-common',

@@ -13,7 +13,6 @@ define (['jquery',
          'd3-common',
          'd3-stemma',
          'd3-chord',
-         'affinity',
          'apparatus',
          'navigator',
          'panel',
@@ -29,7 +28,7 @@ define (['jquery',
         ],
 
 function ($, _, tools, d3, d3common, d3stemma, d3chord,
-          affinity, apparatus, navigator, panel, relatives, textflow, locstem) {
+          apparatus, navigator, panel, relatives, textflow, locstem) {
     'use strict';
 
     var module = {}; // singleton
@@ -50,11 +49,6 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
         module.vtextflow.load  (passage);
         module.vtextflow2.load (passage);
         module.gtextflow.load  (passage);
-
-        // make sure attestation gets set *after* the nodes are loaded
-        module.affinity_promise.done (function () {
-            module.affinity.load (passage);
-        });
     }
 
     /**
@@ -103,13 +97,6 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
             false
         );
 
-        module.affinity     = affinity.init (
-            panel.init ($ ('div.panel-affinity')),
-            'aff_'
-        );
-
-        module.affinity_promise = module.affinity.load_json ('affinity.json');
-
         d3common.insert_css_palette (
             d3common.generate_css_palette (
                 d3common.attestation_palette
@@ -132,19 +119,6 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
         $ (document).on ('click', 'div.panel-textflow g.node', function (event) {
             var ms_id = $ (event.currentTarget).attr ('data-ms-id'); // the g.node, not the circle
             relatives.create_panel (ms_id, event.currentTarget);
-        });
-
-        // Click on a node in the affinity cloud.
-        $ (document).on ('click', '#affinity-wrapper g.node', function (event) {
-            var ms_id = $ (event.currentTarget).attr ('data-ms-id'); // the g.node, not the circle
-            relatives.create_panel (ms_id, event.currentTarget);
-        });
-
-        // Content of popup changed.  Redo force graph highlighting.
-        $ (document).on ('changed.ntg.relatives', function () {
-            var sources = relatives.get_ms_ids_from_popups ('source');
-            var targets = relatives.get_ms_ids_from_popups ('target');
-            module.affinity.highlight (sources, targets);
         });
 
         // The user navigated to new passage.
