@@ -479,19 +479,7 @@ def relatives (hs_hsnr_id, passage_or_id):
         """, dict (parameters, pass_id = passage.pass_id))
         pass_chapter, = res.fetchone ()
 
-        # Get the affinity of the manuscript to MT
-        #
-        # For the reason we don't simply use affinity.affinity, see the comment
-        # in: ActsMsListValPh3.pl
         mt = Bag ()
-        res = execute (conn, """
-        SELECT a.equal::float / c.length as affinity
-        FROM {aff} a
-        JOIN {chap} c
-          ON (a.id1, a.chapter) = (c.ms_id, c.chapter)
-        WHERE a.id1 = :id1 AND a.id2 = 2 AND a.chapter = :chapter
-        """, dict (parameters, id1 = ms.ms_id + 1, chapter = chapter))
-        mt.aff = res.scalar ()
 
         # Get the attestation (labez) of MT
         res = execute (conn, """
@@ -560,25 +548,24 @@ def relatives_json (hs_hsnr_id, passage_or_id):
         """, dict (parameters, ms_id = ms.ms_id + 1, pass_id = passage.pass_id))
         ms.labez, ms.labezsuf, ms.varid, ms.varnew = res.fetchone ()
 
+        # Get the affinity of the manuscript to all manuscripts
+        res = execute (conn, """
+        SELECT avg (a.affinity) as aa,
+               percentile_cont(0.5) WITHIN GROUP (ORDER BY a.affinity) as ma
+        FROM {aff} a
+        JOIN {chap} c
+          ON (a.id1, a.chapter) = (c.ms_id, c.chapter)
+        WHERE a.id1 = :id1 AND a.chapter = :chapter
+        """, dict (parameters, id1 = ms.ms_id + 1, chapter = chapter))
+        ms.aa, ms.ma = res.fetchone ()
+
         # Get the passage
         res = execute (conn, """
         SELECT kapanf FROM {pass} WHERE id = :pass_id
         """, dict (parameters, pass_id = passage.pass_id))
         pass_chapter, = res.fetchone ()
 
-        # Get the affinity of the manuscript to MT
-        #
-        # For the reason we don't simply use affinity.affinity, see the comment
-        # in: ActsMsListValPh3.pl
         mt = Bag ()
-        res = execute (conn, """
-        SELECT a.equal::float / c.length as affinity
-        FROM {aff} a
-        JOIN {chap} c
-          ON (a.id1, a.chapter) = (c.ms_id, c.chapter)
-        WHERE a.id1 = :id1 AND a.id2 = 2 AND a.chapter = :chapter
-        """, dict (parameters, id1 = ms.ms_id + 1, chapter = chapter))
-        mt.aff = res.scalar ()
 
         # Get the attestation (labez) of MT
         res = execute (conn, """
@@ -587,6 +574,23 @@ def relatives_json (hs_hsnr_id, passage_or_id):
         WHERE ms_id = 2 AND pass_id = :pass_id
         """, dict (parameters, pass_id = passage.pass_id))
         mt.labez, mt.labezsuf, mt.varid, mt.varnew = res.fetchone ()
+
+        # Get the affinity of the manuscript to MT
+        #
+        # For a description of mt and mtp see the comment in
+        # ActsMsListValPh3.pl and
+        # http://intf.uni-muenster.de/cbgm/actsPh3/guide_en.html#Ancestors
+
+        mt.mt, mt.mtp = 0.0, 0.0
+        res = execute (conn, """
+        SELECT a.affinity as mt, a.equal::float / c.length as mtp
+        FROM {aff} a
+        JOIN {chap} c
+          ON (a.id1, a.chapter) = (c.ms_id, c.chapter)
+        WHERE a.id1 = :id1 AND a.id2 = 2 AND a.chapter = :chapter
+        """, dict (parameters, id1 = ms.ms_id + 1, chapter = chapter))
+        if res.rowcount > 0:
+            mt.mt, mt.mtp = res.fetchone ()
 
         Nodes = collections.namedtuple ('Nodes', 'ms_id')
 
@@ -660,12 +664,13 @@ def relatives_json (hs_hsnr_id, passage_or_id):
         )
         relatives = list (map (Relatives._make, res))
 
-        return flask.render_template ('relatives.html', mt = mt, rows = relatives)
+        return flask.render_template ('relatives.html', ms = ms, mt = mt, rows = relatives)
 
 
 def remove_z_leaves (G, group_field):
     """ Removes leaves (recursively) if they read z. """
 
+    # We cannot use DFS because we don't know the root.
     for n in nx.topological_sort (G, reverse = True):
         atts = G.node[n]
         if G.out_degree (n) == 0 and group_field in atts and atts[group_field][0] == 'z':

@@ -1,16 +1,32 @@
-<table class="relatives table table-condensed">
-  {% for r in rows %}
-  <tr data-labez="{{r.varnew[0]}}" class="fg_labez{% if loop.first %} first{% endif %}">
-    <td class="rank">{{(r.rank or '')}}</td>
-    <td class="direction">{{r.direction|e}}</td>
-    <th class="ms"><span class="ms hilite-target" data-ms-id="{{r.ms_id}}">{{r.hs|e}}</span></th>
-    <td class="perc">{{(100.0 * r.equal / r.common)|round(3)}}%</td>
-    <td class="equal">{{r.equal}}/{{r.common}}</td>
-    {# actually newer, older because the row is associated with the target ms #}
-    <td class="older">{{r.newer}}:{{r.older}}:{{r.unclear}}:{{r.norel}}</td>
-    <td class="labez">{{r.varnew}} {{r.labezsuf}}
-    {%- if mt.labez == r.labez and mt.labezsuf == r.labezsuf: %} (MT){% endif -%}
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+<div>
+
+  <div class="relatives-metrics">
+    {% if ms.hs != 'MT' %}
+    <span>{{_('MT %(mt)s',    mt  = "{:.2%}".format (mt.mt))}}</span>
+    •
+    <span>{{_('MT/P %(mtp)s', mtp = "{:.2%}".format (mt.mtp))}}</span>
+    •
+    {% endif %}
+    <span>{{_('AA %(aa)s',    aa  = "{:.2%}".format (ms.aa))}}</span>
+    •
+    <span>{{_('MA %(ma)s',    ma  = "{:.2%}".format (ms.ma))}}</span>
+  </div>
+
+  <table class="relatives table table-condensed">
+    {% for r in rows %}
+    <tr data-labez="{{r.varnew[0]}}" class="fg_labez{% if loop.first %} first{% endif %}">
+      <td class="rank">{{(r.rank or '')}}</td>
+      <td class="direction">{{r.direction|e}}</td>
+      <th class="ms"><span class="ms hilite-target" data-ms-id="{{r.ms_id}}">{{r.hs|e}}</span></th>
+      <td class="perc">{{(100.0 * r.equal / r.common)|round(3)}}%</td>
+      <td class="equal">{{r.equal}}/{{r.common}}</td>
+      {# actually newer, older because the row is associated with the target ms #}
+      <td class="older">{{r.newer}}:{{r.older}}:{{r.unclear}}:{{r.norel}}</td>
+      <td class="labez">{{r.varnew}} {{r.labezsuf}}
+      {%- if mt.labez == r.labez and mt.labezsuf == r.labezsuf: %} (MT){% endif -%}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+</div>

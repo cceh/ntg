@@ -56,8 +56,13 @@ function ($, _, d3, d3c, tools, panel, nav) {
         var ms_id = instance.$panel.attr ('data-ms-id');
         var url   = 'relatives.json/' + nav.passage.id + '/' + ms_id
             + '?' + $.param (instance.data); // we must use GET, not POST
-        var $content = instance.$panel.find ('div.panel-relatives-content');
-        $content.load (url + ' table.relatives', function () {
+        var $heading_wrap = instance.$panel.find ('div.panel-relatives-metrics');
+        var $table_wrap   = instance.$panel.find ('div.panel-relatives-content');
+
+        $.get (url, function (data) {
+            var $data = $(data);
+            $heading_wrap.html ($data.find ('div.relatives-metrics'));
+            $table_wrap.html   ($data.find ('table.relatives'));
             changed ();
         });
 

@@ -220,16 +220,16 @@ function ($, _, tools) {
     function create_panel_controls ($panels) {
         $panels.each (function () {
             var $panel = $ (this);
-            // append the buttons in inverse order because they float right
-            if ($panel.hasClass ('panel-closable')) {
-                $panel.find ('div.panel-caption').append (
-                    '<a class="close panel-close"><span class="glyphicon glyphicon-remove"></span></a>'
-                );
-            }
             if ($panel.find ('div.panel-slidable').length > 0) {
-                $panel.find ('div.panel-caption').append (
+                $panel.find ('div.panel-caption').prepend (
                     '<a class="close panel-minimize"><span class="glyphicon glyphicon-collapse-up"></span></a>' +
                     '<a class="close panel-maximize"><span class="glyphicon glyphicon-collapse-down"></span></a>'
+                );
+            }
+            // append the buttons in inverse order because they float right
+            if ($panel.hasClass ('panel-closable')) {
+                $panel.find ('div.panel-caption').prepend (
+                    '<a class="close panel-close"><span class="glyphicon glyphicon-remove"></span></a>'
                 );
             }
         });
