@@ -104,7 +104,7 @@ class Manuscript (object):
 class Word (object):
     """ Represents one word address. """
 
-    RE_HR_WORD = re.compile (r'^(?:(\w+)\s)?(?:(\d+):)?(?:(\d+)/)?(\d+)$')
+    RE_HR_WORD = re.compile (r'^(?:(\w+)\s+)?(?:(\d+):)?(?:(\d+)/)?(\d+)$')
 
     def __init__ (self, w = 0):
         w = int (w)
@@ -189,13 +189,17 @@ class Passage (object):
 
 
     def to_json (self):
+        s = Word (self.start)
+        hr = self.to_hr ()
         return flask.json.jsonify ({
             'id'       : self.pass_id,
-            'hr'       : self.to_hr (),
+            'hr'       : hr,
             'start'    : str (self.start),
             'end'      : str (self.end),
             'passage'  : self.to_passage (),
             'chapter'  : str (self.chapter),
+            'verse'    : s.verse,
+            'word'     : hr.split ('/', 1)[1],
             'variants' : self.variants (),
         })
 
@@ -377,15 +381,19 @@ def links ():
 
 
 @app.endpoint ('passage.json')
-def passage_json (passage_or_id):
+def passage_json (passage_or_id = None):
 
-    passage_or_id = request.args.get ('pass_id') or passage_or_id
-    dest   = request.args.get ('dest')
-    button = request.args.get ('button')
+    passage_or_id = request.args.get ('pass_id') or passage_or_id or '0'
+
+    chapter = request.args.get ('chapter')
+    verse   = request.args.get ('verse')
+    word    = request.args.get ('word')
+
+    button  = request.args.get ('button')
 
     with current_app.config.dba.engine.begin () as conn:
-        if dest and button == 'Go':
-            passage = Passage (conn, Passage.parse (dest))
+        if chapter and verse and word and button == 'Go':
+            passage = Passage (conn, Passage.parse ("%s:%s/%s" % (chapter, verse, word)))
             return passage.to_json ()
 
         if button in ('-1', '1'):
@@ -395,6 +403,62 @@ def passage_json (passage_or_id):
 
         passage = Passage (conn, passage_or_id)
         return passage.to_json ()
+
+
+def f_map_word (t):
+    if t.versanf != t.versend:
+        t2 = "%s-%s/%s" % (t.wortanf, t.versend, t.wortend)
+    elif t.wortanf != t.wortend:
+        t2 = "%s-%s" % (t.wortanf, t.wortend)
+    else:
+        t2 = "%s" % t.wortanf
+    return [t2 + ' ' + t.lemma, t2]
+
+
+@app.endpoint ('suggest.json')
+def suggest_json ():
+
+    # the name of the current field
+    field   = request.args.get ('currentfield')
+
+    # the term the user entered in the current field
+    term    = '^' + re.escape (request.args.get ('term') or '')
+
+    # terms entered in previous fields
+    book    = request.args.get ('book') or 'Acts'
+    chapter = int (request.args.get ('chapter') or '0')
+    verse   = int (request.args.get ('verse') or '0')
+
+    Words = collections.namedtuple ('Words', 'kapanf, versanf, wortanf, versend, wortend, lemma')
+
+    res = []
+    with current_app.config.dba.engine.begin () as conn:
+
+        if field == 'chapter':
+            res = execute (conn, """
+            SELECT DISTINCT kapanf, kapanf
+            FROM {pass}
+            WHERE kapanf::varchar ~ :term
+            ORDER BY kapanf
+            """, dict (parameters, term = term))
+        elif field == 'verse':
+            res = execute (conn, """
+            SELECT DISTINCT versanf, versanf
+            FROM {pass}
+            WHERE kapanf = :chapter AND versanf::varchar ~ :term
+            ORDER BY versanf
+            """, dict (parameters, chapter = chapter, term = term))
+        elif field == 'word':
+            res = execute (conn, """
+            SELECT DISTINCT kapanf, versanf, wortanf, versend, wortend, lemma
+            FROM {pass}
+            WHERE kapanf = :chapter AND versanf = :verse AND wortanf::varchar ~ :term
+            ORDER BY wortanf, versend, wortend
+            """, dict (parameters, chapter = chapter, verse = verse, term = term))
+            res = map (Words._make, res)
+            res = map (f_map_word, res)
+
+    return flask.json.jsonify ([ { 'label' : r[0], 'value' : r[1] } for r in res ])
 
 
 @app.endpoint ('chapters.json')
@@ -1239,8 +1303,10 @@ if __name__ == "__main__":
             Rule ('/comparison',                               endpoint = 'comparison'),
             Rule ('/comparison.csv',                           endpoint = 'comparison.csv'),
             Rule ('/comparison-detail.csv',                    endpoint = 'comparison-detail.csv'),
+            Rule ('/suggest.json',                             endpoint = 'suggest.json'),
             Rule ('/chapters.json',                            endpoint = 'chapters.json'),
             Rule ('/manuscript.json/<hs_hsnr_id>',             endpoint = 'manuscript.json'),
+            Rule ('/passage.json/',                            endpoint = 'passage.json'),
             Rule ('/passage.json/<passage_or_id>',             endpoint = 'passage.json'),
             Rule ('/ms_attesting/<passage_or_id>/<labez>',     endpoint = 'ms_attesting'),
             Rule ('/relatives/<passage_or_id>/<hs_hsnr_id>',   endpoint = 'relatives'),

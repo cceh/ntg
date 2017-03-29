@@ -41,6 +41,7 @@ requirejs.config ({
         // private css
         'site-css'                     : '/static/css/site',
         'coherence-css'                : '/static/css/coherence',
+        'navigator-css'                : '/static/css/navigator',
         'comparison-css'               : '/static/css/comparison',
         'panel-css'                    : '/static/css/panel',
         'relatives-css'                : '/static/css/relatives',

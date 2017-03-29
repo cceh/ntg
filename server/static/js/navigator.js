@@ -6,7 +6,7 @@
  * @author Marcello Perathoner
  */
 
-define (['jquery'], function ($) {
+define (['jquery', 'lodash', 'css!navigator-css'], function ($, _) {
     'use strict';
 
     var module = {};
@@ -26,6 +26,49 @@ define (['jquery'], function ($) {
     }
 
     /**
+     * Get a list of suggestions from the server
+     *
+     * @function suggest
+     *
+     * @param {Object} data - Request object with 'term' property, which refers
+     *                        to the value currently in the text input.
+     *
+     * @param {function} complete - The callback
+     *
+     * @see https://api.jqueryui.com/autocomplete/#option-source
+     */
+    function suggest (data, complete) {
+        var $elem = $ (this.element);
+
+        // collect values from all <input>s
+        var $inputs = $elem.closest ('form').find ('input[data-autocomplete]');
+        $inputs.each (function () {
+            var $this = $ (this);
+            data[$this.attr ('data-autocomplete')] = $this.val ();
+        });
+        // get the name of the current field
+        data.currentfield = $elem.attr ('data-autocomplete');
+
+        $.getJSON ('suggest.json', data, complete);
+    }
+
+    function on_nav (event) {
+        var $target = $ (event.currentTarget);
+        var $form   = $target.closest ('form');
+        var data    = { 'button' : $target.attr ('data') || 'Go' };
+
+        _.forEach ($form.serializeArray (), function (value) {
+            data[value.name] = value.value;
+        });
+
+        $.getJSON ('passage.json', data, function (json) {
+            module.passage = json;
+            window.location.hash = '#' + json.passage;
+        });
+        return false;
+    }
+
+    /**
      * Initialize the module.
      *
      * @function init
@@ -33,29 +76,37 @@ define (['jquery'], function ($) {
      * @returns {Object} - The module object.
      */
     function init () {
-        function on_nav (event) {
-            var $target = $ (event.target);
-            var data = $target.attr ('data') || 'Go';
-            var q = $ (event.delegateTarget).serializeArray (); // the <form>
-            q.push ({ 'name' : 'button', 'value' : data });
-
-            $.getJSON ('passage.json/0?' + $.param (q), function (json) {
-                module.passage = json;
-                window.location.hash = '#' + json.passage;
-            });
-            return false;
-        }
-
         // Tape recorder controls
         $ ('form.passage-selector').on ('click', 'button', on_nav);
         $ ('form.passage-selector').on ('submit', on_nav);
 
+        $ ('form input[data-autocomplete]').autocomplete ( {
+            'source'    : suggest,
+            'minLength' : 0,
+        }).on ('click', function () {
+            $(this).autocomplete ('search');
+        }).on ('autocompletechange', function () {
+            $(this).nextAll ('input').val ('');
+        }).on ('autocompleteselect', function (event, ui) {
+            var $this = $(this);
+            $this.nextAll ('input').val ('');
+            if ($this.attr ('data-autocomplete') == 'word') {
+                // give the control a chance to update the <input> before we call on_nav ()
+                window.setTimeout (function () {
+                    on_nav (event);
+                });
+            }
+        });
+
+
         $ (document).on ('ntg.passage.changed', function (event, json) {
             var $form = $ ('form.passage-selector');
             $form.find ('input[name="pass_id"]').val (json.id);
-            var $input = $form.find ('input[name="dest"]');
-            $input.attr ('placeholder', json.hr);
-            $input.val (json.hr);
+
+            $ ('form input[data-autocomplete]').each (function () {
+                var $this = $(this);
+                $this.val (json[$this.attr ('data-autocomplete')]);
+            });
             $ ('h1 span.passage').text (json.hr);
             $ ('title').text ($ ('h1').text ());
         });
