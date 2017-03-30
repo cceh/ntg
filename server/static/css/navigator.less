@@ -1,3 +1,6 @@
+@import "../bower_components/bootstrap/less/variables.less";
+@import "../bower_components/bootstrap/less/mixins.less";
+
 form.passage-selector {
     .input-group {
         input.form-control {
@@ -15,4 +18,40 @@ form.passage-selector {
             border-width: 1px 0;
         }
     }
+}
+
+.ui-menu td.ui-menu-item-wrapper {
+    padding: 3px 20px;
+    &.ui-state-active {
+        margin: 0;
+        border-width: 0;
+        color: @dropdown-link-active-color;
+        background: @dropdown-link-active-bg;
+    }
+    &.menu-label { text-align: right }
+    &.menu-description { padding-left: 0 }
+}
+
+tr.ui-menu-item {
+    &.ui-state-active {
+        margin: 0;
+        border-width: 0;
+        background: #ccc;
+    }
+}
+
+.dropdown-menu-table {
+    display: table;
+    z-index: @zindex-dropdown;
+    float: left;
+    padding: 5px 0;
+    margin: 0;
+    font-size: @font-size-base;
+    text-align: left;
+    background-color: @dropdown-bg;
+    border: 1px solid @dropdown-fallback-border;
+    border: 1px solid @dropdown-border;
+    border-radius: @border-radius-base;
+    .box-shadow(0 6px 12px rgba(0,0,0,.175));
+    background-clip: padding-box;
 }

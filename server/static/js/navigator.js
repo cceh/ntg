@@ -6,10 +6,32 @@
  * @author Marcello Perathoner
  */
 
-define (['jquery', 'lodash', 'css!navigator-css'], function ($, _) {
+define (['jquery', 'lodash', 'jquery-ui', 'css!navigator-css'], function ($, _) {
     'use strict';
 
     var module = {};
+
+    /*
+     * Extend the stock autocomplete to use a <table> instead of a <ul> and give
+     * it the bootstrap look.  Using a table we can display the passage id
+     * alongside the passage lemma.
+     */
+
+    $.widget ('custom.tableautocomplete', $.ui.autocomplete, {
+        '_renderMenu' : function (ul, items) {
+            this._super (ul, items);
+            ul.addClass ('dropdown-menu-table'); // give it the bootstrap look
+        },
+	    '_renderItem' : function (table, item) {
+		    var tr = $ ('<tr></tr>').data ('item.autocomplete', item);
+            tr.append ($ ('<td class="menu-label">' + item.label + '</td>'));
+            if (_.has (item, 'description')) {
+                tr.append ($ ('<td class="menu-description">' + item.description + '</td>'));
+            }
+			tr.appendTo (table);
+            return tr;
+	    },
+    });
 
     /**
      * Set a new passage.  Programmatically set a new passage, eg. at page load.
@@ -52,6 +74,15 @@ define (['jquery', 'lodash', 'css!navigator-css'], function ($, _) {
         $.getJSON ('suggest.json', data, complete);
     }
 
+    /**
+     * Answer the user input on the navigator buttons.
+     *
+     * @function on_nav
+     *
+     * @param {Object} event - The event
+     *
+     * @return false
+     */
     function on_nav (event) {
         var $target = $ (event.currentTarget);
         var $form   = $target.closest ('form');
@@ -63,7 +94,7 @@ define (['jquery', 'lodash', 'css!navigator-css'], function ($, _) {
 
         $.getJSON ('passage.json', data, function (json) {
             module.passage = json;
-            window.location.hash = '#' + json.passage;
+            window.location.hash = '#' + json.passage; // trigger the move to the new passage
         });
         return false;
     }
@@ -80,14 +111,15 @@ define (['jquery', 'lodash', 'css!navigator-css'], function ($, _) {
         $ ('form.passage-selector').on ('click', 'button', on_nav);
         $ ('form.passage-selector').on ('submit', on_nav);
 
-        $ ('form input[data-autocomplete]').autocomplete ( {
+        $ ('form input[data-autocomplete]').tableautocomplete ( {
             'source'    : suggest,
             'minLength' : 0,
+            'position'  : { 'my' : 'left top', 'at' : 'left bottom+2', 'collision' : 'flipfit' },
         }).on ('click', function () {
-            $(this).autocomplete ('search');
-        }).on ('autocompletechange', function () {
+            $(this).tableautocomplete ('search');
+        }).on ('tableautocompletechange', function () {
             $(this).nextAll ('input').val ('');
-        }).on ('autocompleteselect', function (event, ui) {
+        }).on ('tableautocompleteselect', function (event, ui) {
             var $this = $(this);
             $this.nextAll ('input').val ('');
             if ($this.attr ('data-autocomplete') == 'word') {

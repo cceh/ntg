@@ -412,7 +412,7 @@ def f_map_word (t):
         t2 = "%s-%s" % (t.wortanf, t.wortend)
     else:
         t2 = "%s" % t.wortanf
-    return [t2 + ' ' + t.lemma, t2]
+    return [t2, t2, t.lemma]
 
 
 @app.endpoint ('suggest.json')
@@ -422,7 +422,8 @@ def suggest_json ():
     field   = request.args.get ('currentfield')
 
     # the term the user entered in the current field
-    term    = '^' + re.escape (request.args.get ('term') or '')
+    term    = request.args.get ('term') or ''
+    term    = '^' + re.escape (term.split ('-')[0])
 
     # terms entered in previous fields
     book    = request.args.get ('book') or 'Acts'
@@ -457,6 +458,7 @@ def suggest_json ():
             """, dict (parameters, chapter = chapter, verse = verse, term = term))
             res = map (Words._make, res)
             res = map (f_map_word, res)
+            return flask.json.jsonify ([ { 'label' : r[0], 'value' : r[1], 'description' : r[2] } for r in res ])
 
     return flask.json.jsonify ([ { 'label' : r[0], 'value' : r[1] } for r in res ])
 
