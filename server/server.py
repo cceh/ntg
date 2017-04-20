@@ -594,7 +594,7 @@ def relatives_json (hs_hsnr_id, passage_or_id):
 
     prefix = '' if mode == 'rec' else 'p_'
 
-    if '1' in fragments:
+    if 'fragments' in fragments:
         f_where = ''
     else:
         f_where = 'AND aff.common > ch.length / 2'
