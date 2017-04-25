@@ -9,6 +9,7 @@ import datetime
 import logging
 import subprocess
 import sys
+import types
 
 import six
 
@@ -128,7 +129,7 @@ def log (level, msg, *aargs, **kwargs):
     logger.log (level, msg, *aargs, extra = d)
 
 
-def tabulate (res, stream = sys.stdout):
+def tabulate (res):
     """ Format and output a rowset
 
     Uses an output format similar to the one produced by the mysql commandline
@@ -137,12 +138,13 @@ def tabulate (res, stream = sys.stdout):
     """
     cols = range (0, len (res.keys ()))
     rowlen = dict()
+    a = []
 
     def line ():
         for i in cols:
-            stream.write ("+")
-            stream.write ("-" * (rowlen[i] + 2))
-        stream.write ("+\n")
+            a.append ('+')
+            a.append ('-' * (rowlen[i] + 2))
+        a.append ('+\n')
 
     # convert database types to strings
     rows = []
@@ -166,17 +168,19 @@ def tabulate (res, stream = sys.stdout):
     # output header
     line ()
     for i in cols:
-        stream.write ("| {:<{align}} ".format (res.keys ()[i], align = rowlen[i]))
-    stream.write ("|\n")
+        a.append ('| {:<{align}} '.format (res.keys ()[i], align = rowlen[i]))
+    a.append ('|\n')
     line ()
 
     # output rows
     for row in rows:
         for i in cols:
-            stream.write ("| {:<{align}} ".format (row[i], align = rowlen[i]))
-        stream.write ("|\n")
+            a.append ('| {:<{align}} '.format (row[i], align = rowlen[i]))
+        a.append ('|\n')
     line ()
-    stream.write ("%d rows\n" % len (rows))
+    a.append ('%d rows\n' % len (rows))
+
+    return ''.join (a)
 
 
 def graphviz_layout (dot):
@@ -205,3 +209,27 @@ def graphviz_layout (dot):
         log (logging.ERROR, errs)
 
     return outs
+
+
+def config_from_pyfile (filename):
+    """Mimic Flask config files.
+
+    Emulate the Flask config file parser so we can use the same config files for both,
+    the server and this script.
+
+    """
+
+    d = types.ModuleType ('config')
+    d.__file__ = filename
+    try:
+        with open (filename) as config_file:
+            exec (compile (config_file.read (), filename, 'exec'), d.__dict__)
+    except IOError as e:
+        e.strerror = 'Unable to load configuration file (%s)' % e.strerror
+        raise
+
+    conf = {}
+    for key in dir (d):
+        if key.isupper ():
+            conf[key] = getattr (d, key)
+    return conf

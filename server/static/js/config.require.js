@@ -15,6 +15,7 @@ requirejs.config ({
         'datatables.net-buttons-bs'    : '/static/bower_components/datatables.net-buttons-bs/js/buttons.bootstrap',
         'datatables.net-buttons-html5' : '/static/bower_components/datatables.net-buttons/js/buttons.html5',
         'datatables.net-buttons-print' : '/static/bower_components/datatables.net-buttons/js/buttons.print',
+        'urijs'                        : '/static/bower_components/urijs/src',
         'pegjs'                        : '/static/bower_components/pegjs/peg-0.10.0',
         'rsvp'                         : '/static/bower_components/rsvp.js/rsvp',
         'text'                         : '/static/bower_components/requirejs-text/text',

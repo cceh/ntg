@@ -10,14 +10,63 @@
     <script src="/static/bower_components/requirejs/require.js?bust={{config['server_start_time']}}"></script>
     <script src="/static/js/config.require.js?bust={{config['server_start_time']}}"></script>
 
+    <script>
+      require (['jquery', 'tools', 'css!bootstrap-css', 'css!site-css'], function ($, tools) { tools.init (); });
+      {# @var logged_in True if the user is logged in.  Toggling this variable will not log in the user.
+	                    All endpoints are checked by the server independently of the setting of this variable.  #}
+      var logged_in = {{ 'true' if call_or_get (current_user.is_authenticated) else 'false' }};
+    </script>
+
     {% block head %}
     {% endblock %}
   </head>
 
   <body class="page_{% block page_class %}undefined{% endblock %}">
+    <div id="header">
+      <div class="container">
+        {% block header %}
+        {% endblock %}
+      </div>
+    </div>
     <div id="content">
-      {% block content %}
-      {% endblock %}
+      <div class="bs-docs-header">
+        <div class="container">
+        {% block h1 %}
+        {% endblock %}
+        </div>
+      </div>
+      <div class="container bs-docs-container">
+        <div class="clearfix">
+          <div class="pull-right">
+          {% if call_or_get(current_user.is_authenticated) %}
+            <a href="{{ url_for('user.profile') }}">{{ current_user.username }}</a>
+            &nbsp; | &nbsp;
+            <a class="user_logout_link" href="{{ url_for('user.logout') }}">Sign out</a>
+          {% else %}
+            <a class="user_login_link" href="{{ url_for('user.login') }}">Sign in</a>
+          {% endif %}
+          </div>
+        </div>
+        {% block menu %}
+        {% endblock %}
+        {% block flash_messages %}
+          {%- with messages = get_flashed_messages (with_categories = True) -%}
+            {% if messages %}
+              {% for category, message in messages %}
+                {% if category == 'error' %}
+                  {% set category = 'danger' %}
+                {% endif %}
+                <div class="alert alert-{{category}} alert-dismissible" role="alert">
+                  <button type="button" class="close" data-dismiss="alert"
+                          aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                {{ message|safe }}</div>
+              {% endfor %}
+            {% endif %}
+          {%- endwith %}
+        {% endblock %}
+        {% block content %}
+        {% endblock %}
+      </div>
     </div>
     <div id="footer">
       {% block footer %}

@@ -3,7 +3,6 @@
 {% block page_class %}ms_attesting{% endblock %}
 
 {% block head %}
-
 <title>{{_('Attestation for %(passage)s %(labez)s', passage = passage.to_hr (), labez = labez)}}</title>
 
 <script>
@@ -23,18 +22,12 @@
 </script>
 {% endblock %}
 
+{% block h1 %}
+  <h1>{{_('Attestation for %(passage)s %(labez)s', passage = passage.to_hr (), labez = labez)}}</h1>
+{% endblock %}
+
 {% block content %}
-
-<div class="bs-docs-header">
-  <div class="container">
-    <h1>{{_('Attestation for %(passage)s %(labez)s', passage = passage.to_hr (), labez = labez)}}</h1>
-  </div>
-</div>
-
-<div class="container bs-docs-container">
   {% for r in rows %}
-  <div class="relatives" data-href="../../relatives/{{passage.pass_id|e}}/{{r.hsnr|e}}"></div>
+    <div class="relatives" data-href="../../relatives/{{passage.pass_id|e}}/{{r.hsnr|e}}"></div>
   {% endfor %}
-</div>
-
 {% endblock %}

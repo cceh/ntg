@@ -99,7 +99,8 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
 
         d3common.insert_css_palette (
             d3common.generate_css_palette (
-                d3common.attestation_palette
+                d3common.labez_palette,
+                d3common.splits_palette
             )
         );
 
@@ -119,6 +120,11 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
         $ (document).on ('click', 'div.panel-textflow g.node', function (event) {
             var ms_id = $ (event.currentTarget).attr ('data-ms-id'); // the g.node, not the circle
             relatives.create_panel (ms_id, event.currentTarget);
+        });
+
+        // Click on canvas to close context menus
+        $ (document).on ('click', function (event) {
+            $ ('table.contextmenu').fadeOut (function () { $ (this).remove (); });
         });
 
         // The user navigated to new passage.

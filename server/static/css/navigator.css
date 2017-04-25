@@ -12,26 +12,6 @@ form.passage-selector .input-group span.input-group-addon-verse {
   padding: 6px;
   border-width: 1px 0;
 }
-.ui-menu td.ui-menu-item-wrapper {
-  padding: 3px 20px;
-}
-.ui-menu td.ui-menu-item-wrapper.ui-state-active {
-  margin: 0;
-  border-width: 0;
-  color: #fff;
-  background: #337ab7;
-}
-.ui-menu td.ui-menu-item-wrapper.menu-label {
-  text-align: right;
-}
-.ui-menu td.ui-menu-item-wrapper.menu-description {
-  padding-left: 0;
-}
-tr.ui-menu-item.ui-state-active {
-  margin: 0;
-  border-width: 0;
-  background: #ccc;
-}
 .dropdown-menu-table {
   display: table;
   z-index: 1000;
@@ -46,4 +26,24 @@ tr.ui-menu-item.ui-state-active {
   border-radius: 4px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   background-clip: padding-box;
+}
+.dropdown-menu-table.ui-menu td.ui-menu-item-wrapper {
+  padding: 3px 20px;
+}
+.dropdown-menu-table.ui-menu td.ui-menu-item-wrapper.ui-state-active {
+  margin: 0;
+  border-width: 0;
+  color: #fff;
+  background: #337ab7;
+}
+.dropdown-menu-table.ui-menu td.ui-menu-item-wrapper.menu-label {
+  text-align: right;
+}
+.dropdown-menu-table.ui-menu td.ui-menu-item-wrapper.menu-description {
+  padding-left: 0;
+}
+.dropdown-menu-table tr.ui-menu-item.ui-state-active {
+  margin: 0;
+  border-width: 0;
+  background: #ccc;
 }

@@ -156,6 +156,7 @@ function ($, d3, d3_common, _) {
 
             var groups = node.append ('g')
                 .attr ('data-ms-id', function (d) { return d.ms_id; })
+                .attr ('data-label', function (d) { return d.label; })
                 .attr ('class', function (d) {
                     return 'node node-' + (d.children ? 'internal' : 'leaf');
                 })
@@ -163,9 +164,13 @@ function ($, d3, d3_common, _) {
                     return 'translate(' + d.pos.x + ',' + d.pos.y + ')';
                 });
 
+            var valid = new RegExp ('^[-_A-Za-z0-9]+$');
+
             groups.append ('ellipse')
-                .attr ('class', 'node fg_labez')
-                .attr ('data-labez', function (d) { return d.labez; })
+                .attr ('class', 'node fg_labez bg_split')
+                .attr ('data-labez',  function (d) { return d.labez; })
+                .attr ('data-varnew', function (d) { return d.varnew; })
+                .attr ('data-split',  function (d) { return (d.varnew && d.varnew.length > 1) ? d.varnew[1] : '0'; })
                 .attr ('rx', function (d) {
                     return (d.width  || node_width) * css_dpi / 2;
                 })
@@ -173,31 +178,21 @@ function ($, d3, d3_common, _) {
                     return (d.height || node_height) * css_dpi / 2;
                 })
                 .on ('mouseenter', function (d) {
-                    d3.selectAll ('.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover hi-source', true);
-                    d3.selectAll ('.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hover hi-target', true);
+                    if (valid.test (d.id)) {
+                        d3.selectAll ('.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover hi-source', true);
+                        d3.selectAll ('.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hover hi-target', true);
+                    }
                 })
                 .on ('mouseleave', function (d) {
-                    d3.selectAll ('.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover hi-source', false);
-                    d3.selectAll ('.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hover hi-target', false);
+                    if (valid.test (d.id)) {
+                        d3.selectAll ('.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover hi-source', false);
+                        d3.selectAll ('.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hover hi-target', false);
+                    }
                 });
 
             groups.append ('text')
                 .attr ('class', 'node')
                 .text (function (d) { return d.label; });
-
-            /*
-            var r = node_width * css_dpi / 2;
-
-            groups.append ('foreignObject')
-                .attr ('x', -r)
-                .attr ('y', -r)
-                .attr ('width', 2 * r)
-                .attr ('height', 2 * r)
-                .append ('xhtml:body')
-                .append ('div')
-                .attr ('class', 'node')
-                .text (function (d) { return d.label; });
-            */
 
             // done
 

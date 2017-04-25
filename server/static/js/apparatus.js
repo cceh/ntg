@@ -40,13 +40,13 @@ function ($, _, tools, panel) {
             var html = [];
 
             // load readings into dictionary for faster lookup
-            _.forEach (json.readings, function (reading) {
+            _.forEach (json.data.readings, function (reading) {
                 var key = reading.labez + reading.labezsuf;
                 readings[key] = reading.lesart;
             });
 
             // group manuscripts and loop over groups
-            _.forEach (_.groupBy (_.sortBy (json.manuscripts, grouper), grouper), function (group) {
+            _.forEach (_.groupBy (_.sortBy (json.data.manuscripts, grouper), grouper), function (group) {
                 var data = {
                     'pass_id'  : passage.id,
                     'labez'    : group[0].labez,

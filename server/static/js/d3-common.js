@@ -28,12 +28,29 @@ define ([
      */
     var dot2css = 96.0 / 72.0;
 
+    function brighten_range (range, k) {
+        return range.map (function (c) {
+            var clr = d3.color (c);
+            clr.opacity = 0.2;
+            return clr.toString ();
+        });
+    }
+
+    /* pilfered from d3-scale-chromatic.js */
+    var Greys = "fffffff0f0f0d9d9d9bdbdbd969696737373525252252525000000";
+
+    function color_string_to_range (s) {
+        return s.match (/.{6}/g).map (function (x) {
+            return "#" + x;
+        });
+    }
+
     /**
      * A D3 color palette suitable for attestations.
      *
-     * @var {d3.scale} attestation_palette
+     * @var {d3.scale} labez_palette
      */
-    var attestation_palette = d3.scaleOrdinal ()
+    var labez_palette = d3.scaleOrdinal ()
         .domain (d3.range (20))
         .range (['#888888', '#1f77b4', '#2ca02c', '#d62728',
                  '#e7ba52', '#ff7f0e', '#9467bd', '#8c564b',
@@ -42,20 +59,28 @@ define ([
                  '#f7b6d2', '#dbdb8d', '#9edae5', '#7f7f7f']);
 
     /**
+     * A D3 color palette suitable for splits.
+     *
+     * @var {d3.scale} splits_palette
+     */
+    var splits_palette = d3.scaleOrdinal (color_string_to_range (Greys)).domain (d3.range (9));
+
+    /**
      * Generates a CSS color palette from a D3 scale.
      *
      * @function generate_css_palette
      *
-     * @param d3_scale {d3.scale} - The color palette as D3 scale.
+     * @param labez_scale {d3.scale} - The color palette for labez as D3 scale.
+     * @param split_scale {d3.scale} - The color palette for splits as D3 scale.
      *
      * @return {string} - The color palette as CSS
      */
-    function generate_css_palette (d3_scale) {
+    function generate_css_palette (labez_scale, split_scale) {
         var style;
         function labezFromCharCode (code) {
             return code > 0 ? String.fromCharCode (code + 96) : 'z';
         }
-        style = _.map (_.zip (d3_scale.domain (), d3_scale.range ()), function (pair) {
+        style = _.map (_.zip (labez_scale.domain (), labez_scale.range ()), function (pair) {
             var code = labezFromCharCode (pair[0]);
             return (
                 '.fg_labez[data-labez="' + code + '"] {\n' +
@@ -70,6 +95,21 @@ define ([
         });
         style.unshift ('.fg_labez { color: black !important; stroke: black; }');
         style.unshift ('.bg_labez { background-color: black !important; fill: black; }');
+
+        style = style.concat (_.map (_.zip (split_scale.domain (), split_scale.range ()), function (pair) {
+            var code = pair[0];
+            return (
+                '.fg_split[data-split="' + code + '"] {\n' +
+                '    color: ' + pair[1] + ' !important;\n' +
+                '    stroke: ' + pair[1] + ';\n' +
+                '}\n' +
+                '.bg_split[data-split="' + code + '"] {\n' +
+                '    background-color: ' + pair[1] + ' !important;\n' +
+                '    fill: ' + pair[1] + ';\n' +
+                '}'
+            );
+        }));
+
         return style.join ('\n');
     }
 
@@ -260,7 +300,8 @@ define ([
     }
 
     return {
-        'attestation_palette'  : attestation_palette,
+        'labez_palette'        : labez_palette,
+        'splits_palette'       : splits_palette,
         'insert_css_palette'   : insert_css_palette,
         'generate_css_palette' : generate_css_palette,
         'to_jquery'            : to_jquery,

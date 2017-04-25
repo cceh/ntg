@@ -3,31 +3,24 @@
 {% block page_class %}comparison{% endblock %}
 
 {% block head %}
+  <title>{{_('Comparison of Manuscripts')}}</title>
 
-<title></title>
+  <script>
+    require (['comparison'], function (comp) { comp.init () });
+  </script>
+{% endblock %}
 
-<script>
-  require (['comparison'], function (comp) { comp.init () });
-</script>
-
+{% block h1 %}
+  <h1>
+    <span class="caption">
+      {{_('Comparison of')}}
+      <span class="ms1"></span> {{_('and')}} <span class="ms2"></span>
+    </span>
+    <span class="appname">{{config['APPLICATION_NAME']}}</span>
+  </h1>
 {% endblock %}
 
 {% block content %}
-
-<div class="bs-docs-header">
-  <div class="container">
-    <h1>
-      <span class="caption">
-        {{_('Comparison of')}}
-        <span class="ms1"></span> {{_('and')}} <span class="ms2"></span>
-      </span>
-      <span class="appname">{{config['APPLICATION_NAME']}}</span>
-    </h1>
-  </div>
-</div>
-
-<div class="container bs-docs-container">
-
   <div class="navigator">
     <form class="manuscripts-selector form-inline">
       <div class="form-group">
@@ -73,6 +66,5 @@
       </tbody>
     </table>
   </div>
-</div>
 
 {% endblock %}

@@ -299,6 +299,7 @@ Tabellen und Felder
 -------------------
 
 Felder in der Tabelle Att
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 anfadr, endadr
   Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
@@ -472,20 +473,51 @@ om
 Tabellen für Genealogische Kohärenz
 -----------------------------------
 
+Felder in der Tabelle LocStemEd
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+id
+  Primärer Schlüssel
+
+varid
+  id der variierten Stelle
+
+varnew
+  Gleich wie varid oder neue id nach Splitt.
+
+s1
+  Ursprung der Variante
+
+s2
+  Eventueller zweiter Ursprung der Variante.
+
+begadr
+endar
+  Stelle (Passage)
+
+w
+  Westlicher Text.  Hat für die CBGM keine Bedeutung.
+
+
 Splitt
+~~~~~~
 
-  Ein Splitt wird benötigt wenn eine Lesart mehrmals unabhängig
-  entstanden ist, damit die Abhängigkeiten der Handschriften
-  untereinander nicht verfälscht werden.
+Ein Splitt wird benötigt wenn eine Lesart mehrmals unabhängig entstanden
+ist, damit die Abhängigkeiten der Handschriften untereinander nicht
+verfälscht werden.
 
-  Bei einem Splitt erhalten die Felder varnew, s1, s2 in LocStemEd*
-  durch die Bearbeitung die Form [a-y][1-9].
+Bei einem Splitt erhalten die Felder varnew, s1, s2 in LocStemEd durch
+die Bearbeitung die Form [a-y][1-9].  z.B. weisen die Varianten b1 und
+b2 denselben Wortlaut auf sind aber unabhängig voneinander entstanden.
+
 
 Zusammenlegung
-  Eine Zusammenlegung wird benötigt um einen Splitt rückgängig zu
-  machen???
+~~~~~~~~~~~~~~
 
-  Bei einer Zusammenlegung hast das Feld varnew die Form: [a-y]!.
+Eine Zusammenlegung wird benötigt um einen Splitt rückgängig zu
+machen???
+
+Bei einer Zusammenlegung hast das Feld varnew die Form: [a-y]!.
 
 
 Kritik

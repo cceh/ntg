@@ -159,10 +159,10 @@ function ($, _, tools) {
     function load_labez_dropdown ($group, pass_id, name, prefixes) {
         var $menu = $group.find ('div[data-toggle="buttons"]');
 
-        var promise = $.get ('passage.json/' + pass_id);
+        var promise = $.getJSON ('passage.json/' + pass_id);
         promise.done (function (json) {
             $menu.empty ();
-            var variants = prefixes.concat (json.variants);
+            var variants = prefixes.concat (json.data.variants);
             _.forEach (variants, function (value) {
                 var data = { 'name' : name, 'labez' : value[0], 'labez_i18n' : value[1] };
                 var $item = $ (tools.format (
@@ -190,10 +190,10 @@ function ($, _, tools) {
     function load_chapter_dropdown ($group, name, prefixes) {
         var $menu = $group.find ('div[data-toggle="buttons"]');
 
-        var promise = $.get ('chapters.json');
+        var promise = $.getJSON ('chapters.json');
         promise.done (function (json) {
             $menu.empty ();
-            var chapters = prefixes.concat (json.chapters);
+            var chapters = prefixes.concat (json.data.chapters);
             _.forEach (chapters, function (value) {
                 var data = { 'name' : name, 'chapter' : value[0], 'chapter_i18n' : value[1] };
                 var $item = $ (tools.format (

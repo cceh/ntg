@@ -3,24 +3,22 @@
 {% import 'toolbar.html' as tt %}
 
 {% block head %}
+  <title>Coherence</title>
 
-<title></title>
+  <script>
+    require (['coherence'], function (coherence) { coherence.init () });
+  </script>
+{% endblock %}
 
-<script>
-  require (['coherence'], function (coherence) { coherence.init () });
-</script>
-
+{% block h1 %}
+  <h1>
+    {{_('Attestation for')}}
+    <span class="passage"></span>
+    <span class="appname">{{config['APPLICATION_NAME']}}</span>
+  </h1>
 {% endblock %}
 
 {% block content %}
-<div class="bs-docs-header">
-  <div class="container">
-    <h1>{{_('Attestation for')}} <span class="passage"></span> <span class="appname">{{config['APPLICATION_NAME']}}</span></h1>
-  </div>
-</div>
-
-<div class="container bs-docs-container">
-
   {% include 'navigator.html' %}
 
   <div class="panel panel-default panel-apparatus">
@@ -88,6 +86,4 @@
   </div>
 
   {% include 'navigator.html' %}
-</div>
-
 {% endblock %}

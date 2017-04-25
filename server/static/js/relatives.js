@@ -50,15 +50,15 @@ function ($, _, d3, d3c, tools, panel, nav) {
 
         // replace content
         var ms_id = instance.$panel.attr ('data-ms-id');
-        var url   = 'relatives.json/' + nav.passage.id + '/' + ms_id
+        var url   = 'relatives.html/' + nav.passage.id + '/' + ms_id
             + '?' + $.param (instance.data); // we must use GET, not POST
         var $heading_wrap = instance.$panel.find ('div.panel-relatives-metrics');
         var $table_wrap   = instance.$panel.find ('div.panel-relatives-content');
 
-        $.get (url, function (data) {
-            var $data = $(data);
-            $heading_wrap.html ($data.find ('div.relatives-metrics'));
-            $table_wrap.html   ($data.find ('table.relatives'));
+        $.get (url, function (html) {
+            var $html = $ (html);
+            $heading_wrap.html ($html.find ('div.relatives-metrics'));
+            $table_wrap.html   ($html.find ('table.relatives'));
             changed ();
         });
 
@@ -102,8 +102,8 @@ function ($, _, d3, d3c, tools, panel, nav) {
      *
      * @function create_panel
      *
-     * @param ms_id {integer} The manuscript id.
-     * @param elem {DOM} A DOM element relative to which to position the popup.
+     * @param ms_id  {integer} The manuscript id.
+     * @param target {DOM} A DOM element relative to which to position the popup.
      */
     function create_panel (ms_id, target) {
         $.get ('relatives/' + nav.passage.id + '/' + ms_id, function (html) {
@@ -129,7 +129,6 @@ function ($, _, d3, d3c, tools, panel, nav) {
             });
 
             panel.create_panel_controls ($popup);
-            // make draggable
             $popup.draggable ();
             $popup.on ('dragstart', function () {
                 // FIXME: $popup.appendTo ('#floating-panels'); // bring to top

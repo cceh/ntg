@@ -402,10 +402,10 @@ function ($, d3) {
             var p = deparam (hash);
 
             var p1 = $.getJSON ('manuscript.json/' + p.ms1, function (json) {
-                module.ms1 = json;
+                module.ms1 = json.data;
             });
             var p2 = $.getJSON ('manuscript.json/' + p.ms2, function (json) {
-                module.ms2 = json;
+                module.ms2 = json.data;
             });
 
             $.when (p1, p2).done (function () {

@@ -12,13 +12,15 @@
 define (['jquery',
          'lodash',
          'panel',
+         'navigator',
+         'tools',
          'bootstrap',
          'bootstrap-slider',
          'jquery-ui',
          'css!textflow-css',
         ],
 
-function ($, _, panel) {
+function ($, _, panel, navigator, tools) {
     'use strict';
 
     function changed () {
@@ -104,7 +106,44 @@ function ($, _, panel) {
             'formatter'       : panel.connectivity_formatter,
         });
 
+        if (logged_in) {
+            instance.$panel.on ('contextmenu', 'g.node', instance, open_contextmenu);
+        }
+
         return instance;
+    }
+
+    /**
+     * Open a context menu when right clicked on a node.
+     *
+     * The context menu can be used to reassign the node to a different split.
+     *
+     * @param event
+     */
+
+    function open_contextmenu (event) {
+		event.preventDefault ();
+
+        var labez = event.target.dataset.labez;
+
+        // build the menu contents
+        var menu = $ ('<table class="contextmenu"></table>');
+        _.forEach (navigator.passage.splits, function (value) {
+            var varnew = value[0];
+            if (varnew[0] == labez)
+                menu.append ($ ('<tr><td class="bg_labez" data-labez="' +
+                                varnew[0] + '"></td><td>Move subtree to ' +
+                                varnew + '</td></tr>'));
+        });
+
+        menu.menu ({
+            'select' : function (event, ui) {
+                menu.fadeOut (function () { menu.remove () });
+                console.log ('selected' + ui.item.text ());
+            },
+        });
+
+        tools.svg_contextmenu (menu, event.target);
     }
 
     return {

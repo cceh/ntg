@@ -9,3 +9,6 @@ div.bs-docs-header h1 {
 div.bs-docs-header h1 span.appname {
   float: right;
 }
+.alert {
+  margin-top: 20px;
+}

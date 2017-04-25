@@ -6,7 +6,7 @@
  * @author Marcello Perathoner
  */
 
-define (['jquery', 'lodash', 'jquery-ui', 'css!navigator-css'], function ($, _) {
+define (['jquery', 'lodash', 'urijs/URI', 'jquery-ui', 'css!navigator-css'], function ($, _, urijs) {
     'use strict';
 
     var module = {};
@@ -42,8 +42,8 @@ define (['jquery', 'lodash', 'jquery-ui', 'css!navigator-css'], function ($, _) 
      */
     function set_passage (pass_id) {
         $.getJSON ('passage.json/' + pass_id, function (json) {
-            module.passage = json;
-            $ (document).trigger ('ntg.passage.changed', json);
+            module.passage = json.data;
+            $ (document).trigger ('ntg.passage.changed', json.data);
         });
     }
 
@@ -93,8 +93,8 @@ define (['jquery', 'lodash', 'jquery-ui', 'css!navigator-css'], function ($, _) 
         });
 
         $.getJSON ('passage.json', data, function (json) {
-            module.passage = json;
-            window.location.hash = '#' + json.passage; // trigger the move to the new passage
+            module.passage = json.data;
+            window.location.hash = '#' + json.data.passage; // trigger the move to the new passage
         });
         return false;
     }
@@ -130,25 +130,31 @@ define (['jquery', 'lodash', 'jquery-ui', 'css!navigator-css'], function ($, _) 
             }
         });
 
-
-        $ (document).on ('ntg.passage.changed', function (event, json) {
+        $ (document).on ('ntg.passage.changed', function (event, data) {
             var $form = $ ('form.passage-selector');
-            $form.find ('input[name="pass_id"]').val (json.id);
+            $form.find ('input[name="pass_id"]').val (data.id);
 
             $ ('form input[data-autocomplete]').each (function () {
                 var $this = $(this);
-                $this.val (json[$this.attr ('data-autocomplete')]);
+                $this.val (data[$this.attr ('data-autocomplete')]);
             });
-            $ ('h1 span.passage').text (json.hr);
+            $ ('h1 span.passage').text (data.hr);
             $ ('title').text ($ ('h1').text ());
+
+            // Fix 'next page' parameter in login / logout links
+            var $links = $ ('a.user_login_link, a.user_logout_link');
+            $links.each (function () {
+                var $this = $(this);
+                $this.attr ('href', urijs ($this.attr ('href')).query ( { 'next' : window.location } ));
+            });
         });
 
         // User hit back-button, etc.
         $ (window).on ('hashchange', function () {
             var hash = window.location.hash.substring (1);
             $.getJSON ('passage.json/' + hash, function (json) {
-                module.passage = json;
-                $ (document).trigger ('ntg.passage.changed', json);
+                module.passage = json.data;
+                $ (document).trigger ('ntg.passage.changed', json.data);
             });
         });
 
@@ -157,6 +163,8 @@ define (['jquery', 'lodash', 'jquery-ui', 'css!navigator-css'], function ($, _) 
 
     module.init = init;
     module.set_passage = set_passage;
+    /** JSON object.  Will be updated on navigation */
+    module.passage = null;
 
     return module;
 });

@@ -37,6 +37,9 @@ server: css js
 prepare:
 	scripts/cceh/prepare4cbgm.py -vvv server/instance/current.conf
 
+users:
+	scripts/cceh/mk_users.py -vvv server/instance/_global.conf
+
 db_upload:
 	pg_dump --clean --if-exists ntg_current | bzip2 > /tmp/ntg_current.pg_dump.sql.bz2
 	scp /tmp/ntg_current.pg_dump.sql.bz2 $(NTG_USER)@$(NTG_VM):~/
@@ -85,7 +88,7 @@ install-prerequisites:
 	sudo apt-get install libpq-dev postgresql-9.6-python3-multicorn graphviz
 	pip3 install numpy six networkx matplotlib Pillow rtree
 	pip3 install psycopg2 mysqlclient sqlalchemy sqlalchemy-utils intervals multicorn
-	pip3 install flask babel flask-babel flask-sqlalchemy jinja2
+	pip3 install flask babel flask-babel flask-sqlalchemy jinja2 flask-user
 
 ### Localization ###
 

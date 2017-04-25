@@ -42,8 +42,8 @@ import operator
 import os
 import re
 import sys
-import types
 
+import networkx as nx
 import numpy as np
 import six
 import sqlalchemy
@@ -1847,30 +1847,6 @@ def print_stats (dba, parameters):
         log (logging.INFO, "chap * ms * pas    = {cnt}".format (cnt = pas))
 
 
-def config_from_pyfile (filename):
-    """Mimic Flask config files.
-
-    Emulate the Flask config file parser so we can use the same config files for both,
-    the server and this script.
-
-    """
-
-    d = types.ModuleType ('config')
-    d.__file__ = filename
-    try:
-        with open (filename) as config_file:
-            exec (compile (config_file.read (), filename, 'exec'), d.__dict__)
-    except IOError as e:
-        e.strerror = 'Unable to load configuration file (%s)' % e.strerror
-        raise
-
-    conf = {}
-    for key in dir (d):
-        if key.isupper ():
-            conf[key] = getattr (d, key)
-    return conf
-
-
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser (description='Prepare a database for CBGM')
@@ -1884,7 +1860,7 @@ if __name__ == '__main__':
 
     parser.parse_args (namespace = args)
 
-    config = config_from_pyfile (args.profile)
+    config = tools.config_from_pyfile (args.profile)
 
     if not re.match ('^[-0-9]*$', args.range):
         print ("Error in range option")
@@ -1907,9 +1883,16 @@ if __name__ == '__main__':
     parameters['source_db'] = tools.quote (config['MYSQL_ECM_DB'])
     parameters['src_vg_db'] = tools.quote (config['MYSQL_VG_DB'])
 
-    logging.basicConfig (format = '%(relativeCreated)d - %(levelname)s - %(message)s')
-    logging.getLogger ('sqlalchemy.engine').setLevel (args.log_level)
-    logging.getLogger ('server').setLevel (args.log_level)
+    logging.getLogger ().setLevel (args.log_level)
+    formatter = logging.Formatter (fmt = '%(relativeCreated)d - %(levelname)s - %(message)s')
+
+    stderr_handler = logging.StreamHandler ()
+    stderr_handler.setFormatter (formatter)
+    logging.getLogger ().addHandler (stderr_handler)
+
+    file_handler = logging.FileHandler ('prepare4cbgm.log')
+    file_handler.setFormatter (formatter)
+    logging.getLogger ().addHandler (file_handler)
 
     dbsrc1 = db.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_ECM_DB'])
     dbsrc2 = db.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_VG_DB'])

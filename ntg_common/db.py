@@ -54,14 +54,12 @@ import sqlalchemy.types
 from sqlalchemy import String, Integer, Float, Boolean, DateTime, Column, Index, UniqueConstraint, ForeignKey
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext import compiler
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.schema import DDLElement
 from sqlalchemy.sql import table, text
 
 import sqlalchemy_utils
 from sqlalchemy_utils import IntRangeType
-
-# import pandas as pd
 
 from .tools import log, tabulate
 from .config import args
@@ -128,6 +126,13 @@ def executemany_raw (conn, sql, parameters, param_array, debug_level = logging.I
     return result
 
 
+def rollback (conn, debug_level = logging.INFO):
+    start_time = datetime.datetime.now ()
+    result = conn.execute ("ROLLBACK")
+    log (debug_level, "rollback in %.3fs", (datetime.datetime.now () - start_time).total_seconds ())
+    return result
+
+
 # def execute_pandas (conn, sql, parameters, debug_level = logging.INFO):
 #     sql = sql.format (**parameters)
 #     log (debug_level, sql.rstrip () + ';')
@@ -138,8 +143,7 @@ def debug (conn, msg, sql, parameters):
     if args.log_level <= logging.INFO:
         result = execute (conn, sql, parameters)
         if result.rowcount > 0:
-            log (logging.DEBUG, msg)
-            tabulate (result)
+            log (logging.DEBUG, msg + '\n' + tabulate (result))
 
 
 def fix (conn, msg, check_sql, fix_sql, parameters):
@@ -158,15 +162,13 @@ def fix (conn, msg, check_sql, fix_sql, parameters):
     if result.rowcount > 0:
         # apply fix
         if args.log_level <= logging.INFO:
-            log (logging.WARNING, msg)
-            tabulate (result)
+            log (logging.WARNING, msg + '\n' + tabulate (result))
         if fix_sql:
             execute (conn, fix_sql, parameters)
             # print fixed values
             result = execute (conn, check_sql, parameters)
             if result.rowcount > 0:
-                log (logging.ERROR, msg)
-                tabulate (result)
+                log (logging.ERROR, msg + '\n' + tabulate (result))
 
 
 class DBA (object):
@@ -232,15 +234,15 @@ class PostgreSQLEngine (object):
 
         args = self.get_connection_params (kwargs)
 
-        url = "postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}?sslmode=disable".format (**args)
+        self.url = "postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}".format (**args)
 
-        if not sqlalchemy_utils.functions.database_exists (url):
+        if not sqlalchemy_utils.functions.database_exists (self.url):
             log (logging.INFO, "PostgreSQLEngine: Creating database '{database}'".format (**args))
-            sqlalchemy_utils.functions.create_database (url)
+            sqlalchemy_utils.functions.create_database (self.url)
 
         log (logging.INFO, "PostgreSQLEngine: Connecting to postgres database '{database}' as user '{user}'".format (**args))
 
-        self.engine = sqlalchemy.create_engine (url + "?server_side_cursors")
+        self.engine = sqlalchemy.create_engine (self.url + "?sslmode=disable&server_side_cursors")
 
 
     def connect (self):
@@ -643,3 +645,51 @@ class GephiEdges (Base2):
     __table_args__ = (
         UniqueConstraint ('source', 'target', name = 'unique_gephi_edges_source_target'),
     )
+
+# Tables for flask_login / flask_user / flask_security / whatever
+
+Base3 = declarative_base ()
+
+class _User ():
+    __tablename__ = 'user'
+
+    id           = Column (Integer,      primary_key = True)
+    username     = Column (String (50),  nullable = False, unique = True)
+    password     = Column (String (255), nullable = False, server_default = '')
+    email        = Column (String (255), nullable = False, unique = True)
+    active       = Column (Boolean,      nullable = False, server_default = '0')
+    confirmed_at = Column (DateTime)
+    first_name   = Column (String (100), nullable = False, server_default = '')
+    last_name    = Column (String (100), nullable = False, server_default = '')
+
+
+class _Role ():
+    __tablename__ = 'role'
+
+    id          = Column (Integer,      primary_key = True)
+    name        = Column (String  (80), unique = True)
+    description = Column (String (255), nullable = False, server_default = '')
+
+
+class _Roles_Users ():
+    __tablename__ = 'roles_users'
+
+    id      = Column (Integer, primary_key = True)
+
+    @declared_attr
+    def user_id (cls):
+        return Column (Integer, ForeignKey ('user.id', ondelete='CASCADE'))
+
+    @declared_attr
+    def role_id (cls):
+        return Column (Integer, ForeignKey ('role.id', ondelete='CASCADE'))
+
+
+class User (_User, Base3):
+    pass
+
+class Role (_Role, Base3):
+    pass
+
+class Roles_Users (_Roles_Users, Base3):
+    pass
