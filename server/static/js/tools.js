@@ -74,6 +74,24 @@ function () {
         $parent.slideUp (function () { $parent.remove (); });
     }
 
+    function xhr_alert (xhr, panel) {
+        if (!panel) {
+            panel = $ ('body');
+        }
+        var category = 'danger';
+
+        if (xhr.responseJSON) {
+            var $alert = $ (
+                '<div class="alert alert-' + category + ' alert-dismissible alert-margins" role="alert">' +
+                    '  <button type="button" class="close" data-dismiss="alert"' +
+                    '          aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                    xhr.responseJSON.message +
+                    '</div>'
+            ).hide ();
+            $alert.appendTo (panel).slideDown ();
+        }
+    }
+
     function init () {
         var selector = '[data-dismiss="alert"]';
         // Enable the closing button of the flashed alert messages
@@ -85,9 +103,10 @@ function () {
     }
 
     return {
-        'init'             : init,
         'format'           : format,
         'get_query_params' : get_query_params,
+        'init'             : init,
         'svg_contextmenu'  : svg_contextmenu,
+        'xhr_alert'        : xhr_alert,
     };
 });

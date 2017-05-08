@@ -12,9 +12,10 @@
 
     <script>
       require (['jquery', 'tools', 'css!bootstrap-css', 'css!site-css'], function ($, tools) { tools.init (); });
-      {# @var logged_in True if the user is logged in.  Toggling this variable will not log in the user.
-	                    All endpoints are checked by the server independently of the setting of this variable.  #}
-      var logged_in = {{ 'true' if call_or_get (current_user.is_authenticated) else 'false' }};
+      {# @var is_logged_in True if the user is logged in.  Toggling this variable will not log in the user.
+	                       All endpoints are checked by the server independently of the setting of this variable.  #}
+      var is_logged_in = {{ 'true' if current_user.is_authenticated else 'false' }};
+      var is_editor    = {{ 'true' if current_user.is_authenticated and current_user.has_role ('editor') else 'false' }};
     </script>
 
     {% block head %}

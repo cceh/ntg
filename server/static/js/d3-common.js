@@ -28,7 +28,7 @@ define ([
      */
     var dot2css = 96.0 / 72.0;
 
-    function brighten_range (range, k) {
+    function brighten_range (range, dummy_k) {
         return range.map (function (c) {
             var clr = d3.color (c);
             clr.opacity = 0.2;
@@ -37,11 +37,11 @@ define ([
     }
 
     /* pilfered from d3-scale-chromatic.js */
-    var Greys = "fffffff0f0f0d9d9d9bdbdbd969696737373525252252525000000";
+    var Greys = 'fffffff0f0f0d9d9d9bdbdbd969696737373525252252525000000';
 
     function color_string_to_range (s) {
         return s.match (/.{6}/g).map (function (x) {
-            return "#" + x;
+            return '#' + x;
         });
     }
 
@@ -299,19 +299,52 @@ define ([
         });
     }
 
+    /**
+     * Breadth first search in graph
+     *
+     * @function bfs
+     *
+     * @param edges The edges list
+     * @param start The start node id
+     *
+     * @return A list of node ids in breadth-first order
+     */
+
+    function bfs (edges, start) {
+        var ids   = [start];
+        var queue = [];
+        var cur   = start;
+        function is_adjacent (edge) {
+            return edge.elems[0].id === cur;
+        }
+        while (cur) {
+            _.forEach (_.filter (edges, is_adjacent), function (n) {
+                var id = n.elems[1].id;
+                if (_.indexOf (ids, id) === -1) {
+                    ids.push (id);
+                    queue.push (id);
+                }
+            });
+            cur = queue.shift ();
+        }
+        return ids;
+    }
+
     return {
-        'labez_palette'        : labez_palette,
-        'splits_palette'       : splits_palette,
-        'insert_css_palette'   : insert_css_palette,
+        'append_marker'        : append_marker,
+        'bfs'                  : bfs,
+        'brighten_range'       : brighten_range,
+        'dot'                  : dot,
         'generate_css_palette' : generate_css_palette,
-        'to_jquery'            : to_jquery,
-        'to_d3'                : to_d3,
-        'parse_pt'             : parse_pt,
+        'inflate_bbox'         : inflate_bbox,
+        'insert_css_palette'   : insert_css_palette,
+        'labez_palette'        : labez_palette,
         'parse_bbox'           : parse_bbox,
         'parse_path'           : parse_path,
         'parse_path_svg'       : parse_path_svg,
-        'inflate_bbox'         : inflate_bbox,
-        'dot'                  : dot,
-        'append_marker'        : append_marker,
+        'parse_pt'             : parse_pt,
+        'splits_palette'       : splits_palette,
+        'to_d3'                : to_d3,
+        'to_jquery'            : to_jquery,
     };
 });

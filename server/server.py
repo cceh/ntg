@@ -555,7 +555,7 @@ def textflow_dot (passage_or_id):
             attrs['varid']  = ms.varid
             attrs['varnew'] = ms.varnew
             attrs['labez']  = ms.varnew[0]
-            attrs['ms_id']  = ms.ms_id - 1
+            attrs['ms_id']  = ms.ms_id
             attrs['label']  = ms.hs
             if ms.ms_id == 1 and hyp_a != 'A':
                 attrs['varid']  = hyp_a[0]

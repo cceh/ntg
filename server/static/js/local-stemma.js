@@ -10,11 +10,12 @@ define ([
     'jquery',
     'lodash',
     'd3',
+    'd3-common',
     'navigator',
     'tools',
 ],
 
-function ($, _, d3, navigator, tools) {
+function ($, _, d3, d3common, navigator, tools) {
     'use strict';
 
     function changed () {
@@ -39,14 +40,14 @@ function ($, _, d3, navigator, tools) {
      */
 
     function return_to_base () {
-        return function (d, i, a)  {
+        return function (d, i, dummy_a)  {
             var delta_x = d.pos.x - d.pos.orig_x;
             var delta_y = d.pos.y - d.pos.orig_y;
             d.pos.x = d.pos.orig_x;
             d.pos.y = d.pos.orig_y;
             return function (t) {
-                var x = d.pos.x + (1.0 - t) * delta_x;
-                var y = d.pos.y + (1.0 - t) * delta_y;
+                var x = d.pos.x + ((1.0 - t) * delta_x);
+                var y = d.pos.y + ((1.0 - t) * delta_y);
                 return 'translate(' + x + ',' + y + ')';
             };
         };
@@ -64,58 +65,61 @@ function ($, _, d3, navigator, tools) {
     }
 
     /**
-     * @var dragListener
+     * @function dragListener
      *
-     * Implements the drag-and-drop local stemma editor.
+     * Creates a d3-drag object that implements the drag-and-drop local stemma
+     * editor.
      */
 
-    var dragListener = d3.drag ()
-        .on ('start', function (d) {
-            // do nothing (yet)
-        })
-        .on ('drag', function (d) {
-            if (dragged_node === null) {
-                dragged_node = d3.select (this);
-                d.pos.orig_x = d.pos.x;
-                d.pos.orig_y = d.pos.y;
-                // Suppress the mouseover event on the node being dragged
-                // otherwise it will absorb the event and the underlying node
-                // will not detect it.
-                dragged_node.attr ('pointer-events', 'none');
-                dragged_node.raise ();
-                target_node = null;
-                console.log ('dragging ' + dragged_node.datum ().label);
-            }
-            d.pos.x += d3.event.dx;
-            d.pos.y += d3.event.dy;
-            dragged_node.attr ('transform', 'translate(' + d.pos.x + ',' + d.pos.y + ')');
-        })
-        .on ('end', function (d) {
-            var dragged_node_ref = dragged_node;
-            if (target_node) {
-                // if dropped on another node
-                console.log (dragged_node.datum ().label + ' dropped on ' + target_node.datum ().label);
-                var xhr = $.getJSON ('stemma-edit/' + navigator.passage.id, {
-                    'action' : 'move',
-                    'parent' : target_node.datum ().label,
-                    'child'  : dragged_node.datum ().label
-                });
-                xhr.done (function (json) {
-                    $ (document).trigger ('ntg.passage.changed', json.data);
-                    done = true;
-                });
-                xhr.fail (function () {
+    function dragListener (panel) {
+        return d3.drag ()
+            .on ('start', function (dummy_d) {
+                // do nothing (yet)
+            })
+            .on ('drag', function (d) {
+                if (dragged_node === null) {
+                    dragged_node = d3.select (this);
+                    d.pos.orig_x = d.pos.x;
+                    d.pos.orig_y = d.pos.y;
+                    // Suppress the mouseover event on the node being dragged
+                    // otherwise it will absorb the event and the underlying node
+                    // will not detect it.
+                    dragged_node.attr ('pointer-events', 'none');
+                    dragged_node.raise ();
+                    target_node = null;
+                    // console.log ('dragging ' + dragged_node.datum ().label);
+                }
+                d.pos.x += d3.event.dx;
+                d.pos.y += d3.event.dy;
+                dragged_node.attr ('transform', 'translate(' + d.pos.x + ',' + d.pos.y + ')');
+            })
+            .on ('end', function (dummy_d) {
+                var dragged_node_ref = dragged_node;
+                if (target_node) {
+                    // if dropped on another node
+                    // console.log (dragged_node.datum ().label + ' dropped on ' + target_node.datum ().label);
+                    var xhr = $.getJSON ('stemma-edit/' + navigator.passage.id, {
+                        'action' : 'move',
+                        'parent' : target_node.datum ().label,
+                        'child'  : dragged_node.datum ().label,
+                    });
+                    xhr.done (function (json) {
+                        $ (document).trigger ('ntg.passage.changed', json.data);
+                    });
+                    xhr.fail (function (xhrobj) {
+                        tools.xhr_alert (xhrobj, panel);
+                        cancel (dragged_node_ref);
+                    });
+                    highlight (target_node, false);
+                } else {
+                    // if dropped in no man's land
                     cancel (dragged_node_ref);
-                });
-                highlight (target_node, false);
-            } else {
-                // if dropped in no man's land or server error
-                cancel (dragged_node_ref);
-            };
-            dragged_node.attr ('pointer-events', 'auto');
-            dragged_node = null;
-            target_node = null;
-        });
+                }
+                dragged_node.attr ('pointer-events', 'auto');
+                dragged_node = null;
+                target_node = null;
+            });
+    }
 
     /**
      * Implements the context menu.
@@ -127,65 +131,74 @@ function ($, _, d3, navigator, tools) {
      */
 
     function open_contextmenu (event) {
-		event.preventDefault ();
+        event.preventDefault ();
 
         var xhr = $.getJSON ('splits.json/' + navigator.passage.id);
         xhr.done (function (json) {
-            var splits = _.filter (json.data, function (o) { return o[0][0] != 'z'; } );
-
-            var target_varnew = event.target.dataset.varnew || '';
-            var target_labez  = target_varnew[0];
+            var splits = _.filter (json.data, function (o) { return o[0][0] !== 'z'; });
 
             // build the menu contents
             var menu = $ ('<table class="contextmenu"></table>');
-            var item;
+
+            var data = {};
+            data.target_varnew = event.target.dataset.varnew || '';
+            data.target_labez  = data.target_varnew[0];
 
             // Split
 
-            item = $ ('<tr data-action="split" data-target-varnew="' + target_varnew + '">' +
-                      '<td class="bg_labez" data-labez="' + target_labez + '"></td>' +
-                      '<td>Split ' + target_varnew + '</td></tr>');
-            item.toggleClass ('ui-state-disabled', target_varnew == '?');
-            menu.append (item);
+            var $item = $ (tools.format (
+                '<tr data-action="split" data-target-varnew="{target_varnew}">' +
+                    '<td class="bg_labez" data-labez="{target_labez}"></td>' +
+                    '<td>Split {target_varnew}</td>' +
+                    '</tr>',
+                data
+            ));
+            $item.toggleClass ('ui-state-disabled', data.target_varnew === '?' || data.target_varnew === '*');
+            menu.append ($item);
 
             // Reassign Source or Merge
 
-            item = $ ('<tr><td>-</td><td>-</td></tr>');
-            menu.append (item);
-            _.forEach (splits.concat ([['*', '*'],['?', '?']]), function (value) {
-                var varnew = value[0];
-                var labez = varnew[0];
-                var msg = 'Set Source of ' + target_varnew + ' to ' + varnew;
-                var action = 'move';
-                if (target_labez == labez) {
-                    msg = 'Merge ' + target_varnew + ' into ' + varnew;
-                    action = 'merge';
+            $item = $ ('<tr><td>-</td><td>-</td></tr>');
+            menu.append ($item);
+            _.forEach (splits.concat ([['*', '*'], ['?', '?']]), function (value) {
+                data.varnew = value[0];
+                data.labez  = data.varnew[0];
+                data.msg = 'Set Source of ' + data.target_varnew + ' to ' + data.varnew;
+                data.action = 'move';
+                if (data.target_labez === data.labez) {
+                    data.msg = 'Merge ' + data.target_varnew + ' into ' + data.varnew;
+                    data.action = 'merge';
                 }
-                if (varnew != target_varnew) {
-                    item = $ ('<tr data-varnew="' + varnew + '" data-action="' + action +
-                              '" data-target-varnew = "' + target_varnew + '">' +
-                              '<td class="bg_labez" data-labez="' + labez + '"></td>' +
-                              '<td>' + msg + '</td></tr>');
+                if (data.varnew !== data.target_varnew) {
+                    menu.append ($ (tools.format (
+                        '<tr data-varnew="{varnew}" data-action="{action}" data-target-varnew="{target_varnew}">' +
+                            '<td class="bg_labez" data-labez="{labez}"></td>' +
+                            '<td>{msg}</td>' +
+                            '</tr>',
+                        data
+                    )));
                 }
-                menu.append (item);
             });
 
             // Display the menu
 
             menu.menu ({
-                'select' : function (event, ui) {
+                'select' : function (event2, ui) {
                     var tr = ui.item[0];
-                    console.log ('Selected: ' + $ (tr).text ());
+                    // console.log ('Selected: ' + $ (tr).text ());
 
                     var xhr = $.getJSON ('stemma-edit/' + navigator.passage.id, {
                         'action' : tr.dataset.action,
                         'parent' : tr.dataset.varnew,
-                        'child'  : tr.dataset.targetVarnew
+                        'child'  : tr.dataset.targetVarnew,
                     });
-                    menu.fadeOut (function () { menu.remove () });
                     xhr.done (function (json) {
                         $ (document).trigger ('ntg.passage.changed', json.data);
                     });
+                    xhr.fail (function (xhrobj) {
+                        tools.xhr_alert (xhrobj, event.data.$wrapper);
+                    });
+                    menu.fadeOut (function () { menu.remove (); });
                 },
             });
             tools.svg_contextmenu (menu, event.target);
@@ -214,27 +227,22 @@ function ($, _, d3, navigator, tools) {
             instance.dirty = false;
             instance.$panel.animate ({ 'width' : (instance.graph.bbox.width + 20) + 'px' });
 
-            if (logged_in) {
+            if (is_editor) {
                 // Drag a node.
                 d3.selectAll ('div.panel-local-stemma g.node')
-                    .call (dragListener)
-                    .on ('mouseover', function (d) {
-                        if (dragged_node && d3.select (this) != dragged_node) {
+                    .call (dragListener (instance.$wrapper))
+                    .on ('mouseover', function (dummy_d) {
+                        if (dragged_node && d3.select (this) !== dragged_node) {
                             target_node = d3.select (this);
                             highlight (target_node, true);
                         }
                     })
-                    .on ('mouseout', function (d) {
-                        if (dragged_node && d3.select (this) != dragged_node) {
+                    .on ('mouseout', function (dummy_d) {
+                        if (dragged_node && d3.select (this) !== dragged_node) {
                             highlight (target_node, false);
                             target_node = null;
                         }
-                    })
-                $ ('div.panel-local-stemma g.node').droppable ({
-                    drop: function (event, ui) {
-                        alert ('dropped: ' + $(this).attr ('data-label') + ' on ' + ui.draggable.attr ('data-label'));
-                    }
-                });
+                    });
             }
         });
         changed ();
@@ -258,7 +266,7 @@ function ($, _, d3, navigator, tools) {
 
         instance.graph = graph_module.init (instance.$wrapper, id_prefix);
 
-        if (logged_in) {
+        if (is_editor) {
             instance.$panel.on ('contextmenu', 'g.node', instance, open_contextmenu);
         }
 

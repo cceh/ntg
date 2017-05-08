@@ -14,13 +14,14 @@ define (['jquery',
          'panel',
          'navigator',
          'tools',
+         'd3-common',
          'bootstrap',
          'bootstrap-slider',
          'jquery-ui',
          'css!textflow-css',
         ],
 
-function ($, _, panel, navigator, tools) {
+function ($, _, panel, navigator, tools, d3common) {
     'use strict';
 
     function changed () {
@@ -69,6 +70,77 @@ function ($, _, panel, navigator, tools) {
     }
 
     /**
+     * Open a context menu when right clicked on a node.
+     *
+     * The context menu can be used to reassign the node to a different split.
+     *
+     * @param event
+     */
+
+    function open_contextmenu (event) {
+        event.preventDefault ();
+
+        var xhr = $.getJSON ('splits.json/' + navigator.passage.id);
+        xhr.done (function (json) {
+            var splits = _.filter (json.data, function (o) { return o[0][0] !== 'z'; });
+
+            var instance = event.data;
+            var labez    = event.target.dataset.labez;
+            var varold   = event.target.dataset.varnew;
+            var msid     = event.target.parentNode.dataset.msId;
+
+            // build the menu contents
+            var menu  = $ ('<table class="contextmenu"></table>');
+            menu.append ($ (
+                tools.format (
+                    '<tr class="ui-state-disabled" data-varnew="{varold}">' +
+                        '<td class="bg_labez" data-labez="{varold0}"></td>' +
+                        '<td>{varold}</td>' +
+                        '</tr>',
+                    { 'varold' : varold, 'varold0' : varold[0] }
+                )
+            ));
+            menu.append ($ ('<tr><td>-</td><td>-</td></tr>'));
+
+            _.forEach (splits, function (value) {
+                var varnew = value[0];
+                if (varnew[0] === labez && varnew !== varold) {
+                    menu.append ($ (tools.format (
+                        '<tr data-action="move-subtree" data-varnew="{varnew}">' +
+                            '<td class="bg_labez" data-labez="{varnew0}"></td>' +
+                            '<td>Move subtree to {varnew}</td>' +
+                            '</tr>',
+                        { 'varnew' : varnew, 'varnew0' : varnew[0] })));
+                }
+            });
+
+            menu.menu ({
+                'select' : function (ev, ui) {
+                    var tr     = ui.item[0];
+                    var action = tr.dataset.action;
+
+                    // console.log ('Selected: ' + $ (tr).text ());
+
+                    var xhr = $.getJSON ('stemma-edit/' + navigator.passage.id, {
+                        'action' : action,
+                        'varold' : varold,
+                        'varnew' : tr.dataset.varnew,
+                        'ms_ids' : d3common.bfs (instance.graph.edges, msid),
+                    });
+                    xhr.done (function (json) {
+                        $ (document).trigger ('ntg.passage.changed', json.data);
+                    });
+                    xhr.fail (function (xhrobj) {
+                        tools.xhr_alert (xhrobj, event.data.$wrapper);
+                    });
+                    menu.fadeOut (function () { menu.remove (); });
+                },
+            });
+            tools.svg_contextmenu (menu, event.target);
+        });
+    }
+
+    /**
      * Initialize the module.
      *
      * @function init
@@ -106,44 +178,11 @@ function ($, _, panel, navigator, tools) {
             'formatter'       : panel.connectivity_formatter,
         });
 
-        if (logged_in) {
+        if (is_editor) {
             instance.$panel.on ('contextmenu', 'g.node', instance, open_contextmenu);
         }
 
         return instance;
-    }
-
-    /**
-     * Open a context menu when right clicked on a node.
-     *
-     * The context menu can be used to reassign the node to a different split.
-     *
-     * @param event
-     */
-
-    function open_contextmenu (event) {
-		event.preventDefault ();
-
-        var labez = event.target.dataset.labez;
-
-        // build the menu contents
-        var menu = $ ('<table class="contextmenu"></table>');
-        _.forEach (navigator.passage.splits, function (value) {
-            var varnew = value[0];
-            if (varnew[0] == labez)
-                menu.append ($ ('<tr><td class="bg_labez" data-labez="' +
-                                varnew[0] + '"></td><td>Move subtree to ' +
-                                varnew + '</td></tr>'));
-        });
-
-        menu.menu ({
-            'select' : function (event, ui) {
-                menu.fadeOut (function () { menu.remove () });
-                console.log ('selected' + ui.item.text ());
-            },
-        });
-
-        tools.svg_contextmenu (menu, event.target);
     }
 
     return {

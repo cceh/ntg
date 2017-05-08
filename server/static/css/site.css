@@ -12,3 +12,6 @@ div.bs-docs-header h1 span.appname {
 .alert {
   margin-top: 20px;
 }
+.alert.alert-margins {
+  margin: 20px 15px;
+}

@@ -123,7 +123,7 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
         });
 
         // Click on canvas to close context menus
-        $ (document).on ('click', function (event) {
+        $ (document).on ('click', function (dummy_event) {
             $ ('table.contextmenu').fadeOut (function () { $ (this).remove (); });
         });
 

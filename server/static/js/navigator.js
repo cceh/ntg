@@ -22,15 +22,15 @@ define (['jquery', 'lodash', 'urijs/URI', 'jquery-ui', 'css!navigator-css'], fun
             this._super (ul, items);
             ul.addClass ('dropdown-menu-table'); // give it the bootstrap look
         },
-	    '_renderItem' : function (table, item) {
-		    var tr = $ ('<tr></tr>').data ('item.autocomplete', item);
+        '_renderItem' : function (table, item) {
+            var tr = $ ('<tr></tr>').data ('item.autocomplete', item);
             tr.append ($ ('<td class="menu-label">' + item.label + '</td>'));
             if (_.has (item, 'description')) {
                 tr.append ($ ('<td class="menu-description">' + item.description + '</td>'));
             }
-			tr.appendTo (table);
+            tr.appendTo (table);
             return tr;
-	    },
+        },
     });
 
     /**
@@ -111,31 +111,34 @@ define (['jquery', 'lodash', 'urijs/URI', 'jquery-ui', 'css!navigator-css'], fun
         $ ('form.passage-selector').on ('click', 'button', on_nav);
         $ ('form.passage-selector').on ('submit', on_nav);
 
-        $ ('form input[data-autocomplete]').tableautocomplete ( {
+        $ ('form input[data-autocomplete]').tableautocomplete ({
             'source'    : suggest,
             'minLength' : 0,
             'position'  : { 'my' : 'left top', 'at' : 'left bottom+2', 'collision' : 'flipfit' },
-        }).on ('click', function () {
-            $(this).tableautocomplete ('search');
-        }).on ('tableautocompletechange', function () {
-            $(this).nextAll ('input').val ('');
-        }).on ('tableautocompleteselect', function (event, ui) {
-            var $this = $(this);
-            $this.nextAll ('input').val ('');
-            if ($this.attr ('data-autocomplete') == 'word') {
-                // give the control a chance to update the <input> before we call on_nav ()
-                window.setTimeout (function () {
-                    on_nav (event);
-                });
-            }
-        });
+        })
+            .on ('click', function () {
+                $ (this).tableautocomplete ('search');
+            })
+            .on ('tableautocompletechange', function () {
+                $ (this).nextAll ('input').val ('');
+            })
+            .on ('tableautocompleteselect', function (event, dummy_ui) {
+                var $this = $ (this);
+                $this.nextAll ('input').val ('');
+                if ($this.attr ('data-autocomplete') === 'word') {
+                    // give the control a chance to update the <input> before we call on_nav ()
+                    window.setTimeout (function () {
+                        on_nav (event);
+                    });
+                }
+            });
 
         $ (document).on ('ntg.passage.changed', function (event, data) {
             var $form = $ ('form.passage-selector');
             $form.find ('input[name="pass_id"]').val (data.id);
 
             $ ('form input[data-autocomplete]').each (function () {
-                var $this = $(this);
+                var $this = $ (this);
                 $this.val (data[$this.attr ('data-autocomplete')]);
             });
             $ ('h1 span.passage').text (data.hr);
@@ -144,8 +147,8 @@ define (['jquery', 'lodash', 'urijs/URI', 'jquery-ui', 'css!navigator-css'], fun
             // Fix 'next page' parameter in login / logout links
             var $links = $ ('a.user_login_link, a.user_logout_link');
             $links.each (function () {
-                var $this = $(this);
-                $this.attr ('href', urijs ($this.attr ('href')).query ( { 'next' : window.location } ));
+                var $this = $ (this);
+                $this.attr ('href', urijs ($this.attr ('href')).query ({ 'next' : window.location }));
             });
         });
 

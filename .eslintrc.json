@@ -12,8 +12,10 @@
         "jquery"  : true
     },
     "globals" : {
-        "requirejs" : false,
-        "server_start_time" : true
+        "requirejs"    : false,
+        "server_start_time" : true,
+        "is_editor"    : true,
+		"is_logged_in" : true
     },
     "rules" : {
         // restrict airbnb

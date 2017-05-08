@@ -46,6 +46,8 @@ function ($, d3, d3_common, _) {
             // shrinkwrap + accomodate for the thick borders of circles
             instance.bbox = d3_common.inflate_bbox (graph.attrs.graph.attrs.bbox, 3);
 
+            instance.edges = graph.edges;
+
             var node_width  = graph.attrs.node.attrs.width;     // in inches
             var node_height = graph.attrs.node.attrs.height;    // in inches
             var font_size   = graph.attrs.graph.attrs.fontsize; // in points
