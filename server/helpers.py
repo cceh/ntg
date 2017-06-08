@@ -292,7 +292,8 @@ class Passage (object):
 
 
 def get_locale ():
-    return flask.request.accept_languages.best_match (LANGUAGES.keys ())
+    return flask.request.accept_languages.best_match ('en')
+    # return flask.request.accept_languages.best_match (LANGUAGES.keys ())
 
 
 def make_json_response (json = None, status = 200, message = None):
