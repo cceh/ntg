@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: NTG 2.0\n"
 "Report-Msgid-Bugs-To: marcello@perathoner.de\n"
 "POT-Creation-Date: 2017-01-17 14:49+0100\n"
-"PO-Revision-Date: 2017-01-17 14:49+0100\n"
+"PO-Revision-Date: 2017-06-08 11:47+0200\n"
 "Last-Translator: Marcello Perathoner <marcello@perathoner.de>\n"
 "Language-Team: German <>\n"
 "Language: de\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Gtranslator 2.91.7\n"
+"X-Generator: Poedit 1.8.11\n"
 
 #: server/server.py:39 server/server.py:41 server/server.py:43
 #: server/server.py:44
@@ -66,7 +66,7 @@ msgstr "Lokales Stemma"
 
 #: server/templates/coherence.html:48 server/templates/coherence.html:59
 msgid "Coherence at Variant Passages"
-msgstr "Kohärenz an Varianten Stellen"
+msgstr "Kohärenz an Variierten Stellen"
 
 #: server/templates/coherence.html:48
 msgid "(GraphViz)"
@@ -101,16 +101,12 @@ msgid "Witness"
 msgstr "Zeuge"
 
 #: server/templates/comparison.html:36
-msgid ""
-"Enter the Gregory-Aland no. of the first witness ('A' for the initial text)."
-msgstr ""
-"Eingabe der Gregory-Aland-Nr. des ersten Zeugen ('A' für den Ausgangstext)."
+msgid "Enter the Gregory-Aland no. of the first witness ('A' for the initial text)."
+msgstr "Eingabe der Gregory-Aland-Nr. des ersten Zeugen ('A' für den Ausgangstext)."
 
 #: server/templates/comparison.html:39
-msgid ""
-"Enter the Gregory-Aland no. of the second witness ('A' for the initial text)."
-msgstr ""
-"Eingabe der Gregory-Aland-Nr. des zweiten Zeugen ('A' für den Ausgangstext)."
+msgid "Enter the Gregory-Aland no. of the second witness ('A' for the initial text)."
+msgstr "Eingabe der Gregory-Aland-Nr. des zweiten Zeugen ('A' für den Ausgangstext)."
 
 #: server/templates/comparison.html:42
 msgid "Start the comparison."

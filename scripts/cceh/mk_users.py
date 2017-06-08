@@ -59,7 +59,7 @@ if __name__ == '__main__':
     db.Base3.metadata.drop_all   (dba.engine)
     db.Base3.metadata.create_all (dba.engine)
 
-    pwd_context = CryptContext (schemes = [ config['SECURITY_PASSWORD_HASH'] ])
+    pwd_context = CryptContext (schemes = [ config['USER_PASSWORD_HASH'] ])
 
     with dba.engine.begin () as src:
         execute (src, "INSERT INTO role (id, name, description) VALUES (1, 'admin',  'Administrator')", {})
