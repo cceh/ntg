@@ -53,12 +53,12 @@ mail = flask_mail.Mail ()
 
 @static_app.endpoint ('index')
 def index ():
-    return flask.render_template ('index.html')
+    return flask.redirect ('/ph4/', code = 302)
 
 
-@app.endpoint ('links')
-def links ():
-    return flask.render_template ('links.html')
+@app.endpoint ('acts-phase4')
+def acts_phase4 ():
+    return flask.render_template ('acts-phase4.html')
 
 
 @app.endpoint ('passage.json')
@@ -989,7 +989,7 @@ if __name__ == "__main__":
         sub_app.register_blueprint (editor.app)
 
         sub_app.url_map = Map ([
-            Rule ('/',                                            endpoint = 'links'),
+            Rule ('/',                                            endpoint = 'acts-phase4'),
             Rule ('/coherence',                                   endpoint = 'coherence'),
             Rule ('/comparison',                                  endpoint = 'comparison'),
             Rule ('/comparison.csv',                              endpoint = 'comparison.csv'),

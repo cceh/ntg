@@ -43,8 +43,6 @@
             <a href="{{ url_for('user.profile') }}">{{ current_user.username }}</a>
             &nbsp; | &nbsp;
             <a class="user_logout_link" href="{{ url_for('user.logout') }}">Sign out</a>
-          {% else %}
-            <a class="user_login_link" href="{{ url_for('user.login') }}">Sign in</a>
           {% endif %}
           </div>
         </div>

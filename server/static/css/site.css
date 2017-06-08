@@ -9,6 +9,18 @@ div.bs-docs-header h1 {
 div.bs-docs-header h1 span.appname {
   float: right;
 }
+a.biglink {
+  display: block;
+  font-size: 150%;
+  margin: 1em 0;
+}
+div.logos {
+  margin-top: 2em;
+}
+div.logos img {
+  height: 100px;
+  padding-right: 1em;
+}
 .alert {
   margin-top: 20px;
 }
