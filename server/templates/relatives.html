@@ -23,7 +23,7 @@
       {# actually newer, older because the row is associated with the target ms #}
       <td class="older">{{r.newer}}:{{r.older}}:{{r.unclear}}:{{r.norel}}</td>
       <td class="labez">{{r.varnew}} {{r.labezsuf}}
-      {%- if mt.labez == r.labez and mt.labezsuf == r.labezsuf: %} (MT){% endif -%}
+      {%- if (mt.labez == r.labez) and (mt.labezsuf == r.labezsuf) and (mt.labez[0] != 'z'): %} (MT){% endif -%}
       </td>
     </tr>
     {% endfor %}
