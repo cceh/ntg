@@ -86,7 +86,7 @@ def stemma_edit (passage_or_id):
     child  = request.args.get ('child')  or ''
     varold = request.args.get ('varold') or ''
     varnew = request.args.get ('varnew') or ''
-    ms_ids = set (request.args.getlist ('ms_ids[]') or [])
+    ms_ids = set ([x + 1 for x in request.args.getlist ('ms_ids[]') or []])
 
     if (not RE_VALID_VARNEW.match (parent) or not RE_VALID_VARNEW.match (child)
         or action not in ('split', 'merge', 'move', 'move-subtree')):
