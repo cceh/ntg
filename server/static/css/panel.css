@@ -7,6 +7,9 @@ div.btn-toolbar {
 div.btn-toolbar > div.btn-group {
   margin-top: 5px;
 }
+div.btn-toolbar > div.btn-group.coherence-dot {
+  float: right;
+}
 div.dropdown-menu div.btn-group {
   margin-top: 0;
 }

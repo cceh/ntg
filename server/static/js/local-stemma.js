@@ -1,6 +1,5 @@
 /**
- * This module is just a wrapper around d3stemma for symmetry with the textflow
- * module.  Implements the local stemma drag-and-drop editing.
+ * This module implements the local stemma drag-and-drop editing.
  *
  * @module local-stemma
  * @author Marcello Perathoner
@@ -221,9 +220,11 @@ function ($, _, d3, d3common, navigator, tools) {
         instance.data.width = instance.$wrapper.width ();                            // in px
         instance.data.fontsize = parseFloat (instance.$wrapper.css ('font-size'));   // in px
 
-        instance.graph.load_dot (
-            'stemma.dot/' + passage.id + '?' + $.param (_.pick (instance.data, params))
-        ).done (function () {
+        var url = 'stemma.dot/' + passage.id + '?' + $.param (_.pick (instance.data, params));
+        var name = $.trim (instance.$panel.find ('.panel-caption').text ());
+        instance.$toolbar.find ('a[name="dot"]').attr ('href', url).attr ('download', name + '.dot');
+
+        instance.graph.load_dot (url).done (function () {
             instance.dirty = false;
             instance.$panel.animate ({ 'width' : (instance.graph.bbox.width + 20) + 'px' });
 

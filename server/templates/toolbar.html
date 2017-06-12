@@ -123,6 +123,14 @@
       </div>
     </div>
     {% endif %}
+
+    {% if mode in ('stemma', 'global', 'local', 'variant') %}
+    <div class="coherence-dot btn-group btn-group-xs" data-toggle="buttons">
+      <a type="button" class="btn btn-primary" name="dot" data-opt="dot"
+         title="{{_('Download graph in GraphViz .dot format')}}">{{_('DOT')}}</a>
+    </div>
+    {% endif %}
+
   </div>
 </div>
 

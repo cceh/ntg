@@ -269,7 +269,7 @@ define ([
     }
 
     /**
-     * Parse a .dot file.
+     * Parse a .dot file into lists of subgraphs, nodes, edges, and graph attributes.
      *
      * @function dot
      *

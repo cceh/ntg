@@ -48,12 +48,13 @@ function ($, _, panel, navigator, tools, d3common) {
         instance.data.width = instance.$wrapper.width ();                            // in px
         instance.data.fontsize = parseFloat (instance.$wrapper.css ('font-size'));   // in px
 
-        instance.graph.load_dot (
-            'textflow.dot/' + passage.id + '?' + $.param (_.pick (instance.data, params))
-        ).done (function () {
+        var url = 'textflow.dot/' + passage.id + '?' + $.param (_.pick (instance.data, params));
+        instance.graph.load_dot (url).done (function () {
             instance.dirty = false;
             instance.$panel.animate ({ 'width' : (instance.graph.bbox.width + 20) + 'px' });
         });
+        var name = $.trim (instance.$panel.find ('.panel-caption').text ());
+        instance.$toolbar.find ('a[name="dot"]').attr ('href', url).attr ('download', name + '.dot');
 
         var p1 = panel.load_labez_dropdown (
             this.$toolbar.find ('div.toolbar-labez'), passage.id, 'labez', []);
@@ -61,6 +62,7 @@ function ($, _, panel, navigator, tools, d3common) {
             this.$toolbar.find ('div.toolbar-hyp_a'), passage.id, 'hyp_a', [['A', 'A']]);
         var p3 = panel.load_chapter_dropdown (
             this.$toolbar.find ('div.toolbar-chapter'), 'chapter', [['0', 'All'], ['x', 'This']]);
+
         $.when (p1, p2, p3).done (function () {
             panel.set_toolbar_buttons (instance.$toolbar, instance.data);
             // Maybe we changed chapter while navigating.  Set a new chapter.
