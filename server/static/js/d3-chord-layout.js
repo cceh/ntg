@@ -215,7 +215,7 @@ function ($, d3, d3_common, _) {
                     return 'link fg_labez ' +
                         instance.id_prefix + 'sid-' + d.elems[0].id + ' ' +
                         instance.id_prefix + 'tid-' + d.elems[1].id +
-                        (d.attrs.broken ? ' broken' : '');
+                        (/dashed/.test (d.attrs.style) ? ' dashed' : '');
                 })
                 .attr ('marker-end', 'url(#' + instance.id_prefix + 'triangle)')
                 /* .merge (graph.edges) */

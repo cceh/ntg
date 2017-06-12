@@ -309,7 +309,7 @@ DOT_SKELETON = """
 strict digraph G {{
         graph [nodesep={nodesep},
                ordering=out,
-               rankdir=BT,
+               rankdir=TB,
                ranksep={ranksep},
                size={size:.2f},
                fontname="LiberationSans-Regular", // like Arial
@@ -321,14 +321,15 @@ strict digraph G {{
               width=0.3,
               margin=0.005
         ];
-        edge [arrowhead=none,
+        edge [arrowhead=normal,
               arrowtail=none,
-              headclip=true,
-              tailclip=true,
-              labelangle=0.0,
-              labeldistance=1.5,
+              labelangle=-15.0,
+              labeldistance=2.0,
         ];
 """
+
+def clip (lo, x, hi):
+    return max (lo, min (hi, x))
 
 
 def dot_skeleton (width = 960.0, fontsize = 10.0, ranksep = 0.4, nodesep = 0.1):
@@ -339,6 +340,12 @@ def dot_skeleton (width = 960.0, fontsize = 10.0, ranksep = 0.4, nodesep = 0.1):
 
     # All input to GraphViz assumes 72pt = 1 inch and 72 dpi regardless of the
     # value of dpi. dpi is used only for bitmap and svg output.
+
+    # sanitize input
+    width    = clip (10.0, width,   1600.0)
+    fontsize = clip ( 6.0, fontsize,  72.0)
+    ranksep  = clip ( 0.0, ranksep,   10.0)
+    nodesep  = clip ( 0.0, nodesep,   10.0)
 
     return [DOT_SKELETON.format (
         ranksep = ranksep,
@@ -391,6 +398,7 @@ def nx_to_dot_subgraphs (nxg, field, width = 960.0, fontsize = 10.0):
     sorted_nodes = sorted (nxg, key = lambda n: (nxg.node[n][field], nxg.node[n]['hsnr']))
     for key, nodes_for_key in itertools.groupby (sorted_nodes, key = lambda n: nxg.node[n][field]):
         dot.append ("subgraph cluster_%s {" % key)
+        dot.append ("style=rounded")
         dot.append ("labeljust=l")
         dot.append ("labelloc=c")
         dot.append ("rank=%s" % ('source' if key in ('a', 'a1') else 'same'))

@@ -47,7 +47,7 @@ path, line, text {
         stroke-width: 2px;
         stroke-opacity: @link-opacity;
         fill: none;
-        &.broken {
+        &.dashed {
             stroke-dasharray: 4 4;
         }
         &.hover {
@@ -145,8 +145,10 @@ rect.subgraph {
     stroke: @panel-default-border;
     stroke-width: 1px;
     fill: @panel-default-heading-bg;
-    rx: 5px;
-    ry: 5px;
+    &.rounded {
+        rx: 5px;
+        ry: 5px;
+    }
 }
 
 /* wrapper */

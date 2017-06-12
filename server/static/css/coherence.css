@@ -38,9 +38,9 @@ text.link {
   stroke-opacity: 0.6;
   fill: none;
 }
-path.link.broken,
-line.link.broken,
-text.link.broken {
+path.link.dashed,
+line.link.dashed,
+text.link.dashed {
   stroke-dasharray: 4 4;
 }
 path.link.hover,
@@ -119,6 +119,8 @@ rect.subgraph {
   stroke: #ddd;
   stroke-width: 1px;
   fill: #f5f5f5;
+}
+rect.subgraph.rounded {
   rx: 5px;
   ry: 5px;
 }

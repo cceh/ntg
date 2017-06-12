@@ -74,6 +74,7 @@ function ($, d3, d3_common, _) {
             });
 
             var g = svg.append ('g')
+                // shift a little bit to avoid 'shaving' nodes at the view boundary
                 .attr ('transform', 'translate(' + -instance.bbox.x + ',' + -instance.bbox.y + ')');
 
             // draw the subgraphs: a rectangle with a label
@@ -90,7 +91,9 @@ function ($, d3, d3_common, _) {
                 .attr ('y',      function (d) { return d.bbox.y; })
                 .attr ('width',  function (d) { return d.bbox.width; })
                 .attr ('height', function (d) { return d.bbox.height; })
-                .attr ('class', 'subgraph');
+                .attr ('class',  function (d) {
+                    return 'subgraph' + (/rounded/.test (d.style) ? ' rounded' : '');
+                });
 
             subgraph.append ('text')
                 .attr ('class', 'subgraph')
@@ -124,7 +127,7 @@ function ($, d3, d3_common, _) {
                     return 'link fg_labez ' +
                         instance.id_prefix + 'sid-' + d.elems[0].id + ' ' +
                         instance.id_prefix + 'tid-' + d.elems[1].id +
-                        (d.attrs.broken ? ' broken' : '');
+                        (/dashed/.test (d.attrs.style) ? ' dashed' : '');
                 })
                 .attr ('marker-end', 'url(#' + instance.id_prefix + 'triangle)')
                 .attr ('d', function (d) { return d3_common.parse_path_svg (d.attrs.pos); });

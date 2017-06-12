@@ -221,8 +221,11 @@ function ($, _, d3, d3common, navigator, tools) {
         instance.data.fontsize = parseFloat (instance.$wrapper.css ('font-size'));   // in px
 
         var url = 'stemma.dot/' + passage.id + '?' + $.param (_.pick (instance.data, params));
+        var png_url = 'stemma.png/' + passage.id + '?' + $.param (_.pick (instance.data, params));
+
         var name = $.trim (instance.$panel.find ('.panel-caption').text ());
         instance.$toolbar.find ('a[name="dot"]').attr ('href', url).attr ('download', name + '.dot');
+        instance.$toolbar.find ('a[name="png"]').attr ('href', png_url);
 
         instance.graph.load_dot (url).done (function () {
             instance.dirty = false;

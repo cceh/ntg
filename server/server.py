@@ -432,8 +432,7 @@ def remove_z_leaves (G, group_field):
             G.remove_node (n)
 
 
-@app.endpoint ('textflow.dot')
-def textflow_dot (passage_or_id):
+def textflow (passage_or_id):
     """ Output a stemma of manuscripts. """
 
     varnew       = request.args.get ('labez') or ''
@@ -655,14 +654,27 @@ def textflow_dot (passage_or_id):
                 for p in pred:
                     if attrs['varnew'] != G.node[p]['varnew']:
                         attrs['label'] = "%s: %s" % (attrs['varnew'], attrs['hs'])
-                        G.edge[p][n]['broken'] = 'true'
+                        G.edge[p][n]['style'] = 'dashed'
 
     if var_only:
         dot = helpers.nx_to_dot_subgraphs (G, group_field, width, fontsize)
     else:
         dot = helpers.nx_to_dot (G, width, fontsize)
+    return dot
+
+
+@app.endpoint ('textflow.dot')
+def textflow_dot (passage_or_id):
+    dot = textflow (passage_or_id)
     dot = tools.graphviz_layout (dot)
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
+
+
+@app.endpoint ('textflow.png')
+def textflow_png (passage_or_id):
+    dot = textflow (passage_or_id)
+    png = tools.graphviz_layout (dot, format = 'png')
+    return flask.Response (png, mimetype = 'image/png')
 
 
 def csvify (fields, rows):
@@ -893,8 +905,7 @@ def local_stemma (passage_or_id):
         return helpers.local_stemma_to_nx (conn, passage)
 
 
-@app.endpoint ('stemma.dot')
-def stemma_dot (passage_or_id):
+def stemma (passage_or_id):
     """Serve a local stemma in dot format.
 
     A local stemma is a DAG (directed acyclic graph).  The layout of the DAG is
@@ -919,8 +930,21 @@ def stemma_dot (passage_or_id):
     fontsize = float (request.args.get ('fontsize') or 10.0)
 
     dot = helpers.nx_to_dot (local_stemma (passage_or_id), width, fontsize, nodesep = 0.2)
+    return dot
+
+
+@app.endpoint ('stemma.dot')
+def stemma_dot (passage_or_id):
+    dot = stemma (passage_or_id)
     dot = tools.graphviz_layout (dot)
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
+
+
+@app.endpoint ('stemma.png')
+def stemma_png (passage_or_id):
+    dot = stemma (passage_or_id)
+    png = tools.graphviz_layout (dot, format = 'png')
+    return flask.Response (png, mimetype = 'image/png')
 
 
 # Turns an usafe absolute URL into a safe relative URL by removing the scheme and the hostname
@@ -1006,7 +1030,9 @@ if __name__ == "__main__":
             Rule ('/apparatus.json/<passage_or_id>',              endpoint = 'apparatus.json'),
             Rule ('/attestation.json/<passage_or_id>',            endpoint = 'attestation.json'),
             Rule ('/stemma.dot/<passage_or_id>',                  endpoint = 'stemma.dot'),
+            Rule ('/stemma.png/<passage_or_id>',                  endpoint = 'stemma.png'),
             Rule ('/textflow.dot/<passage_or_id>',                endpoint = 'textflow.dot'),
+            Rule ('/textflow.png/<passage_or_id>',                endpoint = 'textflow.png'),
             Rule ('/stemma-edit/<passage_or_id>',                 endpoint = 'stemma-edit'),
         ])
 

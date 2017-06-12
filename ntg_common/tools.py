@@ -183,20 +183,22 @@ def tabulate (res):
     return ''.join (a)
 
 
-def graphviz_layout (dot):
-    """ Call the GraphViz dot program to precompute the graph layout. """
+def graphviz_layout (dot, format = 'dot'):
+    """Call the GraphViz dot program to generate an image but mostly to precompute
+    the graph layout.
 
-    cmdline = ['dot', '-Tdot']
+    """
+
+    cmdline = ['dot', '-T%s' % format]
 
     p = subprocess.Popen (
         cmdline,
         stdin  = subprocess.PIPE,
         stdout = subprocess.PIPE,
-        stderr = subprocess.PIPE,
-        universal_newlines = True)
+        stderr = subprocess.PIPE)
 
     try:
-        outs, errs = p.communicate (dot, timeout = 15)
+        outs, errs = p.communicate (dot.encode ('utf-8'), timeout = 15)
     except subprocess.TimeoutExpired:
         p.kill ()
         outs, errs = p.communicate ()

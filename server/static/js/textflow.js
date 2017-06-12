@@ -49,12 +49,14 @@ function ($, _, panel, navigator, tools, d3common) {
         instance.data.fontsize = parseFloat (instance.$wrapper.css ('font-size'));   // in px
 
         var url = 'textflow.dot/' + passage.id + '?' + $.param (_.pick (instance.data, params));
+        var png_url = 'textflow.png/' + passage.id + '?' + $.param (_.pick (instance.data, params));
         instance.graph.load_dot (url).done (function () {
             instance.dirty = false;
             instance.$panel.animate ({ 'width' : (instance.graph.bbox.width + 20) + 'px' });
         });
         var name = $.trim (instance.$panel.find ('.panel-caption').text ());
         instance.$toolbar.find ('a[name="dot"]').attr ('href', url).attr ('download', name + '.dot');
+        instance.$toolbar.find ('a[name="png"]').attr ('href', png_url);
 
         var p1 = panel.load_labez_dropdown (
             this.$toolbar.find ('div.toolbar-labez'), passage.id, 'labez', []);

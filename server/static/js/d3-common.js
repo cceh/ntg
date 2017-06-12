@@ -17,7 +17,7 @@ define ([
     var dot_parser = peg.generate (parser_src);
 
     /**
-     * Conversion factor from standard .dot resoolution to standard css resolution.
+     * Conversion factor from standard .dot resolution to standard css resolution.
      *
      * Why 96? See: https://www.w3.org/TR/css3-values/#reference-pixel
      *
@@ -189,9 +189,13 @@ define ([
      */
     function parse_pt (commasep) {
         var pt = commasep.split (',');
+        if (pt[0] == 's' || pt[0] == 'e') {
+            // remove start, end marker
+            pt = pt.slice (1);
+        }
         return {
             'x' : parseFloat (pt[0]) * dot2css,
-            'y' : parseFloat (pt[1]) * dot2css,
+            'y' : parseFloat (pt[1]) * -dot2css,
         };
     }
 
@@ -200,17 +204,25 @@ define ([
      *
      * @function parse_bbox
      *
+     * From the .dot format docs: rect: "%f,%f,%f,%f" The rectangle
+     * llx,lly,urx,ury gives the coordinates, in points, of the lower-left
+     * corner (llx,lly) and the upper-right corner (urx,ury).
+     *
      * @param commasep {string} The bbox as comma-separated values.
      *
      * @return {Object} The bbox as dictionary { x, y, width, height }
      */
     function parse_bbox (commasep) {
         var bb = commasep.split (',');
+        var llx = parseFloat (bb[0]) * dot2css;
+        var lly = parseFloat (bb[1]) * dot2css;
+        var urx = parseFloat (bb[2]) * dot2css;
+        var ury = parseFloat (bb[3]) * dot2css;
         return {
-            'x'      : parseFloat (bb[0] * dot2css),
-            'y'      : parseFloat (bb[1] * dot2css),
-            'width'  : (parseFloat (bb[2]) - parseFloat (bb[0])) * dot2css,
-            'height' : (parseFloat (bb[3]) - parseFloat (bb[1])) * dot2css,
+            'x'      : llx,
+            'y'      : -ury,
+            'width'  : urx - llx,
+            'height' : ury - lly,
         };
     }
 
@@ -224,7 +236,7 @@ define ([
      * @return {Array} The path as array of objects  { x, y }
      */
     function parse_path (path) {
-        path = path.replace ('\\\n', '');
+        path = $.trim (path.replace ('\\\n', ''));
         return _.map (path.split (/\s+/), function (point) {
             return parse_pt (point);
         });
@@ -241,12 +253,24 @@ define ([
      */
 
     function parse_path_svg (path) {
-        path = parse_path (path);
-        var s = 'M' + path[0].x + ',' + path[0].y + 'C';
+        var ppath = parse_path (path);
+        var prefix = 'M';
+        var suffix = '';
 
-        return s + _.map (path.slice (1), function (pt) {
+        if (/e,/.test (path)) {
+            suffix = 'L' + ppath[0].x + ',' + ppath[0].y;
+            ppath = ppath.slice (1);
+        }
+        if (/s,/.test (path)) {
+            prefix += ppath[0].x + ',' + ppath[0].y + 'L';
+            ppath = ppath.slice (1);
+        }
+        prefix += ppath[0].x + ',' + ppath[0].y + 'C';
+        ppath = ppath.slice (1);
+
+        return prefix + _.map (ppath, function (pt) {
             return pt.x + ',' + pt.y;
-        }).join (' ');
+        }).join (' ') + suffix;
     }
 
     /**
