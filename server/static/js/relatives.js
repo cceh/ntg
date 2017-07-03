@@ -90,7 +90,7 @@ function ($, _, d3, d3c, tools, panel, nav) {
             'limit'     : '10',
             'include'   : [],
             'fragments' : [],
-            'mode'      : 'rec',
+            'mode'      : 'sim',
             'labez'     : 'all+lac',
         });
 

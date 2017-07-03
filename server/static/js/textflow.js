@@ -165,7 +165,7 @@ function ($, _, panel, navigator, tools, d3common) {
             'chapter'      : '0',
             'include'      : [],
             'fragments'    : [],
-            'mode'         : 'rec',
+            'mode'         : 'sim',
             'hyp_a'        : 'A',
             'var_only'     : var_only ? ['var_only'] : [],
             'splits'       : [],

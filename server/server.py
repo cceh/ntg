@@ -280,7 +280,7 @@ def relatives_html (hs_hsnr_id, passage_or_id):
     chapter   = request.args.get ('chapter') or 0
     limit     = int (request.args.get ('limit') or 10)
     labez     = request.args.get ('labez') or 'all'
-    mode      = request.args.get ('mode') or 'rec'
+    mode      = request.args.get ('mode') or 'sim'
     include   = request.args.getlist ('include[]') or []
     fragments = request.args.getlist ('fragments[]') or []
 
@@ -460,7 +460,7 @@ def textflow (passage_or_id):
     connectivity = int (request.args.get ('connectivity') or 10)
     width        = float (request.args.get ('width') or 0.0)
     fontsize     = float (request.args.get ('fontsize') or 10.0)
-    mode         = request.args.get ('mode') or 'rec'
+    mode         = request.args.get ('mode') or 'sim'
 
     include      = set (request.args.getlist ('include[]') or ['NONE'])
     fragments    = request.args.getlist ('fragments[]') or []
