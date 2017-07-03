@@ -26,7 +26,8 @@ from flask import request, current_app
 import flask_babel
 from flask_babel import gettext as _, ngettext as n_, lazy_gettext as l_
 import flask_user
-from flask_user import login_required
+from flask_user import login_required, roles_required
+import flask_login
 import flask_mail
 import networkx as nx
 
@@ -49,6 +50,22 @@ user_model = security.declare_user_model (dba)
 db_adapter = flask_user.SQLAlchemyAdapter (dba, security.User)
 user_manager = flask_user.UserManager (db_adapter)
 mail = flask_mail.Mail ()
+
+SHAPES = {
+    'a' : 'ellipse',
+    'b' : 'box',
+    'c' : 'pentagon',
+    'd' : 'hexagon',
+    'e' : 'septagon',
+    'f' : 'octagon',
+    'g' : 'diamond',
+    'h' : 'trapezium',
+    'i' : 'parallelogram',
+    'j' : 'house',
+    'k' : 'invtrapezium',
+    'l' : 'invparallelogram',
+    'm' : 'invhouse',
+}
 
 
 @static_app.endpoint ('index')
@@ -95,7 +112,9 @@ def splits_json (passage_or_id):
 
 
 def f_map_word (t):
-    if t.versanf != t.versend:
+    if t.kapanf != t.kapend:
+        t2 = "%s-%s:%s/%s" % (t.wortanf, t.kapend, t.versend, t.wortend)
+    elif t.versanf != t.versend:
         t2 = "%s-%s/%s" % (t.wortanf, t.versend, t.wortend)
     elif t.wortanf != t.wortend:
         t2 = "%s-%s" % (t.wortanf, t.wortend)
@@ -119,7 +138,7 @@ def suggest_json ():
     chapter = int (request.args.get ('chapter') or '0')
     verse   = int (request.args.get ('verse') or '0')
 
-    Words = collections.namedtuple ('Words', 'kapanf, versanf, wortanf, versend, wortend, lemma')
+    Words = collections.namedtuple ('Words', 'kapanf, versanf, wortanf, kapend, versend, wortend, lemma')
 
     res = []
     with current_app.config.dba.engine.begin () as conn:
@@ -140,7 +159,7 @@ def suggest_json ():
             """, dict (parameters, chapter = chapter, term = term))
         elif field == 'word':
             res = execute (conn, """
-            SELECT DISTINCT kapanf, versanf, wortanf, versend, wortend, lemma
+            SELECT DISTINCT kapanf, versanf, wortanf, kapend, versend, wortend, lemma
             FROM {pass}
             WHERE kapanf = :chapter AND versanf = :verse AND wortanf::varchar ~ :term
             ORDER BY wortanf, versend, wortend
@@ -560,6 +579,7 @@ def textflow (passage_or_id):
                 attrs['varid']  = hyp_a[0]
                 attrs['varnew'] = hyp_a
                 attrs['labez']  = hyp_a[0]
+            # FIXME: attrs['shape'] = SHAPES.get (attrs['labez'], SHAPES['a'])
             G.add_node (ms.ms_id, attrs)
 
         # Step 1: A node that has ancestors within the same attestation keeps
@@ -897,14 +917,6 @@ def attestation_json (passage_or_id):
         })
 
 
-def local_stemma (passage_or_id):
-    """Return a local stemma as nx graph."""
-
-    with current_app.config.dba.engine.begin () as conn:
-        passage = Passage (conn, passage_or_id)
-        return helpers.local_stemma_to_nx (conn, passage)
-
-
 def stemma (passage_or_id):
     """Serve a local stemma in dot format.
 
@@ -929,8 +941,13 @@ def stemma (passage_or_id):
     width    = float (request.args.get ('width') or 0.0)
     fontsize = float (request.args.get ('fontsize') or 10.0)
 
-    dot = helpers.nx_to_dot (local_stemma (passage_or_id), width, fontsize, nodesep = 0.2)
-    return dot
+    with current_app.config.dba.engine.begin () as conn:
+        passage = Passage (conn, passage_or_id)
+        nx = helpers.local_stemma_to_nx (
+            conn, passage, flask_login.current_user.has_role ('editor')
+        )
+        dot = helpers.nx_to_dot (nx, width, fontsize, nodesep = 0.2)
+        return dot
 
 
 @app.endpoint ('stemma.dot')

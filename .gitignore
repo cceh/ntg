@@ -5,6 +5,7 @@ bower_components/
 node_modules/
 jsdoc/
 output/
+papyrus/
 *pg_dump*
 pip-freeze.txt
 server/templates/schemas.xml

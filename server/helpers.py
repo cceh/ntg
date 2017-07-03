@@ -329,7 +329,7 @@ strict digraph G {{
 """
 
 def clip (lo, x, hi):
-    return max (lo, min (hi, x))
+    return max (lo, min (hi, float (x)))
 
 
 def dot_skeleton (width = 960.0, fontsize = 10.0, ranksep = 0.4, nodesep = 0.1):
@@ -419,7 +419,7 @@ def nx_to_dot_subgraphs (nxg, field, width = 960.0, fontsize = 10.0):
     return '\n'.join (dot)
 
 
-def local_stemma_to_nx (conn, passage):
+def local_stemma_to_nx (conn, passage, show_empty_roots = False):
     """ Load a passage fron the database into an nx Graph. """
 
     res = execute (conn, """
@@ -435,14 +435,20 @@ def local_stemma_to_nx (conn, passage):
 
     G = nx.DiGraph ()
 
-    # Add '*' and '?' nodes because there are none in the database
-    G.add_node ('*', label = '*', varnew = '*')
-    G.add_node ('?', label = '?', varnew = '?')
-
     for row in rows:
         G.add_node (row.varnew, label = row.varnew, labez = row.varid, varnew = row.varnew)
         G.add_edge (row.s1, row.varnew)
         if row.s2:
             G.add_edge (row.s2, row.varnew)
+
+    if show_empty_roots:
+        # Always add '*' and '?' nodes
+        G.add_node ('*')
+        G.add_node ('?')
+
+    if '*' in G:
+        G.node['*'].update (label = '*', labez='*', varnew = '*')
+    if '?' in G:
+        G.node['?'].update (label = '?', labez='?', varnew = '?')
 
     return G

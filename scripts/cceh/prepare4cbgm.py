@@ -53,7 +53,7 @@ sys.path.append (os.path.dirname (os.path.abspath (__file__)) + "/../..")
 from ntg_common import db
 from ntg_common import tools
 from ntg_common import plot
-from ntg_common.db import execute, executemany, executemany_raw, debug, fix
+from ntg_common.db import execute, executemany, executemany_raw, warn, debug, fix
 from ntg_common.tools import log
 from ntg_common.config import args
 
@@ -88,70 +88,45 @@ def step01 (dba, dbb, parameters):
     att_model = sqlalchemy.Table (parameters['att'], db.Base.metadata)
     lac_model = sqlalchemy.Table (parameters['lac'], db.Base.metadata)
 
-    target_columns_att = set ([c.name.lower () for c in att_model.columns])
-    target_columns_lac = set ([c.name.lower () for c in lac_model.columns])
+    dest_columns_att = set ([c.name.lower () for c in att_model.columns])
+    dest_columns_lac = set ([c.name.lower () for c in lac_model.columns])
 
     # these columns get special treatment
-    target_columns_att -= set (('id', 'created'))
-    target_columns_lac -= set (('id', 'created'))
+    dest_columns_att -= set (('id', 'created'))
+    dest_columns_lac -= set (('id', 'created'))
 
     dba_meta = sqlalchemy.schema.MetaData (bind = dba.engine)
     dba_meta.reflect ()
 
-    with dba.engine.begin () as src:
+    with dbb.engine.begin () as dest:
+        # Get a list of tables (there are two tables per chapter)
+        table_mask = re.compile (r"^Acts\d\dGVZ(lac)?$")
+        for source_table in sorted (dba_meta.tables.keys ()):
+            if not table_mask.match (source_table):
+                continue
 
-        # create two big tables for easier debugging
-        rows = execute (src, """
-        CREATE OR REPLACE TABLE {att} LIKE Acts01GVZ;
-        """, parameters)
-        rows = execute (src, """
-        CREATE OR REPLACE TABLE {lac} LIKE Acts01GVZlac;
-        """, parameters)
+            is_lac_table = source_table.endswith ('lac')
 
-        with dbb.engine.begin () as dest:
+            dest_table   = parameters['lac'] if is_lac_table else parameters['att']
+            dest_columns = dest_columns_lac  if is_lac_table else dest_columns_att
 
-            # Get a list of tables (there are two tables per chapter)
-            table_mask = re.compile (r"^Acts\d\dGVZ")
-            for table_name in sorted (dba_meta.tables.keys ()):
-                if not table_mask.match (table_name):
-                    continue
+            source_model = sqlalchemy.Table (source_table, dba_meta, autoload = True)
+            columns = [column.name for column in source_model.columns if column.name.lower () in dest_columns]
+            source_columns = ['"' + column + '"' for column in columns]
+            dest_columns   = [column.lower ()    for column in columns]
 
-                is_lac_table = table_name.endswith ('lac')
+            log (logging.INFO, '          Copying table %s' % source_table)
 
-                parameters['source_table'] = table_name
-
-                parameters['t'] = parameters['lac'] if is_lac_table else parameters['att']
-                target_columns = target_columns_lac if is_lac_table else target_columns_att
-
-                source_model = sqlalchemy.Table (parameters['source_table'], dba_meta, autoload = True)
-                source_columns = [column.name.lower() for column in source_model.columns]
-                common_columns = [column for column in source_columns if column in target_columns]
-
-                parameters['fields']              = ', '.join (common_columns)
-                parameters['field_placeholders']  = ', '.join (['%s'] * len (common_columns))
-                parameters['created'] = datetime.date.today().strftime ("%Y-%m-%d")
-
-                log (logging.INFO, '          Copying table {source_table}'.format (**parameters))
-
-                rows = execute (src, """
-                SELECT {fields}, anfadr, endadr + 1
-                FROM {source_table}
-                WHERE hsnr < 500000 AND endadr >= anfadr
-                """, parameters)
-
-                executemany_raw (dest, """
-                INSERT INTO {t} ({fields}, irange, created)
-                VALUES ({field_placeholders}, int4range (%s, %s), '{created}')
-                ON CONFLICT DO NOTHING
-                """, parameters, [r for r in rows])
-
-                # Copy the chapter tables into one big table
-                rows = execute (src, """
-                INSERT INTO {t} ({fields})
-                SELECT {fields}
-                FROM {source_table}
-                WHERE hsnr < 500000 AND endadr >= anfadr
-                """, parameters)
+            rows = execute (dest, """
+            INSERT INTO {dest_table} ({dest_columns}, irange, created)
+            SELECT {source_columns}, int4range ("ANFADR", "ENDADR" + 1), '{created}'
+            FROM app_fdw."{source_table}" s
+            WHERE "HSNR" < 500000 AND "ENDADR" >= "ANFADR"
+            ON CONFLICT DO NOTHING
+            """, dict (parameters, source_table = source_table, dest_table = dest_table,
+                       source_columns = ', '.join (source_columns),
+                       dest_columns = ', '.join (dest_columns),
+                       created = datetime.date.today().strftime ("%Y-%m-%d")))
 
 
 def step01b (dba, parameters):
@@ -966,7 +941,40 @@ def create_var_table (dba, parameters):
         """, parameters)
 
 
-def copy_genealogical_data (dbsrc, dbsrcvg, dbdest, parameters):
+def local_stemma_to_nx (conn, pass_id):
+    """ Load a passage fron the database into an nx Graph. """
+
+    res = execute (conn, """
+    SELECT varid, varnew, s1, s2
+    FROM {locstemed} s
+    WHERE s.varnew !~ '^z' AND pass_id = :pass_id
+    ORDER BY varnew
+    """, dict (parameters, pass_id = pass_id))
+
+    Variant = collections.namedtuple ('stemma_json_variant', 'varid, varnew, s1, s2')
+
+    rows = list (map (Variant._make, res))
+
+    G = nx.DiGraph ()
+
+    # Add '*' and '?' nodes because there are none in the database
+    G.add_node ('root', label = 'root', varnew = '')
+    G.add_node ('*',    label = '*',    varnew = '*')
+    G.add_node ('?',    label = '?',    varnew = '?')
+
+    for row in rows:
+        G.add_node (row.varnew, label = row.varnew, labez = row.varid, varnew = row.varnew)
+        G.add_edge (row.s1, row.varnew)
+        if row.s2:
+            G.add_edge (row.s2, row.varnew)
+
+    G.add_edge ('root', '*')
+    G.add_edge ('root', '?')
+
+    return G
+
+
+def copy_genealogical_data (dbsrcvg, dbdest, parameters):
     """Copy / update genealogical data
 
     Aus: VGA/Att2CBGMPh3.pl
@@ -1016,8 +1024,6 @@ def copy_genealogical_data (dbsrc, dbsrcvg, dbdest, parameters):
 
     """
 
-    dbsrc_meta = sqlalchemy.schema.MetaData (bind = dbsrc.engine)
-    dbsrc_meta.reflect ()
     dbsrcvg_meta = sqlalchemy.schema.MetaData (bind = dbsrcvg.engine)
     dbsrcvg_meta.reflect ()
 
@@ -1027,171 +1033,193 @@ def copy_genealogical_data (dbsrc, dbsrcvg, dbdest, parameters):
         TRUNCATE {locstemed}
         """, parameters)
 
-        with dbsrcvg.engine.begin () as src:
+        # Create debug tables
 
-            # Create debug tables
+        def create_debug_table (dest_table, source_tables):
+            """Copy 28 tables into one for easier debugging."""
 
-            def create_debug_table (dest_table, source_tables):
-                """Copy 28 tables into one for easier debugging."""
+            source_table = source_tables + '01'
 
-                execute (src, """
-                CREATE OR REPLACE TABLE {dest_table} LIKE {source_table}
-                """, dict (parameters, dest_table = dest_table, source_table = source_tables + '01'))
-
-                table_mask = re.compile ('^' + source_tables + r'\d\d$')
-                for source_table in sorted (dbsrcvg_meta.tables.keys ()):
-                    if not table_mask.match (source_table):
-                        continue
-                    log (logging.INFO, "        : Copying table %s" % source_table)
-
-                    source_model = sqlalchemy.Table (source_table, dbsrcvg_meta, autoload = True)
-                    source_columns = ['`' + column.name.lower () + '`'
-                                      for column in source_model.columns if column.name != 'id']
-
-                    rows = execute (src, """
-                    INSERT INTO {dest_table} ({columns})
-                    SELECT {columns}
-                    FROM {source_table}
-                    """, dict (parameters, source_table = source_table, dest_table = dest_table,
-                               columns = ', '.join (source_columns)))
-
-            create_debug_table (parameters['locstemed'], 'LocStemEdAct')
-            create_debug_table (parameters['read'],      'RdgAct')
-            create_debug_table (parameters['var'],       'VarGenAttAct')
-
-            # LocStemEd
-            #
-            # Generate LocStemEd from VarGenAtt.  This is the production
-            # LocStemEd table.  We prefer to recreate it from VarGenAtt to
-            # guarantee that those two tables will not be out of sync.
-
-            params = []
-            table_mask = re.compile (r'^VarGenAttAct\d\d$')
-            for table_name in sorted (dbsrcvg_meta.tables.keys ()):
-                if not table_mask.match (table_name):
-                    continue
-                log (logging.INFO, "        : Copying table %s" % table_name)
-
-                parameters['source_table'] = table_name
-
-                rows = execute (src, """
-                SELECT varid, varnew, s1, s2, begadr, endadr
-                FROM {source_table}
-                GROUP BY begadr, endadr, varid, varnew, s1, s2
-                """, parameters)
-
-                params += [r for r in rows]
-
-            executemany_raw (dest, """
-            INSERT INTO {locstemed} (pass_id, varid, varnew, s1, s2)
-            SELECT p.id, %s, %s, %s, %s
-            FROM {pass} p
-            WHERE (p.anfadr, p.endadr) = (%s, %s)
-            ON CONFLICT (pass_id, varnew, s1)
-              DO UPDATE SET s1 = EXCLUDED.s1, s2 = EXCLUDED.s2
-            """, parameters, params)
-
-
-            fix (dest, "Loop in local stemma", """
-            SELECT *
-            FROM {locstemed}
-            WHERE varnew = s1 OR varnew = s2;
-            """, """
-            UPDATE {locstemed}
-            SET s1 = '?'
-            WHERE varnew = s1
-            """, parameters)
-
-            fix (dest, "Readings older than 'A'", """
-            SELECT *
-            FROM {var}_view v
-            JOIN {locstemed} l USING (pass_id, varnew)
-            WHERE v.ms_id = 1 AND l.s1 NOT IN ('*', '?')
-            """, """
-            /* harmonize it with other occurences but shoudn't it be '?' ? */
-            UPDATE {locstemed} l
-            SET s1 = 'a'
-            FROM {var}_view v
-            WHERE v.pass_id = l.pass_id AND v.varnew = l.varnew
-              AND v.ms_id = 1 AND l.s1 NOT IN ('*', '?') AND v.varnew = 'zu';
-
-            UPDATE {locstemed} l
-            SET s1 = '*'
-            FROM {pass} p
-            WHERE l.pass_id = p.id AND (anfadr, endadr) = (50220027, 50220027)
-              AND varnew = 'a';
-
-            UPDATE {locstemed} l
-            SET s1 = 'a'
-            FROM {pass} p
-            WHERE l.pass_id = p.id AND (anfadr, endadr) = (50220027, 50220027)
-              AND varnew = 'b';
-
-            """, parameters)
-
-            # VarGenAtt
-
-            params = []
-            table_mask = re.compile (r'^VarGenAttAct\d\d$')
-            for table_name in sorted (dbsrcvg_meta.tables.keys ()):
-                if not table_mask.match (table_name):
-                    continue
-                log (logging.INFO, "        : Copying table %s" % table_name)
-
-                parameters['source_table'] = table_name
-
-                rows = execute (src, """
-                SELECT begadr, endadr, varid, varnew, GROUP_CONCAT(ms) AS hsnr
-                FROM {source_table}
-                GROUP BY begadr, endadr, varid, varnew
-                """, parameters)
-
-                for r in rows:
-                    params.append ({
-                        'anfadr' : r[0],
-                        'endadr' : r[1],
-                        'varid'  : r[2],
-                        'varnew' : r[3],
-                        'hsnr'   : [int (hsnr) for hsnr in r[4].split (',')],
-                    })
-
-            executemany (dest, """
-            UPDATE {var} v
-            SET varid = :varid, varnew = :varnew
-            FROM {ms} ms, {pass} pass
-            WHERE v.ms_id   = ms.id   AND ARRAY[ms.hsnr] <@ ARRAY[:hsnr]
-              AND v.pass_id = pass.id AND (pass.anfadr, pass.endadr) = (:anfadr, :endadr)
-            """, parameters, params)
-
-            # Because VarGenAttActXX does not contain manuscripts that are not
-            # defined in chapter XX we must put in the 'zz' readings ourselves.
             execute (dest, """
-            UPDATE {var}
-            SET varid = 'zz', varnew = 'zz'
-            WHERE labez = 'zz' AND varnew = ''
-            """, parameters)
+            DROP TABLE IF EXISTS {dest_table}
+            """, dict (parameters, dest_table = dest_table))
 
-            # Fix varid and varnew where A could not be reconstructed.
-            # These are the passages which have varnew = 'a' and s1 = '?' in locstemed.
             execute (dest, """
-            UPDATE {var} v
-            SET varid = 'zz', varnew = 'zz'
-            FROM {locstemed} l
-            WHERE l.pass_id = v.pass_id AND v.ms_id = 1 AND l.varnew = 'a' AND l.s1 = '?'
-            """, parameters)
+            CREATE TABLE {dest_table} ( LIKE var_fdw."{source_table}" )
+            """, dict (parameters, dest_table = dest_table, source_table = source_table))
 
-            fix (dest, "Bogus varnew", """
-            SELECT *
-            FROM {var}
-            WHERE ord_labez (varid) != ord_labez (varnew)
-            ORDER BY ms_id, pass_id, varnew
-            """, """
-            UPDATE {var}
-            SET varnew = 'a'
-            WHERE varid = 'a' AND varnew = 's';
-            DELETE FROM {locstemed}
-            WHERE ord_labez (varid) != ord_labez (varnew)
-            """, parameters)
+            source_model = sqlalchemy.Table (source_table, dbsrcvg_meta, autoload = True)
+            columns = [column.name for column in source_model.columns]
+
+            for column in columns:
+                if column != column.lower ():
+                    execute (dest, 'ALTER TABLE {dest_table} RENAME COLUMN "{source_column}" TO "{dest_column}"',
+                             dict (parameters, dest_table = dest_table, source_column = column, dest_column = column.lower ()))
+
+            table_mask = re.compile ('^' + source_tables + r'\d\d$')
+            for source_table in sorted (dbsrcvg_meta.tables.keys ()):
+                if not table_mask.match (source_table):
+                    continue
+                log (logging.INFO, "        : Copying table %s" % source_table)
+
+                source_columns = ['"' + column + '"'          for column in columns]
+                dest_columns   = ['"' + column.lower () + '"' for column in columns]
+
+                rows = execute (dest, """
+                INSERT INTO {dest_table} ({dest_columns})
+                SELECT {source_columns}
+                FROM var_fdw."{source_table}"
+                """, dict (parameters, source_table = source_table, dest_table = dest_table,
+                           source_columns = ', '.join (source_columns),
+                           dest_columns = ', '.join (dest_columns)))
+
+        create_debug_table ('debug_' + parameters['locstemed'], 'LocStemEdAct')
+        create_debug_table ('debug_' + parameters['read'],      'RdgAct')
+        create_debug_table ('debug_' + parameters['var'],       'VarGenAttAct')
+
+        #
+        # LocStemEd
+        #
+
+        execute (dest, """
+        INSERT INTO {locstemed} (pass_id, varid, varnew, s1, s2)
+        SELECT p.id, l.varid, l.varnew, l.s1, l.s2
+        FROM debug_{locstemed} l, {pass} p
+        WHERE (p.anfadr, p.endadr) = (l.begadr, l.endadr) AND l.varnew !~ '^z'
+        """, parameters)
+
+        # check generated locstemed
+
+        fix (dest, "Empty s1", """
+        SELECT *
+        FROM {locstemed}
+        WHERE s1 = ''
+        """, """
+        DELETE FROM {locstemed}
+        WHERE s1 = ''
+        """, parameters)
+
+        # must fix these or WITH RECURSIVE will get into an endless loop
+        # fix these here so we don't have to remove these passages later on
+        fix (dest, "Self-reference in local stemma", """
+        SELECT pass_id, anfadr, endadr, varid, varnew, s1, s2
+        FROM {locstemed}_view
+        WHERE varnew = s1 OR varnew = s2
+        """, """
+        DELETE FROM {locstemed}
+        WHERE varnew = s1 OR varnew = s2
+        """, parameters)
+
+        # check if graph is acyclic and connected
+
+        res = execute (dest, """
+        SELECT id, anfadr, endadr FROM {pass}
+        ORDER BY id
+        """, parameters)
+
+        for pass_id in res.fetchall ():
+            G = local_stemma_to_nx (dest, pass_id[0])
+            if not nx.is_weakly_connected (G):
+                log (logging.WARNING, "Local Stemma %s-%s is not connected (pass_id=%s)" % (pass_id[1], pass_id[2], pass_id[0]))
+            if not nx.is_directed_acyclic_graph (G):
+                # must fix these or WITH RECURSIVE will get into an endless loop
+                log (logging.ERROR, "Local Stemma @ %s-%s is not a directed acyclic graph. Deleting." % (pass_id[1], pass_id[2]))
+                execute (dest, """
+                DELETE FROM {locstemed}
+                WHERE pass_id = :pass_id
+                """, dict (parameters, pass_id = pass_id[0]))
+
+        #
+        # VarGenAtt
+        #
+
+        execute (dest, """
+        UPDATE {var} v
+        SET varid = dv.varid, varnew = dv.varnew
+        FROM {ms} ms, {pass} pass, debug_{var} dv
+        WHERE v.ms_id = ms.id     AND ms.hsnr = dv.ms
+          AND v.pass_id = pass.id AND (pass.anfadr, pass.endadr) = (dv.begadr, dv.endadr)
+        """, parameters)
+
+        # Because VarGenAttActXX does not contain manuscripts that are not
+        # defined in chapter XX we must put in the 'zz' readings ourselves.
+        execute (dest, """
+        UPDATE {var}
+        SET varid = 'zz', varnew = 'zz'
+        WHERE labez = 'zz' AND varnew = ''
+        """, parameters)
+
+        # Fix varid and varnew where A could not be reconstructed.
+        # These are the passages which have varnew = 'a' and s1 = '?' in locstemed.
+        execute (dest, """
+        UPDATE {var} v
+        SET varid = 'zz', varnew = 'zz', labez = 'zz', labezsuf = ''
+        FROM {locstemed} l
+        WHERE l.pass_id = v.pass_id AND v.ms_id = 1 AND l.varnew = 'a' AND l.s1 = '?'
+        """, parameters)
+
+        # Fix apparatus where A could not be reconstructed
+        execute (dest, """
+        UPDATE {att} a
+        SET labez = 'zz', labezsuf = '', lesart = ''
+        FROM {locstemed}_view l
+        WHERE a.hs = 'A' AND (l.anfadr, l.endadr, l.varnew, l.s1) = (a.anfadr, a.endadr, 'a', '?')
+        """, parameters)
+
+        #
+        # sanity checks
+        #
+
+        warn (dest, "Readings older than manuscript 'A'", """
+        SELECT hs, v.pass_id, anfadr, endadr, v.varid, v.varnew, s1, s2
+        FROM {var}_view v
+        JOIN {locstemed} l USING (pass_id, varnew)
+        WHERE v.ms_id = 1 AND l.s1 NOT IN ('*', '?')
+        """, parameters)
+
+        warn (dest, "Bogus varnew", """
+        SELECT *
+        FROM {var}
+        WHERE ord_labez (varid) != ord_labez (varnew)
+        ORDER BY ms_id, pass_id, varnew
+        """, parameters)
+
+        warn (dest, "Readings in locstemed but not in var", """
+        SELECT l.pass_id, l.anfadr, l.endadr, l.varnew
+        FROM {locstemed}_view l
+        LEFT JOIN {var} v
+          ON (v.pass_id, v.varnew) = (l.pass_id, l.varnew)
+        WHERE v.varnew IS NULL
+        ORDER BY l.pass_id, l.varnew
+        """, parameters)
+
+        warn (dest, "Readings in var but not in locstemed", """
+        SELECT v.pass_id, v.anfadr, v.endadr, v.hs, v.varnew
+        FROM {var}_view v
+        LEFT JOIN {locstemed} l
+          ON (v.pass_id, v.varnew) = (l.pass_id, l.varnew)
+        WHERE v.varnew !~ '^z' AND v.ms_id != 2 AND l.varnew IS NULL
+        ORDER BY v.pass_id, v.varnew
+        """, parameters)
+
+        warn (dest, "Readings in locstemed but not in apparatus", """
+        SELECT l.pass_id, l.anfadr, l.endadr, l.varid
+        FROM {locstemed}_view l
+        LEFT JOIN {att} a
+          ON (l.anfadr, l.endadr, l.varid) = (a.anfadr, a.endadr, a.labez)
+        WHERE a.labez IS NULL
+        ORDER BY l.anfadr, l.endadr, l.varid
+        """, parameters)
+
+        warn (dest, "Readings in apparatus but not in locstemed", """
+        SELECT a.anfadr, a.endadr, a.hs, a.labez
+        FROM {att} a
+        LEFT JOIN {locstemed}_view l
+          ON (a.anfadr, a.endadr, a.labez) = (l.anfadr, l.endadr, l.varid)
+        WHERE a.labez !~ '^z' AND l.varid IS NULL
+        ORDER BY a.anfadr, a.endadr, a.labez
+        """, parameters)
+
 
 
 def build_byzantine_text (dba, parameters):
@@ -1261,18 +1289,6 @@ def preprocess_local_stemmas (dba, parameters):
     """
 
     with dba.engine.begin () as conn:
-
-        fix (conn, "Disconnected local stemma: s1 without corresponding varnew", """
-        SELECT DISTINCT l1.pass_id, p.anfadr, p.endadr, l1.s1
-        FROM {locstemed} l1
-        JOIN {pass} p
-          ON l1.pass_id = p.id
-        WHERE l1.s1 NOT IN ('*', '?', '') AND l1.varnew !~ '^z' AND NOT EXISTS (
-          SELECT * FROM {locstemed} l2
-          WHERE l1.pass_id = l2.pass_id AND l1.s1 = l2.varnew
-        )
-        ORDER BY l1.pass_id, l1.s1
-        """, "", parameters)
 
         # preprocess source readings
         #
@@ -1894,9 +1910,17 @@ if __name__ == '__main__':
     file_handler.setFormatter (formatter)
     logging.getLogger ().addHandler (file_handler)
 
+    if (args.log_level == logging.INFO):
+        # sqlalchemy is way too verbose on level INFO
+        sqlalchemy_logger = logging.getLogger ('sqlalchemy.engine')
+        sqlalchemy_logger.setLevel (logging.WARN)
+
     dbsrc1 = db.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_ECM_DB'])
     dbsrc2 = db.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_VG_DB'])
     dbdest = db.PostgreSQLEngine (**config)
+
+    db.fdw ('app_fdw', db.Base.metadata,  dbdest, dbsrc1)
+    db.fdw ('var_fdw', db.Base2.metadata, dbdest, dbsrc2)
 
     v = Bag ()
     try:
@@ -1963,7 +1987,7 @@ if __name__ == '__main__':
 
             if step == 32:
                 log (logging.INFO, "Step 32 : Copying genealogical data ...")
-                copy_genealogical_data (dbsrc1, dbsrc2, dbdest, parameters)
+                copy_genealogical_data (dbsrc2, dbdest, parameters)
 
                 log (logging.INFO, "        : Building Byzantine text ...")
                 build_byzantine_text (dbdest, parameters)

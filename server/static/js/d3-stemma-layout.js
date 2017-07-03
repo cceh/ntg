@@ -161,7 +161,7 @@ function ($, d3, d3_common, _) {
 
             var groups = node.append ('g')
                 .attr ('data-ms-id', function (d) { return d.ms_id; })
-                .attr ('data-label', function (d) { return d.label; })
+                .attr ('data-label', function (d) { return d.label ? d.label : d.id; })
                 .attr ('class', function (d) {
                     return 'node node-' + (d.children ? 'internal' : 'leaf');
                 })
@@ -197,7 +197,7 @@ function ($, d3, d3_common, _) {
 
             groups.append ('text')
                 .attr ('class', 'node')
-                .text (function (d) { return d.label; });
+                .text (function (d) { return d.label ? d.label : d.id; });
 
             // done
 

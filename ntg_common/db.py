@@ -42,6 +42,7 @@ Replace <username> and <password> with your own username and password.
 
 """
 
+import configparser
 import datetime
 import logging
 import os
@@ -102,7 +103,46 @@ def view (name, metadata, sql):
     DropView (name).execute_at ('before-drop', metadata)
 
 
-def execute (conn, sql, parameters, debug_level = logging.INFO):
+class CreateFDW (DDLElement):
+    def __init__ (self, name, pg_db, mysql_db):
+        self.name     = name
+        self.pg_db    = pg_db
+        self.mysql_db = mysql_db
+
+class DropFDW (DDLElement):
+    def __init__ (self, name, pg_db, mysql_db):
+        self.name     = name
+        self.pg_db    = pg_db
+        self.mysql_db = mysql_db
+
+@compiler.compiles(CreateFDW)
+def compile (element, compiler, **kw):
+    pp = element.pg_db.params
+    mp = element.mysql_db.params
+    return """
+    CREATE SCHEMA {name};
+    CREATE SERVER {name}_server FOREIGN DATA WRAPPER mysql_fdw OPTIONS (host '{host}', port '{port}');
+    CREATE USER MAPPING FOR {pg_user} SERVER {name}_server OPTIONS (username '{user}', password '{password}');
+    IMPORT FOREIGN SCHEMA "{database}" FROM SERVER {name}_server INTO {name};
+    """.format (name = element.name, pg_database = pp['database'], pg_user = pp['user'], **mp)
+
+@compiler.compiles(DropFDW)
+def compile (element, compiler, **kw):
+    pp = element.pg_db.params
+    mp = element.mysql_db.params
+    return """
+    DROP SCHEMA IF EXISTS {name} CASCADE;
+    DROP USER MAPPING IF EXISTS FOR {pg_user} SERVER {name}_server;
+    DROP SERVER IF EXISTS {name}_server;
+    """.format (name = element.name, pg_database = pp['database'], pg_user = pp['user'], **mp)
+
+def fdw (name, metadata, pg_database, mysql_db):
+    CreateFDW (name, pg_database, mysql_db).execute_at ('after-create', metadata)
+    DropFDW (name, pg_database, mysql_db).execute_at ('before-drop', metadata)
+
+
+
+def execute (conn, sql, parameters, debug_level = logging.DEBUG):
     sql = sql.strip ().format (**parameters)
     start_time = datetime.datetime.now ()
     result = conn.execute (text (sql), parameters)
@@ -110,7 +150,7 @@ def execute (conn, sql, parameters, debug_level = logging.INFO):
     return result
 
 
-def executemany (conn, sql, parameters, param_array, debug_level = logging.INFO):
+def executemany (conn, sql, parameters, param_array, debug_level = logging.DEBUG):
     sql = sql.strip ().format (**parameters)
     start_time = datetime.datetime.now ()
     result = conn.execute (text (sql), param_array)
@@ -118,7 +158,7 @@ def executemany (conn, sql, parameters, param_array, debug_level = logging.INFO)
     return result
 
 
-def executemany_raw (conn, sql, parameters, param_array, debug_level = logging.INFO):
+def executemany_raw (conn, sql, parameters, param_array, debug_level = logging.DEBUG):
     sql = sql.strip ().format (**parameters)
     start_time = datetime.datetime.now ()
     result = conn.execute (sql, param_array)
@@ -126,24 +166,30 @@ def executemany_raw (conn, sql, parameters, param_array, debug_level = logging.I
     return result
 
 
-def rollback (conn, debug_level = logging.INFO):
+def rollback (conn, debug_level = logging.DEBUG):
     start_time = datetime.datetime.now ()
     result = conn.execute ("ROLLBACK")
     log (debug_level, "rollback in %.3fs", (datetime.datetime.now () - start_time).total_seconds ())
     return result
 
 
-# def execute_pandas (conn, sql, parameters, debug_level = logging.INFO):
+# def execute_pandas (conn, sql, parameters, debug_level = logging.DEBUG):
 #     sql = sql.format (**parameters)
 #     log (debug_level, sql.rstrip () + ';')
 #     return pd.read_sql_query (text (sql), conn, parameters)
 
-def debug (conn, msg, sql, parameters):
+def _debug (conn, msg, sql, parameters, level):
     # print values
-    if args.log_level <= logging.INFO:
+    if args.log_level <= level:
         result = execute (conn, sql, parameters)
         if result.rowcount > 0:
-            log (logging.DEBUG, msg + '\n' + tabulate (result))
+            log (level, msg + '\n' + tabulate (result))
+
+def debug (conn, msg, sql, parameters):
+    _debug (conn, msg, sql, parameters, logging.DEBUG)
+
+def warn (conn, msg, sql, parameters):
+    _debug (conn, msg, sql, parameters, logging.WARNING)
 
 
 def fix (conn, msg, check_sql, fix_sql, parameters):
@@ -161,7 +207,7 @@ def fix (conn, msg, check_sql, fix_sql, parameters):
     result = execute (conn, check_sql, parameters)
     if result.rowcount > 0:
         # apply fix
-        if args.log_level <= logging.INFO:
+        if args.log_level >= logging.WARNING:
             log (logging.WARNING, msg + '\n' + tabulate (result))
         if fix_sql:
             execute (conn, fix_sql, parameters)
@@ -169,38 +215,6 @@ def fix (conn, msg, check_sql, fix_sql, parameters):
             result = execute (conn, check_sql, parameters)
             if result.rowcount > 0:
                 log (logging.ERROR, msg + '\n' + tabulate (result))
-
-
-class DBA (object):
-    """ Database Interface """
-
-    def __init__ (self, group = None, db = None):
-        if group is None:
-            group = MYSQL_DEFAULT_GROUP
-        if db is None:
-            db = ''
-
-        log (logging.INFO, "Connecting to db and reading init group: {group}".format (group = group))
-
-        self.engine = sqlalchemy.create_engine (
-            "mysql:///{db}?read_default_group={group}".format (db = db, group = group))
-
-        sqlalchemy.event.listen (self.engine, 'connect', on_connect)
-
-        self.connection = self.connect ()
-
-    def connect (self):
-        connection = self.engine.connect ()
-        # Make MySQL more compatible with other SQL databases
-        connection.execute ("SET sql_mode='ANSI'")
-        return connection
-
-
-#@event.listens_for(eng, "first_connect", insert=True)  # make sure we're the very first thing
-#@event.listens_for(eng, "connect")
-def on_connect (dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor ()
-    cursor.execute ("SET sql_mode = 'ANSI'")
 
 
 class MySQLEngine (object):
@@ -214,6 +228,18 @@ class MySQLEngine (object):
 
         log (logging.INFO, "MySQLEngine: Reading init group: {group}".format (group = group))
         log (logging.INFO, "MySQLEngine: Connecting to db: {db}".format (db = db))
+
+        config = configparser.ConfigParser ()
+        config.read (('/etc/my.cnf', os.path.expanduser ('~/.my.cnf')))
+
+        section = config[group]
+        self.params = {
+            'host' :     section.get ('host', 'localhost').strip ('"'),
+            'port' :     section.get ('port', '3306').strip ('"'),
+            'user' :     section.get ('user', '').strip ('"'),
+            'password' : section.get ('password', '').strip ('"'),
+            'database' : db,
+        }
 
         self.engine = sqlalchemy.create_engine (
             "mysql:///{db}?read_default_group={group}".format (db = db, group = group))
@@ -243,6 +269,8 @@ class PostgreSQLEngine (object):
         log (logging.INFO, "PostgreSQLEngine: Connecting to postgres database '{database}' as user '{user}'".format (**args))
 
         self.engine = sqlalchemy.create_engine (self.url + "?sslmode=disable&server_side_cursors")
+
+        self.params = args
 
 
     def connect (self):
@@ -414,76 +442,6 @@ class Lac (Base): # same as class Att
         UniqueConstraint ('hs', 'irange', name = 'unique_lac_hs_irange')
     )
 
-if 0:
-    class VP (Base):
-        __tablename__ = 'vp'
-
-        id        = Column (Integer,       primary_key = True, autoincrement = True)
-        anfadr    = Column (Integer,       nullable = False)
-        endadr    = Column (Integer,       nullable = False)
-        bzdef     = Column (Integer,       nullable = False, server_default = '0')
-        check     = Column (String (1),    nullable = False, server_default = '')
-
-
-    class Rdg (Base):
-        __tablename__ = 'rdg'
-
-        id        = Column (Integer,       primary_key = True, autoincrement = True)
-        anfadr    = Column (Integer,       nullable = False)
-        endadr    = Column (Integer,       nullable = False)
-        labez     = Column (String (32),   nullable = False, server_default = '')
-        labezsuf  = Column (String (32),   nullable = False, server_default = '')
-        lesart    = Column (String (1024), nullable = False, server_default = '')
-        bz        = Column (Integer,       nullable = False, server_default = '0')
-        bzdef     = Column (Integer,       nullable = False, server_default = '0')
-        byz       = Column (String (1),    nullable = False, server_default = '')
-        check     = Column (String (1),    nullable = False, server_default = '')
-
-        __table_args__ = (
-            UniqueConstraint ('anfadr', 'endadr', 'labez', name = 'unique_rdg_anfadr_endadr_labez'),
-        )
-
-
-    class Witn (Base):
-        __tablename__ = 'witn'
-
-        id        = Column (Integer,       primary_key = True, autoincrement = True)
-        anfadr    = Column (Integer,       nullable = False)
-        endadr    = Column (Integer,       nullable = False)
-        labez     = Column (String (32),   nullable = False, server_default = '')
-        labezsuf  = Column (String (32),   nullable = False, server_default = '')
-        hsnr      = Column (Integer,       nullable = False)
-        hs        = Column (String (32),   nullable = False)
-
-
-    class MsListVal (Base):
-        __tablename__ = 'mslistval'
-
-        id        = Column (Integer,       primary_key = True, autoincrement = True)
-        hsnr      = Column (Integer,       nullable = False)
-        hs        = Column (String (32),   nullable = False)
-        chapter   = Column (Integer,       nullable = False)
-        sumtxt    = Column (Integer,       nullable = False, server_default = '0')
-        summt     = Column (Integer,       nullable = False, server_default = '0')
-        uemt      = Column (Integer,       nullable = False, server_default = '0')
-        qmt       = Column (Float,         nullable = False, server_default = '0.0')
-        check     = Column (String (1),    nullable = False, server_default = '')
-
-
-    class VG (Base):
-        __tablename__ = 'vg'
-
-        id        = Column (Integer,       primary_key = True, autoincrement = True)
-        hsnr      = Column (Integer,       nullable = False)
-        hsnr2     = Column (Integer,       nullable = False)
-        chapter   = Column (Integer,       nullable = False)
-        sumtxt    = Column (Integer,       nullable = False, server_default = '0')
-        summt     = Column (Integer,       nullable = False, server_default = '0')
-        uemt      = Column (Integer,       nullable = False, server_default = '0')
-        qmt       = Column (Float,         nullable = False, server_default = '0.0')
-        check     = Column (String (1),    nullable = False, server_default = '')
-
-
 Base2 = declarative_base ()
 
 class Manuscripts (Base2):
@@ -612,13 +570,18 @@ class Affinity (Base2):
     )
 
 
+view ('locstemed_view', Base2.metadata, """
+    SELECT p.anfadr, p.endadr, locstemed.*
+    FROM locstemed
+    JOIN passages p  ON locstemed.pass_id = p.id
+    """)
+
 view ('var_view', Base2.metadata, """
     SELECT ms.hs, ms.hsnr, p.anfadr, p.endadr, var.*
     FROM var
     JOIN passages p     ON var.pass_id = p.id
     JOIN manuscripts ms ON var.ms_id   = ms.id
     """)
-
 
 class GephiNodes (Base2):
     __tablename__ = 'nodes'
