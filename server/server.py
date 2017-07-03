@@ -48,6 +48,8 @@ static_app = flask.Flask (__name__)
 dba = flask_sqlalchemy.SQLAlchemy ()
 user_model = security.declare_user_model (dba)
 db_adapter = flask_user.SQLAlchemyAdapter (dba, security.User)
+login_manager = flask_login.LoginManager ()
+login_manager.anonymous_user = security.AnonymousUserMixin
 user_manager = flask_user.UserManager (db_adapter)
 mail = flask_mail.Mail ()
 
@@ -1014,7 +1016,7 @@ if __name__ == "__main__":
     static_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     dba.init_app (static_app)
     mail.init_app (static_app)
-    user_manager.init_app (static_app, make_safe_url_function = make_safe_url)
+    user_manager.init_app (static_app, login_manager = login_manager, make_safe_url_function = make_safe_url)
     babel.init_app (static_app)
 
     for fn in glob.glob (args.config_path.rstrip ('/') + '/*.conf'):
@@ -1063,7 +1065,7 @@ if __name__ == "__main__":
         sub_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         dba.init_app (sub_app)
         mail.init_app (sub_app)
-        user_manager.init_app (sub_app, make_safe_url_function = make_safe_url)
+        user_manager.init_app (sub_app, login_manager = login_manager, make_safe_url_function = make_safe_url)
         babel.init_app (sub_app)
 
         instances[sub_app.config['APPLICATION_ROOT']] = sub_app
