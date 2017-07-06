@@ -41,6 +41,7 @@ requirejs.config ({
         'datatables-buttons-bs-css'    : '/static/bower_components/datatables.net-buttons-bs/css/buttons.bootstrap',
         // private css
         'site-css'                     : '/static/css/site',
+        'apparatus-css'                : '/static/css/apparatus',
         'coherence-css'                : '/static/css/coherence',
         'navigator-css'                : '/static/css/navigator',
         'comparison-css'               : '/static/css/comparison',

@@ -7,7 +7,14 @@
  * @author Marcello Perathoner
  */
 
-define (['jquery', 'lodash', 'tools', 'panel', 'bootstrap'],
+define ([
+    'jquery',
+    'lodash',
+    'tools',
+    'panel',
+    'bootstrap',
+    'css!apparatus-css',
+],
 
 function ($, _, tools, panel) {
     'use strict';
@@ -59,9 +66,8 @@ function ($, _, tools, panel) {
                 html.push ('<li class="list-group-item">');
                 html.push ('<h4 class="list-group-item-heading">');
                 html.push (tools.format (
-                    '<a data-labez="{labez}" class="fg_labez" ' +
-                        'href="ms_attesting/{pass_id}/{labez}">{group} {reading}</a></h4>',
-                    data));
+                    '<a data-labez="{labez}" class="apparatus-labez fg_labez">{group} {reading}</a></h4>', data
+                ));
 
                 html.push ('<ul class="list-group-item-text attesting-mss list-inline">');
                 _.forEach (_.sortBy (group, ['hsnr']), function (item) {
@@ -96,6 +102,25 @@ function ($, _, tools, panel) {
     }
 
     /**
+     * Show the attestation in the Coherence panel and scroll to it.
+     *
+     * @param event
+     */
+
+    function goto_attestation (event) {
+        event.stopPropagation ();
+
+        var instance = window.coherence.ltextflow;
+        var labez = $ (event.currentTarget).attr ('data-labez');
+        instance.data.labez = labez;
+        instance.load_passage (instance.data.passage);
+
+        $ ('html, body').animate ({
+            scrollTop: $('div.panel-local-textflow').offset ().top
+        }, 500);
+    }
+
+    /**
      * Initialize the module.
      *
      * @function init
@@ -112,6 +137,9 @@ function ($, _, tools, panel) {
             /* Show splits or not. */
             'splits'  : [],
         });
+
+        // Click on attestation
+        $ (document).on ('click', 'a.apparatus-labez', goto_attestation);
 
         return instance;
     }

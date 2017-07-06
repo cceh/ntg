@@ -142,5 +142,7 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
     module.init = init;
     module.set_passage = set_passage;
 
+    window.coherence = module;
+
     return module;
 });
