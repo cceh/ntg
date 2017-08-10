@@ -14,4 +14,4 @@ Ziele:
   Philologen, interessierte Laien.  Ermöglicht eine visuelle Exploration
   der Datenbasis des ECM.
 
-- Fernziel: Sandkasten (Oberfläche mit was-ist-wenn Funktion).
+- Fernziel: Interaktivität auch für externe Nutzer.
