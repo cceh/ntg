@@ -1,30 +1,31 @@
-RSYNC   := /usr/bin/rsync -azv --exclude '*~'
-SHELL   := /bin/bash
-PYTHON  := /usr/bin/python3
-BROWSER := firefox
+RSYNC       := /usr/bin/rsync -azv --exclude '*~'
+SHELL       := /bin/bash
+PYTHON      := /usr/bin/python3
+BROWSER     := firefox
 
-NTG_VM	   := ntg.cceh.uni-koeln.de
-NTG_USER   := ntg
-NTG_DB     := ntg
-NTG        := $(NTG_USER)@$(NTG_VM)
-NTG_ROOT   := $(NTG):/home/$(NTG_USER)/prj/ntg/ntg
-PSQL_PORT  := 5433
-SERVER     := server
-STATIC	   := $(SERVER)/static
+NTG_VM      := ntg.cceh.uni-koeln.de
+NTG_USER    := ntg
+NTG_DB      := ntg
+NTG         := $(NTG_USER)@$(NTG_VM)
+NTG_ROOT    := $(NTG):/home/$(NTG_USER)/prj/ntg/ntg
+PSQL_PORT   := 5433
+SERVER      := server
+STATIC      := $(SERVER)/static
 
-TRANSLATIONS := de			 # space-separated list of translations we have eg. de fr
+TRANSLATIONS    := de            # space-separated list of translations we have eg. de fr
 
-NTG_SERVER := $(NTG_ROOT)/$(SERVER)
-NTG_STATIC := $(NTG_ROOT)/$(STATIC)
+NTG_SERVER  := $(NTG_ROOT)/$(SERVER)
+NTG_STATIC  := $(NTG_ROOT)/$(STATIC)
 
-LESS	   := $(wildcard $(STATIC)/css/*.less)
-CSS		   := $(LESS:.less=.css)
-CSS_GZ	   := $(patsubst %, %.gzip, $(CSS))
+LESS        := $(wildcard $(STATIC)/css/*.less)
+CSS         := $(LESS:.less=.css)
+CSS_GZ      := $(patsubst %, %.gzip, $(CSS))
 
-JS		   := $(STATIC)/js/*.js
-JS_GZ	   := $(patsubst %, %.gzip, $(JS))
+ES6         := $(wildcard $(STATIC)/js/*.es6)
+JS          := $(STATIC)/js/*.js $(ES6:.es6=.js)
+JS_GZ       := $(patsubst %, %.gzip, $(JS))
 
-PY_SOURCES := scripts/cceh/*.py ntg_common/*.py server/*.py
+PY_SOURCES  := scripts/cceh/*.py ntg_common/*.py server/*.py
 
 .PHONY: upload upload_po update_pot update_po update_mo update_libs vpn server restart psql
 .PHONY: js css jsdoc lint pylint jslint csslint
@@ -59,7 +60,7 @@ pylint:
 	-pylint $(PY_SOURCES)
 
 jslint:
-	./node_modules/.bin/eslint -f unix Gruntfile.js $(JS)
+	./node_modules/.bin/eslint -f unix $(JS)
 
 csslint: css
 	csslint --ignore="adjoining-classes,box-sizing,ids,order-alphabetical,overqualified-elements,qualified-headings" $(CSS)
@@ -77,6 +78,9 @@ upload:
 css: $(CSS)
 
 js:	$(JS)
+
+%.js : %.es6
+	./node_modules/.bin/babel $? --out-file $@ --source-maps
 
 %.css : %.less
 	lessc --autoprefix="last 2 versions" $? $@
