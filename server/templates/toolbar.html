@@ -30,9 +30,9 @@
     {% endif %}
 
     {% if mode in ('apparatus', 'variant') %}
-    <div class="apparatus-splits btn-group btn-group-xs" data-toggle="buttons">
+    <div class="apparatus-cliques btn-group btn-group-xs" data-toggle="buttons">
 	  <label class="btn btn-primary">
-        <input type="checkbox" name="splits" data-opt="splits">{{_('Splits')}}</input>
+        <input type="checkbox" name="cliques" data-opt="cliques">{{_('Splits')}}</input>
 	  </label>
     </div>
     {% endif %}
@@ -63,13 +63,13 @@
     {% endif %}
 
     {% if mode in ('global', 'local', 'variant', 'relatives') %}
-    <div class="toolbar-chapter btn-group btn-group-xs">
-      <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-chapter"
+    <div class="toolbar-range btn-group btn-group-xs">
+      <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-range"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         {{_('Chapter')}}:
         <span class="btn_text"></span> <span class="caret"></span>
       </button>
-      <div class="dropdown-menu dropdown-menu-horiz dropdown-menu-chapter">
+      <div class="dropdown-menu dropdown-menu-horiz dropdown-menu-range">
         <div class="btn-group btn-group-xs" data-toggle="buttons">
           <!-- filled by textflow.js -->
         </div>

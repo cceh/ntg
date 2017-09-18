@@ -90,7 +90,12 @@ ellipse.node {
   stroke-width: 3px;
   fill: #fff;
   transition: fill 2s linear;
+}
+g.clickable ellipse.node {
   cursor: pointer;
+}
+g.draggable ellipse.node {
+  cursor: move;
 }
 line.link.highlight,
 g.highlight ellipse.node {

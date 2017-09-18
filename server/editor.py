@@ -1,7 +1,6 @@
-#!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-"""An application server for CBGM.  Editor.  """
+"""An application server for CBGM.  Editor module.  """
 
 import argparse
 import collections
@@ -26,16 +25,19 @@ from flask_babel import gettext as _, ngettext as n_, lazy_gettext as l_
 from flask_user import roles_required
 import flask_login
 import networkx as nx
+import sqlalchemy
 
 from ntg_common import db
 from ntg_common.db import execute, rollback
 from ntg_common.config import args
 from ntg_common import tools
+from ntg_common import db_tools
 
-import helpers
-from helpers import parameters, Bag, Passage, Manuscript, make_json_response
+from . import helpers
+from .helpers import parameters, Bag, Passage, Manuscript, make_json_response
 
-RE_VALID_VARNEW = re.compile ('^[*]|[?]|[a-z0-9]*$')
+RE_VALID_LABEZ  = re.compile ('^[*]|[?]|[a-y]|z[u-z]$')
+RE_VALID_CLIQUE = re.compile ('^[0-9]$')
 
 app = flask.Blueprint ('the_editor', __name__)
 
@@ -76,46 +78,64 @@ def handle_invalid_edit (ex):
 
 @app.endpoint ('stemma-edit')
 def stemma_edit (passage_or_id):
-    """Edit a local stemma."""
+    """Edit a local stemma.
+
+    Called from local-stemma.js (split, merge, move) and textflow.js (move-manuscripts).
+
+    """
 
     if not flask_login.current_user.has_role ('editor'):
         raise PrivilegeError (_('You don\'t have editor privilege.'))
 
-    action = request.args.get ('action') or ''
-    parent = request.args.get ('parent') or ''
-    child  = request.args.get ('child')  or ''
-    varold = request.args.get ('varold') or ''
-    varnew = request.args.get ('varnew') or ''
-    ms_ids = set ([str (int (x) + 1) for x in request.args.getlist ('ms_ids[]') or []])
+    action = request.args.get ('action')
 
-    if (not RE_VALID_VARNEW.match (parent) or not RE_VALID_VARNEW.match (child)
-        or action not in ('split', 'merge', 'move', 'move-subtree')):
+    if (action not in ('split', 'merge', 'move', 'move-manuscripts')):
         raise EditError (_('Bad request'))
+
+    params = { 'original' : False }
+    for n in 'labez_old labez_new'.split ():
+        params[n] = request.args.get (n)
+        if not RE_VALID_LABEZ.match (params[n]):
+            raise EditError (_('Bad request'))
+        if params[n] == '*':
+            params['original'] = True
+        if params[n] in ('*', '?'):
+            params[n] = None
+    for n in 'clique_old clique_new'.split ():
+        params[n] = request.args.get (n)
+        if not RE_VALID_CLIQUE.match (params[n]):
+            raise EditError (_('Bad request'))
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
+        params['pass_id'] = passage.pass_id
 
         if action == 'move':
-            res = execute (conn, """
-            UPDATE {locstemed}
-            SET s1 = :parent
-            WHERE pass_id = :pass_id AND varnew = :child
-            """, dict (parameters, pass_id = passage.pass_id, parent = parent, child = child))
+            try:
+                res = execute (conn, """
+                UPDATE locstem
+                SET source_labez = :labez_new, source_clique = :clique_new, original = :original
+                WHERE pass_id = :pass_id AND labez = :labez_old AND clique = :clique_old
+                """, dict (parameters, **params))
+            except sqlalchemy.exc.IntegrityError as e:
+                if 'unique_locstem_original' in str (e):
+                    raise EditError (_('Only one original reading allowed. If you want to change the original reading, first remove the old original reading.'))
+                raise EditError (_(str (e)))
+            except sqlalchemy.exc.DatabaseError as e:
+                raise EditError (_(str (e)))
 
             if res.rowcount > 1:
                 raise EditError (_(
-                    'Too many rows {count} affected while moving {child} to {parent}'
-                ).format (count = res.rowcount, child = child, parent = parent)
-            )
+                    'Too many rows ({count}) affected while moving {labez_old}{clique_old} to {labez_new}{clique_new}'
+                ).format (**params, count = res.rowcount))
             if res.rowcount == 0:
                 raise EditError (_(
-                    'Could not move {child} to {parent}'
-                ).format (child = child, parent = parent)
-            )
+                    'Could not move {labez_old}{clique_old} to {labez_new}{clique_new}'
+                ).format (**params))
 
             # test the still uncommited changes
 
-            G = helpers.local_stemma_to_nx (conn, passage)
+            G = db_tools.local_stemma_to_nx (conn, passage.pass_id)
 
             # test: not a DAG
             if not nx.is_directed_acyclic_graph (G):
@@ -124,68 +144,57 @@ def stemma_edit (passage_or_id):
             G.add_edge ('?', '*')
             if nx.isolates (G):
                 raise EditError (_('The graph is not connected anymore.'))
-            # test: more than one original reading
-            if G.out_degree ('*') > 1:
-                raise EditError (_('More than one original reading.'))
             # test: x derived from x
             for e in G.edges_iter ():
                 if e[0][0] == e[1][0]:
-                    raise EditError (_('Reading derived from same reading.'))
-
+                    raise EditError (_('A reading cannot be derived from the same reading.  If you want to <b>merge</b> instead, use shift + drag.'))
 
         elif action == 'split':
-            varid = child[0]
+            res = execute (conn, """
+            SELECT max (clique)
+            FROM  cliques
+            WHERE pass_id = :pass_id AND labez = :labez_old
+            """, dict (parameters, **params))
+
+            # the old clique doesn't matter when splitting, replace it with the
+            # next free one
+            params['clique_old'] = str (int (res.fetchone ()[0]) + 1)
 
             res = execute (conn, """
-            SELECT varnew
-            FROM  {locstemed}
-            WHERE pass_id = :pass_id AND varnew ~ :re
-            """, dict (parameters, pass_id = passage.pass_id, re = '^' + varid))
-
-            max_split = 0
-            for row in res.fetchall ():
-                max_split = max (max_split, int (row[0][1:] or '0'))
-            varnew = varid + str (max_split + 1)
-
-            # FIXME: remember to avoid this in the new database structure !
-            if max_split == 0:
-                # update 'x' => 'x1'
-                res = execute (conn, """
-                UPDATE {locstemed}
-                SET varnew = :varnew
-                WHERE (pass_id, varnew) = (:pass_id, :varold)
-                """, dict (parameters, pass_id = passage.pass_id, varold = varnew, varnew = varid + '1'))
-
-                res = execute (conn, """
-                UPDATE {var}
-                SET varnew = :varnew
-                WHERE (pass_id, varnew) = (:pass_id, :varold)
-                """, dict (parameters, pass_id = passage.pass_id, varold = varnew, varnew = varid + '1'))
+            INSERT INTO cliques (pass_id, labez, clique)
+            VALUES (:pass_id, :labez_old, :clique_old)
+            """, dict (parameters, **params))
 
             res = execute (conn, """
-            INSERT INTO {locstemed} (pass_id, varid, varnew, s1)
-            VALUES (:pass_id, :varid, :varnew, :s1)
-            """, dict (parameters, pass_id = passage.pass_id, varid = varid, varnew = varnew, s1 = '?'))
+            INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original)
+            VALUES (:pass_id, :labez_old, :clique_old, :labez_new, :clique_new, false)
+            """, dict (parameters, **params))
 
         elif action == 'merge':
             res = execute (conn, """
-            UPDATE {var}
-            SET varnew = :varnew
-            WHERE (pass_id, varnew) = (:pass_id, :varold)
-            """, dict (parameters, pass_id = passage.pass_id, varold = child, varnew = parent))
+            UPDATE apparatus
+            SET clique = :clique_new
+            WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old)
+            """, dict (parameters, **params))
 
             res = execute (conn, """
-            DELETE FROM {locstemed}
-            WHERE pass_id = :pass_id AND varnew = :varnew
-            """, dict (parameters, pass_id = passage.pass_id, varnew = child))
+            DELETE FROM locstem
+            WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old)
+            """, dict (parameters, **params))
 
-        elif action == 'move-subtree':
             res = execute (conn, """
-            UPDATE {var}
-            SET varnew = :varnew
-            WHERE (pass_id, varnew) = (:pass_id, :varold) AND ms_id IN :ms_ids
-            """, dict (parameters, pass_id = passage.pass_id,
-                       ms_ids = tuple (ms_ids), varold = varold, varnew = varnew))
+            DELETE FROM cliques
+            WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old)
+            """, dict (parameters, **params))
+
+        elif action == 'move-manuscripts':
+            ms_ids = set (request.args.getlist ('ms_ids[]') or [])
+            res = execute (conn, """
+            UPDATE apparatus
+            SET clique = :clique_new
+            WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old)
+              AND ms_id IN :ms_ids
+            """, dict (parameters, **params, ms_ids = tuple (ms_ids)))
 
             tools.log (logging.INFO, 'Moved ms_ids: ' + str (ms_ids))
 

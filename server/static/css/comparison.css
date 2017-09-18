@@ -53,7 +53,7 @@ div.panel-comparison table.dataTable tbody td.sorting_1 {
 }
 table.comparison {
   margin-bottom: 0;
-  border-width: 0px;
+  border-width: 0;
   text-align: right;
 }
 table.comparison th.ms,
@@ -90,7 +90,7 @@ table.comparison tr.shown td.details-control:after {
   content: "\e082";
   color: red;
 }
-table.comparison tr[data-chapter="0"] td.details-control:after {
+table.comparison tr[data-range="0"] td.details-control:after {
   content: "";
 }
 table.comparison-detail {

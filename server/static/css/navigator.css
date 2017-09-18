@@ -4,10 +4,14 @@ form.passage-selector .input-group input.form-control {
   padding-left: 0.5em;
   padding-right: 0.5em;
 }
+form.passage-selector .input-group input.form-control[name=book] {
+  text-align: left;
+  width: 4em;
+}
 form.passage-selector .input-group input.form-control[name=word] {
   width: 6em;
 }
-form.passage-selector .input-group span.input-group-addon-chapter,
+form.passage-selector .input-group span.input-group-addon-range,
 form.passage-selector .input-group span.input-group-addon-verse {
   padding: 6px;
   border-width: 1px 0;

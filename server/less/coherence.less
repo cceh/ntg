@@ -1,5 +1,5 @@
-@import "../bower_components/bootstrap/less/variables.less";
-@import "../bower_components/bootstrap/less/mixins.less";
+@import "@{BS}/variables.less";
+@import "@{BS}/mixins.less";
 
 @link-color: #ccc;
 @link-opacity: 0.6;
@@ -109,8 +109,15 @@ ellipse {
         stroke-width: 3px;
         fill: #fff;
         transition: fill 2s linear;
-        cursor: pointer;
     }
+}
+
+g.clickable ellipse.node {
+    cursor: pointer;
+}
+
+g.draggable ellipse.node {
+    cursor: move;
 }
 
 line.link.highlight,

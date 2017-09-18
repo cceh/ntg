@@ -3,13 +3,18 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to NTG's documentation!
-===============================
 
-Contents:
+NTG documentation
+=================
+
+A program suite for doing CBGM.
+
+See also: https://github.com/cceh/ntg
+
+Author: Marcello Perathoner <marcello.perathoner@uni-koeln.de>
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
 
 
@@ -21,22 +26,58 @@ Indices and tables
 * :ref:`search`
 
 
-prepare4cbgm.py
----------------
+Script prepare4cbgm.py
+----------------------
 
-.. automodule:: prepare4cbgm
+.. automodule:: scripts.cceh.prepare4cbgm
    :members:
 
 
-ntg_tools.py
-------------
+Package ntg_common
+------------------
 
-.. automodule:: ntg_tools
+.. automodule:: ntg_common
+   :members:
+
+Module db
+~~~~~~~~~
+
+.. automodule:: ntg_common.db
+   :members:
+
+Module db_tools
+~~~~~~~~~~~~~~~
+
+.. automodule:: ntg_common.db_tools
+   :members:
+
+Module tools
+~~~~~~~~~~~~
+
+.. automodule:: ntg_common.tools
    :members:
 
 
-ntg_db.py
----------
+Package server
+--------------
 
-.. automodule:: ntg_db
+.. automodule:: server
+   :members:
+
+Module server
+~~~~~~~~~~~~~
+
+.. automodule:: server.server
+   :members:
+
+Module editor
+~~~~~~~~~~~~~
+
+.. automodule:: server.editor
+   :members:
+
+Module security
+~~~~~~~~~~~~~~~
+
+.. automodule:: server.security
    :members:

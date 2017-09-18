@@ -1,1 +1,1 @@
-""" Package """
+"""An application server for CBGM. """

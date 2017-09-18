@@ -1,5 +1,5 @@
-@import "../bower_components/bootstrap/less/variables.less";
-@import "../bower_components/bootstrap/less/mixins.less";
+@import "@{BS}/variables.less";
+@import "@{BS}/mixins.less";
 
 div.navigator {
     margin-bottom: 1em;
@@ -62,7 +62,7 @@ div.panel-comparison {
 
 table.comparison {
     margin-bottom: 0;
-    border-width: 0px;
+    border-width: 0;
     text-align: right;
     th, td {
         &.ms {
@@ -100,7 +100,7 @@ table.comparison {
         content: "\e082";
         color: red;
     }
-    tr[data-chapter="0"] td.details-control:after {
+    tr[data-range="0"] td.details-control:after {
         content: "";
     }
 }

@@ -2,29 +2,81 @@
 
   <div class="relatives-metrics">
     {% if ms.hs != 'MT' %}
-    <span>{{_('MT %(mt)s',    mt  = "{:.2%}".format (mt.mt))}}</span>
+    <span class="mt fg_labez" data-labez="{{mt.labez}}"><span class="ms hilite-target" data-ms-id="1">MT </span>({{mt.labez}})</span>
     •
-    <span>{{_('MT/P %(mtp)s', mtp = "{:.2%}".format (mt.mtp))}}</span>
+    <span
+        title="The percentage of majority readings at passages where the manuscript is extant and MT is defined."
+        >{{_('MT %(mt)s',    mt  = "{:.2%}".format (mt.mt))}}</span>
+    •
+    <span
+        title="The percentage of majority readings at passages where the manuscript is extant."
+        >{{_('MT/P %(mtp)s', mtp = "{:.2%}".format (mt.mtp))}}</span>
     •
     {% endif %}
-    <span>{{_('AA %(aa)s',    aa  = "{:.2%}".format (ms.aa))}}</span>
+    <span
+        title="The average agreement with all witnesses included."
+        >{{_('AA %(aa)s',    aa  = "{:.2%}".format (ms.aa))}}</span>
     •
-    <span>{{_('MA %(ma)s',    ma  = "{:.2%}".format (ms.ma))}}</span>
+    <span
+        title="The median agreement with all witnesses included."
+        >{{_('MA %(ma)s',    ma  = "{:.2%}".format (ms.ma))}}</span>
   </div>
 
   <table class="relatives table table-condensed">
+    <tr>
+      <th class="rank"
+          title="The ancestral rank according to the degree of agreement"
+          >NR</th>
+      <th class="direction"
+          title="The genealogical direction"
+          >D</th>
+      <th class="ms"
+          title="The Gergory-Aland number of the witness"
+          >Witn</th>
+      <th class="labez"
+          title="The reading offered by the witness"
+          >Rdg</th>
+      <th class="length"
+          title="The number of variant passages defined in this witness"
+          >Len</th>
+      <th class="perc"
+          title="The percentage of variant passages that agree in both witnesses"
+          >Perc</th>
+      <th class="equal"
+          title="The number of variant passages that agree in both witnesses"
+          >=</th>
+      <th class="common"
+          title="The number of variant passages defined in both witnesses"
+          >Com</th>
+      <th class="older"
+          title="The number of prior variants offered by this witness"
+          >Old</th>
+      <th class="newer"
+          title="The number of posterior variants offered by this witness"
+          >New</th>
+      <th class="unclear"
+          title="The number of passages where no decision has been made about priority"
+          >?</th>
+      <th class="norel"
+          title="The number of passages where the offered variants are unrelated"
+          >&lt; &gt;</th>
+    </tr>
     {% for r in rows %}
-    <tr data-labez="{{r.varnew[0]}}" class="fg_labez{% if loop.first %} first{% endif %}">
+    <tr data-labez="{{r.labez}}" class="fg_labez comparison{% if loop.first %} first{% endif %}"
+        data-ms2-id="{{ms.ms_id}}" data-ms1-id="{{r.ms_id}}">
       <td class="rank">{{(r.rank or '')}}</td>
       <td class="direction">{{r.direction|e}}</td>
       <th class="ms"><span class="ms hilite-target" data-ms-id="{{r.ms_id}}">{{r.hs|e}}</span></th>
-      <td class="perc">{{(100.0 * r.equal / r.common)|round(3)}}%</td>
-      <td class="equal">{{r.equal}}/{{r.common}}</td>
-      {# actually newer, older because the row is associated with the target ms #}
-      <td class="older">{{r.newer}}:{{r.older}}:{{r.unclear}}:{{r.norel}}</td>
-      <td class="labez">{{r.varnew}} {{r.labezsuf}}
-      {%- if (mt.labez == r.labez) and (mt.labezsuf == r.labezsuf) and (mt.labez[0] != 'z'): %} (MT){% endif -%}
-      </td>
+      <td class="labez">({{r.labez}})</td>
+      <td class="length">{{r.length}}</td>
+      <td class="perc">{{ '{0:0.2f}'.format (100.0 * r.equal / r.common) }}%</td>
+      <td class="equal">{{r.equal}}</td>
+      <td class="common">{{r.common}}</td>
+      {# Actually older. r.newer because the query refers to the title bar ms. #}
+      <td class="older">{{r.newer}}</td>
+      <td class="newer">{{r.older}}</td>
+      <td class="unclear">{{r.unclear}}</td>
+      <td class="norel">{{r.norel}}</td>
     </tr>
     {% endfor %}
   </table>

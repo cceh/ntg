@@ -12,10 +12,7 @@
 
 {% block h1 %}
   <h1>
-    <span class="caption">
-      {{_('Comparison of')}}
-      <span class="ms1"></span> {{_('and')}} <span class="ms2"></span>
-    </span>
+    <span class="caption" />
     <span class="appname">{{config['APPLICATION_NAME']}}</span>
   </h1>
 {% endblock %}
@@ -44,27 +41,8 @@
       </div>
     </div>
 
-    <table class="comparison table table-bordered table-condensed table-hover" cellspacing="0">
-      <thead>
-        <tr>
-          <th class="details-control"></th>
-          <th class="chapter exportable">{{_('Chapter')}}</th>
-          <th class="ms ms1 exportable">{{_('W1')}}</th>
-          <th class="direction exportable">{{_('Dir')}}</th>
-          <th class="ms ms2 exportable">{{_('W2')}}</th>
-          <th class="rank exportable">{{_('Rank')}}</th>
-          <th class="perc exportable">{{_('Perc')}}</th>
-          <th class="eq exportable">{{_('Eq')}}</th>
-          <th class="pass exportable">{{_('Pass')}}</th>
-          <th class="w1w2 exportable">{{_('W1&lt;W2')}}</th>
-          <th class="w2w1 exportable">{{_('W1&gt;W2')}}</th>
-          <th class="uncl exportable">{{_('Uncl')}}</th>
-          <th class="norel exportable">{{_('Norel')}}</th>
-        </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
+    <!-- main table inserted here by JS -->
+
   </div>
 
 {% endblock %}

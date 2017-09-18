@@ -1,7 +1,7 @@
 div.panel.panel-relatives {
     z-index: 10;
     width: 36em;
-    min-width: auto;
+    min-width: 0;
     span.ms {
         font-weight: bold;
     }
@@ -20,14 +20,28 @@ div.panel.panel-relatives {
 
 table.relatives {
     margin-bottom: 0;
-    th {
-        text-align: right;
-    }
-    td {
+    th, td {
+        padding-left: 0;
+        padding-right: 0;
+        &:first-child {
+            padding-left: 1em;
+        }
+        &:last-child {
+            padding-right: 1em;
+        }
         &.rank {
             text-align: right;
         }
         &.direction {
+            text-align: right;
+        }
+        &.equal {
+            text-align: right;
+        }
+        &.labez {
+            text-align: right;
+        }
+        &.length {
             text-align: right;
         }
         &.perc {
@@ -36,7 +50,19 @@ table.relatives {
         &.equal {
             text-align: right;
         }
+        &.common {
+            text-align: right;
+        }
         &.older {
+            text-align: right;
+        }
+        &.newer {
+            text-align: right;
+        }
+        &.unclear {
+            text-align: right;
+        }
+        &.norel {
             text-align: right;
         }
     }

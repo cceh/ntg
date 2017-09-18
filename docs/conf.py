@@ -20,7 +20,7 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-sys.path.insert(0, os.path.abspath('../scripts/cceh'))
+sys.path.insert (0, os.path.abspath ('..'))
 
 # -- General configuration ------------------------------------------------
 
@@ -35,6 +35,7 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.todo',
     'sphinx.ext.mathjax',
+    'sphinx.ext.imgconverter',
     'sphinx.ext.githubpages',
 ]
 
@@ -54,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'NTG'
-copyright = '2016 CCeH - Licensed under the GNU GPL v3 or later'
+copyright = '2016-17 CCeH - Licensed under the GNU GPL v3 or later'
 author = 'Marcello Perathoner'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -93,7 +94,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
-#add_module_names = True
+add_module_names = False
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
@@ -117,20 +118,22 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
-html_theme = "classic"
-html_theme_options = {
-    # "rightsidebar": "false",
-    # "relbarbgcolor": "black"
-}
-
+import sphinx_rtd_theme
+html_theme = "sphinx_rtd_theme" # nature
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #html_theme_options = {}
+html_theme_options = {
+    'collapse_navigation': False,
+    'display_version': False,
+    'navigation_depth': 3,
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
@@ -162,10 +165,6 @@ html_static_path = ['_static']
 # bottom, using the given strftime format.
 # The empty string is equivalent to '%b %d, %Y'.
 #html_last_updated_fmt = None
-
-# If true, SmartyPants will be used to convert quotes and dashes to
-# typographically correct entities.
-#html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}

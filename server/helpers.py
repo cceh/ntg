@@ -40,7 +40,6 @@ LANGUAGES = {
 
 
 LABEZ_I18N = {
-    'z':       l_('Lac'),
     'zu':      l_('Overlap'),
     'zv':      l_('Lac'),
     'zw':      l_('Dub'),
@@ -64,8 +63,9 @@ class Manuscript (object):
     RE_HS   = re.compile (r'^[PL]?[s\d]+[.]?$|^A$|^MT$')   # 01.
 
     def __init__ (self, conn, manuscript_id_or_hs_or_hsnr):
-        """ Initialize passage struct from manuscript id or hs or hsnr. """
+        """ Initialize from manuscript id or hs or hsnr. """
 
+        self.conn = conn
         self.ms_id = self.hs = self.hsnr = None
         param = manuscript_id_or_hs_or_hsnr
 
@@ -73,8 +73,8 @@ class Manuscript (object):
             where = 'hsnr = :param'
             param = int (param)
         elif Manuscript.RE_MSID.search (param):
-            where = 'id = :param'
-            param = int (param) + 1
+            where = 'ms_id = :param'
+            param = int (param)
         elif Manuscript.RE_HS.search (param):
             where = 'hs = :param'
             param = param.strip ('.')
@@ -82,26 +82,38 @@ class Manuscript (object):
             return
 
         res = execute (conn, """
-        SELECT id - 1 as id, hs, hsnr
-        FROM {ms}
+        SELECT ms_id, hs, hsnr
+        FROM manuscripts
         WHERE {where}
         """, dict (parameters, where = where, param = param))
 
         self.ms_id, self.hs, self.hsnr = res.first ()
 
 
+    def get_length (self, passage, range_ = '0'):
+        # Get the length of the manuscript, ie. the no. of existing passages
+
+        res = execute (self.conn, """
+        SELECT length
+        FROM ms_ranges_view
+        WHERE ms_id = :ms_id AND bk_id = :bk_id AND range = :range_
+        """, dict (parameters, ms_id = self.ms_id, bk_id = passage.bk_id, range_ = range_))
+
+        return res.fetchone ()[0]
+
+
     def to_json (self):
         return {
-            'id'   : self.ms_id,
-            'hs'   : self.hs,
-            'hsnr' : self.hsnr,
+            'ms_id'  : self.ms_id,
+            'hs'     : self.hs,
+            'hsnr'   : self.hsnr,
         }
 
 
 class Word (object):
     """ Represents one word address. """
 
-    RE_HR_WORD = re.compile (r'^(?:(\w+)\s+)?(?:(\d+):)?(?:(\d+)/)?(\d+)$')
+    RE_HR_WORD = re.compile (r'^(?:(\d?\w+)\s+)?(?:(\d+):)?(?:(\d+)/)?(\d+)$')
 
     def __init__ (self, w = 0):
         w = int (w)
@@ -119,10 +131,14 @@ class Word (object):
 
 
     def parse (self, s):
-        # Parse an address from the format: "Acts 1:2/3-4"
+        # Parse an address from the format: "Act 1:2/3-4"
         m = Word.RE_HR_WORD.match (s)
         if m:
-            self.book    = 5 # FIXME parse m.group (1)
+            self.book = 0
+            if m.group (1):
+                bk = m.group (1).lower ()
+                books = [book for book in enumerate (tools.BOOKS) if book[1][1].lower () == bk or book[1][2].lower () == bk]
+                self.book = books[0][0] + 1
             self.chapter = int (m.group (2) or '0')
             self.verse   = int (m.group (3) or '0')
             self.word    = int (m.group (4) or '0')
@@ -135,7 +151,7 @@ class Word (object):
             return "%s %d:%d/%d" % (tools.BOOKS[self.book - 1][1], self.chapter, self.verse, self.word)
 
         if start.book != self.book:
-            return " - %s %d:%d/%d" % (tools.BOOKS[self.book - 1], self.chapter, self.verse, self.word)
+            return " - %s %d:%d/%d" % (tools.BOOKS[self.book - 1][1], self.chapter, self.verse, self.word)
         if start.chapter != self.chapter:
             return " - %d:%d/%d" % (self.chapter, self.verse, self.word)
         if start.verse != self.verse:
@@ -149,25 +165,28 @@ class Passage (object):
     """ Represents one passage. """
 
     def __init__ (self, conn, passage_or_id):
-        """ Initialize passage struct from passage or passage id. """
+        """ Initialize from passage or passage id. """
 
         self.conn = conn
+        self.pass_id, self.start, self.end, self.chapter = 0, 0, 0, 0
         start, end =  self.fix (str (passage_or_id))
 
         if int (start) > 10000000:
             res = execute (conn, """
-            SELECT id, anfadr, endadr, kapanf
-            FROM {pass}
+            SELECT pass_id, anfadr, endadr, adr2book (anfadr), adr2chapter (anfadr)
+            FROM passages
             WHERE anfadr = :anfadr AND endadr = :endadr
             """, dict (parameters, anfadr = start, endadr = end))
         else:
             res = execute (conn, """
-            SELECT id, anfadr, endadr, kapanf
-            FROM {pass}
-            WHERE id = :pass_id
+            SELECT pass_id, anfadr, endadr, adr2book (anfadr), adr2chapter (anfadr)
+            FROM passages
+            WHERE pass_id = :pass_id
             """, dict (parameters, pass_id = start))
 
-        self.pass_id, self.start, self.end, self.chapter = res.first ()
+        res = res.first ()
+        if res is not None:
+            self.pass_id, self.start, self.end, self.bk_id, self.chapter = res
 
 
     @staticmethod
@@ -188,17 +207,21 @@ class Passage (object):
     def to_json (self):
         s = Word (self.start)
         hr = self.to_hr ()
+        bk = tools.BOOKS[self.bk_id - 1]
         return {
-            'id'       : self.pass_id,
+            'pass_id'  : self.pass_id,
             'hr'       : hr,
             'start'    : str (self.start),
             'end'      : str (self.end),
             'passage'  : self.to_passage (),
+            'bk_id'    : self.bk_id,
+            'siglum'   : bk[1],
+            'book'     : bk[2],
             'chapter'  : str (self.chapter),
             'verse'    : s.verse,
             'word'     : hr.split ('/', 1)[1],
-            'variants' : self.variants (),
-            'splits'   : self.splits (),
+            'readings' : self.readings (),
+            'cliques'  : self.cliques (),
         }
 
 
@@ -229,6 +252,20 @@ class Passage (object):
         return start, start[:cut] + end
 
 
+    def range_id (self, range_ = None):
+        """ Return the id of the range containing this passage. """
+
+        range_ = range_ or self.chapter
+
+        res = execute (self.conn, """
+        SELECT rg_id
+        FROM ranges_view
+        WHERE bk_id = :bk_id AND range = :range_
+        """, dict (parameters, bk_id = self.bk_id, range_ = range_))
+
+        return res.fetchone ()[0]
+
+
     def to_passage (self):
         # get a passage id in the form "start-end"
         if self.start == self.end:
@@ -237,13 +274,13 @@ class Passage (object):
         return str (self.start) + '-' + str (self.end)[common:]
 
 
-    def variants (self, prefix = [], suffix = [], delete = []):
-        # Get a list of all variants for this passage
+    def readings (self, prefix = [], suffix = [], delete = []):
+        # Get a list of all readings for this passage
 
         res = execute (self.conn, """
-        SELECT DISTINCT SUBSTR (labez, 1, 1) AS labez
-        FROM {var}
-        WHERE pass_id = :pass_id
+        SELECT labez
+        FROM readings
+        WHERE pass_id = :pass_id AND labez != 'zz'
         ORDER BY labez
         """, dict (parameters, pass_id = self.pass_id))
 
@@ -260,35 +297,22 @@ class Passage (object):
         for k in d.keys ():
             d[k] = LABEZ_I18N.get (d[k], d[k])
 
-        Variants = collections.namedtuple ('Variants', 'labez labez_i18n')
-        return list (map (Variants._make, ((k, v) for k, v in d.items ())))
+        Readings = collections.namedtuple ('Readings', 'labez labez_i18n')
+        return list (map (Readings._make, ((k, v) for k, v in d.items ())))
 
 
-    def splits (self, prefix = [], suffix = [], delete = []):
-        # Get a list of all split-variants for this passage
+    def cliques (self, prefix = [], suffix = [], delete = []):
+        # Get a list of all cliques for this passage
 
         res = execute (self.conn, """
-        SELECT DISTINCT varnew
-        FROM {locstemed}
+        SELECT labez, clique, labez_clique (labez, clique) AS labez_clique
+        FROM cliques
         WHERE pass_id = :pass_id
-        ORDER BY varnew
+        ORDER BY labez, clique
         """, dict (parameters, pass_id = self.pass_id))
 
-        d = collections.OrderedDict ()
-        for p in prefix:
-            d[p] = p
-        for row in res:
-            d[row[0]] = row[0]
-        for s in suffix:
-            d[s] = s
-        for dd in delete:
-            if dd in d:
-                del d[dd]
-        for k in d.keys ():
-            d[k] = LABEZ_I18N.get (d[k][0], d[k])
-
-        Variants = collections.namedtuple ('Splits', 'split split_i18n')
-        return list (map (Variants._make, ((k, v) for k, v in d.items ())))
+        Cliques = collections.namedtuple ('Cliques', 'labez clique labez_clique')
+        return list (map (Cliques._make, (r for r in prefix + list (res.fetchall ()) + suffix if r not in delete)))
 
 
 def get_locale ():
@@ -397,12 +421,12 @@ def nx_to_dot_subgraphs (nxg, field, width = 960.0, fontsize = 10.0):
     # Copy nodes and sort them.  (Sorting nodes is important too.)
     sorted_nodes = sorted (nxg, key = lambda n: (nxg.node[n][field], nxg.node[n]['hsnr']))
     for key, nodes_for_key in itertools.groupby (sorted_nodes, key = lambda n: nxg.node[n][field]):
-        dot.append ("subgraph cluster_%s {" % key)
+        dot.append ("subgraph \"cluster_%s\" {" % key)
         dot.append ("style=rounded")
         dot.append ("labeljust=l")
         dot.append ("labelloc=c")
         dot.append ("rank=%s" % ('source' if key in ('a', 'a1') else 'same'))
-        dot.append ("label=%s" % key)
+        dot.append ("label=\"%s\"" % key)
         for n in nodes_for_key:
             attr = nxg.node[n]
             dot.append ("\"%s\" [%s];" %
@@ -417,38 +441,3 @@ def nx_to_dot_subgraphs (nxg, field, width = 960.0, fontsize = 10.0):
     dot.append ('}\n')
 
     return '\n'.join (dot)
-
-
-def local_stemma_to_nx (conn, passage, show_empty_roots = False):
-    """ Load a passage fron the database into an nx Graph. """
-
-    res = execute (conn, """
-    SELECT varid, varnew, s1, s2
-    FROM {locstemed} s
-    WHERE s.varnew !~ '^z' AND pass_id = :pass_id
-    ORDER BY varnew
-    """, dict (parameters, pass_id = passage.pass_id))
-
-    Variant = collections.namedtuple ('stemma_json_variant', 'varid, varnew, s1, s2')
-
-    rows = list (map (Variant._make, res))
-
-    G = nx.DiGraph ()
-
-    for row in rows:
-        G.add_node (row.varnew, label = row.varnew, labez = row.varid, varnew = row.varnew)
-        G.add_edge (row.s1, row.varnew)
-        if row.s2:
-            G.add_edge (row.s2, row.varnew)
-
-    if show_empty_roots:
-        # Always add '*' and '?' nodes
-        G.add_node ('*')
-        G.add_node ('?')
-
-    if '*' in G:
-        G.node['*'].update (label = '*', labez='*', varnew = '*')
-    if '?' in G:
-        G.node['?'].update (label = '?', labez='?', varnew = '?')
-
-    return G

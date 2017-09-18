@@ -1,3 +1,7 @@
+# -*- encoding: utf-8 -*-
+
+"""An application server for CBGM.  User management module.  """
+
 import sqlalchemy
 from sqlalchemy import String, Integer, Float, Boolean, DateTime, Column, Index, UniqueConstraint, ForeignKey
 

@@ -6,6 +6,7 @@
         "airbnb-base/legacy"
         // "eslint:recommended"
     ],
+    "parser": "babel-eslint",
     "env" : {
         "amd"     : true,
         "browser" : true,

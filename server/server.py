@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-"""An application server for CBGM."""
+"""An application server for CBGM. Main module."""
 
 import argparse
 import collections
@@ -31,17 +31,16 @@ import flask_login
 import flask_mail
 import networkx as nx
 
-sys.path.append (os.path.abspath (os.path.dirname (__file__) + '/..'))
-
-import helpers
-from helpers import parameters, Bag, Passage, Manuscript, LANGUAGES, LABEZ_I18N, make_json_response
-import security
-import editor
+from . import helpers
+from .helpers import parameters, Bag, Passage, Manuscript, LANGUAGES, LABEZ_I18N, make_json_response
+from . import security
+from . import editor
 
 from ntg_common import db
 from ntg_common.db import execute
 from ntg_common.config import args
 from ntg_common import tools
+from ntg_common import db_tools
 
 app = flask.Blueprint ('the_app', __name__)
 static_app = flask.Flask (__name__)
@@ -72,28 +71,46 @@ SHAPES = {
 
 @static_app.endpoint ('index')
 def index ():
+    """ Endpoint.  The root of the application. """
+
     return flask.redirect ('/ph4/', code = 302)
 
 
 @app.endpoint ('acts-phase4')
 def acts_phase4 ():
+    """ Endpoint.  The current main page. """
+
     return flask.render_template ('acts-phase4.html')
 
 
 @app.endpoint ('passage.json')
 def passage_json (passage_or_id = None):
+    """Endpoint.  Serve information about a passage.
+
+    Return information about a passage or navigate to it.
+
+    :param string passage_or_id: The passage id.
+    :param string siglum:        The siglum of the book to navigate to.
+    :param string chapter:       The chapter to navigate to.
+    :param string verse:         The verse to navigate to.
+    :param string word:          The word (range) to navigate to.
+    :param string button:        The button pressed.
+
+    """
 
     passage_or_id = request.args.get ('pass_id') or passage_or_id or '0'
 
+    siglum  = request.args.get ('siglum')
     chapter = request.args.get ('chapter')
     verse   = request.args.get ('verse')
     word    = request.args.get ('word')
-
     button  = request.args.get ('button')
 
     with current_app.config.dba.engine.begin () as conn:
-        if chapter and verse and word and button == 'Go':
-            passage = Passage (conn, Passage.parse ("%s:%s/%s" % (chapter, verse, word)))
+        if siglum and chapter and verse and word and button == 'Go':
+            parsed_passage = Passage.parse ("%s %s:%s/%s" % (siglum, chapter, verse, word))
+            # tools.log (logging.INFO, parsed_passage)
+            passage = Passage (conn, parsed_passage)
             return make_json_response (passage.to_json ())
 
         if button in ('-1', '1'):
@@ -105,15 +122,25 @@ def passage_json (passage_or_id = None):
         return make_json_response (passage.to_json ())
 
 
-@app.endpoint ('splits.json')
-def splits_json (passage_or_id):
+@app.endpoint ('cliques.json')
+def cliques_json (passage_or_id):
+    """ Endpoint.  Serve all cliques found in a passage.
+
+    :param string passage_or_id: The passage id.
+
+    """
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
-        return make_json_response (passage.splits ());
+        return make_json_response (passage.cliques ());
 
 
-def f_map_word (t):
+def _f_map_word (t):
+    """Helper function for the :func:`suggest_json` function.
+
+    Formats the entry of the last field of the navigation gadget.
+    """
+
     if t.kapanf != t.kapend:
         t2 = "%s-%s:%s/%s" % (t.wortanf, t.kapend, t.versend, t.wortend)
     elif t.versanf != t.versend:
@@ -127,6 +154,13 @@ def f_map_word (t):
 
 @app.endpoint ('suggest.json')
 def suggest_json ():
+    """Endpoint.  The suggestion drop-downs in the navigator.
+
+    Serves a list of books, chapters, verses, or words that the user can enter
+    in the navigation gadget.  It suggests only entities that are actually in
+    the database.
+
+    """
 
     # the name of the current field
     field   = request.args.get ('currentfield')
@@ -136,65 +170,95 @@ def suggest_json ():
     term    = '^' + re.escape (term.split ('-')[0])
 
     # terms entered in previous fields
-    book    = request.args.get ('book') or 'Acts'
-    chapter = int (request.args.get ('chapter') or '0')
-    verse   = int (request.args.get ('verse') or '0')
+    siglum  = request.args.get ('siglum')  or 'Act'
+    chapter = request.args.get ('chapter') or 'All'
+    verse   = request.args.get ('verse')   or '1'
 
     Words = collections.namedtuple ('Words', 'kapanf, versanf, wortanf, kapend, versend, wortend, lemma')
 
     res = []
     with current_app.config.dba.engine.begin () as conn:
 
-        if field == 'chapter':
+        if field == 'siglum':
             res = execute (conn, """
-            SELECT DISTINCT kapanf, kapanf
-            FROM {pass}
-            WHERE kapanf::varchar ~ :term
-            ORDER BY kapanf
+            SELECT siglum, siglum, book
+            FROM books b
+            WHERE siglum ~ :term OR book ~ :term
+            ORDER BY bk_id
             """, dict (parameters, term = term))
+            return flask.json.jsonify ([ { 'value' : r[0], 'label' : r[1], 'description' : r[2] } for r in res ])
+
+        elif field == 'chapter':
+            res = execute (conn, """
+            SELECT range, range
+            FROM ranges_view
+            WHERE siglum = :siglum AND range ~ '[1-9][0-9]*' AND range ~ :term
+            ORDER BY range::integer
+            """, dict (parameters, siglum = siglum, term = term))
+            return flask.json.jsonify ([ { 'value' : r[0], 'label' : r[1] } for r in res ])
+
         elif field == 'verse':
             res = execute (conn, """
-            SELECT DISTINCT versanf, versanf
-            FROM {pass}
-            WHERE kapanf = :chapter AND versanf::varchar ~ :term
-            ORDER BY versanf
-            """, dict (parameters, chapter = chapter, term = term))
+            SELECT DISTINCT verse, verse
+            FROM passages_view
+            WHERE siglum = :siglum AND chapter = :chapter AND verse::varchar ~ :term
+            ORDER BY verse
+            """, dict (parameters, siglum = siglum, chapter = chapter, term = term))
+            return flask.json.jsonify ([ { 'value' : r[0], 'label' : r[1] } for r in res ])
+
         elif field == 'word':
             res = execute (conn, """
-            SELECT DISTINCT kapanf, versanf, wortanf, kapend, versend, wortend, lemma
-            FROM {pass}
-            WHERE kapanf = :chapter AND versanf = :verse AND wortanf::varchar ~ :term
-            ORDER BY wortanf, versend, wortend
-            """, dict (parameters, chapter = chapter, verse = verse, term = term))
+            SELECT DISTINCT chapter, verse, word,
+                            adr2chapter (endadr), adr2verse (endadr), adr2word (endadr),
+                            lemma
+            FROM passages_view
+            WHERE siglum = :siglum AND chapter = :chapter AND verse = :verse AND word::varchar ~ :term
+            ORDER BY word, adr2verse (endadr), adr2word (endadr)
+            """, dict (parameters, siglum = siglum, chapter = chapter, verse = verse, term = term))
             res = map (Words._make, res)
-            res = map (f_map_word, res)
-            return flask.json.jsonify ([ { 'label' : r[0], 'value' : r[1], 'description' : r[2] } for r in res ])
+            res = map (_f_map_word, res)
+            return flask.json.jsonify ([ { 'value' : r[0], 'label' : r[1], 'description' : r[2] } for r in res ])
 
-    return flask.json.jsonify ([ { 'label' : r[0], 'value' : r[1] } for r in res ])
+    return flask.json.jsonify ([])
 
 
-@app.endpoint ('chapters.json')
-def chapters_json ():
+@app.endpoint ('ranges.json')
+def ranges_json ():
+    """Endpoint.  Serve a list of ranges.
+
+    Serves a list of the configured ranges that are contained inside a book in
+    the NT.
+
+    :param integer bk_id: The id of the book.
+
+    """
+
+    bk_id = request.args.get ('bk_id') or 5   # default to: Acts
 
     with current_app.config.dba.engine.begin () as conn:
         res = execute (conn, """
-        SELECT DISTINCT chapter, chapter
-        FROM {chap}
-        WHERE chapter > 0
-        ORDER BY chapter
-        """, parameters)
+        SELECT DISTINCT range, range, lower (ch.irange) as anfadr, upper (ch.irange) as endadr
+        FROM ranges ch
+        WHERE bk_id = :bk_id
+        ORDER BY anfadr, endadr DESC
+        """, dict (parameters, bk_id = bk_id))
 
-        Chapters = collections.namedtuple ('Chapters', 'chapter i18n')
-        chapters = list (map (Chapters._make, res))
-        # chapters = [ Chapters._make (r)._asdict () for r in res ]
+        Ranges = collections.namedtuple ('Ranges', 'range, value, anfadr, endadr')
+        # ranges = list (map (Ranges._make, res))
+        ranges = [ Ranges._make (r)._asdict () for r in res ]
 
         return make_json_response ({
-            'chapters' : chapters,
+            'ranges' : ranges,
         })
 
 
 @app.endpoint ('manuscript.json')
 def manuscript_json (hs_hsnr_id):
+    """Endpoint.  Serve information about a manuscript.
+
+    :param string hs_hsnr_id: The hs, hsnr or id of the manuscript.
+
+    """
 
     hs_hsnr_id = request.args.get ('ms_id') or hs_hsnr_id
 
@@ -212,7 +276,7 @@ def ms_attesting (passage_or_id, labez):
 
         res = execute (conn, """
         SELECT hsnr
-        FROM {var}_view
+        FROM apparatus_view
         WHERE pass_id = :pass_id AND labez = :labez
         ORDER BY hsnr
         """, dict (parameters, pass_id = passage.pass_id, labez = labez))
@@ -225,45 +289,40 @@ def ms_attesting (passage_or_id, labez):
                                       passage = passage, labez = labez, rows = attesting)
 
 
-@app.endpoint ('relatives')
-def relatives (hs_hsnr_id, passage_or_id):
-    """The relatives popup skeleton.
+@app.endpoint ('relatives-skeleton')
+def relatives_skeleton (hs_hsnr_id, passage_or_id):
+    """Endpoint. Serve a skeleton for the relatives popup.
 
-    A convenience method that serves an empty skeleton for the relatives popup.
+    An endpoint that serves an empty skeleton for the relatives popup.
 
     """
 
-    chapter = request.args.get ('chapter') or 0
+    chapter = request.args.get ('range') or 'All'
     caption = _('Relatives for')
 
     with current_app.config.dba.engine.begin () as conn:
 
-        passage = Passage (conn, passage_or_id)
-        ms      = Manuscript (conn, hs_hsnr_id)
+        passage   = Passage (conn, passage_or_id)
+        ms        = Manuscript (conn, hs_hsnr_id)
+        ms.length = ms.get_length (passage, chapter)
 
-        # Get the attestation (labez) of the manuscript
+        # Get the attestation(s) of the manuscript
         res = execute (conn, """
-        SELECT labez, labezsuf, varid, varnew
-        FROM {var}
+        SELECT labez
+        FROM apparatus_view_agg
         WHERE ms_id = :ms_id AND pass_id = :pass_id
-        """, dict (parameters, ms_id = ms.ms_id + 1, pass_id = passage.pass_id))
-        ms.labez, ms.labezsuf, ms.varid, ms.varnew = res.fetchone ()
-
-        # Get the passage
-        res = execute (conn, """
-        SELECT kapanf FROM {pass} WHERE id = :pass_id
-        """, dict (parameters, pass_id = passage.pass_id))
-        pass_chapter, = res.fetchone ()
+        """, dict (parameters, ms_id = ms.ms_id, pass_id = passage.pass_id))
+        ms.labez,  = res.fetchone ()
 
         mt = Bag ()
 
-        # Get the attestation (labez) of MT
+        # Get the reading of MT
         res = execute (conn, """
-        SELECT labez, labezsuf, varid, varnew
-        FROM {var}
+        SELECT labez, clique, labez_clique
+        FROM apparatus_view
         WHERE ms_id = 2 AND pass_id = :pass_id
         """, dict (parameters, pass_id = passage.pass_id))
-        mt.labez, mt.labezsuf, mt.varid, mt.varnew = res.fetchone ()
+        mt.labez, mt.clique, mt.labez_clique = res.fetchone ()
 
     # convert tuples to lists
     return flask.render_template ('relatives-skeleton.html', caption = caption, ms = ms, mt = mt)
@@ -279,17 +338,19 @@ def relatives_html (hs_hsnr_id, passage_or_id):
     """
 
     type_     = request.args.get ('type') or 'rel'
-    chapter   = request.args.get ('chapter') or 0
+    chapter   = request.args.get ('range') or 'All'
     limit     = int (request.args.get ('limit') or 10)
     labez     = request.args.get ('labez') or 'all'
     mode      = request.args.get ('mode') or 'sim'
     include   = request.args.getlist ('include[]') or []
     fragments = request.args.getlist ('fragments[]') or []
 
+    view = 'affinity_view' if mode == 'rec' else 'affinity_p_view'
+
     caption = _('Relatives for')
     where = ''
     if type_ == 'anc':
-        where =  ' AND older <= newer'
+        where =  ' AND older < newer'
         caption = _('Ancestors for')
     if type_ == 'des':
         where =  ' AND older >= newer'
@@ -302,54 +363,38 @@ def relatives_html (hs_hsnr_id, passage_or_id):
     else:
         where += " AND labez = '%s'" % labez
 
-    prefix = '' if mode == 'rec' else 'p_'
-
     if 'fragments' in fragments:
         f_where = ''
     else:
-        f_where = 'AND aff.common > ch.length / 2'
+        f_where = 'AND aff.common > aff.ms1_length / 2'
 
     limit = '' if limit == 0 else ' LIMIT %d' % limit
 
     with current_app.config.dba.engine.begin () as conn:
 
-        passage = Passage (conn, passage_or_id)
-        ms      = Manuscript (conn, hs_hsnr_id)
-
-        # Get the attestation (labez) of the manuscript
-        res = execute (conn, """
-        SELECT labez, labezsuf, varid, varnew
-        FROM {var}
-        WHERE ms_id = :ms_id AND pass_id = :pass_id
-        """, dict (parameters, ms_id = ms.ms_id + 1, pass_id = passage.pass_id))
-        ms.labez, ms.labezsuf, ms.varid, ms.varnew = res.fetchone ()
+        passage   = Passage (conn, passage_or_id)
+        ms        = Manuscript (conn, hs_hsnr_id)
+        ms.length = ms.get_length (passage, chapter)
+        rg_id     = passage.range_id (chapter)
 
         # Get the affinity of the manuscript to all manuscripts
         res = execute (conn, """
         SELECT avg (a.affinity) as aa,
                percentile_cont(0.5) WITHIN GROUP (ORDER BY a.affinity) as ma
-        FROM {aff} a
-        JOIN {chap} c
-          ON (a.id1, a.chapter) = (c.ms_id, c.chapter)
-        WHERE a.id1 = :id1 AND a.chapter = :chapter
-        """, dict (parameters, id1 = ms.ms_id + 1, chapter = chapter))
+        FROM affinity a
+        WHERE a.ms_id1 = :ms_id1 AND a.rg_id = :rg_id
+        """, dict (parameters, ms_id1 = ms.ms_id, rg_id = rg_id))
         ms.aa, ms.ma = res.fetchone ()
-
-        # Get the passage
-        res = execute (conn, """
-        SELECT kapanf FROM {pass} WHERE id = :pass_id
-        """, dict (parameters, pass_id = passage.pass_id))
-        pass_chapter, = res.fetchone ()
 
         mt = Bag ()
 
-        # Get the attestation (labez) of MT
+        # Get the reading of MT
         res = execute (conn, """
-        SELECT labez, labezsuf, varid, varnew
-        FROM {var}
+        SELECT labez, clique, labez_clique
+        FROM apparatus_view
         WHERE ms_id = 2 AND pass_id = :pass_id
         """, dict (parameters, pass_id = passage.pass_id))
-        mt.labez, mt.labezsuf, mt.varid, mt.varnew = res.fetchone ()
+        mt.labez, mt.clique, mt.labez_clique = res.fetchone ()
 
         # Get the affinity of the manuscript to MT
         #
@@ -360,11 +405,11 @@ def relatives_html (hs_hsnr_id, passage_or_id):
         mt.mt, mt.mtp = 0.0, 0.0
         res = execute (conn, """
         SELECT a.affinity as mt, a.equal::float / c.length as mtp
-        FROM {aff} a
-        JOIN {chap} c
-          ON (a.id1, a.chapter) = (c.ms_id, c.chapter)
-        WHERE a.id1 = :id1 AND a.id2 = 2 AND a.chapter = :chapter
-        """, dict (parameters, id1 = ms.ms_id + 1, chapter = chapter))
+        FROM affinity a
+        JOIN ms_ranges c
+          ON (a.ms_id1, a.rg_id) = (c.ms_id, c.rg_id)
+        WHERE a.ms_id1 = :ms_id1 AND a.ms_id2 = 2 AND a.rg_id = :rg_id
+        """, dict (parameters, ms_id1 = ms.ms_id, rg_id = rg_id))
         if res.rowcount > 0:
             mt.mt, mt.mtp = res.fetchone ()
 
@@ -373,10 +418,10 @@ def relatives_html (hs_hsnr_id, passage_or_id):
         if include:
             # get ids of nodes to include
             res = execute (conn, """
-            SELECT id
-            FROM {ms}
+            SELECT ms_id
+            FROM manuscripts
             WHERE (hs IN :include)
-            ORDER BY id
+            ORDER BY ms_id
             """, dict (parameters, include = tuple (include)))
 
             include = [str (n.ms_id) for n in map (Nodes._make, res)]
@@ -388,55 +433,52 @@ def relatives_html (hs_hsnr_id, passage_or_id):
         res = execute (conn, """
         /* get the LIMIT closest ancestors for this node */
         WITH ranks AS (
-          SELECT id1, id2, rank () OVER (ORDER BY affinity DESC) AS rank, affinity
-          FROM {aff} aff
-          JOIN {chap} ch
-            ON ch.ms_id = aff.id1 AND ch.chapter = aff.chapter
-          WHERE id1 = :ms_id1 AND aff.chapter = :chapter AND id2 NOT IN :exclude
-            AND {prefix}newer > {prefix}older AND aff.common > ch.length / 2
+          SELECT ms_id1, ms_id2, rank () OVER (ORDER BY affinity DESC) AS rank, affinity
+          FROM {view} aff
+          JOIN ms_ranges ch
+            ON ch.ms_id = aff.ms_id1 AND ch.rg_id = aff.rg_id
+          WHERE ms_id1 = :ms_id1 AND aff.rg_id = :rg_id AND ms_id2 NOT IN :exclude
+            AND newer > older AND aff.common > ch.length / 2
           ORDER BY affinity DESC
         )
 
         SELECT r.rank,
-               ms2.id - 1 as ms_id,
-               ms2.hs,
-               ms2.hsnr,
+               aff.ms_id2 as ms_id,
+               ms.hs,
+               ms.hsnr,
+               aff.ms2_length,
                aff.common,
                aff.equal,
-               aff.{prefix}older,
-               aff.{prefix}newer,
+               aff.older,
+               aff.newer,
                aff.unclear,
-               aff.common - aff.equal - aff.{prefix}older - aff.{prefix}newer - aff.unclear as norel,
-               CASE WHEN aff.{prefix}newer < aff.{prefix}older THEN ''
-                    WHEN aff.{prefix}newer = aff.{prefix}older THEN '-'
+               aff.common - aff.equal - aff.older - aff.newer - aff.unclear as norel,
+               CASE WHEN aff.newer < aff.older THEN ''
+                    WHEN aff.newer = aff.older THEN '-'
                     ELSE '>'
                END as direction,
                aff.affinity,
-               v.labez,
-               v.labezsuf,
-               v.varid,
-               v.varnew
+               a.labez
         FROM
-          {aff} aff
-        JOIN {ms} ms2
-          ON aff.id2 = ms2.id AND aff.id2 NOT IN :exclude
-        JOIN {var} v
-          ON aff.id2 = v.ms_id
-        JOIN {chap} ch
-          ON ch.ms_id = aff.id1 AND ch.chapter = aff.chapter
+          {view} aff
+        JOIN apparatus_view_agg a
+          ON aff.ms_id2 = a.ms_id
+        JOIN manuscripts ms
+          ON aff.ms_id2 = ms.ms_id
         LEFT JOIN ranks r
-          ON r.id2 = aff.id2
-        WHERE aff.id1 = :ms_id1 AND aff.chapter = :chapter AND aff.common > 0
-              AND v.pass_id = :pass_id {where} {f_where}
-        ORDER BY affinity DESC, r.rank, {prefix}newer DESC, {prefix}older DESC, hsnr
+          ON r.ms_id2 = aff.ms_id2
+        WHERE aff.ms_id2 NOT IN :exclude AND aff.ms_id1 = :ms_id1
+              AND aff.rg_id = :rg_id AND aff.common > 0
+              AND a.pass_id = :pass_id {where} {f_where}
+        ORDER BY affinity DESC, r.rank, newer DESC, older DESC, hsnr
         {limit}
-        """, dict (parameters, where = where, f_where = f_where, ms_id1 = ms.ms_id + 1, hsnr = ms.hsnr,
-                   pass_id = passage.pass_id, chapter = chapter, limit = limit,
-                   prefix = prefix, exclude = tuple (exclude)))
+        """, dict (parameters, where = where, f_where = f_where, ms_id1 = ms.ms_id, hsnr = ms.hsnr,
+                   pass_id = passage.pass_id, rg_id = rg_id, limit = limit,
+                   view = view, exclude = tuple (exclude)))
 
         Relatives = collections.namedtuple (
             'Relatives',
-            'rank ms_id hs hsnr common equal older newer unclear norel direction affinity labez labezsuf varid varnew'
+            'rank ms_id hs hsnr length common equal older newer unclear norel direction affinity labez'
         )
         relatives = list (map (Relatives._make, res))
 
@@ -456,9 +498,9 @@ def remove_z_leaves (G, group_field):
 def textflow (passage_or_id):
     """ Output a stemma of manuscripts. """
 
-    varnew       = request.args.get ('labez') or ''
-    hyp_a        = request.args.get ('hyp_a')  or 'A'
-    chapter      = request.args.get ('chapter') or 0
+    labez        = request.args.get ('labez') or ''
+    hyp_a        = request.args.get ('hyp_a') or 'A'
+    chapter      = request.args.get ('range') or 'All'
     connectivity = int (request.args.get ('connectivity') or 10)
     width        = float (request.args.get ('width') or 0.0)
     fontsize     = float (request.args.get ('fontsize') or 10.0)
@@ -467,11 +509,11 @@ def textflow (passage_or_id):
     include      = set (request.args.getlist ('include[]') or ['NONE'])
     fragments    = request.args.getlist ('fragments[]') or []
     var_only     = request.args.getlist ('var_only[]')  or []
-    splits       = request.args.getlist ('splits[]')    or []
+    cliques      = request.args.getlist ('cliques[]')    or []
 
     fragments = 'fragments' in fragments
     var_only  = 'var_only'  in var_only
-    splits    = 'splits'    in splits
+    cliques   = 'cliques'   in cliques
     show_z    = 'Z'         in include
 
     prefix = '' if mode == 'rec' else 'p_'
@@ -483,16 +525,27 @@ def textflow (passage_or_id):
     else:
         f_where = 'AND a.common > c.length / 2'
 
-    varnew_where = ''
-    if varnew != '':
-        varnew_where = 'AND v.varnew ~ :varnew'
+    labez_where = ''
+    if labez != '':
+        labez_where = 'AND a.cbgm AND a.labez = :labez'
         if hyp_a != 'A':
-            varnew_where = 'AND (v.varnew ~ :varnew OR (v.ms_id = 1 AND :hyp_a ~ :varnew))'
+            labez_where = 'AND a.cbgm AND (a.labez = :labez OR (a.ms_id = 1 AND :hyp_a = :labez))'
 
-    group_field = 'varnew' if splits else 'varid'
+    group_field = 'labez' if cliques else 'labez_clique'
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
+
+        if chapter == 'This':
+            chapter = passage.chapter
+
+        # get rg_id
+        res = execute (conn, """
+        SELECT rg_id
+        FROM ranges
+        WHERE range = :range_ AND bk_id = :bk_id
+        """, dict (parameters, bk_id = passage.bk_id, range_ = chapter))
+        rg_id, = res.fetchone ()
 
         G = nx.DiGraph ()
 
@@ -500,55 +553,55 @@ def textflow (passage_or_id):
 
         # get ids of nodes to exclude
         res = execute (conn, """
-        SELECT id
-        FROM {ms}
+        SELECT ms_id
+        FROM manuscripts
         WHERE (hs IN ('A', 'MT')) AND (hs NOT IN :include)
-        ORDER BY id
+        ORDER BY ms_id
         """, dict (parameters, include = tuple (include)))
 
         exclude = set ([str (n.ms_id) for n in map (Nodes._make, res)])
         exclude.add (-1) # a non-existing id to avoid SQL syntax error if empty
 
-        # get all nodes or all nodes (hypothetically) attesting varnew
+        # get all nodes or all nodes (hypothetically) attesting labez
         res = execute (conn, """
         SELECT ms_id
-        FROM {var} v
-        WHERE pass_id = :pass_id {varnew_where} AND ms_id NOT IN :exclude
+        FROM apparatus a
+        WHERE pass_id = :pass_id {labez_where} AND ms_id NOT IN :exclude
         """, dict (parameters, exclude = tuple (exclude),
-                   pass_id = passage.pass_id, varnew = '^' + varnew,
-                   hyp_a = hyp_a, varnew_where = varnew_where))
+                   pass_id = passage.pass_id, labez = labez,
+                   hyp_a = hyp_a, labez_where = labez_where))
 
         nodes = list (map (Nodes._make, res))
 
         for n in nodes:
             G.add_node (n.ms_id)
 
-        order = 'affinity DESC, common, older, newer DESC, id2' # id2 is a tiebreaker
+        order = 'affinity DESC, common, older, newer DESC, ms_id2' # id2 is a tiebreaker
 
         # query to get the closest ancestors for every node with rank <= connectivity
         query = """
-        SELECT id1, id2, rank
+        SELECT ms_id1, ms_id2, rank
         FROM (
-          SELECT id1, id2, rank () OVER (PARTITION BY id1 ORDER BY {order}) AS rank
-          FROM {aff} a
-          JOIN {chap} c
-            ON c.ms_id = a.id1 AND c.chapter = a.chapter
-          WHERE id1 IN :nodes AND a.chapter = :chapter AND id2 NOT IN :exclude
-            AND {prefix}newer > {prefix}older AND a.common > c.length / 2
+          SELECT ms_id1, ms_id2, rank () OVER (PARTITION BY ms_id1 ORDER BY {order}) AS rank
+          FROM affinity a
+          JOIN ms_ranges c
+            ON c.ms_id = a.ms_id1 AND c.rg_id = a.rg_id
+          WHERE ms_id1 IN :nodes AND a.rg_id = :rg_id AND ms_id2 NOT IN :exclude
+            AND {prefix}newer > {prefix}older {f_where}
         ) AS r
         WHERE rank <= :connectivity
         ORDER BY rank
         """
 
-        global_textflow = not ((varnew != '') or var_only)
+        global_textflow = not ((labez != '') or var_only)
         if global_textflow:
             connectivity = 1
 
         res = execute (conn, query,
                        dict (parameters, nodes = tuple (G.nodes ()), exclude = tuple (exclude),
-                             chapter = chapter, pass_id = passage.pass_id, prefix = prefix,
-                             varnew = '^' + varnew, connectivity = connectivity, order = order,
-                             f_where = f_where, hyp_a = hyp_a, varnew_where = varnew_where))
+                             rg_id = rg_id, pass_id = passage.pass_id, prefix = prefix,
+                             labez = labez, connectivity = connectivity, order = order,
+                             f_where = f_where, hyp_a = hyp_a, labez_where = labez_where))
 
         Ranks = collections.namedtuple ('Ranks', 'ms_id1 ms_id2 rank')
         ranks = list (map (Ranks._make, res))
@@ -559,28 +612,37 @@ def textflow (passage_or_id):
         src_nodes  = set ([r.ms_id2 for r in ranks])
 
         res = execute (conn, """
-        SELECT ms.id, ms.hs, ms.hsnr, v.varid, v.varnew
-        FROM {ms} ms
-        JOIN {var} v
-          ON ms.id = v.ms_id AND v.pass_id = :pass_id
-        WHERE ms.id IN :ms_ids
+        SELECT ms.ms_id, ms.hs, ms.hsnr, av.labez, av.clique, av.labez_clique
+        FROM manuscripts ms
+        JOIN (
+          SELECT ms_id,
+                 labez_agg (labez order by labez) as labez,
+                 labez_agg (clique order by clique) as clique,
+                 labez_agg (labez_clique order by labez_clique) as labez_clique
+          FROM apparatus_view
+          WHERE pass_id = :pass_id
+          GROUP BY ms_id
+        ) AS av
+        USING (ms_id)
+        WHERE ms.ms_id IN :ms_ids
         """, dict (parameters, ms_ids = tuple (src_nodes | dest_nodes), pass_id = passage.pass_id))
 
-        Mss = collections.namedtuple ('Mss', 'ms_id hs hsnr varid varnew')
+        Mss = collections.namedtuple ('Mss', 'ms_id hs hsnr labez clique labez_clique')
         mss = list (map (Mss._make, res))
         for ms in mss:
             attrs = {}
-            attrs['hs']     = ms.hs
-            attrs['hsnr']   = ms.hsnr
-            attrs['varid']  = ms.varid
-            attrs['varnew'] = ms.varnew
-            attrs['labez']  = ms.varnew[0]
-            attrs['ms_id']  = ms.ms_id - 1
-            attrs['label']  = ms.hs
+            attrs['hs']           = ms.hs
+            attrs['hsnr']         = ms.hsnr
+            attrs['labez']        = ms.labez
+            attrs['clique']       = ms.clique
+            attrs['labez_clique'] = ms.labez_clique
+            attrs['ms_id']        = ms.ms_id
+            attrs['label']        = ms.hs
+            attrs['clickable']    = '1'
             if ms.ms_id == 1 and hyp_a != 'A':
-                attrs['varid']  = hyp_a[0]
-                attrs['varnew'] = hyp_a
-                attrs['labez']  = hyp_a[0]
+                attrs['labez']        = hyp_a[0]
+                attrs['clique']       = ''
+                attrs['labez_clique'] = hyp_a[0]
             # FIXME: attrs['shape'] = SHAPES.get (attrs['labez'], SHAPES['a'])
             G.add_node (ms.ms_id, attrs)
 
@@ -628,9 +690,10 @@ def textflow (passage_or_id):
         if var_only:
             # Remove non-variant links
             #
-            # remove nodes attesting z and link the children up
+            # remove nodes attesting zz/zw and link the children up
             for n in G:
-                if G.node[n][group_field][0] == 'z':
+                gf = G.node[n][group_field]
+                if gf == 'zz' or '/' in gf:
                     pred = G.predecessors (n)
                     if pred:
                         G.remove_edge (pred[0], n)
@@ -639,7 +702,8 @@ def textflow (passage_or_id):
                         if pred:
                             G.add_edge (pred[0], succ)
 
-            # remove a node's other edges if one edge is within attestation
+            # if one predecessor is within the same attestation then remove all
+            # other predecessors that are not within the same attestation
             for n in G:
                 within = False
                 attestation_n = G.node[n][group_field]
@@ -667,15 +731,15 @@ def textflow (passage_or_id):
 
         else:
             for n in G:
-                # Use a different label if the parent's varnew differs from this
-                # node's varnew.
+                # Use a different label if the parent's labez_clique differs from this
+                # node's labez_clique.
                 pred = G.predecessors (n)
                 attrs = G.node[n]
                 if not pred:
-                    attrs['label'] = "%s: %s" % (attrs['varnew'], attrs['hs'])
+                    attrs['label'] = "%s: %s" % (attrs['labez_clique'], attrs['hs'])
                 for p in pred:
-                    if attrs['varnew'] != G.node[p]['varnew']:
-                        attrs['label'] = "%s: %s" % (attrs['varnew'], attrs['hs'])
+                    if attrs['labez_clique'] != G.node[p]['labez_clique']:
+                        attrs['label'] = "%s: %s" % (attrs['labez_clique'], attrs['hs'])
                         G.edge[p][n]['style'] = 'dashed'
 
     if var_only:
@@ -708,53 +772,59 @@ def csvify (fields, rows):
     return flask.Response (fp.getvalue (), mimetype = 'text/csv')
 
 
-@app.endpoint ('coherence')
-def coherence ():
-    """The main page of the user interface.
+@app.endpoint ('coherence-skeleton')
+def coherence_skeleton ():
+    """Endpoint. Serve a skeleton of the Coherence page.
 
-    This page gets a hashtag parameter for the passage id.  All
-    relevant content is loaded by ajax.
+    The Coherence page is the main page of the application.  This endpoint only
+    serves a skeleton.  All relevant content is then loaded by AJAX.
 
     """
 
-    return flask.render_template ('coherence.html')
+    return flask.render_template ('coherence-skeleton.html')
 
 
-@app.endpoint ('comparison')
-def comparison ():
-    """ Comparison of 2 witnesses. """
+@app.endpoint ('comparison-skeleton')
+def comparison_skeleton ():
+    """Endpoint. Serve a skeleton of the Comparison page.
+
+    The comparison page contains a table detailing the differences between 2
+    manuscripts.  This endpoint only serves a skeleton.  The table rows will be
+    loaded with AJAX.
+
+    """
 
     with current_app.config.dba.engine.begin () as conn:
         ms1 = Manuscript (conn, request.args.get ('ms1') or 'A')
         ms2 = Manuscript (conn, request.args.get ('ms2') or 'A')
 
-        return flask.render_template ('comparison.html', ms1 = ms1, ms2 = ms2)
+        return flask.render_template ('comparison-skeleton.html', ms1 = ms1, ms2 = ms2)
 
 
-ComparisonRow = collections.namedtuple (
-    'Comparison', 'chapter, common, equal, older, newer, unclear, affinity, rank')
+_ComparisonRow = collections.namedtuple (
+    'ComparisonRow', 'rg_id, range, common, equal, older, newer, unclear, affinity, rank, length1, length2')
 
 
-ComparisonDetailRow = collections.namedtuple (
-    'ComparisonDetailRow',
-    'pass_id anfadr endadr var1 mask1 anc1 par1 lesart1 var2 mask2 anc2 par2 lesart2'
-)
-
-class ComparisonDetailRowCalcFields (ComparisonDetailRow):
+class _ComparisonRowCalcFields (_ComparisonRow):
     __slots__ = ()
 
-    _fields = ComparisonDetailRow._fields + ('pass_hr', )
+    _fields = _ComparisonRow._fields + ('norel', )
 
     @property
-    def pass_hr (self):
-        return Passage._to_hr (self.anfadr, self.endadr)
+    def norel (self):
+        return self.common - self.equal - self.older - self.newer - self.unclear
 
     def _asdict (self):
-        return collections.OrderedDict (zip (self._fields, self + (self.pass_hr, )))
+        return collections.OrderedDict (zip (self._fields, self + (self.norel, )))
 
 
-def _comparison ():
-    """ Comparison of 2 witnesses. Returns CSV. """
+def comparison_summary ():
+    """Output comparison of 2 witnesses, chapter summary.
+
+    Outputs a summary of the differences between 2 manuscripts, one summary row
+    per chapters.
+
+    """
 
     with current_app.config.dba.engine.begin () as conn:
         ms1 = Manuscript (conn, request.args.get ('ms1') or 'A')
@@ -762,91 +832,124 @@ def _comparison ():
 
         res = execute (conn, """
         (WITH ranks AS (
-          SELECT id1, id2, aff.chapter, rank () OVER (PARTITION BY aff.chapter ORDER BY affinity DESC) AS rank, affinity
-          FROM {aff} aff
-          JOIN {chap} ch
-            ON ch.ms_id = aff.id1 AND ch.chapter = aff.chapter
-          WHERE id1 = :ms_id1
-            AND {prefix}newer > {prefix}older AND aff.common > ch.length / 2
+          SELECT ms_id1, ms_id2, rg_id, rank () OVER (PARTITION BY rg_id ORDER BY affinity DESC) AS rank, affinity
+          FROM affinity aff
+          WHERE ms_id1 = :ms_id1
+            AND {prefix}newer > {prefix}older
           ORDER BY affinity DESC
         )
 
-        SELECT a.chapter, a.common, a.equal,
-               a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, r.rank
-        FROM {aff} a
-        JOIN ranks r
-          ON r.id1 = a.id1 AND r.id2 = a.id2 AND r.chapter = a.chapter
-        WHERE a.id1 = :ms_id1 AND a.id2 = :ms_id2
+        SELECT a.rg_id, ch.range, a.common, a.equal,
+               a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, r.rank, c1.length, c2.length
+        FROM affinity a
+        JOIN ranks r     USING (rg_id, ms_id1, ms_id2)
+        JOIN ranges ch USING (rg_id)
+        JOIN ms_ranges c1 ON a.ms_id1 = c1.ms_id AND a.rg_id = c1.rg_id
+        JOIN ms_ranges c2 ON a.ms_id2 = c2.ms_id AND a.rg_id = c2.rg_id
+        WHERE a.ms_id1 = :ms_id1 AND a.ms_id2 = :ms_id2
         )
 
         UNION
 
         (WITH ranks2 AS (
-          SELECT id1, id2, aff.chapter, rank () OVER (PARTITION BY aff.chapter ORDER BY affinity DESC) AS rank, affinity
-          FROM {aff} aff
-          JOIN {chap} ch
-            ON ch.ms_id = aff.id2 AND ch.chapter = aff.chapter
-          WHERE id2 = :ms_id2
-            AND {prefix}newer < {prefix}older AND aff.common > ch.length / 2
+          SELECT ms_id1, ms_id2, rg_id, rank () OVER (PARTITION BY rg_id ORDER BY affinity DESC) AS rank, affinity
+          FROM affinity aff
+          WHERE ms_id2 = :ms_id2
+            AND {prefix}newer < {prefix}older
           ORDER BY affinity DESC
         )
 
-        SELECT a.chapter, a.common, a.equal,
-               a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, r.rank
-        FROM {aff} a
-        JOIN ranks2 r
-          ON r.id1 = a.id1 AND r.id2 = a.id2 AND r.chapter = a.chapter
-        WHERE a.id1 = :ms_id1 AND a.id2 = :ms_id2
+        SELECT a.rg_id, ch.range, a.common, a.equal,
+               a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, r.rank, c1.length, c2.length
+        FROM affinity a
+        JOIN ranks2 r    USING (rg_id, ms_id1, ms_id2)
+        JOIN ranges ch USING (rg_id)
+        JOIN ms_ranges c1 ON a.ms_id1 = c1.ms_id AND a.rg_id = c1.rg_id
+        JOIN ms_ranges c2 ON a.ms_id2 = c2.ms_id AND a.rg_id = c2.rg_id
+        WHERE a.ms_id1 = :ms_id1 AND a.ms_id2 = :ms_id2
         )
 
         UNION
 
-        SELECT a.chapter, a.common, a.equal,
-               a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, NULL
-        FROM {aff} a
-        WHERE a.id1 = :ms_id1 AND a.id2 = :ms_id2 AND a.{prefix}newer = a.{prefix}older
+        SELECT a.rg_id, ch.range, a.common, a.equal,
+               a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, NULL, c1.length, c2.length
+        FROM affinity a
+        JOIN ranges ch USING (rg_id)
+        JOIN ms_ranges c1 ON a.ms_id1 = c1.ms_id AND a.rg_id = c1.rg_id
+        JOIN ms_ranges c2 ON a.ms_id2 = c2.ms_id AND a.rg_id = c2.rg_id
+        WHERE a.ms_id1 = :ms_id1 AND a.ms_id2 = :ms_id2 AND a.{prefix}newer = a.{prefix}older
 
-        ORDER BY chapter
-        """, dict (parameters, ms_id1 = ms1.ms_id + 1, ms_id2 = ms2.ms_id + 1, prefix = 'p_'))
+        ORDER BY rg_id
+        """, dict (parameters, ms_id1 = ms1.ms_id, ms_id2 = ms2.ms_id, prefix = ''))
 
-        return list (map (ComparisonRow._make, res))
+        return list (map (_ComparisonRowCalcFields._make, res))
 
 
-def _comparison_detail ():
-    """Comparison of 2 witnesses, chapter detail"""
+_ComparisonDetailRow = collections.namedtuple (
+    'ComparisonDetailRow',
+    'pass_id anfadr endadr labez_clique1 lesart1 labez_clique2 lesart2 older newer unclear'
+)
+
+class _ComparisonDetailRowCalcFields (_ComparisonDetailRow):
+    __slots__ = ()
+
+    _fields = _ComparisonDetailRow._fields + ('pass_hr', 'norel')
+
+    @property
+    def pass_hr (self):
+        return Passage._to_hr (self.anfadr, self.endadr)
+
+    @property
+    def norel (self):
+        return not (self.older or self.newer or self.unclear)
+
+    def _asdict (self):
+        return collections.OrderedDict (zip (self._fields, self + (self.pass_hr, self.norel)))
+
+
+def comparison_detail ():
+    """Output comparison of 2 witnesses, chapter detail.
+
+    Outputs a detail of the differences between 2 manuscripts in one chapter.
+    """
 
     with current_app.config.dba.engine.begin () as conn:
         ms1 = Manuscript (conn, request.args.get ('ms1') or 'A')
         ms2 = Manuscript (conn, request.args.get ('ms2') or 'A')
-        chapter = request.args.get ('chapter') or 0
+        range_ = request.args.get ('range') or 'All'
 
         res = execute (conn, """
-        SELECT p.id, p.anfadr, p.endadr,
-          v1.varnew, l1.varnewmask, l1.ancestors, l1.parents, r1.lesart,
-          v2.varnew, l2.varnewmask, l2.ancestors, l2.parents, r2.lesart
-        FROM (SELECT * FROM {pass} WHERE kapanf = :chapter) p
-          JOIN {var} v1 ON v1.pass_id = p.id AND v1.ms_id = :ms1
-          JOIN {var} v2 ON v2.pass_id = p.id AND v2.ms_id = :ms2
-          JOIN {locstemed} l1 ON l1.pass_id = p.id AND l1.varnew = v1.varnew
-          JOIN {locstemed} l2 ON l2.pass_id = p.id AND l2.varnew = v2.varnew
-          JOIN {read} r1 ON r1.pass_id = p.id AND r1.labez = v1.labez AND r1.labezsuf = v1.labezsuf
-          JOIN {read} r2 ON r2.pass_id = p.id AND r2.labez = v2.labez AND r2.labezsuf = v2.labezsuf
-        WHERE v1.varnew != v2.varnew AND v1.varnew !~ '^z' AND v2.varnew !~ '^z'
-        ORDER BY p.id
-        """, dict (parameters, ms1 = ms1.ms_id + 1, ms2 = ms2.ms_id + 1, chapter = chapter))
+        SELECT p.pass_id, p.anfadr, p.endadr, v1.labez_clique, v1.lesart,
+                                              v2.labez_clique, v2.lesart,
+          is_older (p.pass_id, v1.labez, v1.clique, v2.labez, v2.clique) AS older,
+          is_older (p.pass_id, v2.labez, v2.clique, v1.labez, v1.clique) AS newer,
+          is_unclear (p.pass_id, v1.labez, v1.clique) OR
+          is_unclear (p.pass_id, v2.labez, v2.clique) AS unclear
+        FROM (SELECT * FROM ranges WHERE range = :range_) r
+          JOIN passages p ON (r.irange @> p.irange )
+          JOIN apparatus_view v1 USING (pass_id)
+          JOIN apparatus_view v2 USING (pass_id)
+        WHERE v1.ms_id = :ms1 AND v2.ms_id = :ms2
+          AND v1.labez != v2.labez AND v1.labez !~ '^z' AND v2.labez !~ '^z'
+          AND v1.cbgm AND v2.cbgm
+        ORDER BY p.pass_id
+        """, dict (parameters, ms1 = ms1.ms_id, ms2 = ms2.ms_id, range_ = range_))
 
-        return list (map (ComparisonDetailRowCalcFields._make, res))
+        return list (map (_ComparisonDetailRowCalcFields._make, res))
 
 
-@app.endpoint ('comparison.csv')
-def comparison_csv ():
-    return csvify (ComparisonRow._fields, _comparison ())
+@app.endpoint ('comparison-summary.csv')
+def comparison_summary_csv ():
+    """Endpoint. Serve a CSV table. (see also :func:`comparison_summary`)"""
+
+    return csvify (_ComparisonRowCalcFields._fields, comparison_summary ())
 
 
 @app.endpoint ('comparison-detail.csv')
 def comparison_detail_csv ():
-    # tools.log (logging.INFO, ComparisonDetailRow._source)
-    return csvify (ComparisonDetailRowCalcFields._fields, _comparison_detail ())
+    """Endpoint. Serve a CSV table. (see also :func:`comparison_detail`)"""
+
+    return csvify (_ComparisonDetailRowCalcFields._fields, comparison_detail ())
 
 
 @app.endpoint ('apparatus.json')
@@ -856,36 +959,26 @@ def apparatus_json (passage_or_id):
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
 
-        Readings    = collections.namedtuple ('Readings',    'labez labezsuf lesart')
-        Manuscripts = collections.namedtuple ('Manuscripts', 'varid varnew labez labezsuf ms_id hs hsnr')
-
-        # list of labez, labezsuf => lesart
+        # list of labez => lesart
         res = execute (conn, """
-        SELECT labez, labezsuf, lesart
-        FROM {read}
+        SELECT labez, lesart
+        FROM readings
         WHERE pass_id = :pass_id
-        ORDER BY labez, labezsuf
+        ORDER BY labez
         """, dict (parameters, pass_id = passage.pass_id))
 
-        def i18n (d):
-            if d['labez'] in LABEZ_I18N:
-                d['lesart'] = LABEZ_I18N[d['labez']]
-            return d
+        Readings = collections.namedtuple ('Readings', 'labez lesart')
+        readings = [ Readings._make (r)._asdict () for r in res ]
 
-        readings = [ i18n (Readings._make (r)._asdict ()) for r in res ]
-
-        for k in LABEZ_I18N:
-            readings.append ({ 'labez': k, 'labezsuf': '', 'lesart': LABEZ_I18N[k] });
-
-
-        # list of varnew => manuscripts
+        # list of labez_clique => manuscripts
         res = execute (conn, """
-        SELECT varid, varnew, labez, labezsuf, ms_id - 1 as ms_id, hs, hsnr
-        FROM {var}_view
+        SELECT labez, clique, labez_clique, ms_id, hs, hsnr, certainty
+        FROM apparatus_view
         WHERE pass_id = :pass_id
-        ORDER BY varnew, labezsuf, hsnr
+        ORDER BY labez, clique, hsnr
         """, dict (parameters, pass_id = passage.pass_id))
 
+        Manuscripts = collections.namedtuple ('Manuscripts', 'labez clique labez_clique ms_id hs hsnr certainty')
         manuscripts = [ Manuscripts._make (r)._asdict () for r in res ]
 
         return make_json_response ({
@@ -904,7 +997,7 @@ def attestation_json (passage_or_id):
 
         res = execute (conn, """
         SELECT ms_id, labez
-        FROM {var}
+        FROM apparatus
         WHERE pass_id = :pass_id
         ORDER BY ms_id
         """, dict (parameters, pass_id = passage.pass_id))
@@ -912,7 +1005,7 @@ def attestation_json (passage_or_id):
         attestations = {}
         for row in res:
             ms_id, labez = row
-            attestations[str(ms_id - 1)] = labez
+            attestations[str (ms_id)] = labez
 
         return make_json_response ({
             'attestations': attestations
@@ -945,8 +1038,8 @@ def stemma (passage_or_id):
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
-        nx = helpers.local_stemma_to_nx (
-            conn, passage, flask_login.current_user.has_role ('editor')
+        nx = db_tools.local_stemma_to_nx (
+            conn, passage.pass_id, flask_login.current_user.has_role ('editor')
         )
         dot = helpers.nx_to_dot (nx, width, fontsize, nodesep = 0.2)
         return dot
@@ -996,7 +1089,6 @@ if __name__ == "__main__":
     args.start_time = datetime.datetime.now ()
     LOG_LEVELS = { 0: logging.CRITICAL, 1: logging.ERROR, 2: logging.WARN, 3: logging.INFO, 4: logging.DEBUG }
     args.log_level = LOG_LEVELS.get (args.verbose + 1, logging.CRITICAL)
-    parameters.update (tools.init_parameters (tools.DEFAULTS))
 
     babel = flask_babel.Babel ()
     babel.localeselector (helpers.get_locale)
@@ -1033,18 +1125,18 @@ if __name__ == "__main__":
 
         sub_app.url_map = Map ([
             Rule ('/',                                            endpoint = 'acts-phase4'),
-            Rule ('/coherence',                                   endpoint = 'coherence'),
-            Rule ('/comparison',                                  endpoint = 'comparison'),
-            Rule ('/comparison.csv',                              endpoint = 'comparison.csv'),
+            Rule ('/coherence',                                   endpoint = 'coherence-skeleton'),
+            Rule ('/comparison',                                  endpoint = 'comparison-skeleton'),
+            Rule ('/comparison-summary.csv',                      endpoint = 'comparison-summary.csv'),
             Rule ('/comparison-detail.csv',                       endpoint = 'comparison-detail.csv'),
             Rule ('/suggest.json',                                endpoint = 'suggest.json'),
-            Rule ('/chapters.json',                               endpoint = 'chapters.json'),
+            Rule ('/ranges.json',                                 endpoint = 'ranges.json'),
             Rule ('/manuscript.json/<hs_hsnr_id>',                endpoint = 'manuscript.json'),
             Rule ('/passage.json/',                               endpoint = 'passage.json'),
             Rule ('/passage.json/<passage_or_id>',                endpoint = 'passage.json'),
-            Rule ('/splits.json/<passage_or_id>',                 endpoint = 'splits.json'),
+            Rule ('/cliques.json/<passage_or_id>',                endpoint = 'cliques.json'),
             Rule ('/ms_attesting/<passage_or_id>/<labez>',        endpoint = 'ms_attesting'),
-            Rule ('/relatives/<passage_or_id>/<hs_hsnr_id>',      endpoint = 'relatives'),
+            Rule ('/relatives/<passage_or_id>/<hs_hsnr_id>',      endpoint = 'relatives-skeleton'),
             Rule ('/relatives.html/<passage_or_id>/<hs_hsnr_id>', endpoint = 'relatives.html'),
             Rule ('/apparatus.json/<passage_or_id>',              endpoint = 'apparatus.json'),
             Rule ('/attestation.json/<passage_or_id>',            endpoint = 'attestation.json'),

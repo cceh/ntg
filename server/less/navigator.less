@@ -1,5 +1,5 @@
-@import "../bower_components/bootstrap/less/variables.less";
-@import "../bower_components/bootstrap/less/mixins.less";
+@import "@{BS}/variables.less";
+@import "@{BS}/mixins.less";
 
 form.passage-selector {
     .input-group {
@@ -8,11 +8,15 @@ form.passage-selector {
             width: 3em;
             padding-left: 0.5em;
             padding-right: 0.5em;
+            &[name=book] {
+                text-align: left;
+                width: 4em;
+            }
             &[name=word] {
                 width: 6em;
             }
         }
-        span.input-group-addon-chapter,
+        span.input-group-addon-range,
         span.input-group-addon-verse {
             padding: 6px;
             border-width: 1px 0;

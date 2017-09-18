@@ -17,26 +17,28 @@ TRANSLATIONS    := de            # space-separated list of translations we have 
 NTG_SERVER  := $(NTG_ROOT)/$(SERVER)
 NTG_STATIC  := $(NTG_ROOT)/$(STATIC)
 
-LESS        := $(wildcard $(STATIC)/css/*.less)
-CSS         := $(LESS:.less=.css)
+LESS        := $(wildcard $(SERVER)/less/*.less)
+CSS         := $(patsubst $(SERVER)/less/%.less, $(STATIC)/css/%.css, $(LESS))
 CSS_GZ      := $(patsubst %, %.gzip, $(CSS))
 
-ES6         := $(wildcard $(STATIC)/js/*.es6)
-JS          := $(STATIC)/js/*.js $(ES6:.es6=.js)
+ES6         := $(wildcard $(SERVER)/es6/*.es6)
+JS_SRC      := $(wildcard $(SERVER)/es6/*.js)
+JS          := $(patsubst $(SERVER)/es6/%.es6, $(STATIC)/js/%.js, $(ES6)) \
+               $(patsubst $(SERVER)/es6/%.js,  $(STATIC)/js/%.js, $(JS_SRC))
 JS_GZ       := $(patsubst %, %.gzip, $(JS))
 
 PY_SOURCES  := scripts/cceh/*.py ntg_common/*.py server/*.py
 
 .PHONY: upload upload_po update_pot update_po update_mo update_libs vpn server restart psql
-.PHONY: js css jsdoc lint pylint jslint csslint
+.PHONY: js css docs jsdoc sphinx lint pylint jslint csslint
 
 restart: js css server
 
 server: css js
-	server/server.py -vv
+	python3 -m server.server -vv
 
 prepare:
-	scripts/cceh/prepare4cbgm.py -vvv server/instance/current.conf
+	python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/ph4.conf
 
 users:
 	scripts/cceh/mk_users.py -vvv server/instance/_global.conf
@@ -60,10 +62,15 @@ pylint:
 	-pylint $(PY_SOURCES)
 
 jslint:
-	./node_modules/.bin/eslint -f unix $(JS)
+	./node_modules/.bin/eslint -f unix $(ES6) $(JS_SRC)
 
 csslint: css
 	csslint --ignore="adjoining-classes,box-sizing,ids,order-alphabetical,overqualified-elements,qualified-headings" $(CSS)
+
+docs: sphinx jsodc
+
+sphinx:
+	cd docs; make html; cd ..
 
 jsdoc:
 	jsdoc -d jsdoc -a all $(JS) && $(BROWSER) jsdoc/index.html
@@ -79,11 +86,14 @@ css: $(CSS)
 
 js:	$(JS)
 
-%.js : %.es6
+$(STATIC)/js/%.js : $(SERVER)/es6/%.es6
 	./node_modules/.bin/babel $? --out-file $@ --source-maps
 
-%.css : %.less
-	lessc --autoprefix="last 2 versions" $? $@
+$(STATIC)/js/%.js : $(SERVER)/es6/%.js
+	cp $? $@
+
+$(STATIC)/css/%.css : $(SERVER)/less/%.less
+	lessc --global-var="BS=\"$(STATIC)/bower_components/bootstrap/less\"" --autoprefix="last 2 versions" $? $@
 
 %.gzip : %
 	gzip < $? > $@

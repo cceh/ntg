@@ -1,7 +1,7 @@
 div.panel.panel-relatives {
   z-index: 10;
   width: 36em;
-  min-width: auto;
+  min-width: 0;
 }
 div.panel.panel-relatives span.ms {
   font-weight: bold;
@@ -20,21 +20,64 @@ div.panel.panel-relatives div.panel-relatives-content {
 table.relatives {
   margin-bottom: 0;
 }
-table.relatives th {
-  text-align: right;
+table.relatives th,
+table.relatives td {
+  padding-left: 0;
+  padding-right: 0;
 }
+table.relatives th:first-child,
+table.relatives td:first-child {
+  padding-left: 1em;
+}
+table.relatives th:last-child,
+table.relatives td:last-child {
+  padding-right: 1em;
+}
+table.relatives th.rank,
 table.relatives td.rank {
   text-align: right;
 }
+table.relatives th.direction,
 table.relatives td.direction {
   text-align: right;
 }
-table.relatives td.perc {
-  text-align: right;
-}
+table.relatives th.equal,
 table.relatives td.equal {
   text-align: right;
 }
+table.relatives th.labez,
+table.relatives td.labez {
+  text-align: right;
+}
+table.relatives th.length,
+table.relatives td.length {
+  text-align: right;
+}
+table.relatives th.perc,
+table.relatives td.perc {
+  text-align: right;
+}
+table.relatives th.equal,
+table.relatives td.equal {
+  text-align: right;
+}
+table.relatives th.common,
+table.relatives td.common {
+  text-align: right;
+}
+table.relatives th.older,
 table.relatives td.older {
+  text-align: right;
+}
+table.relatives th.newer,
+table.relatives td.newer {
+  text-align: right;
+}
+table.relatives th.unclear,
+table.relatives td.unclear {
+  text-align: right;
+}
+table.relatives th.norel,
+table.relatives td.norel {
   text-align: right;
 }

@@ -15,58 +15,36 @@ import six
 
 from .config import args
 
-DEFAULTS = {
-    #'att'    : 'ActsAtt_3',
-    #'lac'    : 'ActsLac_3',
-    #'attlac' : 'ActsAttLac_3',
-    #'tmp'    : 'ActsTmp_3',
-
-    'att'       : 'att',
-    'lac'       : 'lac',
-    'pass'      : 'passages',
-    'chap'      : 'chapters',
-    'ms'        : 'manuscripts',
-    'var'       : 'var',
-    'read'      : 'readings',
-    'aff'       : 'affinity',
-    'tmp'       : 'tmp',
-    'g_nodes'   : 'nodes',
-    'g_edges'   : 'edges',
-    'locstemed' : 'locstemed',
-    'locstemedtmp' : 'locstemedtmp',
-}
-""" Defaults for init_parameters () """
-
-
-BOOKS = (
-    ("Mt",  "Matthew"),
-	("Mc",  "Mark"),
-    ("L",   "Luke"),
-	("J",   "John"),
-	("Act", "Acts"),
-	("R",   "Romans"),
-	("1K",  "1Corinthians"),
-	("2K",  "2Corinthians"),
-	("G",   "Galatians"),
-	("E",   "Ephesians"),
-	("Ph",  "Philippians"),
-	("Kol", "Colossians"),
-	("1Th", "1Thessalonians"),
-	("2Th", "2Thessalonians"),
-	("1T",  "1Timothy"),
-	("2T",  "2Timothy"),
-	("Tt",  "Titus"),
-	("Phm", "Philemon"),
-	("H",   "Hebrews"),
-	("Jc",  "James"),
-	("1P",  "1Peter"),
-	("2P",  "2Peter"),
-	("1J",  "1John"),
-	("2J",  "2John"),
-	("3J",  "3John"),
-	("Jd",  "Jude"),
-	("Ap",  "Revelation")
-)
+BOOKS = [
+    # id, siglum, name, no. of chapters
+    ( 1, "Mt",  "Matthew",        0),
+    ( 2, "Mc",  "Mark",          16),
+    ( 3, "L",   "Luke",           0),
+    ( 4, "J",   "John",           0),
+    ( 5, "Act", "Acts",          28),
+    ( 6, "R",   "Romans",         0),
+    ( 7, "1K",  "1Corinthians",   0),
+    ( 8, "2K",  "2Corinthians",   0),
+    ( 9, "G",   "Galatians",      0),
+    (10, "E",   "Ephesians",      0),
+    (11, "Ph",  "Philippians",    0),
+    (12, "Kol", "Colossians",     0),
+    (13, "1Th", "1Thessalonians", 0),
+    (14, "2Th", "2Thessalonians", 0),
+    (15, "1T",  "1Timothy",       0),
+    (16, "2T",  "2Timothy",       0),
+    (17, "Tt",  "Titus",          0),
+    (18, "Phm", "Philemon",       0),
+    (19, "H",   "Hebrews",        0),
+    (20, "Jc",  "James",          0),
+    (21, "1P",  "1Peter",         0),
+    (22, "2P",  "2Peter",         0),
+    (23, "1J",  "1John",          0),
+    (24, "2J",  "2John",          0),
+    (25, "3J",  "3John",          0),
+    (26, "Jd",  "Jude",           0),
+    (27, "Ap",  "Revelation",     0),
+]
 """ Titles of the NT books """
 
 BYZ_HSNR = "(300010, 300180, 300350, 303300, 303980, 304240, 312410)"
@@ -103,18 +81,6 @@ def quote (s):
     if ' ' in s:
         return '"' + s + '"'
     return s
-
-def init_parameters (defaults):
-
-    parameters = dict ()
-
-    for k, v in defaults.items ():
-        parameters[k] = quote (v)
-
-    parameters['fehlverse'] = FEHLVERSE
-    parameters['byzlist']   = BYZ_HSNR
-
-    return parameters
 
 
 def log (level, msg, *aargs, **kwargs):
