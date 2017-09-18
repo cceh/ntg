@@ -168,7 +168,7 @@ class Passage (object):
         """ Initialize from passage or passage id. """
 
         self.conn = conn
-        self.pass_id, self.start, self.end, self.chapter = 0, 0, 0, 0
+        self.pass_id, self.start, self.end, self.bk_id, self.chapter = 0, 0, 0, 0, 0
         start, end =  self.fix (str (passage_or_id))
 
         if int (start) > 10000000:
