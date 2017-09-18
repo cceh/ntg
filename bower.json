@@ -1,37 +1,36 @@
 {
-  "name": "cceh-ntg",
-  "version": "0.1.0",
-  "authors": [
-    "CCeH - Cologne Center for eHumanities"
-  ],
-  "license": "GPL3",
-  "private": false,
-  "ignore": [
-    "**/.*",
-    "**/*~",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
-  "dependencies": {
-    "requirejs": "^2.2.0",
-    "require-css": "^0.1.8",
-    "requirejs-text": "^2.0.15",
-    "jquery": "^3.1.1",
-    "jquery-ui": "^1.12.0",
-    "d3": "^4.3.0",
-    "d3.promise": "^2.0.0",
-    "lodash": "^4.17.2",
-    "pegjs": "^0.10.0",
-    "rsvp.js": "rsvp#^3.3.3",
-    "bootstrap": "^3.3.6",
-    "seiyria-bootstrap-slider": "^9.4.1",
-    "datatables.net": "^1.10.13",
-    "datatables.net-bs": "^1.10.13",
-    "datatables.net-buttons": "^1.2.4",
-    "datatables.net-buttons-bs": "^1.2.4",
-    "urijs": "^1.18.10"
-  },
-  "devDependencies": {}
+    "name": "cceh-ntg",
+    "version": "0.1.0",
+    "authors": [
+        "CCeH - Cologne Center for eHumanities"
+    ],
+    "license": "GPL3",
+    "private": false,
+    "ignore": [
+        "**/.*",
+        "**/*~",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "requirejs": "^2.2.0",
+        "require-css": "*",
+        "requirejs-text": "*",
+        "jquery": "^3.1.1",
+        "jquery-ui": "^1.12.0",
+        "d3": "^4.3.0",
+        "lodash": "^4.17.2",
+        "pegjs": "^0.10.0",
+        "bootstrap": "^3.3.6",
+        "seiyria-bootstrap-slider": "^9.4.1",
+        "datatables.net": "^1.10.13",
+        "datatables.net-bs": "^1.10.13",
+        "datatables.net-buttons": "^1.2.4",
+        "datatables.net-buttons-bs": "^1.2.4",
+        "urijs": "^1.18.10"
+    },
+    "devDependencies": {
+    }
 }

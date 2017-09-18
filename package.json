@@ -1,37 +1,38 @@
 {
-  "name": "@cceh/ntg",
-  "description": "The Novum Testamentum Graecum Website",
-  "homepage": "http://ntg.uni-koeln.de",
-  "author": "CCeH - Cologne Center for eHumanities",
-  "contributors": [
-    "Marcello Perathoner <marcello.perathoner@uni-koeln.de>"
-  ],
-  "version": "0.1.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cceh/ntg"
-  },
-  "bugs": {
-    "url": "https://github.com/cceh/ntg/issues"
-  },
-  "license": "GPL-3.0",
-  "devDependencies": {
-    "babel-cli": "*",
-    "babel-eslint": "^8.0.0",
-    "babel-preset-env": "*",
-    "bower": "*",
-    "eslint": "*",
-    "eslint-config-airbnb": "*",
-    "eslint-config-standard": "*",
-    "eslint-plugin-import": "*",
-    "eslint-plugin-jsx-a11y": "*",
-    "eslint-plugin-node": "*",
-    "eslint-plugin-promise": "*",
-    "eslint-plugin-react": "*",
-    "eslint-plugin-standard": "*",
-    "less-plugin-autoprefix": "*"
-  },
-  "engines": {
-    "node": ">=0.10.1"
-  }
+    "name": "@cceh/ntg",
+    "description": "The Novum Testamentum Graecum Website",
+    "homepage": "http://ntg.cceh.uni-koeln.de",
+    "author": "CCeH - Cologne Center for eHumanities",
+    "contributors": [
+        "Marcello Perathoner <marcello.perathoner@uni-koeln.de>"
+    ],
+    "version": "0.1.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cceh/ntg"
+    },
+    "bugs": {
+        "url": "https://github.com/cceh/ntg/issues"
+    },
+    "license": "GPL-3.0",
+    "devDependencies": {
+        "babel-cli": "*",
+        "babel-eslint": "^8",
+        "babel-preset-env": "*",
+        "bower": "*",
+        "eslint": "*",
+        "eslint-config-airbnb": "*",
+        "eslint-config-standard": "*",
+        "eslint-plugin-import": "*",
+        "eslint-plugin-jsx-a11y": "^5",
+        "eslint-plugin-node": "*",
+        "eslint-plugin-promise": "*",
+        "eslint-plugin-react": "*",
+        "eslint-plugin-standard": "*",
+        "less": "*",
+        "less-plugin-autoprefix": "*"
+    },
+    "engines": {
+        "node": ">=0.10.1"
+    }
 }

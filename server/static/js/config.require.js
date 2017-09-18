@@ -6,7 +6,6 @@ requirejs.config ({
         'jquery'                       : '/static/bower_components/jquery/dist/jquery',
         'jquery-ui'                    : '/static/bower_components/jquery-ui/jquery-ui',
         'd3'                           : '/static/bower_components/d3/d3',
-        'd3-promise'                   : '/static/bower_components/d3.promise/dist/d3.promise',
         'bootstrap-slider'             : '/static/bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider',
         'lodash'                       : '/static/bower_components/lodash/lodash',
         'datatables.net'               : '/static/bower_components/datatables.net/js/jquery.dataTables',
@@ -17,7 +16,6 @@ requirejs.config ({
         'datatables.net-buttons-print' : '/static/bower_components/datatables.net-buttons/js/buttons.print',
         'urijs'                        : '/static/bower_components/urijs/src',
         'pegjs'                        : '/static/bower_components/pegjs/peg-0.10.0',
-        'rsvp'                         : '/static/bower_components/rsvp.js/rsvp',
         'text'                         : '/static/bower_components/requirejs-text/text',
         'css'                          : '/static/bower_components/require-css/css',
         // private libs
