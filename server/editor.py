@@ -127,7 +127,7 @@ def stemma_edit (passage_or_id):
             if res.rowcount > 1:
                 raise EditError (_(
                     'Too many rows ({count}) affected while moving {labez_old}{clique_old} to {labez_new}{clique_new}'
-                ).format (**params, count = res.rowcount))
+                ).format (count = res.rowcount, **params))
             if res.rowcount == 0:
                 raise EditError (_(
                     'Could not move {labez_old}{clique_old} to {labez_new}{clique_new}'
@@ -194,7 +194,7 @@ def stemma_edit (passage_or_id):
             SET clique = :clique_new
             WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old)
               AND ms_id IN :ms_ids
-            """, dict (parameters, **params, ms_ids = tuple (ms_ids)))
+            """, dict (parameters, ms_ids = tuple (ms_ids), **params))
 
             tools.log (logging.INFO, 'Moved ms_ids: ' + str (ms_ids))
 
