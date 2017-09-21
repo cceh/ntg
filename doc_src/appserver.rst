@@ -11,6 +11,7 @@
 -------------------------------
 
 .. automodule:: server.server
+   :synopsis: Main Module
    :members:
 
 
@@ -18,6 +19,7 @@
 -------------------------------
 
 .. automodule:: server.editor
+   :synopsis: Editor Module
    :members:
 
 
@@ -25,4 +27,5 @@
 -----------------------------------
 
 .. automodule:: server.security
+   :synopsis: User Management Module
    :members:

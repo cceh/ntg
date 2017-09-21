@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Transformation tools &mdash; NTG 0.1.1 documentation</title>
+  <title>Scripts &mdash; NTG 0.1.1 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
-        <link rel="next" title="Application Server" href="appserver.html"/>
-        <link rel="prev" title="Common Code" href="ntg_common.html"/> 
+        <link rel="next" title="Common Code" href="ntg_common.html"/>
+        <link rel="prev" title="Application Client" href="appclient.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -130,19 +130,11 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Database Tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Generic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="database.html#source-tables">Source Tables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#locstemed">LocStemEd</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Transformation tools</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#tabellen-und-felder">Tabellen und Felder</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#felder-in-der-tabelle-locstemed">Felder in der Tabelle LocStemEd</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
@@ -152,18 +144,28 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appclient.html">Application Client</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id1">Module apparatus</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id2">Module coherence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id3">Module comparison</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id4">Module d3-chord-layout</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id5">Module d3-common</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id6">Module d3-stemma-layout</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id7">Module local-stemma</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id8">Module navigator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id9">Module panel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id10">Module relatives</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#textflow">Module textflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id12">Module tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-coherence"><code class="docutils literal"><span class="pre">coherence</span></code> — The Coherence Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-navigator"><code class="docutils literal"><span class="pre">navigator</span></code> — The Navigator Gadget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-apparatus"><code class="docutils literal"><span class="pre">apparatus</span></code> — The Apparatus Panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-local-stemma"><code class="docutils literal"><span class="pre">local-stemma</span></code> — The Local Stemma Panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-textflow"><code class="docutils literal"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-relatives"><code class="docutils literal"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-panel"><code class="docutils literal"><span class="pre">panel</span></code> — The Panel Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-chord-layout"><code class="docutils literal"><span class="pre">d3-chord-layout</span></code> — The Chord Layout Engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-stemma-layout"><code class="docutils literal"><span class="pre">d3-stemma-layout</span></code> — The Stemma Layout Engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-comparison"><code class="docutils literal"><span class="pre">comparison</span></code> — The Comparison Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-common"><code class="docutils literal"><span class="pre">d3-common</span></code> — Various functions for D3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-tools"><code class="docutils literal"><span class="pre">tools</span></code> — Various Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Scripts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Various Functions for Database Access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Various Functions</a></li>
 </ul>
 </li>
 </ul>
@@ -210,13 +212,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Transformation tools</li>
+      <li>Scripts</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/transform.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/scripts.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -229,8 +231,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="transformation-tools">
-<h1>Transformation tools<a class="headerlink" href="#transformation-tools" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="scripts">
+<h1>Scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h1>
 <p>Transform the Nestle-Aland database into a database suitable for the CBGM.</p>
 <p>Die mysql-Datenbank, die uns zur Verfügung gestellt wurde, enthält 28 +
 28 Tabellen, je zwei für jedes Kapitel der Apostelgeschichte.  Die erste
@@ -269,56 +271,8 @@ hat, weil z.B. die Seite beschädigt ist.  Korrekturen oder
 Alternativlesarten werden für die CBGM ignoriert.</p>
 <p class="attribution">&mdash;ArbeitsablaufCBGMApg_Db.docx</p>
 </div></blockquote>
-<div class="section" id="tabellen-und-felder">
-<h2>Tabellen und Felder<a class="headerlink" href="#tabellen-und-felder" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="felder-in-der-tabelle-locstemed">
-<h3>Felder in der Tabelle LocStemEd<a class="headerlink" href="#felder-in-der-tabelle-locstemed" title="Permalink to this headline">¶</a></h3>
-<dl class="attribute">
-<dt id="id">
-<code class="descname">id</code><a class="headerlink" href="#id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Primärer Schlüssel</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="varid">
-<code class="descname">varid</code><a class="headerlink" href="#varid" title="Permalink to this definition">¶</a></dt>
-<dd><p>id der variierten Stelle</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="varnew">
-<code class="descname">varnew</code><a class="headerlink" href="#varnew" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gleich wie varid oder neue id nach Splitt.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="s1">
-<code class="descname">s1</code><a class="headerlink" href="#s1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ursprung der Variante</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="s2">
-<code class="descname">s2</code><a class="headerlink" href="#s2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Eventueller zweiter Ursprung der Variante.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">begadr, endar</code></dt>
-<dd><p>Stelle (Passage)</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="w">
-<code class="descname">w</code><a class="headerlink" href="#w" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flag für “Westlicher Text”.  Hat für die CBGM keine Bedeutung.</p>
-</dd></dl>
-
-</div>
-</div>
-<div class="section" id="module-scripts.cceh.prepare4cbgm">
-<span id="scripts-cceh-prepare4cbgm-prepare4cbgm"></span><h2><a class="reference internal" href="#module-scripts.cceh.prepare4cbgm" title="scripts.cceh.prepare4cbgm"><code class="xref py py-mod docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code></a> — prepare4cbgm<a class="headerlink" href="#module-scripts.cceh.prepare4cbgm" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-scripts"></span><div class="section" id="module-scripts.cceh.prepare4cbgm">
+<span id="scripts-cceh-prepare4cbgm-prepare4cbgm"></span><h2><a class="reference internal" href="#module-scripts.cceh.prepare4cbgm" title="scripts.cceh.prepare4cbgm: Initialize the CBGM Database"><code class="xref py py-mod docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code></a> — prepare4cbgm<a class="headerlink" href="#module-scripts.cceh.prepare4cbgm" title="Permalink to this headline">¶</a></h2>
 <p>Prepare the database for CBGM</p>
 <p>This script converts the apparatus tables used in the production of Nestle-Aland
 into tables suitable for doing CBGM:</p>
@@ -638,10 +592,10 @@ the end we will have no ‘zw’ rows left (they only gave trouble anyway).</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="appserver.html" class="btn btn-neutral float-right" title="Application Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="ntg_common.html" class="btn btn-neutral float-right" title="Common Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="ntg_common.html" class="btn btn-neutral" title="Common Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="appclient.html" class="btn btn-neutral" title="Application Client" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

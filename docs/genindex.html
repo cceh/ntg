@@ -129,19 +129,11 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Database Tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Generic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="database.html#source-tables">Source Tables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#locstemed">LocStemEd</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="transform.html">Transformation tools</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="transform.html#tabellen-und-felder">Tabellen und Felder</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="transform.html#felder-in-der-tabelle-locstemed">Felder in der Tabelle LocStemEd</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="transform.html#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
@@ -151,18 +143,28 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appclient.html">Application Client</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id1">Module apparatus</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id2">Module coherence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id3">Module comparison</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id4">Module d3-chord-layout</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id5">Module d3-common</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id6">Module d3-stemma-layout</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id7">Module local-stemma</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id8">Module navigator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id9">Module panel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id10">Module relatives</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#textflow">Module textflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id12">Module tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-coherence"><code class="docutils literal"><span class="pre">coherence</span></code> — The Coherence Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-navigator"><code class="docutils literal"><span class="pre">navigator</span></code> — The Navigator Gadget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-apparatus"><code class="docutils literal"><span class="pre">apparatus</span></code> — The Apparatus Panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-local-stemma"><code class="docutils literal"><span class="pre">local-stemma</span></code> — The Local Stemma Panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-textflow"><code class="docutils literal"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-relatives"><code class="docutils literal"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-panel"><code class="docutils literal"><span class="pre">panel</span></code> — The Panel Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-chord-layout"><code class="docutils literal"><span class="pre">d3-chord-layout</span></code> — The Chord Layout Engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-stemma-layout"><code class="docutils literal"><span class="pre">d3-stemma-layout</span></code> — The Stemma Layout Engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-comparison"><code class="docutils literal"><span class="pre">comparison</span></code> — The Comparison Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-common"><code class="docutils literal"><span class="pre">d3-common</span></code> — Various functions for D3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-tools"><code class="docutils literal"><span class="pre">tools</span></code> — Various Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.html">Scripts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="scripts.html#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Various Functions for Database Access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Various Functions</a></li>
 </ul>
 </li>
 </ul>
@@ -315,7 +317,7 @@
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.BOOKS">BOOKS (in module ntg_common.tools)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.build_byzantine_text">build_byzantine_text() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.build_byzantine_text">build_byzantine_text() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.BYZ_HSNR">BYZ_HSNR (in module ntg_common.tools)</a>
 </li>
@@ -325,13 +327,13 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.calculate_mss_similarity_postco">calculate_mss_similarity_postco() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.calculate_mss_similarity_postco">calculate_mss_similarity_postco() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.calculate_mss_similarity_preco">calculate_mss_similarity_preco() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.calculate_mss_similarity_preco">calculate_mss_similarity_preco() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db.Apparatus.cbgm">cbgm (Apparatus attribute)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.CBGM_Params">CBGM_Params (class in scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.CBGM_Params">CBGM_Params (class in scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db.Apparatus.certainty">certainty (Apparatus attribute)</a>
 </li>
@@ -363,17 +365,17 @@
 </li>
       <li><a href="appserver.html#server.server.comparison_summary_csv">comparison_summary_csv() (in module server.server)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.concat_tables">concat_tables() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.concat_tables">concat_tables() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.config_from_pyfile">config_from_pyfile() (in module ntg_common.tools)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.copy_genealogical_data">copy_genealogical_data() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.copy_genealogical_data">copy_genealogical_data() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.copy_table">copy_table() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.copy_table">copy_table() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.count_by_range">count_by_range() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.count_by_range">count_by_range() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.create_labez_matrix">create_labez_matrix() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.create_labez_matrix">create_labez_matrix() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -389,7 +391,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appclient.html#module-d3-stemma-layout">d3-stemma-layout (module)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.delete_passages_without_variants">delete_passages_without_variants() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.delete_passages_without_variants">delete_passages_without_variants() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -413,15 +415,15 @@
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.FEHLVERSE">FEHLVERSE (in module ntg_common.tools)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.fill_apparatus_table">fill_apparatus_table() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.fill_apparatus_table">fill_apparatus_table() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.fill_manuscripts_table">fill_manuscripts_table() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.fill_manuscripts_table">fill_manuscripts_table() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.fill_passages_table">fill_passages_table() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.fill_passages_table">fill_passages_table() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.fill_readings_table">fill_readings_table() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.fill_readings_table">fill_readings_table() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db_tools.fix">fix() (in module ntg_common.db_tools)</a>
 </li>
@@ -463,7 +465,7 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="transform.html#id">id</a>
+      <li><a href="database.html#id">id</a>
 </li>
       <li><a href="appserver.html#server.server.index">index() (in module server.server)</a>
 </li>
@@ -687,9 +689,9 @@
 </li>
       <li><a href="ntg_common.html#module-ntg_common.tools">ntg_common.tools (module)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.NULL_FIELDS">NULL_FIELDS (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.NULL_FIELDS">NULL_FIELDS (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.NULL_N_FIELDS">NULL_N_FIELDS (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.NULL_N_FIELDS">NULL_N_FIELDS (in module scripts.cceh.prepare4cbgm)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -765,13 +767,15 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="transform.html#s1">s1</a>
+      <li><a href="database.html#s1">s1</a>
 </li>
-      <li><a href="transform.html#s2">s2</a>
+      <li><a href="database.html#s2">s2</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db.SaveReadings">SaveReadings (class in ntg_common.db)</a>
 </li>
-      <li><a href="transform.html#module-scripts.cceh.prepare4cbgm">scripts.cceh.prepare4cbgm (module)</a>
+      <li><a href="scripts.html#module-scripts">scripts (module)</a>
+</li>
+      <li><a href="scripts.html#module-scripts.cceh.prepare4cbgm">scripts.cceh.prepare4cbgm (module)</a>
 </li>
       <li><a href="appserver.html#module-server">server (module)</a>
 </li>
@@ -793,21 +797,21 @@
 </li>
       <li><a href="appserver.html#server.editor.stemma_edit">stemma_edit() (in module server.editor)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.step01">step01() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step01">step01() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.step01b">step01b() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step01b">step01b() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.step01c">step01c() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step01c">step01c() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.step02">step02() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step02">step02() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.step05">step05() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step05">step05() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.step06">step06() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step06">step06() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.step06b">step06b() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step06b">step06b() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.step07">step07() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step07">step07() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db.Att.suffix">suffix (Att attribute)</a>
 </li>
@@ -843,13 +847,13 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="transform.html#scripts.cceh.prepare4cbgm.vacuum">vacuum() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.vacuum">vacuum() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="transform.html#varid">varid</a>
+      <li><a href="database.html#varid">varid</a>
 </li>
-      <li><a href="transform.html#varnew">varnew</a>
+      <li><a href="database.html#varnew">varnew</a>
 </li>
   </ul></td>
 </tr></table>
@@ -857,7 +861,7 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="transform.html#w">w</a>
+      <li><a href="database.html#w">w</a>
 </li>
   </ul></td>
 </tr></table>

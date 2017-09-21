@@ -123,7 +123,7 @@ function () {
     }
 
     /**
-     * Initilaize the module.
+     * Initialize the module.
      *
      * @function init
      */

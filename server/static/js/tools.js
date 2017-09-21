@@ -34,6 +34,8 @@ define([], function () {
      * the length of the run prepended, eg. 123 => 3123, 123456 =>
      * 6123456.
      *
+     * @function natural_sort
+     *
      * @param {string} s - The input string
      *
      * @return {string} - The transformed string
@@ -68,6 +70,8 @@ define([], function () {
      * Since jQuery doesn't grok the SVG DOM, we have to calculate the
      * position of the menu manually.
      *
+     * @function svg_contextmenu
+     *
      * @param {Object} menu   - The menu
      * @param {Object} target - The DOM object to attach the menu to
      */
@@ -89,6 +93,8 @@ define([], function () {
 
     /**
      * Display an auto-closing alert window.
+     *
+     * @function xhr_alert
      *
      * @param {Object} xhr - The server response containing the
      *                          message.  The JSON response must
@@ -114,6 +120,12 @@ define([], function () {
             $alert.slideDown().delay(5000).slideUp();
         }
     }
+
+    /**
+     * Initialize the module.
+     *
+     * @function init
+     */
 
     function init() {}
 

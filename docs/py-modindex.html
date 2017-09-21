@@ -131,19 +131,11 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Database Tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Generic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="database.html#source-tables">Source Tables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#locstemed">LocStemEd</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="transform.html">Transformation tools</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="transform.html#tabellen-und-felder">Tabellen und Felder</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="transform.html#felder-in-der-tabelle-locstemed">Felder in der Tabelle LocStemEd</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="transform.html#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
@@ -153,18 +145,28 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appclient.html">Application Client</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id1">Module apparatus</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id2">Module coherence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id3">Module comparison</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id4">Module d3-chord-layout</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id5">Module d3-common</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id6">Module d3-stemma-layout</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id7">Module local-stemma</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id8">Module navigator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id9">Module panel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id10">Module relatives</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#textflow">Module textflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id12">Module tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-coherence"><code class="docutils literal"><span class="pre">coherence</span></code> — The Coherence Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-navigator"><code class="docutils literal"><span class="pre">navigator</span></code> — The Navigator Gadget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-apparatus"><code class="docutils literal"><span class="pre">apparatus</span></code> — The Apparatus Panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-local-stemma"><code class="docutils literal"><span class="pre">local-stemma</span></code> — The Local Stemma Panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-textflow"><code class="docutils literal"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-relatives"><code class="docutils literal"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-panel"><code class="docutils literal"><span class="pre">panel</span></code> — The Panel Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-chord-layout"><code class="docutils literal"><span class="pre">d3-chord-layout</span></code> — The Chord Layout Engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-stemma-layout"><code class="docutils literal"><span class="pre">d3-stemma-layout</span></code> — The Stemma Layout Engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-comparison"><code class="docutils literal"><span class="pre">comparison</span></code> — The Comparison Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-common"><code class="docutils literal"><span class="pre">d3-common</span></code> — Various functions for D3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-tools"><code class="docutils literal"><span class="pre">tools</span></code> — Various Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.html">Scripts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="scripts.html#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Various Functions for Database Access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Various Functions</a></li>
 </ul>
 </li>
 </ul>
@@ -245,7 +247,7 @@
               id="toggle-1" style="display: none" alt="-" /></td>
        <td>
        <a href="ntg_common.html#module-ntg_common"><code class="xref">ntg_common</code></a></td><td>
-       <em>Common code</em></td></tr>
+       <em>Common Code</em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
@@ -255,12 +257,12 @@
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="ntg_common.html#module-ntg_common.db_tools"><code class="xref">ntg_common.db_tools</code></a></td><td>
-       <em>Database Tools</em></td></tr>
+       <em>Various Functions for Database Access</em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="ntg_common.html#module-ntg_common.tools"><code class="xref">ntg_common.tools</code></a></td><td>
-       <em>Generic Tools</em></td></tr>
+       <em>Various Functions</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-s"><td></td><td>
        <strong>s</strong></td><td></td></tr>
@@ -268,13 +270,13 @@
        <td><img src="_static/minus.png" class="toggler"
               id="toggle-2" style="display: none" alt="-" /></td>
        <td>
-       <code class="xref">scripts</code></td><td>
-       <em></em></td></tr>
+       <a href="scripts.html#module-scripts"><code class="xref">scripts</code></a></td><td>
+       <em>Scripts</em></td></tr>
      <tr class="cg-2">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="transform.html#module-scripts.cceh.prepare4cbgm"><code class="xref">scripts.cceh.prepare4cbgm</code></a></td><td>
-       <em></em></td></tr>
+       <a href="scripts.html#module-scripts.cceh.prepare4cbgm"><code class="xref">scripts.cceh.prepare4cbgm</code></a></td><td>
+       <em>Initialize the CBGM Database</em></td></tr>
      <tr>
        <td><img src="_static/minus.png" class="toggler"
               id="toggle-3" style="display: none" alt="-" /></td>
@@ -285,17 +287,17 @@
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="appserver.html#module-server.editor"><code class="xref">server.editor</code></a></td><td>
-       <em></em></td></tr>
+       <em>Editor Module</em></td></tr>
      <tr class="cg-3">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="appserver.html#module-server.security"><code class="xref">server.security</code></a></td><td>
-       <em></em></td></tr>
+       <em>User Management Module</em></td></tr>
      <tr class="cg-3">
        <td></td>
        <td>&#160;&#160;&#160;
        <a href="appserver.html#module-server.server"><code class="xref">server.server</code></a></td><td>
-       <em></em></td></tr>
+       <em>Main Module</em></td></tr>
    </table>
 
 

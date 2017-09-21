@@ -35,29 +35,34 @@ function ($, _, d3, d3common, navigator, tools) {
      *
      * @function return_to_base
      *
-     * @returns {Object} - A D3 interpolator function.
+     * @param {Object} node - The node to slide back.
      */
 
-    function return_to_base () {
-        return function (d, dummy_i, dummy_a)  {
-            var delta_x = d.pos.x - d.pos.orig_x;
-            var delta_y = d.pos.y - d.pos.orig_y;
-            d.pos.x = d.pos.orig_x;
-            d.pos.y = d.pos.orig_y;
-            return function (t) {
-                var x = d.pos.x + ((1.0 - t) * delta_x);
-                var y = d.pos.y + ((1.0 - t) * delta_y);
-                return 'translate(' + x + ',' + y + ')';
-            };
-        };
-    }
-
-    function cancel (node) {
+    function return_to_base (node) {
         if (node !== null) {
             var t = d3.transition ().duration (500).ease (d3.easeLinear);
-            node.transition (t).attrTween ('transform', return_to_base ());
+            node.transition (t).attrTween ('transform', function (d, dummy_i, dummy_a)  {
+                var delta_x = d.pos.x - d.pos.orig_x;
+                var delta_y = d.pos.y - d.pos.orig_y;
+                d.pos.x = d.pos.orig_x;
+                d.pos.y = d.pos.orig_y;
+                return function (tt) {
+                    var x = d.pos.x + ((1.0 - tt) * delta_x);
+                    var y = d.pos.y + ((1.0 - tt) * delta_y);
+                    return 'translate(' + x + ',' + y + ')';
+                };
+            });
         }
     }
+
+    /**
+     * Highlight or unhighlight a node
+     *
+     * @function highlight
+     *
+     * @param {Object} node - The node to highlight
+     * @param {bool} b      - Whether to highlight or unhighlight
+     */
 
     function highlight (node, b) {
         if (node) {
@@ -72,6 +77,8 @@ function ($, _, d3, d3common, navigator, tools) {
      * editor.
      *
      * @function dragListener
+     *
+     * @param {Object} panel - The panel we are attached to.
      */
 
     function dragListener (panel) {
@@ -121,12 +128,12 @@ function ($, _, d3, d3common, navigator, tools) {
                     });
                     xhr.fail (function (xhrobj) {
                         tools.xhr_alert (xhrobj, panel);
-                        cancel (dragged_node_ref);
+                        return_to_base (dragged_node_ref);
                     });
                     highlight (target_node, false);
                 } else {
                     // if dropped in no man's land
-                    cancel (dragged_node_ref);
+                    return_to_base (dragged_node_ref);
                 }
                 if (dragged_node !== null) {
                     dragged_node.attr ('pointer-events', 'auto');
@@ -135,6 +142,16 @@ function ($, _, d3, d3common, navigator, tools) {
                 target_node = null;
             });
     }
+
+    /**
+     * Output one menu item
+     *
+     * @function trow
+     *
+     * @param {Object} data - A dictionary
+     *
+     * @returns {jQuery} The table row object.
+     */
 
     function trow (data) {
         return $ (tools.format (

@@ -1,6 +1,6 @@
-======================
- Transformation tools
-======================
+=========
+ Scripts
+=========
 
 Transform the Nestle-Aland database into a database suitable for the CBGM.
 
@@ -48,44 +48,14 @@ Konventionen zurückgehen.
     -- ArbeitsablaufCBGMApg_Db.docx
 
 
-Tabellen und Felder
-===================
-
-
-Felder in der Tabelle LocStemEd
--------------------------------
-
-.. attribute:: id
-
-  Primärer Schlüssel
-
-.. attribute:: varid
-
-  id der variierten Stelle
-
-.. attribute:: varnew
-
-  Gleich wie varid oder neue id nach Splitt.
-
-.. attribute:: s1
-
-  Ursprung der Variante
-
-.. attribute:: s2
-
-  Eventueller zweiter Ursprung der Variante.
-
-.. attribute:: begadr, endar
-
-  Stelle (Passage)
-
-.. attribute:: w
-
-  Flag für "Westlicher Text".  Hat für die CBGM keine Bedeutung.
+.. automodule:: scripts
+   :synopsis: Scripts
+   :members:
 
 
 :mod:`scripts.cceh.prepare4cbgm` --- prepare4cbgm
 =================================================
 
 .. automodule:: scripts.cceh.prepare4cbgm
+   :synopsis: Initialize the CBGM Database
    :members:

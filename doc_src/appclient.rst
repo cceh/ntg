@@ -7,28 +7,111 @@
 The Javascript client on the browser.
 
 
-.. module:: apparatus
+:mod:`coherence` --- The Coherence Page
+=======================================
 
-Module apparatus
-================
+.. module:: coherence
+
+.. autofunction:: module:coherence~init()
+
+
+:mod:`navigator` --- The Navigator Gadget
+=========================================
+
+.. module:: navigator
+
+.. autofunction:: module:navigator~set_passage(pass_id)
+.. autofunction:: module:navigator~suggest(data, complete)
+.. autofunction:: module:navigator~on_nav(event)
+.. autofunction:: module:navigator~init()
+
+
+:mod:`apparatus` --- The Apparatus Panel
+========================================
+
+.. module:: apparatus
 
 .. autofunction:: module:apparatus~load_passage(passage)
 .. autofunction:: module:apparatus~goto_attestation(event)
 .. autofunction:: module:apparatus~init(instance)
 
 
-.. module:: coherence
+:mod:`local-stemma` --- The Local Stemma Panel
+==============================================
 
-Module coherence
-================
+.. module:: local-stemma
 
-.. autofunction:: module:coherence~init()
+.. autofunction:: module:local-stemma~return_to_base(node)
+.. autofunction:: module:local-stemma~highlight(node, b)
+.. autofunction:: module:local-stemma~dragListener(panel)
+.. autofunction:: module:local-stemma~trow(data)
+.. autofunction:: module:local-stemma~open_contextmenu(event)
+.. autofunction:: module:local-stemma~load_passage(passage)
+.. autofunction:: module:local-stemma~init(instance, graph_module, id_prefix)
 
+
+.. _textflow:
+
+:mod:`textflow` --- The 3 Coherence and the General Textual Flow Panels
+=======================================================================
+
+.. module:: textflow
+
+The javascript module that displays the textflow diagrams.
+
+.. autofunction:: module:textflow~init(instance, graph_module, id_prefix, var_only)
+.. autofunction:: module:textflow~load_passage(passage)
+.. autofunction:: module:textflow~open_contextmenu(event)
+
+
+:mod:`relatives` --- The Relatives Popup
+========================================
+
+.. module:: relatives
+
+.. autofunction:: module:relatives~get_ms_ids_from_popups(what)
+.. autofunction:: module:relatives~load_passage(passage)
+.. autofunction:: module:relatives~create_panel(ms_id, target)
+.. autofunction:: module:relatives~init(instance)
+
+
+:mod:`panel` --- The Panel Module
+=================================
+
+.. module:: panel
+
+.. autofunction:: module:panel~init($panel)
+.. autofunction:: module:panel~load_labez_dropdown($group, pass_id, name, prefixes, suffixes)
+.. autofunction:: module:panel~load_range_dropdown($group, name, prefixes, suffixes)
+.. autofunction:: module:panel~handle_toolbar_events(event)
+.. autofunction:: module:panel~set_toolbar_buttons($toolbar, new_status)
+.. autofunction:: module:panel~create_panel_controls($panels)
+.. autofunction:: module:panel~setup_button_event_handlers()
+
+
+:mod:`d3-chord-layout` --- The Chord Layout Engine
+==================================================
+
+.. module:: d3-chord-layout
+
+.. autofunction:: module:d3-chord-layout~load_dot(url)
+.. autofunction:: module:d3-chord-layout~init($wrapper, id_prefix)
+
+
+:mod:`d3-stemma-layout` --- The Stemma Layout Engine
+====================================================
+
+.. module:: d3-stemma-layout
+
+.. autofunction:: module:d3-stemma-layout~init($wrapper, id_prefix)
+.. autofunction:: module:d3-stemma-layout~load_dot(url)
+
+
+
+:mod:`comparison` --- The Comparison Page
+=========================================
 
 .. module:: comparison
-
-Module comparison
-=================
 
 .. autofunction:: module:comparison~deparam(s)
 .. autofunction:: module:comparison~dir(older, newer)
@@ -44,19 +127,12 @@ Module comparison
 .. autofunction:: module:comparison~init()
 
 
-.. module:: d3-chord-layout
-
-Module d3-chord-layout
-======================
-
-.. autofunction:: module:d3-chord-layout~load_dot(url)
-.. autofunction:: module:d3-chord-layout~init($wrapper, id_prefix)
-
+:mod:`d3-common` --- Various functions for D3
+=============================================
 
 .. module:: d3-common
 
-Module d3-common
-================
+Useful functions for wrestling with D3.
 
 .. autofunction:: module:d3-common~color_string_to_palette(s)
 .. autofunction:: module:d3-common~generate_css_palette(labez_scale, clique_scale)
@@ -73,85 +149,12 @@ Module d3-common
 .. autofunction:: module:d3-common~bfs(edges, start)
 
 
-.. module:: d3-stemma-layout
-
-Module d3-stemma-layout
-=======================
-
-.. autofunction:: module:d3-stemma-layout~init($wrapper, id_prefix)
-
-.. autofunction:: module:d3-stemma-layout~load_dot(url)
-
-
-
-.. module:: local-stemma
-
-Module local-stemma
-===================
-
-.. autofunction:: module:local-stemma~return_to_base(node)
-.. autofunction:: module:local-stemma~highlight(node, b)
-.. autofunction:: module:local-stemma~dragListener(panel)
-.. autofunction:: module:local-stemma~trow(data)
-.. autofunction:: module:local-stemma~open_contextmenu(event)
-.. autofunction:: module:local-stemma~load_passage(passage)
-.. autofunction:: module:local-stemma~init(instance, graph_module, id_prefix)
-
-
-.. module:: navigator
-
-Module navigator
-================
-
-.. autofunction:: module:navigator~set_passage(pass_id)
-.. autofunction:: module:navigator~suggest(data, complete)
-.. autofunction:: module:navigator~on_nav(event)
-.. autofunction:: module:navigator~init()
-
-
-.. module:: panel
-
-Module panel
-============
-
-.. autofunction:: module:panel~init($panel)
-.. autofunction:: module:panel~load_labez_dropdown($group, pass_id, name, prefixes, suffixes)
-.. autofunction:: module:panel~load_range_dropdown($group, name, prefixes, suffixes)
-.. autofunction:: module:panel~handle_toolbar_events(event)
-.. autofunction:: module:panel~set_toolbar_buttons($toolbar, new_status)
-.. autofunction:: module:panel~create_panel_controls($panels)
-.. autofunction:: module:panel~setup_button_event_handlers()
-
-
-.. module:: relatives
-
-Module relatives
-================
-
-.. autofunction:: module:relatives~get_ms_ids_from_popups(what)
-.. autofunction:: module:relatives~load_passage(passage)
-.. autofunction:: module:relatives~create_panel(ms_id, target)
-.. autofunction:: module:relatives~init(instance)
-
-
-.. module:: textflow
-
-.. _textflow:
-
-Module textflow
-===============
-
-The javascript module that displays the textflow diagrams.
-
-.. autofunction:: module:textflow~init(instance, graph_module, id_prefix, var_only)
-.. autofunction:: module:textflow~load_passage(passage)
-.. autofunction:: module:textflow~open_contextmenu(event)
-
+:mod:`tools` --- Various Functions
+==================================
 
 .. module:: tools
 
-Module tools
-============
+Useful functions that don't fit anywhere else.
 
 .. autofunction:: module:tools~format(s, data)
 .. autofunction:: module:tools~natural_sort(s)

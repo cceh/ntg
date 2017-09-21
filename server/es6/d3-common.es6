@@ -47,7 +47,7 @@ function ($, d3, _, peg, parser_src) {
      */
 
     function color_string_to_palette (s) {
-        var no_of_colors = s.length () / 6;
+        var no_of_colors = s.length / 6;
         var range = s.match (/.{6}/g).map (x => '#' + x);
         return d3.scaleOrdinal (range).domain (d3.range (no_of_colors));
     }

@@ -1,9 +1,9 @@
 
 .. _contents:
 
-============================
- NTG documentation contents
-============================
+===================
+ NTG Documentation
+===================
 
 .. toctree::
    :maxdepth: 2
@@ -12,10 +12,10 @@
    developer
    install
    database
-   ntg_common
-   transform
    appserver
    appclient
+   scripts
+   ntg_common
 
 
 

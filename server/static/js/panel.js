@@ -355,10 +355,10 @@ function ($, _, tools) {
     }
 
     return {
-        'init'                   : init,
-        'set_toolbar_buttons'    : set_toolbar_buttons,
-        'load_labez_dropdown'    : load_labez_dropdown,
-        'load_range_dropdown'    : load_range_dropdown,
-        'create_panel_controls'  : create_panel_controls,
+        'init'                  : init,
+        'set_toolbar_buttons'   : set_toolbar_buttons,
+        'load_labez_dropdown'   : load_labez_dropdown,
+        'load_range_dropdown'   : load_range_dropdown,
+        'create_panel_controls' : create_panel_controls,
     };
 });

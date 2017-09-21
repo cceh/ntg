@@ -3,7 +3,7 @@
 =============
 
 .. automodule:: ntg_common
-   :synopsis: Common code
+   :synopsis: Common Code
    :members:
 
 
@@ -17,17 +17,17 @@
    :members:
 
 
-:mod:`ntg_common.db_tools` --- Database Tools
-=============================================
+:mod:`ntg_common.db_tools` --- Various Functions for Database Access
+====================================================================
 
 .. automodule:: ntg_common.db_tools
-   :synopsis: Database Tools
+   :synopsis: Various Functions for Database Access
    :members:
 
 
-:mod:`ntg_common.tools` --- Generic Tools
-=========================================
+:mod:`ntg_common.tools` --- Various Functions
+=============================================
 
 .. automodule:: ntg_common.tools
-   :synopsis: Generic Tools
+   :synopsis: Various Functions
    :members:
