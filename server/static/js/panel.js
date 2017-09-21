@@ -1,8 +1,9 @@
 /**
- * This module is the base for a panel. It implements the toolbars and the
+ * This module is the base for a panel.  It implements the toolbars and the
  * minimize/maximize functionality and updates the panel only while it is open.
  *
  * @module panel
+ *
  * @author Marcello Perathoner
  */
 
@@ -19,6 +20,7 @@ function ($, _, tools) {
 
         instance.visible = true;
         if (instance.dirty) {
+            instance.dirty = false;
             instance.load_passage (instance.data.passage);
         }
     }
@@ -36,6 +38,7 @@ function ($, _, tools) {
      *
      * @param {Object} passage - Passage data
      */
+
     function load (passage) {
         var instance = this;
 
@@ -55,9 +58,16 @@ function ($, _, tools) {
         return (s === 21) ? 'All' : s;
     }
 
-    function handle_toolbar_events (event) {
-        // change opts according to event
+    /**
+     * Read the status of the toolbar buttons after event
+     *
+     * @function handle_toolbar_events
+     *
+     * @param {Object} event - The event.  The status is saved in
+     *                         event.data.data
+     */
 
+    function handle_toolbar_events (event) {
         if (event.type === 'click' || event.type === 'slideStop') {
             var opts    = event.data.data;
             var $target = $ (event.target);
@@ -97,14 +107,19 @@ function ($, _, tools) {
         event.stopPropagation ();
     }
 
-    function set_toolbar_buttons (target, opts) {
-        var $target = $ (target);
+    /**
+     * Set the status of the toolbar buttons
+     *
+     * @function set_toolbar_buttons
+     *
+     * @param {jQuery} $toolbar   - The toolbar
+     * @param {Object} new_status - The new status of the toolbar buttons
+     */
 
-        // Set bootstrap buttons according to opts
+    function set_toolbar_buttons ($toolbar, new_status) {
+        var $panel = $toolbar.closest ('div.panel');
 
-        var $panel = $target.closest ('div.panel');
-
-        _.forEach (opts, function (value, key) {
+        _.forEach (new_status, function (value, key) {
             var $input = $panel.find ('input[name="' + key  + '"]');
             var $group = $input.closest ('.btn-group');
             var type   = get_control_type ($input);
@@ -145,7 +160,10 @@ function ($, _, tools) {
     }
 
     /**
-     * Loads the buttons in the labez dropdown with the labez of the passage.
+     * Loads the buttons in the labez dropdown.
+     *
+     * Loads the buttons in the labez dropdown with the labez of the readings of
+     * the passage.
      *
      * @function load_labez_dropdown
      *
@@ -155,8 +173,9 @@ function ($, _, tools) {
      * @param {Array} prefixes     - Strings to prepend to the list.
      * @param {Array} suffixes     - Strings to append to the list.
      *
-     * @return {Promise} - Promise, resolved when the buttons are loaded.
+     * @return {Promise} Promise, resolved when the buttons are loaded.
      */
+
     function load_labez_dropdown ($group, pass_id, name, prefixes, suffixes) {
         var $menu = $group.find ('div[data-toggle="buttons"]');
 
@@ -180,19 +199,23 @@ function ($, _, tools) {
     /**
      * Loads the buttons in the range dropdown.
      *
+     * Loads the buttons in the range dropdown with the ranges of the book.
+     *
      * @function load_range_dropdown
      *
-     * @param {jQuery} $group  - The button group
-     * @param {string} name    - The button(s) name
-     * @param {Array} prefixes - Strings to prepend to the list.
-     * @param {Array} suffixes - Strings to append to the list.
+     * @param {jQuery} $group      - The button group
+     * @param {int|string} pass_id - The passage id
+     * @param {string} name        - The button(s) name
+     * @param {Array} prefixes     - Strings to prepend to the list.
+     * @param {Array} suffixes     - Strings to append to the list.
      *
-     * @return {Promise} - Promise, resolved when the buttons are loaded.
+     * @return {Promise} Promise, resolved when the buttons are loaded.
      */
-    function load_range_dropdown ($group, name, prefixes, suffixes) {
+
+    function load_range_dropdown ($group, pass_id, name, prefixes, suffixes) {
         var $menu = $group.find ('div[data-toggle="buttons"]');
 
-        var promise = $.getJSON ('ranges.json');
+        var promise = $.getJSON ('ranges.json/' + pass_id);
         promise.done (function (json) {
             $menu.empty ();
             var ranges = prefixes.concat (json.data.ranges).concat (suffixes);
@@ -212,13 +235,15 @@ function ($, _, tools) {
     /**
      * Put min-max and close buttons onto panels.
      *
-     * Put min-max buttons on panels that contain div.panel-slidable panes.
-     * Put close buttons on panels that contain div.panel-closable panes.
-     *
-     * @param $panels {jQuery}  The panels to consider.
+     * Put minimize and maximize buttons on panels that contain
+     * div.panel-slidable panes.  Put close buttons on panels that contain
+     * div.panel-closable panes.
      *
      * @function create_panel_controls
+     *
+     * @param {jQuery} $panels - The panel(s)
      */
+
     function create_panel_controls ($panels) {
         $panels.each (function () {
             var $panel = $ (this);
@@ -238,11 +263,12 @@ function ($, _, tools) {
     }
 
     /**
-     * Init panel button events
+     * Setup the minimize, maximize, and close button event handlers.
      *
-     * @function init_panel_events
+     * @function setup_button_event_handlers
      */
-    function init_panel_events () {
+
+    function setup_button_event_handlers () {
         // Click on minimize icon
         $ (document).on ('click', 'a.panel-minimize', function (event) {
             var $this = $ (this);
@@ -288,8 +314,9 @@ function ($, _, tools) {
      *
      * @param {Object} $panel - The panel element.
      *
-     * @returns {dict} - The module instance object.
+     * @returns {Object} The module instance object.
      */
+
     function init ($panel) {
         var instance = {};
         instance.load             = load;
@@ -300,8 +327,22 @@ function ($, _, tools) {
         instance.$panel           = $panel;
         instance.$toolbar         = $panel.find ('div.toolbar');
 
+        // The user navigated to new passage.
+        $ (document).on ('ntg.panel.reload', function (event, passage) {
+            instance.load (passage);
+        });
+
+        setup_button_event_handlers ();
+
         // Init toolbar.
         instance.$toolbar.find ('.dropdown-toggle').dropdown ();
+
+        instance.$toolbar.find ('input[name="connectivity"]').bootstrapSlider ({
+            'value'           : 5,
+            'ticks'           : [1,  5, 10, 20,  21],
+            'ticks_positions' : [0, 25, 50, 90, 100],
+            'formatter'       : connectivity_formatter,
+        });
 
         // Answer toolbar activity.
         instance.$toolbar.on ('click slideStop', 'input', instance, on_toolbar);
@@ -315,12 +356,9 @@ function ($, _, tools) {
 
     return {
         'init'                   : init,
-        'handle_toolbar_events'  : handle_toolbar_events,
-        'connectivity_formatter' : connectivity_formatter,
         'set_toolbar_buttons'    : set_toolbar_buttons,
         'load_labez_dropdown'    : load_labez_dropdown,
         'load_range_dropdown'    : load_range_dropdown,
         'create_panel_controls'  : create_panel_controls,
-        'init_panel_events'      : init_panel_events,
     };
 });

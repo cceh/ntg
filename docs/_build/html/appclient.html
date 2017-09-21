@@ -1,0 +1,546 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Application Client &mdash; NTG 0.1.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
+        <link rel="prev" title="Application Server" href="appserver.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> NTG
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Kurze Einführung in die Textkritik und das Neue Testament</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#editionen">Editionen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#die-textzeugen">Die Textzeugen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#textformen-texttypen">Textformen (Texttypen)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#textkritik">Textkritik</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#terminologie">Terminologie</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#lesart">Lesart</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#variierte-stelle">Variierte Stelle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#umfaszte-varianten">Umfaßte Varianten</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#fehlverse">Fehlverse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#splitt">Splitt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#zusammenlegung">Zusammenlegung</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#literatur">Literatur</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Database Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Generic Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Transformation tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="transform.html#tabellen-und-felder">Tabellen und Felder</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="transform.html#felder-in-der-tabelle-locstemed">Felder in der Tabelle LocStemEd</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="transform.html#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.server"><code class="docutils literal"><span class="pre">server.server</span></code> — Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.editor"><code class="docutils literal"><span class="pre">server.editor</span></code> — Editor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.security"><code class="docutils literal"><span class="pre">server.security</span></code> — Security</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Application Client</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Module apparatus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">Module d3-stemma-layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">Module panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#textflow">Module textflow</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NTG</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Application Client</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/appclient.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="application-client">
+<h1>Application Client<a class="headerlink" href="#application-client" title="Permalink to this headline">¶</a></h1>
+<p>The Javascript client on the browser.</p>
+<span class="target" id="module-apparatus"></span><div class="section" id="id1">
+<h2>Module apparatus<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="apparatus.module:apparatus.load_passage">
+<code class="descclassname">module:apparatus.</code><code class="descname">load_passage</code><span class="sig-paren">(</span><em>passage</em><span class="sig-paren">)</span><a class="headerlink" href="#apparatus.module:apparatus.load_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a new passage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>passage</strong> (<em>Object</em>) – Which passage to load.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-d3-stemma-layout"></span></div>
+<div class="section" id="id2">
+<h2>Module d3-stemma-layout<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="d3-stemma-layout.module:d3-stemma-layout.init">
+<code class="descclassname">module:d3-stemma-layout.</code><code class="descname">init</code><span class="sig-paren">(</span><em>$wrapper</em>, <em>id_prefix</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-stemma-layout.module:d3-stemma-layout.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>$wrapper</strong> (<em>jQuery</em>) – A jQuery selector that points to the element inside of which the graph will be placed.</li>
+<li><strong>id_prefix</strong> (<em>string</em>) – The prefix to add to all ids.  Use if you have more than one graph on a page.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Graph</strong> – - A graph instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-stemma-layout.module:d3-stemma-layout.load_dot">
+<code class="descclassname">module:d3-stemma-layout.</code><code class="descname">load_dot</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-stemma-layout.module:d3-stemma-layout.load_dot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an SVG graph from a dot file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<em>string</em>) – The url (must serve dot format).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – - A promise resolved when all SVG elements have been created.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-panel"></span></div>
+<div class="section" id="id3">
+<h2>Module panel<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="panel.module:panel.init">
+<code class="descclassname">module:panel.</code><code class="descname">init</code><span class="sig-paren">(</span><em>$panel</em><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>$panel</strong> (<em>Object</em>) – The panel element.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – The module instance object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="panel.module:panel.load_labez_dropdown">
+<code class="descclassname">module:panel.</code><code class="descname">load_labez_dropdown</code><span class="sig-paren">(</span><em>$group</em>, <em>pass_id</em>, <em>name</em>, <em>prefixes</em>, <em>suffixes</em><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.load_labez_dropdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the buttons in the labez dropdown.</p>
+<p>Loads the buttons in the labez dropdown with the labez of the readings of
+the passage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>$group</strong> (<em>jQuery</em>) – The button group</li>
+<li><strong>pass_id</strong> (<em>int|string</em>) – The passage id</li>
+<li><strong>name</strong> (<em>string</em>) – The button(s) name</li>
+<li><strong>prefixes</strong> (<em>Array</em>) – Strings to prepend to the list.</li>
+<li><strong>suffixes</strong> (<em>Array</em>) – Strings to append to the list.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – Promise, resolved when the buttons are loaded.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="panel.module:panel.load_range_dropdown">
+<code class="descclassname">module:panel.</code><code class="descname">load_range_dropdown</code><span class="sig-paren">(</span><em>$group</em>, <em>name</em>, <em>prefixes</em>, <em>suffixes</em><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.load_range_dropdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the buttons in the range dropdown.</p>
+<p>Loads the buttons in the range dropdown with the ranges of the book.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>$group</strong> (<em>jQuery</em>) – The button group</li>
+<li><strong>pass_id</strong> (<em>int|string</em>) – The passage id</li>
+<li><strong>name</strong> (<em>string</em>) – The button(s) name</li>
+<li><strong>prefixes</strong> (<em>Array</em>) – Strings to prepend to the list.</li>
+<li><strong>suffixes</strong> (<em>Array</em>) – Strings to append to the list.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – Promise, resolved when the buttons are loaded.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="panel.module:panel.handle_toolbar_events">
+<code class="descclassname">module:panel.</code><code class="descname">handle_toolbar_events</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.handle_toolbar_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the status of the toolbar buttons after event</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>event</strong> (<em>Object</em>) – The event.  The status is saved in event.data.data</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="panel.module:panel.set_toolbar_buttons">
+<code class="descclassname">module:panel.</code><code class="descname">set_toolbar_buttons</code><span class="sig-paren">(</span><em>$toolbar</em>, <em>new_status</em><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.set_toolbar_buttons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the status of the toolbar buttons</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>$toolbar</strong> (<em>jQuery</em>) – The toolbar</li>
+<li><strong>new_status</strong> (<em>Object</em>) – The new status of the toolbar buttons</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="panel.module:panel.create_panel_controls">
+<code class="descclassname">module:panel.</code><code class="descname">create_panel_controls</code><span class="sig-paren">(</span><em>$panels</em><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.create_panel_controls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Put min-max and close buttons onto panels.</p>
+<p>Put minimize and maximize buttons on panels that contain
+div.panel-slidable panes.  Put close buttons on panels that contain
+div.panel-closable panes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>$panels</strong> (<em>jQuery</em>) – The panel(s)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="panel.module:panel.setup_button_event_handlers">
+<code class="descclassname">module:panel.</code><code class="descname">setup_button_event_handlers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.setup_button_event_handlers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup the minimize, maximize, and close button event handlers.</p>
+</dd></dl>
+
+<span class="target" id="module-textflow"></span></div>
+<div class="section" id="textflow">
+<span id="id4"></span><h2>Module textflow<a class="headerlink" href="#textflow" title="Permalink to this headline">¶</a></h2>
+<p>The javascript module that displays the textflow diagrams.</p>
+<dl class="function">
+<dt id="textflow.module:textflow.init">
+<code class="descclassname">module:textflow.</code><code class="descname">init</code><span class="sig-paren">(</span><em>instance</em>, <em>graph_module</em>, <em>id_prefix</em>, <em>var_only</em><span class="sig-paren">)</span><a class="headerlink" href="#textflow.module:textflow.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the module.</p>
+<p>This module inherits from module <a class="reference internal" href="#panel" title="panel"><code class="xref js js-mod docutils literal"><span class="pre">panel</span></code></a> and uses module
+<a class="reference internal" href="#d3-stemma-layout" title="d3-stemma-layout"><code class="xref js js-mod docutils literal"><span class="pre">d3-stemma-layout</span></code></a> to actually draw the graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>instance</strong> (<em>Object</em>) – The panel instance to inherit from.</li>
+<li><strong>graph_module</strong> (<em>Object</em>) – The graph module to use.</li>
+<li><strong>id_prefix</strong> (<em>string</em>) – The prefix to use for all generated ids.</li>
+<li><strong>global</strong> (<em>bool</em>) – Display global textual flow</li>
+<li><strong>var_only</strong> (<em>bool</em>) – Display only nodes and links between different readings.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – The module instance object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="textflow.module:textflow.load_passage">
+<code class="descclassname">module:textflow.</code><code class="descname">load_passage</code><span class="sig-paren">(</span><em>passage</em><span class="sig-paren">)</span><a class="headerlink" href="#textflow.module:textflow.load_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a new passage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>passage</strong> (<em>Object</em>) – Which passage to load.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="textflow.module:textflow.open_contextmenu">
+<code class="descclassname">module:textflow.</code><code class="descname">open_contextmenu</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#textflow.module:textflow.open_contextmenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open a context menu when right clicked on a node.</p>
+<p>The context menu can be used to reassign the node to a different split.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>event</strong> (<em>Object</em>) – The event</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="appserver.html" class="btn btn-neutral" title="Application Server" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-17 CCeH - Licensed under the GNU GPL v3 or later.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

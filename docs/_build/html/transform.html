@@ -1,0 +1,679 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Transformation tools &mdash; NTG 0.1.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
+        <link rel="next" title="Application Server" href="appserver.html"/>
+        <link rel="prev" title="Common Code" href="ntg_common.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> NTG
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Kurze Einführung in die Textkritik und das Neue Testament</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#editionen">Editionen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#die-textzeugen">Die Textzeugen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#textformen-texttypen">Textformen (Texttypen)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#textkritik">Textkritik</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#terminologie">Terminologie</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#lesart">Lesart</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#variierte-stelle">Variierte Stelle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#umfaszte-varianten">Umfaßte Varianten</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#fehlverse">Fehlverse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#splitt">Splitt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#zusammenlegung">Zusammenlegung</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#literatur">Literatur</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Database Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Generic Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Transformation tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tabellen-und-felder">Tabellen und Felder</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#felder-in-der-tabelle-locstemed">Felder in der Tabelle LocStemEd</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.server"><code class="docutils literal"><span class="pre">server.server</span></code> — Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.editor"><code class="docutils literal"><span class="pre">server.editor</span></code> — Editor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.security"><code class="docutils literal"><span class="pre">server.security</span></code> — Security</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="appclient.html">Application Client</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id1">Module apparatus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id2">Module d3-stemma-layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id3">Module panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#textflow">Module textflow</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NTG</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Transformation tools</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/transform.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="transformation-tools">
+<h1>Transformation tools<a class="headerlink" href="#transformation-tools" title="Permalink to this headline">¶</a></h1>
+<p>Transform the Nestle-Aland database into a database suitable for the CBGM.</p>
+<p>Die mysql-Datenbank, die uns zur Verfügung gestellt wurde, enthält 28 +
+28 Tabellen, je zwei für jedes Kapitel der Apostelgeschichte.  Die erste
+Tabelle enthält die Lesarten, die zweite die Lücken.</p>
+<p>Aus diesen Tabellen wird der Nestle-Aland automagisch erstellt.</p>
+<p>Die Tabellen müssen nun für die CBGM umgeformt werden.  Dafür gibt es
+eine Reihe von Skripten (in perl und python).</p>
+<p>Die Tabelle der Lesarten ist ein negativer Apparat.  Sie enthält den Text
+des Archetypus (HS = A) und alle davon abweichenden Stellen.</p>
+<p>Für die CBGM benötigen wir einen positiven Apparat.  Dieser wird aus dem
+negativen Apparat und der Tabelle der Lücken erstellt.  Zuerst wird für
+jede Passage und jede Handschrift ein Lückeneintrag erstellt wenn diese
+Handschrift an dieser Passage eine Lücke aufweist.  Dann wird für jede
+Passage und jede Handschrift die Lesart der HS A eingefügt, falls diese
+Handschrift an dieser Passage noch keinen Text oder Lückeneintrag hat.
+Am Ende haben wir für jede Passage und jede Handschrift einen Datensatz.</p>
+<p>Die Datenbank wird auch von Lesarten bereinigt, die für den
+Nestle-Aland, aber nicht für die CBGM relevant sind.  Das sind z.B. alle
+Passagen die nur eine Lesart aufweisen (2/3 (!) des NT), alle
+Korrekturen, die nicht von der ersten Hand stammen und Lesarten die auf
+orthographische Fehler oder unterschiedliche orthographische
+Konventionen zurückgehen.</p>
+<blockquote>
+<div><p>Ausgangspunkt ist der Apparat mit allen für die Druckfassung notwendigen
+Informationen.  Diese Datenbasis muss für die CBGM bearbeitet werden.  Die
+Ausgangsdaten stellen einen negativen Apparat dar, d.h. die griechischen
+handschriftlichen Zeugen, die mit dem rekonstruierten Ausgangstext
+übereinstimmen, werden nicht ausdrücklich aufgelistet.  Aufgelistet werden
+alle Zeugen, die von diesem Text abweichen bzw. Korrekturen oder
+Alternativlesarten haben.  Ziel ist es, einen positiven Apparat zu erhalten.
+Wir benötigen einen Datensatz pro griechischem handschriftlichen Zeugen
+erster Hand und variierten Stelle (einschließlich der Lücken).  D.h. für
+jede variierte Stelle liegt die explizite Information vor, ob die
+Handschrift dem Ausgangstext folgt, einen anderen Text oder gar keinen Text
+hat, weil z.B. die Seite beschädigt ist.  Korrekturen oder
+Alternativlesarten werden für die CBGM ignoriert.</p>
+<p class="attribution">&mdash;ArbeitsablaufCBGMApg_Db.docx</p>
+</div></blockquote>
+<div class="section" id="tabellen-und-felder">
+<h2>Tabellen und Felder<a class="headerlink" href="#tabellen-und-felder" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="felder-in-der-tabelle-locstemed">
+<h3>Felder in der Tabelle LocStemEd<a class="headerlink" href="#felder-in-der-tabelle-locstemed" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="id">
+<code class="descname">id</code><a class="headerlink" href="#id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Primärer Schlüssel</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="varid">
+<code class="descname">varid</code><a class="headerlink" href="#varid" title="Permalink to this definition">¶</a></dt>
+<dd><p>id der variierten Stelle</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="varnew">
+<code class="descname">varnew</code><a class="headerlink" href="#varnew" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gleich wie varid oder neue id nach Splitt.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="s1">
+<code class="descname">s1</code><a class="headerlink" href="#s1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ursprung der Variante</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="s2">
+<code class="descname">s2</code><a class="headerlink" href="#s2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Eventueller zweiter Ursprung der Variante.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">begadr, endar</code></dt>
+<dd><p>Stelle (Passage)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="w">
+<code class="descname">w</code><a class="headerlink" href="#w" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag für “Westlicher Text”.  Hat für die CBGM keine Bedeutung.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-scripts.cceh.prepare4cbgm">
+<span id="scripts-cceh-prepare4cbgm-prepare4cbgm"></span><h2><a class="reference internal" href="#module-scripts.cceh.prepare4cbgm" title="scripts.cceh.prepare4cbgm"><code class="xref py py-mod docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code></a> — prepare4cbgm<a class="headerlink" href="#module-scripts.cceh.prepare4cbgm" title="Permalink to this headline">¶</a></h2>
+<p>Prepare the database for CBGM</p>
+<p>This script converts the apparatus tables used in the production of Nestle-Aland
+into tables suitable for doing CBGM:</p>
+<ul class="simple">
+<li>copy the data from multiple mysql tables to a single postgres table</li>
+<li>remove unwanted readings</li>
+<li>build a positive apparatus</li>
+<li>calculate the pre-coherence similarity of manuscripts</li>
+<li>calculate the post-coherence ancestrality of manuscripts</li>
+</ul>
+<dl class="class">
+<dt id="scripts.cceh.prepare4cbgm.CBGM_Params">
+<em class="property">class </em><code class="descname">CBGM_Params</code><a class="headerlink" href="#scripts.cceh.prepare4cbgm.CBGM_Params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure for intermediate results of the CBGM.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="scripts.cceh.prepare4cbgm.NULL_FIELDS">
+<code class="descname">NULL_FIELDS</code><em class="property"> = ['lemma', 'lesart', 'labezsuf']</em><a class="headerlink" href="#scripts.cceh.prepare4cbgm.NULL_FIELDS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fields to look for data entry error NULL, and change it into ‘’</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="scripts.cceh.prepare4cbgm.NULL_N_FIELDS">
+<code class="descname">NULL_N_FIELDS</code><em class="property"> = ['base', 'comp', 'comp1', 'komm', 'kontrolle', 'korr', 'lekt', 'over', 'over1', 'suff', 'suffix2', 'vid', 'vl']</em><a class="headerlink" href="#scripts.cceh.prepare4cbgm.NULL_N_FIELDS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fields to look for data entry error ‘N’ and NULL, and change them into ‘’</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.build_byzantine_text">
+<code class="descname">build_byzantine_text</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.build_byzantine_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reconstruct the Majority Text</p>
+<p>Build a virtual manuscript that reconstructs the <a class="reference internal" href="developer.html#mt"><span class="std std-ref">Majority Text</span></a>.
+The MT manuscripts has a hard-coded ms_id of 2.</p>
+<p id="mt-rules">Im Laufe der Textgeschichte hat sich eine Textform durchgesetzt, der
+sogenannte Mehrheitstext, der auch Byzantinischer Text genannt wird.
+Diese Textform wird exemplarisch durch die sieben Handschriften 1, 18,
+35, 330, 398, 424 und 1241 repräsentiert.  Für jede variierte Stelle
+wird nun gezählt und festgehalten, wieviele dieser sieben Handschriften
+bei einer Lesart vertreten sind.  Eine Lesart gilt als Mehrheitslesart,
+wenn sie</p>
+<ol class="loweralpha simple">
+<li>von mindestens sechs der oben genannten repräsentativen Handschriften
+bezeugt wird und höchstens eine Handschrift abweicht, oder</li>
+<li>von fünf Repräsentanten bezeugt wird und zwei mit unterschiedlichen
+Lesarten abweichen.</li>
+</ol>
+<p>–PreCo/PreCoActs/ActsMT2.pl</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.calculate_mss_similarity_postco">
+<code class="descname">calculate_mss_similarity_postco</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em>, <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.calculate_mss_similarity_postco" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate post-coherence mss similarity</p>
+<p>Genealogical coherence outputs asymmetrical matrices.
+Loop over all mss O(n_mss² * n_ranges * n_passages).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.calculate_mss_similarity_preco">
+<code class="descname">calculate_mss_similarity_preco</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em>, <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.calculate_mss_similarity_preco" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate pre-coherence mss similarity</p>
+<p>Aus: VGA/VG05_all3.pl</p>
+<blockquote>
+<div>Kapitelweise füllen auf Basis von Vergleichen einzelner
+Variantenspektren in ECM_Acts_Sp.  Vergleich von je zwei Handschriften:
+An wieviel Stellen haben sie gemeinsam Text, an wieviel Stellen stimmen
+sie überein bzw. unterscheiden sie sich (inklusive Quotient)?  Die
+Informationen werden sowohl auf Kapitel- wie auch Buchebene
+festgehalten.</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.concat_tables">
+<code class="descname">concat_tables</code><span class="sig-paren">(</span><em>conn</em>, <em>meta</em>, <em>dest_table</em>, <em>fdw</em>, <em>source_tables</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.concat_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy 28 tables into one for easier debugging.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.copy_genealogical_data">
+<code class="descname">copy_genealogical_data</code><span class="sig-paren">(</span><em>dbsrcvg</em>, <em>dbdest</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.copy_genealogical_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy / update genealogical data</p>
+<p>Aus: VGA/Att2CBGMPh3.pl</p>
+<p>“kopiert die Daten aus ECM_Acts_CBGM nach VarGenAtt_Act,
+zur weiteren Bearbeitung im Stemma-Editor”</p>
+<p>Aus: VGA/PortCBGMInfoPh3.pl</p>
+<p>“Kopiert die genealogischen Informationen von einer Phase zur nächsten.</p>
+<p>Splitts müssen nur dort übertragen werden, wo sich der Apparat nicht
+geändert hat.  Hat sich der Apparat geändert, d.h. gibt es in der neuen
+Phase für eine Adresse keine Entsprechung in der vorhergehenden Phase, so
+werden die Defaultwerte eingetragen.  Zuerst muss festgestellt werden, wo
+Splitts oder Zusammenlegungen stattgefunden haben.  Dann werden diese
+Lesarten gelöscht und aus der vorhergehenden Phase kopiert.</p>
+<p>Stellen mit geänderter Leitzeile werden zunächst einfach übergangen.</p>
+<p>Defaultwerte eintragen, wenn eine variierte Stelle mit gleicher numerischer
+Adresse mehr Lesarten als in der vorhergehenden Phase hat, die nicht nur
+versionell bezeugt sind.”</p>
+<p>VarGenAtt_ActPh2 -&gt; VarGenAtt_ActPh3</p>
+<ol class="arabic simple">
+<li>copy entries from att with default values (every other labez depends on
+a) (done in the last step)</li>
+<li>overwrite with values from locstemed (done in this step)</li>
+</ol>
+<p>FIXME: do we really need step 1? To provide the new passages if the
+apparatus changed? At least it doesn’t do any damage because there should be
+no passages in att that are not in locstemed also.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.copy_table">
+<code class="descname">copy_table</code><span class="sig-paren">(</span><em>conn</em>, <em>source_table</em>, <em>dest_table</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.copy_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a copy of a table.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.count_by_range">
+<code class="descname">count_by_range</code><span class="sig-paren">(</span><em>a</em>, <em>range_starts</em>, <em>range_ends</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.count_by_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count true bits in array ranges</p>
+<p>Count the bits that are true in multiple ranges of the same array of booleans.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a</strong> (<em>np.Array of np.bool:</em>) – Input array</li>
+<li><strong>range_starts</strong> (<em>int</em><em>[</em><em>]</em>) – Starting offsets of the ranges to count.</li>
+<li><strong>range_ends</strong> (<em>int</em><em>[</em><em>]</em>) – Ending offsets of the ranges to count.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.create_labez_matrix">
+<code class="descname">create_labez_matrix</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em>, <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.create_labez_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the labez matrix.</p>
+<p>Create a matrix of manuscripts x passages.  Each entry represents one
+reading: 0 = lacuna, 1 = ‘a’, 2 = ‘b’, …</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.delete_passages_without_variants">
+<code class="descname">delete_passages_without_variants</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.delete_passages_without_variants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete passages without variants</p>
+<p>Aus: prepare4cbgm_5.py</p>
+<p>An diese Stelle versetzt damit sie nur einmal aufgerufen werden muß.</p>
+<blockquote>
+<div><p>Stellen löschen, an denen nur eine oder mehrere f- oder o-Lesarten vom
+A-Text abweichen. Hier gibt es also keine Variante.</p>
+<p>Nicht löschen, wenn an dieser variierten Stelle eine Variante ‘b’ - ‘y’
+erscheint.</p>
+<p>Änderung 2014-12-16: Act 28,29/22 gehört zu einem Fehlvers.  Dort gibt
+es u.U. keine Variante neben b, sondern nur ein Orthographicum.  Wir
+suchen also nicht mehr nach einer Variante ‘b’ bis ‘y’, sondern zählen
+die Varianten.  Liefert getReadings nur 1 zurück, gibt es keine
+Varianten.</p>
+</div></blockquote>
+<p>Stellen ohne Varianten sind für die CBGM irrelevant.  Stellen mit
+ausschließlich ‘z[u-z]’ Lesearten ebenso.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.fill_apparatus_table">
+<code class="descname">fill_apparatus_table</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.fill_apparatus_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the apparatus table.</p>
+<p>Build a positive apparatus.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.fill_manuscripts_table">
+<code class="descname">fill_manuscripts_table</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.fill_manuscripts_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the Manuscripts and Ms_Ranges tables.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.fill_passages_table">
+<code class="descname">fill_passages_table</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.fill_passages_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the Passages table.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.fill_readings_table">
+<code class="descname">fill_readings_table</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.fill_readings_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the readings table.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.step01">
+<code class="descname">step01</code><span class="sig-paren">(</span><em>dba</em>, <em>dbb</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step01" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy tables to new database</p>
+<p>Copy the (28 * 2) mysql tables to 2 tables in a new postgres database.  Do
+<em>not</em> copy versions and patristic manuscripts.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.step01b">
+<code class="descname">step01b</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step01b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete Versions</p>
+<p>No need to delete translations because we didn’t copy them in the first
+place.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.step01c">
+<code class="descname">step01c</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step01c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fix data entry errors.</p>
+<p>Fix a bogus hsnr.</p>
+<p>These errors should be fixed in the original database.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.step02">
+<code class="descname">step02</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step02" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data cleanup</p>
+<p>Delete spurious carriage return characters in suffix2 field.  Replace NULL
+entries with empty strings.</p>
+<blockquote>
+<div><p>Korrekturen in den Acts-Tabellen: L-Notierungen nur im Feld LEKT, *-
+u. C-Notierungen nur im Feld KORR.</p>
+<p>Gelegentlich steht an Stellen, an denen mehrere Lektionen desselben
+Lektionars zu verzeichnen sind, in KORR ein überflüssiges ‘L’ ohne
+Nummer.  Es kommt auch vor, dass L1 und L2 in KORR stehen oder
+C-Notierungen in LEKT.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.step05">
+<code class="descname">step05</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step05" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process differing readings in commentaries (T1, T2)</p>
+<p>Aus: prepare4cbgm_5b.py</p>
+<blockquote>
+<div><p>Wenn bei Wiederholung des Lemmatextes in Kommentarhandschriften
+Varianten entstanden sind, wird mit zw (=zweifelhaft) verzeichnet.</p>
+<p>20. Mai 2015.  Commentary manuscripts like 307 cannot be treated like
+lectionaries where we choose the first text.  If a T1 or T2 reading is
+found they have to be deleted.  A new zw reading is created containing
+the old readings as suffix.</p>
+<p>This has to be done as long as both witnesses are present.</p>
+<p>If the counterpart of one entry belongs to the list of lacunae the
+witness will be treated as normal witness. The T notation can be
+deleted.</p>
+</div></blockquote>
+<p>DIVINATIO: If there is only one T1 or T2 reading for that passage and
+manuscript, unset the ‘T’ suffix.  If there are both T1 and T2 readings, merge
+them into one ‘zw’ reading.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.step06">
+<code class="descname">step06</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step06" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete later hands</p>
+<p>Aus: prepare4cbgm_6.py</p>
+<blockquote>
+<div><p>Lesarten löschen, die nicht von der ersten Hand stammen.  Bei mehreren
+Lektionslesarten gilt die L1-Lesart.  Ausnahme: Bei Selbstkorrekturen
+wird die <em>-Lesart gelöscht und die C</em>-Lesart beibehalten.</p>
+<p>Erweiterung vom 15.02.2013: Wenn die einzige Variante an einer Stelle
+nur von einem oder mehreren Korrektoren bezeugt ist (z.B. 26:8/17),
+gehört die Stelle nicht in die Tabelle.  Es muss also noch eine Prüfung
+stattfinden, ob nach diesem Vorgang eine Stelle noch immer eine
+variierte Stelle ist. Wenn nicht, kann der Datensatz gelöscht werden.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.step06b">
+<code class="descname">step06b</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step06b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process Sigla</p>
+<p>Aus: prepare4cbgm_6b.py</p>
+<blockquote>
+<div><p>Handschriften, die mit einem “V” für videtur gekennzeichnet sind, werden
+ebenso wie alle anderen behandelt.  Das “V” kann also getilgt werden.
+Die Eintragungen für “ursprünglich (*)” und “C*” werden ebenfalls
+gelöscht.  Schließlich auch die Zusätze zur Handschriftennummer wie
+“T1”.  Diese Eintragungen werden (bisher) einfach an die
+Handschriftenbezeichnung angehängt.</p>
+<p>Der Eintrag ‘videtur’, gekennzeichnet durch ein ‘V’ hinter der
+Handschriftennummer, spielt für die CBGM keine Rolle.  Ein eventuell
+vorhandenes ‘V’ muss getilgt werden.  Gleiches gilt für die Einträge ‘*’
+und ‘C*’.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.step07">
+<code class="descname">step07</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step07" title="Permalink to this definition">¶</a></dt>
+<dd><p>zw Lesarten</p>
+<p>Aus: prepare4cbgm_7.py</p>
+<blockquote>
+<div>zw-Lesarten der übergeordneten Variante zuordnen, wenn ausschliesslich
+verschiedene Lesarten derselben Variante infrage kommen (z.B. zw a/ao
+oder b/bo_f).  In diesen Fällen tritt die Buchstabenkennung der
+übergeordneten Variante in labez an die Stelle von ‘zw’.</div></blockquote>
+<p>Unroll uncertain labez into multiple rows and set the certainty to &lt;1.0.  In
+the end we will have no ‘zw’ rows left (they only gave trouble anyway).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.vacuum">
+<code class="descname">vacuum</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.vacuum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vacuum database</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="appserver.html" class="btn btn-neutral float-right" title="Application Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ntg_common.html" class="btn btn-neutral" title="Common Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-17 CCeH - Licensed under the GNU GPL v3 or later.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

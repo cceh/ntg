@@ -33,24 +33,6 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
     var module = {}; // singleton
 
     /**
-     * Set a new passage.  Update all gadgets on the page.
-     *
-     * @function set_passage
-     *
-     * @param {Object} json - The new passage object from the server.
-     */
-    function set_passage (passage) {
-        module.apparatus.load (passage);
-        module.local_stemma.load (passage);
-        module.ltextflow.data.labez = 'a';
-        module.ltextflow.data.hyp_a = 'A';
-        module.ltextflow.load  (passage);
-        module.vtextflow.load  (passage);
-        module.vtextflow2.load (passage);
-        module.gtextflow.load  (passage);
-    }
-
-    /**
      * Initialize the module.
      *
      * @function init
@@ -60,7 +42,11 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
 
         module.navigator    = navigator.init ();
 
-        module.apparatus    = apparatus.init (panel.init ($ ('div.panel-apparatus')));
+        // create the panels
+
+        module.apparatus    = apparatus.init (
+            panel.init ($ ('div.panel-apparatus'))
+        );
 
         module.local_stemma = locstem.init  (
             panel.init ($ ('div.panel-local-stemma')),
@@ -68,17 +54,11 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
             'ls_'
         );
 
-        module.ltextflow    = textflow.init  (
-            panel.init ($ ('div.panel-local-textflow')),
-            d3stemma,
-            'tf_',
-            false
-        );
-
         module.vtextflow    = textflow.init  (
             panel.init ($ ('div.panel-variant-textflow')),
             d3stemma,
             'vtf_',
+            true,
             true
         );
 
@@ -86,16 +66,33 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
             panel.init ($ ('div.panel-variant-textflow-2')),
             d3chord,
             'vtf2_',
+            true,
             true
+        );
+
+        module.ltextflow    = textflow.init  (
+            panel.init ($ ('div.panel-local-textflow')),
+            d3stemma,
+            'tf_',
+            false,
+            false
         );
 
         module.gtextflow    = textflow.init  (
             panel.init ($ ('div.panel-global-textflow')),
             d3stemma,
             'gtf_',
+            true,
             false
         );
 
+        panel.create_panel_controls ($ ('div.panel'));
+
+        // this panel is closed by default
+        $ ('div.panel-variant-textflow-2 .panel-slidable').slideUp ();
+        module.vtextflow2.visible = false;
+
+        // insert css for color palettes
         d3common.insert_css_palette (
             d3common.generate_css_palette (
                 d3common.labez_palette,
@@ -103,11 +100,7 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
             )
         );
 
-        panel.create_panel_controls ($ ('div.panel'));
-        panel.init_panel_events ();
-
-        $ ('div.panel-variant-textflow-2 .panel-slidable').slideUp ();
-        module.vtextflow2.visible = false;
+        // install event handlers
 
         // Click on a ms. in the apparatus or in a relatives popup.
         $ (document).on ('click', '.ms[data-ms-id]', function (event) {
@@ -136,11 +129,6 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
             $ ('table.contextmenu').fadeOut (function () { $ (this).remove (); });
         });
 
-        // The user navigated to new passage.
-        $ (document).on ('ntg.passage.changed', function (event, json) {
-            set_passage (json);
-        });
-
         // Simulate user navigation set the passage on all modules.
         if (window.location.hash) {
             var hash = window.location.hash.substring (1);
@@ -149,7 +137,6 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
     }
 
     module.init = init;
-    module.set_passage = set_passage;
 
     window.coherence = module;
 

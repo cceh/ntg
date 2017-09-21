@@ -28,10 +28,10 @@ import networkx as nx
 import sqlalchemy
 
 from ntg_common import db
-from ntg_common.db import execute, rollback
-from ntg_common.config import args
 from ntg_common import tools
 from ntg_common import db_tools
+from ntg_common.db_tools import execute, rollback
+from ntg_common.config import args
 
 from . import helpers
 from .helpers import parameters, Bag, Passage, Manuscript, make_json_response

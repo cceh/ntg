@@ -1,5 +1,6 @@
 #floating-panels {
   position: relative;
+  height: 0;
 }
 form.passage-selector {
   margin-bottom: 20px;

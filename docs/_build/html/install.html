@@ -1,0 +1,407 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation &mdash; NTG 0.1.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
+        <link rel="next" title="Common Code" href="ntg_common.html"/>
+        <link rel="prev" title="Kurze Einführung in die Textkritik und das Neue Testament" href="developer.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> NTG
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Kurze Einführung in die Textkritik und das Neue Testament</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#editionen">Editionen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#die-textzeugen">Die Textzeugen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#textformen-texttypen">Textformen (Texttypen)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#textkritik">Textkritik</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#terminologie">Terminologie</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#lesart">Lesart</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#variierte-stelle">Variierte Stelle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#umfaszte-varianten">Umfaßte Varianten</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#fehlverse">Fehlverse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#splitt">Splitt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#zusammenlegung">Zusammenlegung</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#literatur">Literatur</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#database-access">Database Access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mysql-database">MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#postgres-database">Postgres database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#application-server">Application server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Database Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Generic Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Transformation tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="transform.html#tabellen-und-felder">Tabellen und Felder</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="transform.html#felder-in-der-tabelle-locstemed">Felder in der Tabelle LocStemEd</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="transform.html#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.server"><code class="docutils literal"><span class="pre">server.server</span></code> — Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.editor"><code class="docutils literal"><span class="pre">server.editor</span></code> — Editor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.security"><code class="docutils literal"><span class="pre">server.security</span></code> — Security</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="appclient.html">Application Client</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id1">Module apparatus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id2">Module d3-stemma-layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id3">Module panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#textflow">Module textflow</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NTG</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/install.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="database-access">
+<h2>Database Access<a class="headerlink" href="#database-access" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mysql-database">
+<h3>MySQL database<a class="headerlink" href="#mysql-database" title="Permalink to this headline">¶</a></h3>
+<p>Edit (or create) your <code class="file docutils literal"><span class="pre">~/.my.cnf</span></code> and add these sections:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="k">[ntg-local]</span>
+<span class="na">host</span><span class="o">=</span><span class="s">&#39;localhost&#39;</span>
+<span class="na">database</span><span class="o">=</span><span class="s">&#39;apparat&#39;</span>
+<span class="na">user</span><span class="o">=</span><span class="s">&#39;username&#39;</span>
+<span class="na">password</span><span class="o">=</span><span class="s">&#39;password&#39;</span>
+<span class="na">default-character-set</span><span class="o">=</span><span class="s">&#39;utf8&#39;</span>
+
+<span class="k">[ntg-remote]</span>
+<span class="na">host</span><span class="o">=</span><span class="s">&#39;remote&#39;</span>
+<span class="na">database</span><span class="o">=</span><span class="s">&#39;apparat&#39;</span>
+<span class="na">user</span><span class="o">=</span><span class="s">&#39;username&#39;</span>
+<span class="na">password</span><span class="o">=</span><span class="s">&#39;password&#39;</span>
+<span class="na">default-character-set</span><span class="o">=</span><span class="s">&#39;utf8&#39;</span>
+</pre></div>
+</div>
+<p>Replace <em>username</em> and <em>password</em> with your own username and password.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Make sure <code class="file docutils literal"><span class="pre">~/.my.cnf</span></code> is readable only by yourself!</p>
+</div>
+</div>
+<div class="section" id="postgres-database">
+<h3>Postgres database<a class="headerlink" href="#postgres-database" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">Create a postgres user. Login to postgres as superuser and say:</p>
+<div class="highlight-psql"><div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">USER</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span> <span class="n">CREATEDB</span> <span class="k">PASSWORD</span> <span class="s1">&#39;&lt;password&gt;&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Edit (or create) your <code class="file docutils literal"><span class="pre">~/.pgpass</span></code> and add this line:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>localhost:5432:ntg:&lt;username&gt;:&lt;password&gt;
+</pre></div>
+</div>
+<p>Replace &lt;username&gt; and &lt;password&gt; with your own username and password.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Make sure <code class="file docutils literal"><span class="pre">~/.pgpass</span></code> is readable only by yourself!</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You can now login to the Postgres database as user &lt;username&gt; without having
+to enter your password:</p>
+<div class="last highlight-shell"><div class="highlight"><pre><span></span>psql -h localhost -U &lt;username&gt; -d &lt;database&gt;
+</pre></div>
+</div>
+</div>
+</li>
+<li><p class="first">Create MySQL Foreign Data Wrapper</p>
+<p>Allows Postgres to access the MySQL databases in the prepare4cbgm.py script.</p>
+<p>As postgres superuser do:</p>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>$ psql -U postgres -h /var/run/postgresql/ -d ntg
+</pre></div>
+</div>
+<div class="highlight-psql"><div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">EXTENSION</span> <span class="n">mysql_fdw</span><span class="p">;</span>
+<span class="go">GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO &lt;username&gt;;</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="application-server">
+<h3>Application server<a class="headerlink" href="#application-server" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">Configure the global settings for the application server.  This concerns the
+user management database that holds user credentials and has to send
+confirmation mails.</p>
+<p>Edit (or create) your <code class="file docutils literal"><span class="pre">server/instance/_global.conf</span></code></p>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="na">APPLICATION_NAME</span>    <span class="o">=</span> <span class="s">&quot;Root&quot;</span>
+<span class="na">APPLICATION_ROOT</span>    <span class="o">=</span> <span class="s">&quot;/&quot;</span>
+<span class="na">SESSION_COOKIE_PATH</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span>
+<span class="na">SECRET_KEY</span>          <span class="o">=</span> <span class="s">&quot;&lt;a random string&gt;&quot;</span>
+
+<span class="na">PGHOST</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<span class="na">PGPORT</span><span class="o">=</span><span class="s">&quot;5432&quot;</span>
+<span class="na">PGDATABASE</span><span class="o">=</span><span class="s">&quot;ntg_user&quot;</span>
+<span class="na">PGUSER</span><span class="o">=</span><span class="s">&quot;ntg&quot;</span>
+
+<span class="na">USER_APP_NAME</span><span class="o">=</span><span class="s">&quot;NTG&quot;</span>
+<span class="na">USER_PASSWORD_HASH</span><span class="o">=</span><span class="s">&quot;pbkdf2_sha512&quot;</span>
+<span class="na">USER_PASSWORD_SALT</span><span class="o">=</span><span class="s">&quot;&lt;a random string&gt;&quot;</span>
+
+<span class="na">MAIL_SERVER</span>  <span class="o">=</span> <span class="s">&quot;smtp.domain.tld&quot;</span>
+<span class="na">MAIL_PORT</span>    <span class="o">=</span> <span class="s">25</span>
+<span class="na">MAIL_USE_TLS</span> <span class="o">=</span> <span class="s">True</span>
+<span class="na">MAIL_DEFAULT_SENDER</span> <span class="o">=</span> <span class="s">&quot;ntg appserver &lt;noreply@domain.tld&gt;&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Per-database setting of the application server.  The server can serve
+multiple databases from different mount points.  This concerns the CBGM
+database(s).</p>
+<p>Edit (or create) your <code class="file docutils literal"><span class="pre">server/instance/ph4.conf</span></code></p>
+<div class="highlight-ini"><div class="highlight"><pre><span></span><span class="na">APPLICATION_NAME</span><span class="o">=</span><span class="s">&quot;Phase 4&quot;</span>
+<span class="na">APPLICATION_ROOT</span><span class="o">=</span><span class="s">&quot;/ph4&quot;</span>
+
+<span class="na">PGHOST</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<span class="na">PGPORT</span><span class="o">=</span><span class="s">&quot;5432&quot;</span>
+<span class="na">PGDATABASE</span><span class="o">=</span><span class="s">&quot;ntg_ph4&quot;</span>
+<span class="na">PGUSER</span><span class="o">=</span><span class="s">&quot;ntg&quot;</span>
+
+<span class="na">MYSQL_GROUP</span><span class="o">=</span><span class="s">&quot;ntg&quot;</span>
+<span class="na">MYSQL_ECM_DB</span><span class="o">=</span><span class="s">&quot;ECM_ActsPh4&quot;</span>
+<span class="na">MYSQL_VG_DB</span><span class="o">=</span><span class="s">&quot;VarGenAtt_ActPh4&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Add an administrator for the application server.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is not the same user (and password) as the database user above!</p>
+</div>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>python3 -m scripts.mk_user -e &lt;email&gt; -u &lt;username&gt; -p &lt;password&gt;
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ntg_common.html" class="btn btn-neutral float-right" title="Common Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="developer.html" class="btn btn-neutral" title="Kurze Einführung in die Textkritik und das Neue Testament" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-17 CCeH - Licensed under the GNU GPL v3 or later.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

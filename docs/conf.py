@@ -31,13 +31,18 @@ sys.path.insert (0, os.path.abspath ('..'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx_js',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
+    'sphinx.ext.graphviz',
     'sphinx.ext.todo',
     'sphinx.ext.mathjax',
     'sphinx.ext.imgconverter',
     'sphinx.ext.githubpages',
 ]
+
+js_source_path = '../server/es6'
+#jsdoc_config_path = '../conf.json'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

@@ -44,7 +44,7 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
      *
      * @function deparam
      *
-     * @param s {string} A string in the form "p=1&q=2"
+     * @param {string} s - A string in the form "p=1&q=2"
      *
      * @return {Object} { p : 1, q : 2 }
      */
@@ -64,8 +64,8 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
      *
      * @function dir
      *
-     * @param older How many passages are older.
-     * @param newer How many passages are newer.
+     * @param {integer} older - How many passages are older.
+     * @param {integer} newer - How many passages are newer.
      *
      * @return Direction marker.
      */
@@ -136,7 +136,7 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
      *
      * @function init_details_table
      *
-     * @param $detailsTable {jQuery} The details table root node, which is not
+     * @param {jQuery} $detailsTable - The details table root node, which is not
      * really a table node but a tr node containing a table further down.
      */
 
@@ -267,9 +267,9 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
      *
      * @function create_details_table
      *
-     * @param ms1 {string} Name of the first manuscript to compare.
-     * @param ms2 {string} Name of the second manuscript to compare.
-     * @param range {string} The range to compare.
+     * @param {string} ms1   - Name of the first manuscript to compare.
+     * @param {string} ms2   - Name of the second manuscript to compare.
+     * @param {string} range - The range to compare.
      *
      * @return {jQuery} The HTML skeleton.
      */

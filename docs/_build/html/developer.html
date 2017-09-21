@@ -1,0 +1,608 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Kurze Einführung in die Textkritik und das Neue Testament &mdash; NTG 0.1.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
+        <link rel="next" title="Installation" href="install.html"/>
+        <link rel="prev" title="Introduction" href="intro.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> NTG
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Kurze Einführung in die Textkritik und das Neue Testament</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#das-neue-testament">Das Neue Testament</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#editionen">Editionen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#die-textzeugen">Die Textzeugen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#textformen-texttypen">Textformen (Texttypen)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#textkritik">Textkritik</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#terminologie">Terminologie</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#lesart">Lesart</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#variierte-stelle">Variierte Stelle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#umfaszte-varianten">Umfaßte Varianten</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fehlverse">Fehlverse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#splitt">Splitt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#zusammenlegung">Zusammenlegung</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#literatur">Literatur</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Database Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Generic Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Transformation tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="transform.html#tabellen-und-felder">Tabellen und Felder</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="transform.html#felder-in-der-tabelle-locstemed">Felder in der Tabelle LocStemEd</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="transform.html#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.server"><code class="docutils literal"><span class="pre">server.server</span></code> — Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.editor"><code class="docutils literal"><span class="pre">server.editor</span></code> — Editor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.security"><code class="docutils literal"><span class="pre">server.security</span></code> — Security</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="appclient.html">Application Client</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id1">Module apparatus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id2">Module d3-stemma-layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id3">Module panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#textflow">Module textflow</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NTG</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Kurze Einführung in die Textkritik und das Neue Testament</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/developer.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="kurze-einfuhrung-in-die-textkritik-und-das-neue-testament">
+<h1>Kurze Einführung in die Textkritik und das Neue Testament<a class="headerlink" href="#kurze-einfuhrung-in-die-textkritik-und-das-neue-testament" title="Permalink to this headline">¶</a></h1>
+<p>Dies ist eine kurzgehaltene Einführung für Software-Entwickler, um die
+Grundlagen zu vermitteln, die zum Verstehen des Verfahrens notwendig
+sind.  Sie entspricht nicht dem neuesten Stand der Forschung.</p>
+<div class="section" id="das-neue-testament">
+<h2>Das Neue Testament<a class="headerlink" href="#das-neue-testament" title="Permalink to this headline">¶</a></h2>
+<p>Es besteht aus:</p>
+<ul class="simple">
+<li>(e) Evangelien<ul>
+<li>(Mk) Markus</li>
+<li>(Mt) Matthäus</li>
+<li>(L) Lukas</li>
+<li>(J) Johannes</li>
+</ul>
+</li>
+<li>(a) Apostolos<ul>
+<li>(act)  Apostelgeschichte</li>
+<li>(cath) Katholische Briefe</li>
+</ul>
+</li>
+<li>(p) Paulusbriefe (14 Briefe)</li>
+<li>(r) Offenbarung des Johannes (revelatio)</li>
+</ul>
+<div class="section" id="editionen">
+<h3>Editionen<a class="headerlink" href="#editionen" title="Permalink to this headline">¶</a></h3>
+<p>Herausgegeben durch das Institut für neutestamentliche Textforschung,
+Münster.</p>
+<div class="section" id="nestle-aland">
+<h4>Nestle-Aland<a class="headerlink" href="#nestle-aland" title="Permalink to this headline">¶</a></h4>
+<p>Novum Testamentum Graece, 28. Auflage, 2012, (NA28) (Editio minor)</p>
+<p>Handausgabe, etwa 900 Seiten, ab 28€</p>
+<p>Die MySQL-Datenbank, die dieser Ausgabe zugrunde liegt, ist der
+Startpiunkt der CBGM.</p>
+</div>
+<div class="section" id="editio-critica-maior">
+<h4>Editio Critica Maior<a class="headerlink" href="#editio-critica-maior" title="Permalink to this headline">¶</a></h4>
+<p>Novum Testamentum Graecum, Editio Critica Maior</p>
+<p>Historisch kritische Ausgabe</p>
+<p>Bereits erschienen: Band IV/1 und Band IV/2,
+enthaltend die katholischen Briefe,
+etwa 600 Seiten,
+ab 98€</p>
+<p>Demnächst erscheint: Apostelgeschichte.  Hierfür ist unsere Mithilfe
+erwünscht.</p>
+<div class="figure" id="id13">
+<img alt="_images/Aland1998-fig1.jpeg" src="_images/Aland1998-fig1.jpeg" />
+<p class="caption"><span class="caption-text">Beispielseite: Jak 2,3</span></p>
+</div>
+<p>Die katholischen Briefe wurden ausgewählt, da sie eine größere Variation
+besitzen als das übrige NT und sich daher gut für die Entwicklung der
+CBGM eignen. (<a class="reference internal" href="#aland1998" id="id1">[ALAND1998]</a> §22)</p>
+</div>
+</div>
+<div class="section" id="die-textzeugen">
+<h3>Die Textzeugen<a class="headerlink" href="#die-textzeugen" title="Permalink to this headline">¶</a></h3>
+<p>Etwa 5000 Handschriften.
+Handschriften des NT verwenden fast ausschließlich das Codex-Format.</p>
+<p>Folgende Arten von Textzeugen werden herangezogen:</p>
+<div class="section" id="papyri">
+<h4>Papyri<a class="headerlink" href="#papyri" title="Permalink to this headline">¶</a></h4>
+<p>Früheste Überlieferungen.  Dem Originaltext am nächsten.</p>
+<p>Ab Jahr 125.  Meist nur fragmentarisch.  Hat sich nur im Wüstenklima
+erhalten.</p>
+<p>Bezeichnung: ‘𝔓’ gefolgt von hochgestellter Zahl (z.B. 𝔓<sup>52</sup>)</p>
+<p>Papyri haben eine gute Seite (mit horizontal verlaufenden Fasern) und
+eine schlechte Seite (mit vertikal verlaufenden Fasern.)  Bei
+Schriftrollen wurde zunächst nur die gute Seite beschrieben.  Die
+schlechte Seite wurde oft später aus Gründen der Sparsamkeit
+beschrieben.  Diese Sitte ermöglicht eine Datierung eines undatierten
+Dokuments wenn das Dokument auf der anderen Seite datiert ist.</p>
+</div>
+<div class="section" id="majuskeln">
+<h4>Majuskeln<a class="headerlink" href="#majuskeln" title="Permalink to this headline">¶</a></h4>
+<p>Ab dem 4. Jahrhundert.  Auf Pergament.  Viele vollständige Abschriften
+des NT sind als Majuskel erhalten.  Sehr unterschiedliche Nähe zum
+Originaltext.</p>
+<p>Bezeichnung: Zahl mit führender Null (z.B. 0189)</p>
+<p>Frühere Bezeichnung: lateinische, griechische oder hebräische
+Großbuchstaben</p>
+<p>Wichtige Majuskeln:</p>
+<ul class="simple">
+<li>01 (א) Codex Sinaiticus eapr IV</li>
+<li>02 (A) Codex Alexandrinus eapr† V</li>
+<li>03 (B) Codex Vaticanus eap† IV</li>
+<li>04 (C) Codex Ephraemi Syri rescriptus eapr† V</li>
+<li>05 (D) Codex Bezae Cantabrigiensis ea†</li>
+</ul>
+<p>Im 7. und 8. Jahrhundert verschlechtert sich das Pergament.  Das Format
+wird verkleinert.  Alte Handschriften werden überschrieben (Palimpsest,
+codex rescriptus).  (<a class="reference internal" href="#nestle1923" id="id2">[NESTLE1923]</a> § 36)</p>
+</div>
+<div class="section" id="minuskeln">
+<h4>Minuskeln<a class="headerlink" href="#minuskeln" title="Permalink to this headline">¶</a></h4>
+<p>Ab dem 9. Jahrhundert.  Auf Pergament oder Papier.  Die allermeisten
+davon enthalten den byzantinischen Text und sind für uns uninteressant,
+aber einige wenige sind dem Originaltext sehr nahe.  Es sind 2800
+Minuskeln bekannt.  (<a class="reference internal" href="#aland1989" id="id3">[ALAND1989]</a> S. 140)</p>
+<p>Bezeichnung: Zahl (z.B. 33)</p>
+<p>Ab dem 13. Jhd. wird Papier für Bibelhandschriften verwendet.
+Im 15. Jhd. beginnt das Papier zu überwiegen.  (<a class="reference internal" href="#nestle1923" id="id4">[NESTLE1923]</a> § 36)</p>
+</div>
+<div class="section" id="lektionare">
+<h4>Lektionare<a class="headerlink" href="#lektionare" title="Permalink to this headline">¶</a></h4>
+<p>Lektionare (kirchliche Lesebücher) bringen nur ausgewählte Perikopen des
+NT, geordnet nach dem Kirchenjahr.  Es sind 2300 Lektionare bekannt.
+Das System der Lektionare entstand geschätzt im 4 Jhd.  (Kuriosum: da das
+Kirchenjahr Ostern anfängt, hat es bis zu 57 Wochen.)
+(<a class="reference internal" href="#aland1989" id="id5">[ALAND1989]</a> S. 172ff)</p>
+<p>Lektionare können den gleichen Text mehrmals enthalten, die
+unterschiedlichen Lesungen werden in den Datenbank mit L1, L2
+bezeichnet.</p>
+<p>Bezeichnung: ‘ℓ’ gefolgt von Zahl (z.B. ℓ 1178)</p>
+</div>
+<div class="section" id="ubersetzungen-versionen">
+<h4>Übersetzungen (Versionen)<a class="headerlink" href="#ubersetzungen-versionen" title="Permalink to this headline">¶</a></h4>
+<p>Latein, Syrisch, Koptisch, …</p>
+<p>Haben ergänzende Funktion.  Sie sind wertvoll wenn sie einen frühen Text
+als Vorlage benützt haben.  Wörtliche Übersetzungen sind wertvoller als
+idiomatische.</p>
+<p>Bezeichnung: Sprachkürzel mit hochgestellten Buchstaben (z.B.
+sy<sup>c</sup> für den Cureton-Syrer)</p>
+</div>
+<div class="section" id="zitate-bei-den-kirchenvatern-kommentare">
+<h4>Zitate bei den Kirchenvätern (Kommentare)<a class="headerlink" href="#zitate-bei-den-kirchenvatern-kommentare" title="Permalink to this headline">¶</a></h4>
+<p>Haben ergänzende Funktion.</p>
+<p>Kommentarhandschriften enthalten den Text des NT oft mehrmals.  Denn dem
+eigentlichen Zitat im laufenden Text des Kommentars ist oft der
+vollständige Text des Lemmas vorangestellt.</p>
+<p>Das eigentliche Zitat genießt eine höheren Wert.  Der Lemma-Text wurde
+hingegegen oft durch einen geläufigeren Text ersetzt.
+(<a class="reference internal" href="#aland1989" id="id6">[ALAND1989]</a> S. 179)</p>
+<p>Die unterschiedlichen Lesungen werden in der Datenbank mit T1, T2
+bezeichnet.</p>
+<p>Bezeichnung: Name oder Abkürzung (z.B. Or für Origenes)</p>
+</div>
+</div>
+<div class="section" id="textformen-texttypen">
+<h3>Textformen (Texttypen)<a class="headerlink" href="#textformen-texttypen" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="alexandrinischer-text">
+<h4>Alexandrinischer Text<a class="headerlink" href="#alexandrinischer-text" title="Permalink to this headline">¶</a></h4>
+<p>In Alexandria entstanden.</p>
+</div>
+<div class="section" id="majority-text">
+<span id="mt"></span><h4>Majority Text<a class="headerlink" href="#majority-text" title="Permalink to this headline">¶</a></h4>
+<p>(Byzantinischer Text, Koine, Mehrheitstext)</p>
+<p>Der byzantinische Text ist am weitesten verbreitet.  Er war der de facto
+offizielle Text des Mittelalters.  Durch seine Geläufigkeit bei den
+Schreibern wurden andere Lesarten oft durch ihn ersetzt, bewußt oder
+unterbewußt.  Er gilt als minderwertig weil er erst spät entstanden ist.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">The <a class="reference internal" href="transform.html#mt-rules"><span class="std std-ref">rules to reconstruct the Majority Text</span></a>.</p>
+</div>
+</div>
+<div class="section" id="textus-receptus">
+<span id="tr"></span><h4>Textus Receptus<a class="headerlink" href="#textus-receptus" title="Permalink to this headline">¶</a></h4>
+<p>Textus Receptus: der von Erasmus von Rotterdam im Jahre 1516 gedruckte
+Text.  Er gilt als besonders minderwertig, da Erasmus überstürzt
+gearbeitet hat und nur wenige Textzeugen verwendet hat.</p>
+</div>
+<div class="section" id="westlicher-text-d-text">
+<h4>Westlicher Text (D-Text)<a class="headerlink" href="#westlicher-text-d-text" title="Permalink to this headline">¶</a></h4>
+<p>Textgruppe, die im wesentlichen aus der D-Majuskel entstanden ist.</p>
+</div>
+</div>
+</div>
+<div class="section" id="textkritik">
+<h2>Textkritik<a class="headerlink" href="#textkritik" title="Permalink to this headline">¶</a></h2>
+<p>Ob die Vorlage eine Minuskel oder eine Maiuskel war, ist oft an
+Schreibfehlern festzustellen. (<a class="reference internal" href="#nestle1923" id="id7">[NESTLE1923]</a> § 103)</p>
+<p>Bei Auslassungen läßt sich durch Zählung der Buchstaben auch ein Bild
+von der Zeilenbreite der Vorlage gewinnen. (<a class="reference internal" href="#nestle1923" id="id8">[NESTLE1923]</a> § 103)</p>
+<p>Brevior lectio potior: die kürzere Lesart ist die stärkere.  Schreiber
+haben öfter hinzugefügt als weggelassen.  (Einige Wissenschaftler
+glauben hingegen, daß die ausgelassene Zeile der häufigste
+Schreiberfehler ist. Siehe: <a class="reference internal" href="#metzger2005" id="id9">[METZGER2005]</a> S. 213f)</p>
+<p>Difficilior lectio potior: die schwerere Lesart ist die Stärkere.
+Schreiber haben schwer verständliche Passagen oft vereinfacht.</p>
+<p><em>Den Vorzug verdient die Lesart,</em> aus der sich die Entstehung der
+anderen Lesarten am leichtesten erklären läßt.  (<a class="reference internal" href="#nestle1923" id="id10">[NESTLE1923]</a> § 115)</p>
+<p><em>Knowledge of documents should precede final judgement upon readings.</em>
+(<a class="reference internal" href="#westcott1881" id="id11">[WESTCOTT1881]</a> S. 31)</p>
+</div>
+<div class="section" id="terminologie">
+<h2>Terminologie<a class="headerlink" href="#terminologie" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="lesart">
+<h3>Lesart<a class="headerlink" href="#lesart" title="Permalink to this headline">¶</a></h3>
+<p>Eine Lesart hat eine eindeutige Adresse, eine Lesartenbezeichnung
+(Labez), das Suffix einer Lesartenbezeichnung (Labezsuf) und natürlich
+den Text der Lesart selbst.  Das Suffix kennzeichnet z.B. eine
+Fehlerlesart oder ein Orthographicum.</p>
+</div>
+<div class="section" id="variierte-stelle">
+<span id="variiert"></span><h3>Variierte Stelle<a class="headerlink" href="#variierte-stelle" title="Permalink to this headline">¶</a></h3>
+<p>Eine variierte Stelle (variant passage) ist eine Stelle die zwei oder
+mehr Lesarten aufweist.  Die große Mehrheit der Stellen im NT, etwa 2/3
+davon, weist nur eine einzige Lesart auf, und ist deshalb für die CBGM
+uninteressant.</p>
+</div>
+<div class="section" id="umfaszte-varianten">
+<span id="umfasst"></span><h3>Umfaßte Varianten<a class="headerlink" href="#umfaszte-varianten" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div>Beim Herantreten an die Einzelarbeit ist das erste Erfordernis, die
+zu untersuchende Lesart als solche richtig abzugrenzen.  Die
+Apparate sind in dieser Hinsicht sehr verschieden angelegt: manche
+buchen ganze Satzvarianten, die man zerlegen muß; andere geben jedes
+Wort für sich, sodaß man, um ein klares Bild zu bekommen,
+zusammenfassen muß.  (<a class="reference internal" href="#nestle1923" id="id12">[NESTLE1923]</a> § 108)</div></blockquote>
+<p>Wenn variierte Wörter, die durch andere Satzteile voneinander getrennt
+sind, sinngemäß zu einer Einheit gehören, so verzeichnet unsere
+Datenbank sie als eine einzelne Lesart.  Sind in diesen anderen
+Satzteilen ebenso Varianten entstanden, sprechen wir von umfaßten
+Varianten.</p>
+<p>Umfassende Varianten können Lesarten beitragen, die gewisse umfaßte
+Varianten nicht zulassen.  In diesem Fall wird die umfaßte Lesart mit
+‘zu’ gekennzeichent.</p>
+</div>
+<div class="section" id="fehlverse">
+<span id="fehlvers"></span><h3>Fehlverse<a class="headerlink" href="#fehlverse" title="Permalink to this headline">¶</a></h3>
+<p>Fehlverse sind in späteren Zeitaltern hinzugefügte Verse.  Bei einem
+Fehlvers muß anstatt der Handschrift ‘A’ der <a class="reference internal" href="#tr"><span class="std std-ref">Textus Receptus</span></a>
+als Basis verwendet werden.</p>
+</div>
+<div class="section" id="splitt">
+<span id="split"></span><h3>Splitt<a class="headerlink" href="#splitt" title="Permalink to this headline">¶</a></h3>
+<p>Ein Splitt wird benötigt wenn eine Lesart mehrmals unabhängig entstanden
+ist, damit die Abhängigkeiten der Handschriften untereinander nicht
+verfälscht werden.</p>
+<p>Bei einem Splitt erhalten die Felder varnew, s1, s2 in LocStemEd durch
+die Bearbeitung die Form [a-y][1-9].  z.B. weisen die Varianten b1 und
+b2 denselben Wortlaut auf sind aber unabhängig voneinander entstanden.</p>
+</div>
+<div class="section" id="zusammenlegung">
+<h3>Zusammenlegung<a class="headerlink" href="#zusammenlegung" title="Permalink to this headline">¶</a></h3>
+<p>Eine Zusammenlegung wird benötigt um einen Splitt rückgängig zu
+machen???[dubious - discuss]</p>
+<p>Bei einer Zusammenlegung hast das Feld varnew die Form: [a-y]!.</p>
+</div>
+</div>
+<div class="section" id="literatur">
+<h2>Literatur<a class="headerlink" href="#literatur" title="Permalink to this headline">¶</a></h2>
+<table class="docutils citation" frame="void" id="aland1989" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[ALAND1989]</td><td><em>(<a class="fn-backref" href="#id3">1</a>, <a class="fn-backref" href="#id5">2</a>, <a class="fn-backref" href="#id6">3</a>)</em> Aland, Kurt, und Barbara Aland.  1989.  <em>Der Text des
+Neuen Testaments: Einführung in die wissenschaftlichen Ausgaben und
+in Theorie wie Praxis der modernen Textkritik. 2. Auflage.</em> Stuttgart:
+Deutsche Bibelgesellschaft.</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="aland1998" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[ALAND1998]</a></td><td>Aland, Barbara.  1998.  <em>Novum Testamentum Graecum Editio
+Critica Maior: Presentation of the First Part: The Letter of James.</em>
+Münster.  <a class="reference external" href="http://rosetta.reltech.org/TC/v03/Aland1998.html">http://rosetta.reltech.org/TC/v03/Aland1998.html</a></td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="clark1918" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[CLARK1918]</td><td>Clark, Albert C. 1918. <em>The Descent of Manuscripts</em>.
+Oxford</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="gabel2015" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[GÄBEL2015]</td><td>Georg Gäbel et al. 2015. <em>The CBGM Applied to Variants
+from Acts. Methodological Background.</em> Institut für Neutestamentliche
+Textforschung, University of Münster.
+<a class="reference external" href="http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-background.pdf">http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-background.pdf</a></td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="metzger2005" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id9">[METZGER2005]</a></td><td>Metzger, Bruce Manning.  2005.  The Text of the New
+Testament.  4th Edition.</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="mink2008" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[MINK2008]</td><td>Mink, Gerd.  <em>The Coherence-Based Genealogical Method (CBGM)
+— Introductory Presentation by Gerd Mink.</em>
+<a class="reference external" href="http://www.uni-muenster.de/INTF/cbgm_presentation/CBGM_Presentation.zip">http://www.uni-muenster.de/INTF/cbgm_presentation/CBGM_Presentation.zip</a></td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="nestle1923" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[NESTLE1923]</td><td><em>(<a class="fn-backref" href="#id2">1</a>, <a class="fn-backref" href="#id4">2</a>, <a class="fn-backref" href="#id7">3</a>, <a class="fn-backref" href="#id8">4</a>, <a class="fn-backref" href="#id10">5</a>, <a class="fn-backref" href="#id12">6</a>)</em> Nestle, Eberhard.  1923.  <em>Eberhard Nestle’s Einführung
+in das Griechische Neue Testament. Vierte Auflage.  Völlig
+umgearbeitet von Ernst von Dobschütz.</em>  Göttingen: Vandenhoeck &amp;
+Ruprecht.</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="wachtel2015" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[WACHTEL2015]</td><td>Wachtel, Klaus.  2015.  <em>The Coherence Method and
+History.</em> Institut für Neutestamentliche Textforschung, University of
+Münster.  <a class="reference external" href="http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-history.pdf">http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-history.pdf</a></td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="wachtel2015a" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[WACHTEL2015a]</td><td>Wachtel, Klaus.  2015.  <em>Constructing Local Stemmata
+for the ECM of Acts: Examples.</em>  Institut für Neutestamentliche
+Textforschung, University of Münster.
+<a class="reference external" href="http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-examples.pdf">http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-examples.pdf</a></td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="westcott1881" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id11">[WESTCOTT1881]</a></td><td>Westcott, Brooke Foss and Hort, Fenton John Anthony.
+<em>The New Testament in the Original Greek.  Volume 2.  Introduction
+and Appendix by the Editors</em>
+<a class="reference external" href="https://archive.org/details/newtestamentinor82west">https://archive.org/details/newtestamentinor82west</a></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="install.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="intro.html" class="btn btn-neutral" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-17 CCeH - Licensed under the GNU GPL v3 or later.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -30,7 +30,7 @@ JS_GZ       := $(patsubst %, %.gzip, $(JS))
 PY_SOURCES  := scripts/cceh/*.py ntg_common/*.py server/*.py
 
 .PHONY: upload upload_po update_pot update_po update_mo update_libs vpn server restart psql
-.PHONY: js css docs jsdoc sphinx lint pylint jslint csslint
+.PHONY: js css doc jsdoc sphinx lint pylint jslint csslint
 
 restart: js css server
 
@@ -67,12 +67,13 @@ jslint:
 csslint: css
 	csslint --ignore="adjoining-classes,box-sizing,ids,order-alphabetical,overqualified-elements,qualified-headings" $(CSS)
 
-docs: sphinx jsodc
+doc: sphinx
 
 sphinx:
 	cd docs; make html; cd ..
 
-jsdoc:
+# jsdoc doesn't grok ES6
+jsdoc: js
 	jsdoc -d jsdoc -a all $(JS) && $(BROWSER) jsdoc/index.html
 
 bower_update:

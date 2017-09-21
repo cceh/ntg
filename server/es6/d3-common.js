@@ -70,8 +70,8 @@ define ([
      *
      * @function generate_css_palette
      *
-     * @param labez_scale {d3.scale} - The color palette for labez as D3 scale.
-     * @param clique_scale {d3.scale} - The color palette for cliques as D3 scale.
+     * @param {d3.scale} labez_scale  - The color palette for labez as D3 scale.
+     * @param {d3.scale} clique_scale - The color palette for cliques as D3 scale.
      *
      * @return {string} - The color palette as CSS
      */
@@ -125,14 +125,11 @@ define ([
      *
      * @function insert_css_palette
      *
-     * @param css {string} - The color palette as CSS.
+     * @param {string} css - The color palette as CSS.
      */
     function insert_css_palette (css) {
         $ ('<style type="text/css">' + css + '</style>').appendTo ('head');
     }
-
-    // For D3 and jQuery Interoperability see:
-    //   http://collaboradev.com/2014/03/18/d3-and-jquery-interoperability/
 
     /**
      * Convert a D3 selection object into a jQuery selection object.
@@ -142,6 +139,8 @@ define ([
      * @param {d3.selection} d3_selection - The D3 selection object
      *
      * @return {jQuery.selection} - The jQuery selection object.
+     *
+     * @see http://collaboradev.com/2014/03/18/d3-and-jquery-interoperability/
      */
     function to_jquery (d3_selection) {
         return $ (d3_selection.nodes ());
@@ -165,8 +164,8 @@ define ([
      *
      * @function append_marker
      *
-     * @param svg {jQuery.selection|d3.selection} The SVG element.
-     * @param id_prefix The id prefix.
+     * @param {jQuery.selection|d3.selection} svg - The SVG element.
+     * @param {string} id_prefix                  - The id prefix.
      */
     function append_marker (svg, id_prefix) {
         svg
@@ -190,7 +189,7 @@ define ([
      *
      * @function parse_pt
      *
-     * @param commasep {string} The pt as comma-separated values.
+     * @param {string} commasep - The pt as comma-separated values.
      *
      * @return {Object} The point as dictionary { x, y }
      */
@@ -209,13 +208,13 @@ define ([
     /**
      * Parse bounding box coordinates from .dot format.
      *
-     * @function parse_bbox
-     *
      * From the .dot format docs: rect: "%f,%f,%f,%f" The rectangle
      * llx,lly,urx,ury gives the coordinates, in points, of the lower-left
-     * corner (llx,lly) and the upper-right corner (urx,ury).
+     * corner \(llx,lly\) and the upper-right corner \(urx,ury\).
      *
-     * @param commasep {string} The bbox as comma-separated values.
+     * @function parse_bbox
+     *
+     * @param {string} commasep - The bbox as comma-separated values.
      *
      * @return {Object} The bbox as dictionary { x, y, width, height }
      */
@@ -238,7 +237,7 @@ define ([
      *
      * @function parse_path
      *
-     * @param path {string} The path in .dot format
+     * @param {string} path - The path in .dot format
      *
      * @return {Array} The path as array of objects  { x, y }
      */
@@ -254,7 +253,7 @@ define ([
      *
      * @function parse_path_svg
      *
-     * @param path {string} The path in .dot format
+     * @param {string} path - The path in .dot format
      *
      * @return {string} The path as 'Mx,y Cx,y x,y x,y ...'
      */
@@ -285,10 +284,10 @@ define ([
      *
      * @function inflate_bbox
      *
-     * @param bbox The bbox as dictionary { x, y, width, height }
-     * @param len  The bbox will be twice this wider and taller.
+     * @param {Object} bbox - The bbox as dictionary of x, y, width, height
+     * @param {float}  len  - The bbox will be twice this wider and taller.
      *
-     * @return {Object} The bbox as dictionary { x, y, width, height }
+     * @return {Object} The bbox as dictionary of x, y, width, height
      */
     function inflate_bbox (bbox, len) {
         return {
@@ -304,8 +303,8 @@ define ([
      *
      * @function dot
      *
-     * @param url {string}        The url
-     * @param callback {function} The callback function.
+     * @param {string} url        - The url
+     * @param {function} callback - The callback function.
      *
      * @return {Promise}
      */
@@ -335,8 +334,8 @@ define ([
      *
      * @function bfs
      *
-     * @param edges The edges list
-     * @param start The start node id
+     * @param {Object} edges - The edges list
+     * @param {string} start - The start node id
      *
      * @return A list of node ids in breadth-first order
      */

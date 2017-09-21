@@ -15,7 +15,7 @@ function () {
      *
      * @function format
      *
-     * @param {string} s - The string to format
+     * @param {string} s  - The string to format
      * @param {dict} data - A dictionary of key: value
      *
      * @return {string} - The formatted string
@@ -62,11 +62,11 @@ function () {
     /**
      * Position a context menu aside an svg element.
      *
-     * Since jQuery doesn't grok the SVG DOM, we have to calculate the position
-     * of the menu manually.
+     * Since jQuery doesn't grok the SVG DOM, we have to calculate the
+     * position of the menu manually.
      *
-     * @param menu
-     * @param target
+     * @param {Object} menu   - The menu
+     * @param {Object} target - The DOM object to attach the menu to
      */
 
     function svg_contextmenu (menu, target) {
@@ -87,9 +87,11 @@ function () {
     /**
      * Display an auto-closing alert window.
      *
-     * @param xhr    The server response containing the message.
-     *               The JSON response must contain an Object with a message field.
-     * @param $panel The panel to append the window to.
+     * @param {Object} xhr - The server response containing the
+     *                          message.  The JSON response must
+     *                          contain an Object with a message
+     *                          field.
+     * @param {jQuery} $panel - The panel to append the window to.
      */
 
     function xhr_alert (xhr, $panel) {

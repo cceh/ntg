@@ -23,6 +23,8 @@
   </head>
 
   <body class="page_{% block page_class %}undefined{% endblock %}">
+    <div id="floating-panels">
+    </div>
     <div id="header">
       <div class="container">
         {% block header %}
@@ -70,8 +72,6 @@
     <div id="footer">
       {% block footer %}
       {% endblock %}
-    </div>
-    <div id="floating-panels">
     </div>
   </body>
 </html>

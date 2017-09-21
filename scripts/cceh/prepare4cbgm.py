@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-"""Prepare a database for CBGM
+"""Prepare the database for CBGM
 
 This script converts the apparatus tables used in the production of Nestle-Aland
 into tables suitable for doing CBGM:
@@ -11,28 +11,6 @@ into tables suitable for doing CBGM:
 - build a positive apparatus
 - calculate the pre-coherence similarity of manuscripts
 - calculate the post-coherence ancestrality of manuscripts
-
-We assume that a manuscript is older than another manuscript if it contains a
-greater percentage of older readings than younger readings.
-
-Then for building our stemma tree we assume that the source of a manuscript is
-the most similar among the older manuscripts.
-
-    Ausgangspunkt ist der Apparat mit allen für die Druckfassung notwendigen
-    Informationen.  Diese Datenbasis muss für die CBGM bearbeitet werden.  Die
-    Ausgangsdaten stellen einen negativen Apparat dar, d.h. die griechischen
-    handschriftlichen Zeugen, die mit dem rekonstruierten Ausgangstext
-    übereinstimmen, werden nicht ausdrücklich aufgelistet.  Aufgelistet werden
-    alle Zeugen, die von diesem Text abweichen bzw. Korrekturen oder
-    Alternativlesarten haben.  Ziel ist es, einen positiven Apparat zu erhalten.
-    Wir benötigen einen Datensatz pro griechischem handschriftlichen Zeugen
-    erster Hand und variierten Stelle (einschließlich der Lücken).  D.h. für
-    jede variierte Stelle liegt die explizite Information vor, ob die
-    Handschrift dem Ausgangstext folgt, einen anderen Text oder gar keinen Text
-    hat, weil z.B. die Seite beschädigt ist.  Korrekturen oder
-    Alternativlesarten werden für die CBGM ignoriert.
-
-    -- ArbeitsablaufCBGMApg_Db.docx
 
 """
 
@@ -54,12 +32,10 @@ import networkx as nx
 import numpy as np
 import sqlalchemy
 
-# sys.path.append (os.path.dirname (os.path.abspath (__file__)) + "/../..")
-
 from ntg_common import db
 from ntg_common import tools
 from ntg_common import db_tools
-from ntg_common.db import execute, executemany, executemany_raw, warn, debug, fix
+from ntg_common.db_tools import execute, executemany, executemany_raw, warn, debug, fix
 from ntg_common.tools import log
 from ntg_common.config import args
 
@@ -830,8 +806,8 @@ def delete_passages_without_variants (dba, parameters):
         """, parameters)
 
 
-class Bag (object):
-    """ Holds some values for us. """
+class CBGM_Params (object):
+    """ Structure for intermediate results of the CBGM. """
 
     n_mss = 0               # No. of manuscripts
     n_passages = 0          # No. of passages
@@ -1416,24 +1392,27 @@ def fill_apparatus_table (dba, parameters):
 
 
 def build_byzantine_text (dba, parameters):
-    """ Reconstruct the "Byzantine" text
+    """Reconstruct the Majority Text
 
-    Build a virtual manuscript that reconstructs the "Majority Text."
+    Build a virtual manuscript that reconstructs the :ref:`Majority Text <mt>`.
+    The MT manuscripts has a hard-coded ms_id of 2.
 
-        Im Laufe der Textgeschichte hat sich eine Textform durchgesetzt, der
-        sogenannte Mehrheitstext, der auch Byzantinischer Text genannt wird.
-        Diese Textform wird exemplarisch durch die sieben Handschriften 1, 18,
-        35, 330, 398, 424 und 1241 repräsentiert.  Für jede variierte Stelle
-        wird nun gezählt und festgehalten, wieviele dieser sieben Handschriften
-        bei einer Lesart vertreten sind.  Eine Lesart gilt als Mehrheitslesart,
-        wenn sie
+    .. _mt_rules:
 
-        a) von mindestens sechs der oben genannten repräsentativen Handschriften
-           bezeugt wird und höchstens eine Handschrift abweicht, oder
-        b) von fünf Repräsentanten bezeugt wird und zwei mit unterschiedlichen
-           Lesarten abweichen.
+    Im Laufe der Textgeschichte hat sich eine Textform durchgesetzt, der
+    sogenannte Mehrheitstext, der auch Byzantinischer Text genannt wird.
+    Diese Textform wird exemplarisch durch die sieben Handschriften 1, 18,
+    35, 330, 398, 424 und 1241 repräsentiert.  Für jede variierte Stelle
+    wird nun gezählt und festgehalten, wieviele dieser sieben Handschriften
+    bei einer Lesart vertreten sind.  Eine Lesart gilt als Mehrheitslesart,
+    wenn sie
 
-        --PreCo/PreCoActs/ActsMT2.pl
+    a) von mindestens sechs der oben genannten repräsentativen Handschriften
+       bezeugt wird und höchstens eine Handschrift abweicht, oder
+    b) von fünf Repräsentanten bezeugt wird und zwei mit unterschiedlichen
+       Lesarten abweichen.
+
+    --PreCo/PreCoActs/ActsMT2.pl
 
     """
 
@@ -2039,7 +2018,7 @@ if __name__ == '__main__':
     db.fdw ('app_fdw', db.Base.metadata,  dbdest, dbsrc1)
     db.fdw ('var_fdw', db.Base2.metadata, dbdest, dbsrc2)
 
-    v = Bag ()
+    v = CBGM_Params ()
     try:
         for step in range (args.range[0], args.range[1] + 1):
             if step == 1:

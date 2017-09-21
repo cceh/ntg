@@ -240,7 +240,7 @@ function ($, d3, d3_common, _) {
         };
     }
 
-    return /** @alias module:d3-stemma-layout */ {
+    return {
         'init' : init,
     };
 });

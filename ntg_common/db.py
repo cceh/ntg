@@ -1,54 +1,10 @@
 # -*- encoding: utf-8 -*-
 
-"""Database Interface Module
-
-How To Configure Database Access
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The MySQL database:
-
-Edit (or create) your ~/.my.cnf and add these sections: ::
-
-    [ntg-local]
-    host='localhost'
-    database='apparat'
-    user='username'
-    password='password'
-    default-character-set='utf8'
-
-    [ntg-remote]
-    host='remote'
-    database='apparat'
-    user='username'
-    password='password'
-    default-character-set='utf8'
-
-Replace *username* and *password* with your own username and password.
-**Make sure ~/.my.cnf is readable only by yourself!**
-
-The Postgres database:
-
-1. Create a postgres user. Login to postgres as superuser and say: ::
-
-    CREATE USER <username> CREATEDB PASSWORD '<password>';
-
-2. Edit (or create) your ~/.pgpass and add this line: ::
-
-    localhost:5432:ntg:<username>:<password>
-
-Replace <username> and <password> with your own username and password.
-**Make sure ~/.pgpass is readable only by yourself!**
-
+"""This module contains the sqlalchemy classes that create the database structure
+we need for doing the CBGM and running the application server.
 
 """
 
-import configparser
-import datetime
-import logging
-import os
-import os.path
-
-import six
 import sqlalchemy
 import sqlalchemy.types
 
@@ -58,28 +14,20 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext import compiler
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.schema import DDLElement
-from sqlalchemy.sql import table, text
-
-import sqlalchemy_utils
 from sqlalchemy_utils import IntRangeType
 
-from .tools import log, tabulate
-from .config import args
 
-MYSQL_DEFAULT_GROUP  = 'ntg-local'
+# class CoerceInteger (sqlalchemy.types.TypeDecorator):
+#     """ Coerce numpy integers to python integers
+#     before passing off to the database."""
 
+#     impl = sqlalchemy.types.Integer
 
-class CoerceInteger (sqlalchemy.types.TypeDecorator):
-    """ Coerce numpy integers to python integers
-    before passing off to the database."""
+#     def process_bind_param (self, value, dialect):
+#         return int (value)
 
-    impl = sqlalchemy.types.Integer
-
-    def process_bind_param (self, value, dialect):
-        return int (value)
-
-    def process_result_value (self, value, dialect):
-        return value
+#     def process_result_value (self, value, dialect):
+#         return value
 
 # let sqlalchemy manage our views
 
@@ -199,189 +147,140 @@ def generic (metadata, create_cmd, drop_cmd):
     DropGeneric (drop_cmd).execute_at ('before-drop', metadata)
 
 
-def execute (conn, sql, parameters, debug_level = logging.DEBUG):
-    sql = sql.strip ().format (**parameters)
-    start_time = datetime.datetime.now ()
-    result = conn.execute (text (sql), parameters)
-    log (debug_level, '%d rows in %.3fs', result.rowcount, (datetime.datetime.now () - start_time).total_seconds ())
-    return result
-
-
-def executemany (conn, sql, parameters, param_array, debug_level = logging.DEBUG):
-    sql = sql.strip ().format (**parameters)
-    start_time = datetime.datetime.now ()
-    result = conn.execute (text (sql), param_array)
-    log (debug_level, '%d rows in %.3fs', result.rowcount, (datetime.datetime.now () - start_time).total_seconds ())
-    return result
-
-
-def executemany_raw (conn, sql, parameters, param_array, debug_level = logging.DEBUG):
-    sql = sql.strip ().format (**parameters)
-    start_time = datetime.datetime.now ()
-    result = conn.execute (sql, param_array)
-    log (debug_level, '%d rows in %.3fs', result.rowcount, (datetime.datetime.now () - start_time).total_seconds ())
-    return result
-
-
-def rollback (conn, debug_level = logging.DEBUG):
-    start_time = datetime.datetime.now ()
-    result = conn.execute ('ROLLBACK')
-    log (debug_level, 'rollback in %.3fs', (datetime.datetime.now () - start_time).total_seconds ())
-    return result
-
-
-# def execute_pandas (conn, sql, parameters, debug_level = logging.DEBUG):
-#     sql = sql.format (**parameters)
-#     log (debug_level, sql.rstrip () + ';')
-#     return pd.read_sql_query (text (sql), conn, parameters)
-
-def _debug (conn, msg, sql, parameters, level):
-    # print values
-    if args.log_level <= level:
-        result = execute (conn, sql, parameters)
-        if result.rowcount > 0:
-            log (level, msg + '\n' + tabulate (result))
-
-def debug (conn, msg, sql, parameters):
-    _debug (conn, msg, sql, parameters, logging.DEBUG)
-
-def warn (conn, msg, sql, parameters):
-    _debug (conn, msg, sql, parameters, logging.WARNING)
-
-
-def fix (conn, msg, check_sql, fix_sql, parameters):
-    """Check and eventually fix errors.
-
-    Executes the check_sql statement to check for a possible error conditions
-    and, if rows emerge, prints a warning and executes the fix_sql statement.
-    The fix_sql statement should be written as to fix the errors reported by the
-    check_sql statement.  Finally it executes the check_sql statement again and
-    reports an error if the error condition still exists.
-
-    :param str msg:       The warning / error message
-    :param str check_sql: The sql statement that checks for the error condition.
-    :param str fix_sql:   The sql statement that fixes the error condition.
-
-    """
-
-    # print unfixed values
-    result = execute (conn, check_sql, parameters)
-    if result.rowcount > 0:
-        # apply fix
-        if args.log_level <= logging.WARNING:
-            log (logging.WARNING, msg + '\n' + tabulate (result))
-        if fix_sql:
-            execute (conn, fix_sql, parameters)
-            # print fixed values
-            result = execute (conn, check_sql, parameters)
-            if result.rowcount > 0:
-                log (logging.ERROR, msg + '\n' + tabulate (result))
-
-
-class MySQLEngine (object):
-    """ Database Interface """
-
-    def __init__ (self, group = None, db = None):
-        if group is None:
-            group = MYSQL_DEFAULT_GROUP
-        if db is None:
-            db = ''
-
-        log (logging.INFO, 'MySQLEngine: Reading init group: {group}'.format (group = group))
-        log (logging.INFO, 'MySQLEngine: Connecting to db: {db}'.format (db = db))
-
-        config = configparser.ConfigParser ()
-        config.read (('/etc/my.cnf', os.path.expanduser ('~/.my.cnf')))
-
-        section = config[group]
-        self.params = {
-            'host' :     section.get ('host', 'localhost').strip ('"'),
-            'port' :     section.get ('port', '3306').strip ('"'),
-            'user' :     section.get ('user', '').strip ('"'),
-            'password' : section.get ('password', '').strip ('"'),
-            'database' : db,
-        }
-
-        self.engine = sqlalchemy.create_engine (
-            'mysql:///{db}?read_default_group={group}'.format (db = db, group = group))
-
-        self.connection = self.connect ()
-
-    def connect (self):
-        connection = self.engine.connect ()
-        # Make MySQL more compatible with other SQL databases
-        connection.execute ("SET sql_mode='ANSI'")
-        return connection
-
-
-class PostgreSQLEngine (object):
-    """ PostgreSQL Database Interface """
-
-    def __init__ (self, **kwargs):
-
-        args = self.get_connection_params (kwargs)
-
-        self.url = 'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'.format (**args)
-
-        if not sqlalchemy_utils.functions.database_exists (self.url):
-            log (logging.INFO, "PostgreSQLEngine: Creating database '{database}'".format (**args))
-            sqlalchemy_utils.functions.create_database (self.url)
-
-        log (logging.INFO, "PostgreSQLEngine: Connecting to postgres database '{database}' as user '{user}'".format (**args))
-
-        self.engine = sqlalchemy.create_engine (self.url + '?sslmode=disable&server_side_cursors')
-
-        self.params = args
-
-
-    def connect (self):
-        return self.engine.connect ()
-
-
-    def get_connection_params (self, args = None):
-        """ Get connection parameters from environment. """
-
-        defaults = {
-            'host'     : 'localhost',
-            'port'     : '5432',
-            'database' : 'ntg',
-            'user'     : 'ntg',
-        }
-
-        if args is None:
-            args = {}
-
-        params = ('host', 'port', 'database', 'user') # order must match ~/.pgpass
-        res = {}
-
-        for p in params:
-            pu = 'PG' + p.upper ()
-            res[p] = args.get (p) or args.get (pu) or os.environ.get (pu) or defaults[p]
-
-        # scan ~/.pgpass for password
-        pgpass = os.path.expanduser ('~/.pgpass')
-        try:
-            with open (pgpass, 'r') as f:
-                for line in f.readlines ():
-                    line = line.strip ()
-                    if line == '' or line.startswith ('#'):
-                        continue
-                    # format: hostname:port:database:username:password
-                    fields = line.split (':')
-                    if all ([field == '*' or field == res[param]
-                             for field, param in zip (fields, params)]):
-                        res['password'] = fields[4]
-                        break
-
-        except IOError:
-            print ('Error: could not open %s for reading' % pgpass)
-
-        return res
-
+# Input tables from the Nestle-Aland database
 
 Base = declarative_base ()
 
 class Att (Base):
+    """Input buffer table for the Nestle-Aland ECM_Acts*GVZ tables.
+
+    The Nestle-Aland database contains one table for each chapter (for
+    historical reasons). As first step we copy those many tables into one big
+    table, this one.
+
+    This table contains a negative apparatus of all manuscripts.  For the CBGM
+    the data in this table has to be normalised into our database structure and
+    converted into a positive apparatus.
+
+    .. attribute:: anfadr, endadr
+
+      Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
+      Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade
+      einen Zwischenraum.
+
+    .. attribute:: hsnr
+
+      Interne Handschriftnummer.
+
+    .. attribute:: hs
+
+      Siglum der Handschrift.  An das Siglum werden Suffixe angehängt, die
+      die Hand und die Lesung bezeichnen.  Im Laufe der Verarbeitung werden
+      die Lesarten reduziert, bis nur eine Lesart pro Handschrift
+      übrigbleibt.  Parallel dazu werden die Suffixe von den Siglen
+      entfernt.
+
+    .. attribute:: labez
+
+      See the :ref:`description of this field in table readings <labez>`.
+
+    .. attribute:: labezsuf
+
+       Contains auxiliary information about the reading:
+
+       .. data:: f
+
+          Fehler.  The reading is considered a scribal error.
+
+       .. data:: o
+
+          Orthographicum.  The reading is considered an orthographical variant,
+          eg. a variant place name.
+
+       If the labez is 'zw' labezsuf contains a "/"-separated list of possible
+       readings, eg. "a/b_o/c_f" means this reading may be 'a' or an
+       orthographicum of 'b' or a scribal error of 'c'.
+
+    .. attribute:: suffix
+
+      .. data:: \*
+
+        Erste, ursprüngliche Hand
+
+      .. data:: C*
+
+        Von erster Hand korrigiert
+
+      .. data:: C1
+
+        Erster Korrektor (Korrektoren der ersten Stunde)
+
+      .. data:: C2
+
+        Zweiter Korrektor (Korrektoren aus späteren Jahrhunderten)
+
+      .. data:: C
+
+        Korrektor (Korrektor aus ungewisser Epoche)
+
+      .. data:: L1, L2
+
+        Unterschiedliche Lesungen in einem Lektionar.
+        L2 ist für die CBGM nicht relevant.
+
+      .. data:: T1, T2
+
+        Unterschiedliche Lesungen des Textes der ersten Hand.  Die erste Hand
+        hat diese Passagen mehrmals abgeschrieben, vielleicht aus
+        unterschiedlicher Quelle.  Bei fehlender Übereinstimmung muß 'zw'
+        gesetzt werden.
+
+      .. data:: A
+
+        Vom Schreiber selbst gekennzeichnete alternative Lesart.
+        Für die CBGM nicht relevant.
+
+      .. data:: K
+
+        Varianten im Kommentar einer Handschrift.
+        Für die CBGM nicht relevant.
+
+      .. data:: s, s1, s2
+
+        (supplement) Nachträgliche Ergänzung verlorener Stellen.  Bei nur
+        einer Ergänzung wird 's' verwendet.  Bei mehreren Ergänzungen werden
+        's1', 's2', etc. für jeweils einen Abschnitt verwendet.  Ergänzungen
+        können nicht die Authorität der jeweiligen Hs beanspruchen.
+
+      .. data:: V, vid
+
+        (ut videtur) augenscheinlich.  Unsichere aber höchst wahrscheinliche
+        Lesung.  Ist für die CBGM als sichere Lesart zu akzeptieren.
+
+    .. attribute:: base
+
+      Basistext. Nur relevant bei :ref:`Fehlversen <fehlvers>`.
+
+      .. data:: a
+
+        Urtext
+
+      .. data:: b
+
+        Fehlverse: Textus Receptus.
+
+    .. attribute:: comp
+
+      .. data:: x
+
+        :ref:`Umfaßte Variante <umfasst>`.
+
+    .. attribute:: lekt
+
+      Lektionen in einem Lektionar.
+
+    """
+
     __tablename__ = 'att'
 
     id           = Column (Integer,       primary_key = True, autoincrement = True)
@@ -425,7 +324,19 @@ class Att (Base):
     )
 
 
-class Lac (Base): # same as class Att
+class Lac (Base):
+    """Input buffer table for the Nestle-Aland ECM_Acts*GVZLac tables.
+
+    The Nestle-Aland database contains one table for each chapter (for
+    historical reasons). As first step we copy those many tables into one big
+    table, this one.
+
+    This table contains a list of all lacunae in all manuscripts.  It records
+    the start and end of each lacuna.  A lacuna entry generally spans many
+    passages in the Att table.
+
+    """
+
     __tablename__ = 'lac'
 
     id        = Column (Integer,       primary_key = True, autoincrement = True)
@@ -467,7 +378,9 @@ class Lac (Base): # same as class Att
     )
 
 
-class SaveReadings (Base): # same as class Att
+class SaveReadings (Base):
+    """ A temporary table for readings. """
+
     __tablename__ = 'save_readings'
 
     id        = Column (Integer,       primary_key = True, autoincrement = True)
@@ -503,6 +416,8 @@ function ('adr2word', Base.metadata, 'adr INTEGER', 'INTEGER', '''
     SELECT (adr %% 1000)
     ''', volatility = 'IMMUTABLE')
 
+
+# Tables for the CBGM / App Server
 
 Base2 = declarative_base ()
 
@@ -648,12 +563,14 @@ class Readings (Base2):
     normalized, then equal readings are grouped.  Each group of readings is
     assigned an id, the 'labez'.
 
+    .. _labez:
+
     .. attribute:: labez
 
         (LesArtBEZeichnung).  Usually 'a' indicates the original reading, while
         'b'...'y' indicate readings relegated to the apparatus, although this is
-        not necessarily so.  Exceptions are the 'Fehlverse' and the cases where
-        no original reading could be assessed.
+        not necessarily so.  Exceptions are the :ref:`Fehlverse <fehlvers>` and
+        the cases where no original reading could be assessed.
 
         Readings starting with 'z' have special meaning:
 
@@ -675,10 +592,8 @@ class Readings (Base2):
             reconstruction in agreement with two or more different variants.
             Entspricht in der ECM einem Doppelpfeil nach links-rechts.
 
-            labezsuf contains a '/'-separated list of the possible readings.
-
-            N.B. not used any more, instead the readings will get a certainty <
-            1.0.
+            The reading 'zw' is used only in the Att table.  In this table each
+            questionable reading will get its own entry with a certainty < 1.0.
 
         .. data:: zz
 
@@ -691,14 +606,26 @@ class Readings (Base2):
             mindestens ein Buchstabe vorhanden ist.  In diesem Fall steht es in
             der stellenbezogenen Lückenliste.
 
-        Caveat: die Lesart 'a' kann für dieselbe Passage mehrmals vergeben
-        worden sein, immer dann wenn im Nestle-Aland ein positiver Apparat
-        benutzt wurde.
+        Caveat: die Lesart der Handschrift 'A' kann trotz negativem Apparat in
+        der Tabelle Att in dieselben Passage mehrmals vorkommen, weil an einigen
+        Stellen im Nestle-Aland ein positiver Apparat benutzt wurde.
 
     .. attribute:: lesart
 
         The normalized reading.  Scribal errors are silently corrected and
-        orthographic variants are normalized.
+        orthographic variants are normalized.  Following abbreviations are used:
+
+        .. data:: om
+
+          Missing text (omissio).  The scribe did not write any text.
+
+        .. data:: lac
+
+          Missing substrate (lacuna).  The manuscript is damaged or missing.
+
+        .. data:: vac
+
+          Missing substrate (vacat).  The manuscript is damaged or missing.
 
     """
 
@@ -761,9 +688,6 @@ class Apparatus (Base2):
 
            Orthographicum.  The reading is considered an orthographical variant,
            eg. a variant place name.
-
-        If the labez is 'zw' labezsuf contains a "/"-separated list of possible
-        readings, eg. "a/b_o/c_f".
 
     .. attribute:: certainty
 
@@ -914,9 +838,9 @@ class Ms_Ranges (Base2):
 class Affinity (Base2):
     """A table that contains CBGM output related to each pair of manuscripts.
 
-    This table contains the actual results of applying the CBGM.  It has one row
-    for each pair of manuscripts that have at least one passage in common and
-    each range we are interested in.
+    This table contains the actual results of applying the CBGM: the priority of
+    the manuscripts.  It has one row for each pair of manuscripts that have at
+    least one passage in common and each range we are interested in.
 
     Two sets of data are included, one for the recursive interpretation of the
     locstem data, and one for the backward-compatible non-recurisve

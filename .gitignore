@@ -36,6 +36,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+package-lock.json
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -66,7 +67,8 @@ coverage.xml
 *.log
 
 # Sphinx documentation
-docs/_build/
+docs/_build/doctrees/
+docs/_build/.buildinfo
 *.aux
 *.log
 *.out

@@ -31,6 +31,7 @@ function ($, _, d3, d3c, tools, panel, nav) {
      *
      * @return {Object} - Array of ms_ids
      */
+
     function get_ms_ids_from_popups (what) {
         var ms_ids = {};
         $ ('div.panel-relatives div:visible .hilite-' + what + '[data-ms-id]').each (function () {
@@ -44,56 +45,39 @@ function ($, _, d3, d3c, tools, panel, nav) {
      *
      * @function load_passage
      */
-    function load_passage (dummy_passage) {
+
+    function load_passage (passage) {
         var instance = this;
+        instance.data.passage = passage;
 
         // replace content
         var ms_id = instance.$panel.attr ('data-ms-id');
-        var url   = 'relatives.html/' + nav.passage.pass_id + '/' + ms_id
+        var url   = 'relatives.html/' + passage.pass_id + '/' + ms_id
             + '?' + $.param (instance.data); // we must use GET, not POST
         var $heading_wrap = instance.$panel.find ('div.panel-relatives-metrics');
         var $table_wrap   = instance.$panel.find ('div.panel-relatives-content');
 
-        $.get (url, function (html) {
+        var p0 = $.get (url);
+        var p1 = panel.load_labez_dropdown (
+            instance.$toolbar.find ('div.toolbar-labez'), passage.pass_id, 'labez',
+            [['all', 'All'], ['all+lac', 'All+Lac']], []);
+        var p2 = panel.load_range_dropdown (
+            instance.$toolbar.find ('div.toolbar-range'), passage.pass_id, 'range',
+            [{ 'range' : 'This', 'value' : 'x' }], []);
+
+        p0.done (function (html) {
             var $html = $ (html);
             $heading_wrap.html ($html.find ('div.relatives-metrics'));
             $table_wrap.html   ($html.find ('table.relatives'));
-            changed ();
         });
 
-        var p1 = panel.load_labez_dropdown (
-            instance.$toolbar.find ('div.toolbar-labez'),
-            nav.passage.pass_id, 'labez', [['all', 'All'], ['all+lac', 'All+Lac']], []);
-        var p2 = panel.load_range_dropdown (
-            instance.$toolbar.find ('div.toolbar-range'),
-            'range', [{ 'range' : 'This', 'value' : 'x' }], []);
-        return $.when (p1, p2).done (function () {
+        return $.when (p0, p1, p2).done (function () {
             panel.set_toolbar_buttons (instance.$toolbar, instance.data);
             // Maybe we changed range while navigating.  Set a new range.
             instance.$toolbar.find ('div.toolbar-range input[data-opt = "x"]')
-                .attr ('data-opt', nav.passage.chapter);
+                .attr ('data-opt', passage.chapter);
             changed ();
         });
-    }
-
-    /**
-     * Initialize the module.
-     *
-     * @function init
-     */
-    function init (instance) {
-        instance.load_passage = load_passage;
-        $.extend (instance.data, {
-            'type'      : 'rel',
-            'range'     : 'All',
-            'limit'     : '10',
-            'include'   : [],
-            'fragments' : [],
-            'mode'      : 'sim',
-            'labez'     : 'all+lac',
-        });
-
-        return instance;
     }
 
     /**
@@ -101,9 +85,10 @@ function ($, _, d3, d3c, tools, panel, nav) {
      *
      * @function create_panel
      *
-     * @param ms_id  {integer} The manuscript id.
-     * @param target {DOM} A DOM element relative to which to position the popup.
+     * @param {integer} ms_id - The manuscript id.
+     * @param {DOM} target    - A DOM element relative to which to position the popup.
      */
+
     function create_panel (ms_id, target) {
         $.get ('relatives/' + nav.passage.pass_id + '/' + ms_id, function (html) {
             // create
@@ -113,7 +98,7 @@ function ($, _, d3, d3c, tools, panel, nav) {
             $popup.on ('changed.panel.visibility', changed);
 
             var instance = init (panel.init ($popup));
-            instance.load_passage ().done (function () {
+            instance.load_passage (nav.passage).done (function () {
                 // position popup
                 var rect = target.getBoundingClientRect ();
                 var bodyRect = document.body.getBoundingClientRect (); // account for scrolling
@@ -136,6 +121,32 @@ function ($, _, d3, d3c, tools, panel, nav) {
             // notify others
             changed ();
         });
+    }
+
+    /**
+     * Initialize the module.
+     *
+     * @function init
+     */
+
+    function init (instance) {
+        instance.load_passage = load_passage;
+        $.extend (instance.data, {
+            'type'      : 'rel',
+            'range'     : 'All',
+            'limit'     : '10',
+            'include'   : [],
+            'fragments' : [],
+            'mode'      : 'sim',
+            'labez'     : 'all+lac',
+        });
+
+        // Install handler for reloading
+        $ (document).on ('ntg.panel.reload', function (event, passage) {
+            instance.load_passage (passage);
+        });
+
+        return instance;
     }
 
     return {

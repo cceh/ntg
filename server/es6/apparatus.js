@@ -32,7 +32,7 @@ function ($, _, tools, panel) {
     function load_passage (passage) {
         this.data.passage = passage;
 
-        var that = this;
+        var instance = this;
         var new_list;
         var json_deferred = new $.Deferred ();
 
@@ -40,7 +40,7 @@ function ($, _, tools, panel) {
             var labez_grouper  = function (g) { return g.labez; };
             var clique_grouper = function (g) { return g.labez + (g.clique || ''); };
 
-            var grouper = _.includes (that.data.cliques, 'cliques') ? clique_grouper : labez_grouper;
+            var grouper = _.includes (instance.data.cliques, 'cliques') ? clique_grouper : labez_grouper;
 
             var readings = [];
             var html = [];
@@ -87,7 +87,7 @@ function ($, _, tools, panel) {
         var faded_promise = this.$wrapper.animate ({ 'opacity' : 0.0 }, 300);
 
         $.when (json_deferred.promise (), faded_promise).done (function () {
-            var $wrapper = that.$wrapper;
+            var $wrapper = instance.$wrapper;
             var old_height = $wrapper.get (0).scrollHeight;
             $wrapper.html (new_list);
             var new_height = $wrapper.get (0).scrollHeight;
@@ -96,7 +96,7 @@ function ($, _, tools, panel) {
                 $wrapper.height ('auto');
                 $wrapper.animate ({ 'opacity' : 1.0 }, 300);
             });
-            panel.set_toolbar_buttons (that.toolbar, that.data);
+            panel.set_toolbar_buttons (instance.$toolbar, instance.data);
             changed ();
         });
     }
@@ -104,7 +104,7 @@ function ($, _, tools, panel) {
     /**
      * Show the attestation in the Coherence panel and scroll to it.
      *
-     * @param event
+     * @param {Object} event - The event
      */
 
     function goto_attestation (event) {

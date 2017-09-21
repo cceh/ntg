@@ -42,6 +42,13 @@ function ($, _, panel, navigator, tools, d3common) {
             'mode', 'hyp_a', 'var_only', 'width', 'fontsize', 'cliques',
         ];
 
+        // reset dropdown selection if reading is not in new passage
+        if (!instance.data.global && _.findIndex (
+            passage.readings, function (o) { return o[0] === instance.data.labez; }) === -1) {
+            instance.data.labez = passage.readings[0][0];
+            instance.data.hyp_a = 'A';
+        }
+
         // dirty hack! Make panel visible so SVG getBBox () will work.
         instance.$wrapper.slideDown ();
 
@@ -52,7 +59,6 @@ function ($, _, panel, navigator, tools, d3common) {
         var url = 'textflow.dot/' + passage.pass_id + '?' + $.param (_.pick (instance.data, params));
         var png_url = 'textflow.png/' + passage.pass_id + '?' + $.param (_.pick (instance.data, params));
         instance.graph.load_dot (url).done (function () {
-            instance.dirty = false;
             instance.$panel.animate ({ 'width' : (instance.graph.bbox.width + 20) + 'px' });
         });
         var name = $.trim (instance.$panel.find ('.panel-caption').text ());
@@ -64,7 +70,7 @@ function ($, _, panel, navigator, tools, d3common) {
         var p2 = panel.load_labez_dropdown (
             this.$toolbar.find ('div.toolbar-hyp_a'), passage.pass_id, 'hyp_a', [['A', 'A']], []);
         var p3 = panel.load_range_dropdown (
-            this.$toolbar.find ('div.toolbar-range'), 'range',
+            this.$toolbar.find ('div.toolbar-range'), passage.pass_id, 'range',
             [{ 'range' : 'This', 'value' : 'x' }], []);
 
         $.when (p1, p2, p3).done (function () {
@@ -81,7 +87,9 @@ function ($, _, panel, navigator, tools, d3common) {
      *
      * The context menu can be used to reassign the node to a different split.
      *
-     * @param event
+     * @function open_contextmenu
+     *
+     * @param {Object} event - The event
      */
 
     function open_contextmenu (event) {
@@ -144,7 +152,8 @@ function ($, _, panel, navigator, tools, d3common) {
                         })
                     );
                     xhr2.done (function (json2) {
-                        $ (document).trigger ('ntg.passage.changed', json2.data);
+                        // stemma-edit returns the changed passage
+                        $ (document).trigger ('ntg.panel.reload', json2.data);
                     });
                     xhr2.fail (function (xhrobj) {
                         tools.xhr_alert (xhrobj, event.data.$wrapper);
@@ -159,19 +168,24 @@ function ($, _, panel, navigator, tools, d3common) {
     /**
      * Initialize the module.
      *
+     * This module inherits from module :mod:`panel` and uses module
+     * :mod:`d3-stemma-layout` to actually draw the graph.
+     *
      * @function init
      *
      * @param {Object} instance     - The panel instance to inherit from.
      * @param {Object} graph_module - The graph module to use.
      * @param {string} id_prefix    - The prefix to use for all generated ids.
+     * @param {bool}   global       - Display global textual flow
      * @param {bool}   var_only     - Display only nodes and links between different readings.
      *
-     * @returns {Object} - The module instance object.
+     * @returns {Object} The module instance object.
      */
-    function init (instance, graph_module, id_prefix, var_only) {
+    function init (instance, graph_module, id_prefix, global, var_only) {
         instance.load_passage = load_passage;
         $.extend (instance.data, {
             'passage'      : null,
+            'global'       : global,
             'labez'        : '',
             'connectivity' : '5',
             'range'        : 'All',
@@ -185,14 +199,6 @@ function ($, _, panel, navigator, tools, d3common) {
         instance.$wrapper = instance.$panel.find ('.panel-content'); // see: dirty hack
 
         instance.graph = graph_module.init (instance.$wrapper, id_prefix);
-
-        // Init toolbar.
-        instance.$toolbar.find ('input[name="connectivity"]').bootstrapSlider ({
-            'value'           : 5,
-            'ticks'           : [1,  5, 10, 20,  21],
-            'ticks_positions' : [0, 25, 50, 90, 100],
-            'formatter'       : panel.connectivity_formatter,
-        });
 
         if (is_editor) {
             instance.$panel.on ('contextmenu', 'g.node', instance, open_contextmenu);

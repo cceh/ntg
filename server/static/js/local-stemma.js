@@ -20,9 +20,9 @@ function ($, _, d3, d3common, navigator, tools) {
         $ (document).trigger ('changed.ntg.local-stemma');
     }
 
-    /** @var dragged_node {D3.selector} The node being dragged or null */
+    /** @var {D3selector} dragged_node - The node being dragged or null */
     var dragged_node = null;
-    /** @var target_node {D3.selector}  The node under the node being dragged or null */
+    /** @var {D3selector} target_node  - The node under the node being dragged or null */
     var target_node  = null;
 
     /**
@@ -33,7 +33,9 @@ function ($, _, d3, d3common, navigator, tools) {
      *
      * @see: https://github.com/d3/d3-transition#transition_attrTween
      *
-     * @return A D3 interpolator function.
+     * @function return_to_base
+     *
+     * @returns {Object} - A D3 interpolator function.
      */
 
     function return_to_base () {
@@ -64,10 +66,12 @@ function ($, _, d3, d3common, navigator, tools) {
     }
 
     /**
-     * @function dragListener
+     * Drag and drop handler
      *
      * Creates a d3-drag object that implements the drag-and-drop local stemma
      * editor.
+     *
+     * @function dragListener
      */
 
     function dragListener (panel) {
@@ -112,7 +116,8 @@ function ($, _, d3, d3common, navigator, tools) {
                         'clique_new' : target_node.datum ().clique,
                     });
                     xhr.done (function (json) {
-                        $ (document).trigger ('ntg.passage.changed', json.data);
+                        // stemma-edit returns the changed passage
+                        $ (document).trigger ('ntg.panel.reload', json.data);
                     });
                     xhr.fail (function (xhrobj) {
                         tools.xhr_alert (xhrobj, panel);
@@ -148,7 +153,9 @@ function ($, _, d3, d3common, navigator, tools) {
      * The context menu can be used to split the attestation, reassign source
      * nodes or to merge a split.
      *
-     * @param event
+     * @function open_contextmenu
+     *
+     * @param {Object} event - The event
      */
 
     function open_contextmenu (event) {
@@ -226,7 +233,8 @@ function ($, _, d3, d3common, navigator, tools) {
 
                     var xhr2 = $.getJSON ('stemma-edit/' + navigator.passage.pass_id, tr.dataset);
                     xhr2.done (function (json2) {
-                        $ (document).trigger ('ntg.passage.changed', json2.data);
+                        // stemma-edit returns the changed passage
+                        $ (document).trigger ('ntg.panel.reload', json2.data);
                     });
                     xhr2.fail (function (xhrobj) {
                         tools.xhr_alert (xhrobj, event.data.$wrapper);
@@ -262,7 +270,6 @@ function ($, _, d3, d3common, navigator, tools) {
         instance.$toolbar.find ('a[name="png"]').attr ('href', png_url);
 
         instance.graph.load_dot (url).done (function () {
-            instance.dirty = false;
             instance.$panel.animate ({ 'width' : (instance.graph.bbox.width + 20) + 'px' });
 
             if (is_editor) {

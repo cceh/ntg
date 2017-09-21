@@ -41,7 +41,7 @@ define (['jquery', 'lodash', 'urijs/URI', 'jquery-ui', 'css!navigator-css'], fun
     function set_passage (pass_id) {
         $.getJSON ('passage.json/' + pass_id, function (json) {
             module.passage = json.data;
-            $ (document).trigger ('ntg.passage.changed', json.data);
+            $ (document).trigger ('ntg.panel.reload', [module.passage]);
         });
     }
 
@@ -132,15 +132,15 @@ define (['jquery', 'lodash', 'urijs/URI', 'jquery-ui', 'css!navigator-css'], fun
                 }
             });
 
-        $ (document).on ('ntg.passage.changed', function (event, data) {
+        $ (document).on ('ntg.panel.reload', function (event, passage) {
             var $form = $ ('form.passage-selector');
-            $form.find ('input[name="pass_id"]').val (data.pass_id);
+            $form.find ('input[name="pass_id"]').val (passage.pass_id);
 
             $ ('form input[data-autocomplete]').each (function () {
                 var $this = $ (this);
-                $this.val (data[$this.attr ('data-autocomplete')]);
+                $this.val (passage[$this.attr ('data-autocomplete')]);
             });
-            $ ('h1 span.passage').text (data.hr);
+            $ ('h1 span.passage').text (passage.hr);
             $ ('title').text ($ ('h1').text ());
 
             // Fix 'next page' parameter in login / logout links
@@ -153,11 +153,7 @@ define (['jquery', 'lodash', 'urijs/URI', 'jquery-ui', 'css!navigator-css'], fun
 
         // User hit back-button, etc.
         $ (window).on ('hashchange', function () {
-            var hash = window.location.hash.substring (1);
-            $.getJSON ('passage.json/' + hash, function (json) {
-                module.passage = json.data;
-                $ (document).trigger ('ntg.passage.changed', json.data);
-            });
+            set_passage (window.location.hash.substring (1));
         });
 
         return module;

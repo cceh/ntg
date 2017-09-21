@@ -26,7 +26,7 @@ from flask_user import login_required
 import flask_mail
 import networkx as nx
 
-from ntg_common.db import execute
+from ntg_common.db_tools import execute
 from ntg_common import tools
 
 

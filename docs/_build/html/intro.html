@@ -1,0 +1,427 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction &mdash; NTG 0.1.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
+        <link rel="next" title="Kurze Einführung in die Textkritik und das Neue Testament" href="developer.html"/>
+        <link rel="prev" title="NTG documentation contents" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> NTG
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Kurze Einführung in die Textkritik und das Neue Testament</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#editionen">Editionen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#die-textzeugen">Die Textzeugen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#textformen-texttypen">Textformen (Texttypen)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#textkritik">Textkritik</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#terminologie">Terminologie</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#lesart">Lesart</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#variierte-stelle">Variierte Stelle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#umfaszte-varianten">Umfaßte Varianten</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#fehlverse">Fehlverse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#splitt">Splitt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#zusammenlegung">Zusammenlegung</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#literatur">Literatur</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Database Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Generic Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Transformation tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="transform.html#tabellen-und-felder">Tabellen und Felder</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="transform.html#felder-in-der-tabelle-locstemed">Felder in der Tabelle LocStemEd</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="transform.html#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.server"><code class="docutils literal"><span class="pre">server.server</span></code> — Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.editor"><code class="docutils literal"><span class="pre">server.editor</span></code> — Editor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.security"><code class="docutils literal"><span class="pre">server.security</span></code> — Security</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="appclient.html">Application Client</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id1">Module apparatus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id2">Module d3-stemma-layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id3">Module panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#textflow">Module textflow</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NTG</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Introduction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/intro.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>A program suite for doing CBGM.</p>
+<p>The CBGM is a method for inferring global manuscript stemmata from local
+stemmata in the manuscripts’ texts.</p>
+<div class="figure align-center" id="id1">
+<img src="_images/graphviz-cbf096f7832230206b31bda1c9ee8404edd0d4a9.png" alt="strict digraph G {
+	graph [bb=&quot;0,0,175,175&quot;,
+		fontname=&quot;LiberationSans-Regular&quot;,
+		fontsize=10.5,
+		nodesep=0.2,
+		ordering=out,
+		rankdir=TB,
+		ranksep=0.4,
+		remincross=true,
+		size=11.85
+	];
+	node [height=0.3,
+		label=&quot;\N&quot;,
+		margin=0.005,
+		shape=ellipse,
+		width=0.3
+	];
+	edge [arrowhead=normal,
+		arrowtail=none,
+		labelangle=-15.0,
+		labeldistance=2.0
+	];
+	&quot;*&quot;	 [clique=0,
+		droptarget=1,
+		height=0.30556,
+		label=&quot;*&quot;,
+		labez=&quot;*&quot;,
+		labez_clique=&quot;*&quot;,
+		pos=&quot;83,164&quot;,
+		width=0.30556];
+	a0	 [clique=0,
+		draggable=1,
+		droptarget=1,
+		height=0.30556,
+		label=a0,
+		labez=a,
+		labez_clique=a0,
+		pos=&quot;83,113&quot;,
+		width=0.30556];
+	&quot;*&quot; -&gt; a0	 [pos=&quot;e,83,124.04 83,152.61 83,147.21 83,140.42 83,134.05&quot;];
+	&quot;?&quot;	 [clique=0,
+		droptarget=1,
+		height=0.30556,
+		label=&quot;?&quot;,
+		labez=&quot;?&quot;,
+		labez_clique=&quot;?&quot;,
+		pos=&quot;137,164&quot;,
+		width=0.30556];
+	d0	 [clique=0,
+		draggable=1,
+		droptarget=1,
+		height=0.30556,
+		label=d0,
+		labez=d,
+		labez_clique=d0,
+		pos=&quot;128,113&quot;,
+		width=0.30556];
+	&quot;?&quot; -&gt; d0	 [pos=&quot;e,129.82,123.9 135.18,153.08 134.18,147.64 132.9,140.68 131.7,134.15&quot;];
+	e0	 [clique=0,
+		draggable=1,
+		droptarget=1,
+		height=0.30556,
+		label=e0,
+		labez=e,
+		labez_clique=e0,
+		pos=&quot;164,113&quot;,
+		width=0.30556];
+	&quot;?&quot; -&gt; e0	 [pos=&quot;e,159.08,122.93 141.95,154.01 145.38,147.8 150.05,139.32 154.21,131.76&quot;];
+	b0	 [clique=0,
+		draggable=1,
+		droptarget=1,
+		height=0.30556,
+		label=b0,
+		labez=b,
+		labez_clique=b0,
+		pos=&quot;29,62&quot;,
+		width=0.30556];
+	a0 -&gt; b0	 [pos=&quot;e,36.651,69.943 75.032,104.77 66.964,97.449 54.283,85.942 44.272,76.858&quot;];
+	c0	 [clique=0,
+		draggable=1,
+		droptarget=1,
+		height=0.30556,
+		label=c0,
+		labez=c,
+		labez_clique=c0,
+		pos=&quot;65,62&quot;,
+		width=0.30556];
+	a0 -&gt; c0	 [pos=&quot;e,68.583,72.754 79.529,102.55 77.415,96.797 74.637,89.233 72.076,82.263&quot;];
+	d1	 [clique=1,
+		draggable=1,
+		droptarget=1,
+		height=0.30556,
+		label=d1,
+		labez=d,
+		labez_clique=d1,
+		pos=&quot;101,62&quot;,
+		width=0.30556];
+	a0 -&gt; d1	 [pos=&quot;e,97.417,72.754 86.471,102.55 88.585,96.797 91.363,89.233 93.924,82.263&quot;];
+	f0	 [clique=0,
+		draggable=1,
+		droptarget=1,
+		height=0.30556,
+		label=f0,
+		labez=f,
+		labez_clique=f0,
+		pos=&quot;137,62&quot;,
+		width=0.30556];
+	a0 -&gt; f0	 [pos=&quot;e,129.35,69.943 90.968,104.77 99.036,97.449 111.72,85.942 121.73,76.858&quot;];
+	d2	 [clique=2,
+		draggable=1,
+		droptarget=1,
+		height=0.30556,
+		label=d2,
+		labez=d,
+		labez_clique=d2,
+		pos=&quot;11,11&quot;,
+		width=0.30556];
+	b0 -&gt; d2	 [pos=&quot;e,14.583,21.754 25.529,51.552 23.415,45.797 20.637,38.233 18.076,31.263&quot;];
+	g0	 [clique=0,
+		draggable=1,
+		droptarget=1,
+		height=0.30556,
+		label=g0,
+		labez=g,
+		labez_clique=g0,
+		pos=&quot;47,11&quot;,
+		width=0.30556];
+	b0 -&gt; g0	 [pos=&quot;e,43.417,21.754 32.471,51.552 34.585,45.797 37.363,38.233 39.924,31.263&quot;];
+}" />
+<p class="caption"><span class="caption-text">A example of local stemma</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<p>In the CBGM we assume that a manuscript is prior to another manuscript if it
+contains a greater percentage of prior readings than posterior readings.  Then
+we build a global stemma of manuscripts by using the most similar prior
+manuscripts as the parent manuscript.</p>
+<p>The program suite consists of scripts for setting up the CBGM database and an
+application server for interactive graphic interrogation of the CBGM database.</p>
+<p>The source code can be found at: <a class="reference external" href="https://github.com/cceh/ntg">https://github.com/cceh/ntg</a></p>
+<p>Author: Marcello Perathoner &lt;<a class="reference external" href="mailto:marcello&#46;perathoner&#37;&#52;&#48;uni-koeln&#46;de">marcello<span>&#46;</span>perathoner<span>&#64;</span>uni-koeln<span>&#46;</span>de</a>&gt;</p>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="developer.html" class="btn btn-neutral float-right" title="Kurze Einführung in die Textkritik und das Neue Testament" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="NTG documentation contents" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-17 CCeH - Licensed under the GNU GPL v3 or later.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

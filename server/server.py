@@ -37,7 +37,7 @@ from . import security
 from . import editor
 
 from ntg_common import db
-from ntg_common.db import execute
+from ntg_common.db_tools import execute
 from ntg_common.config import args
 from ntg_common import tools
 from ntg_common import db_tools
@@ -223,19 +223,23 @@ def suggest_json ():
 
 
 @app.endpoint ('ranges.json')
-def ranges_json ():
+def ranges_json (passage_or_id):
     """Endpoint.  Serve a list of ranges.
 
     Serves a list of the configured ranges that are contained inside a book in
     the NT.
 
-    :param integer bk_id: The id of the book.
+    :param string passage_or_id: The passage id.
+    :param integer bk_id:        The id of the book.
 
     """
 
-    bk_id = request.args.get ('bk_id') or 5   # default to: Acts
+    passage_or_id = request.args.get ('pass_id') or passage_or_id or '0'
 
     with current_app.config.dba.engine.begin () as conn:
+        passage = Passage (conn, passage_or_id)
+        bk_id   = request.args.get ('bk_id') or passage.bk_id
+
         res = execute (conn, """
         SELECT DISTINCT range, range, lower (ch.irange) as anfadr, upper (ch.irange) as endadr
         FROM ranges ch
@@ -509,7 +513,7 @@ def textflow (passage_or_id):
     include      = set (request.args.getlist ('include[]') or ['NONE'])
     fragments    = request.args.getlist ('fragments[]') or []
     var_only     = request.args.getlist ('var_only[]')  or []
-    cliques      = request.args.getlist ('cliques[]')    or []
+    cliques      = request.args.getlist ('cliques[]')   or []
 
     fragments = 'fragments' in fragments
     var_only  = 'var_only'  in var_only
@@ -1103,7 +1107,7 @@ if __name__ == "__main__":
     static_app.config['server_start_time'] = str (int (args.start_time.timestamp ()))
     static_app.url_map.add (Rule ('/', endpoint = 'index'))
 
-    static_app.config.dba = db.PostgreSQLEngine (**static_app.config)
+    static_app.config.dba = db_tools.PostgreSQLEngine (**static_app.config)
     static_app.config['SQLALCHEMY_DATABASE_URI'] = static_app.config.dba.url
     static_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     dba.init_app (static_app)
@@ -1130,11 +1134,11 @@ if __name__ == "__main__":
             Rule ('/comparison-summary.csv',                      endpoint = 'comparison-summary.csv'),
             Rule ('/comparison-detail.csv',                       endpoint = 'comparison-detail.csv'),
             Rule ('/suggest.json',                                endpoint = 'suggest.json'),
-            Rule ('/ranges.json',                                 endpoint = 'ranges.json'),
             Rule ('/manuscript.json/<hs_hsnr_id>',                endpoint = 'manuscript.json'),
             Rule ('/passage.json/',                               endpoint = 'passage.json'),
             Rule ('/passage.json/<passage_or_id>',                endpoint = 'passage.json'),
             Rule ('/cliques.json/<passage_or_id>',                endpoint = 'cliques.json'),
+            Rule ('/ranges.json/<passage_or_id>',                 endpoint = 'ranges.json'),
             Rule ('/ms_attesting/<passage_or_id>/<labez>',        endpoint = 'ms_attesting'),
             Rule ('/relatives/<passage_or_id>/<hs_hsnr_id>',      endpoint = 'relatives-skeleton'),
             Rule ('/relatives.html/<passage_or_id>/<hs_hsnr_id>', endpoint = 'relatives.html'),
@@ -1152,7 +1156,7 @@ if __name__ == "__main__":
             path = sub_app.config['APPLICATION_ROOT'],
             conf = fn))
 
-        sub_app.config.dba = db.PostgreSQLEngine (**sub_app.config)
+        sub_app.config.dba = db_tools.PostgreSQLEngine (**sub_app.config)
         sub_app.config['SQLALCHEMY_DATABASE_URI'] = static_app.config.dba.url
         sub_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         dba.init_app (sub_app)

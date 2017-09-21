@@ -95,60 +95,6 @@ def log (level, msg, *aargs, **kwargs):
     logger.log (level, msg, *aargs, extra = d)
 
 
-def tabulate (res):
-    """ Format and output a rowset
-
-    Uses an output format similar to the one produced by the mysql commandline
-    utility.
-
-    """
-    cols = range (0, len (res.keys ()))
-    rowlen = dict()
-    a = []
-
-    def line ():
-        for i in cols:
-            a.append ('+')
-            a.append ('-' * (rowlen[i] + 2))
-        a.append ('+\n')
-
-    # convert database types to strings
-    rows = []
-    for row in res.fetchall():
-        newrow = []
-        for i in cols:
-            if row[i] is None:
-                newrow.append ('NULL')
-            else:
-                newrow.append (six.text_type (row[i]))
-        rows.append (newrow)
-
-    # calculate column widths
-    for i in cols:
-        rowlen[i] = len (res.keys ()[i])
-
-    for row in rows:
-        for i in cols:
-            rowlen[i] = max (rowlen[i], len (row[i]))
-
-    # output header
-    line ()
-    for i in cols:
-        a.append ('| {:<{align}} '.format (res.keys ()[i], align = rowlen[i]))
-    a.append ('|\n')
-    line ()
-
-    # output rows
-    for row in rows:
-        for i in cols:
-            a.append ('| {:<{align}} '.format (row[i], align = rowlen[i]))
-        a.append ('|\n')
-    line ()
-    a.append ('%d rows\n' % len (rows))
-
-    return ''.join (a)
-
-
 def graphviz_layout (dot, format = 'dot'):
     """Call the GraphViz dot program to generate an image but mostly to precompute
     the graph layout.

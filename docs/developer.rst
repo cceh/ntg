@@ -1,8 +1,12 @@
 .. -*- encoding: utf-8; bidi-paragraph-direction: left-to-right; fill-column: 72 -*-
 
 
-Interne Dokumentation für Entwickler
-====================================
+Kurze Einführung in die Textkritik und das Neue Testament
+=========================================================
+
+Dies ist eine kurzgehaltene Einführung für Software-Entwickler, um die
+Grundlagen zu vermitteln, die zum Verstehen des Verfahrens notwendig
+sind.  Sie entspricht nicht dem neuesten Stand der Forschung.
 
 
 Das Neue Testament
@@ -28,26 +32,29 @@ Es besteht aus:
 
 - \(p) Paulusbriefe (14 Briefe)
 
-- (r = revelatio) Offenbarung des Johannes
+- \(r) Offenbarung des Johannes (revelatio)
 
 
 Editionen
----------
+~~~~~~~~~
 
 Herausgegeben durch das Institut für neutestamentliche Textforschung,
 Münster.
 
 
 Nestle-Aland
-~~~~~~~~~~~~
+++++++++++++
 
 Novum Testamentum Graece, 28. Auflage, 2012, (NA28) (Editio minor)
 
 Handausgabe, etwa 900 Seiten, ab 28€
 
+Die MySQL-Datenbank, die dieser Ausgabe zugrunde liegt, ist der
+Startpiunkt der CBGM.
+
 
 Editio Critica Maior
-~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++
 
 Novum Testamentum Graecum, Editio Critica Maior
 
@@ -71,7 +78,7 @@ CBGM eignen. ([ALAND1998]_ §22)
 
 
 Die Textzeugen
---------------
+~~~~~~~~~~~~~~
 
 Etwa 5000 Handschriften.
 Handschriften des NT verwenden fast ausschließlich das Codex-Format.
@@ -80,7 +87,7 @@ Folgende Arten von Textzeugen werden herangezogen:
 
 
 Papyri
-~~~~~~
+++++++
 
 Früheste Überlieferungen.  Dem Originaltext am nächsten.
 
@@ -98,7 +105,7 @@ Dokuments wenn das Dokument auf der anderen Seite datiert ist.
 
 
 Majuskeln
-~~~~~~~~~
++++++++++
 
 Ab dem 4. Jahrhundert.  Auf Pergament.  Viele vollständige Abschriften
 des NT sind als Majuskel erhalten.  Sehr unterschiedliche Nähe zum
@@ -127,7 +134,7 @@ codex rescriptus).  ([NESTLE1923]_ § 36)
 
 
 Minuskeln
-~~~~~~~~~
++++++++++
 
 Ab dem 9. Jahrhundert.  Auf Pergament oder Papier.  Die allermeisten
 davon enthalten den byzantinischen Text und sind für uns uninteressant,
@@ -141,7 +148,7 @@ Im 15. Jhd. beginnt das Papier zu überwiegen.  ([NESTLE1923]_ § 36)
 
 
 Lektionare
-~~~~~~~~~~
+++++++++++
 
 Lektionare (kirchliche Lesebücher) bringen nur ausgewählte Perikopen des
 NT, geordnet nach dem Kirchenjahr.  Es sind 2300 Lektionare bekannt.
@@ -157,7 +164,7 @@ Bezeichnung: 'ℓ' gefolgt von Zahl (z.B. ℓ 1178)
 
 
 Übersetzungen (Versionen)
-~~~~~~~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++++++++
 
 Latein, Syrisch, Koptisch, ...
 
@@ -170,7 +177,7 @@ sy\ :sup:`c` für den Cureton-Syrer)
 
 
 Zitate bei den Kirchenvätern (Kommentare)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++++++++++++++++++++++++
 
 Haben ergänzende Funktion.
 
@@ -189,27 +196,48 @@ Bezeichnung: Name oder Abkürzung (z.B. Or für Origenes)
 
 
 Textformen (Texttypen)
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
-- Alexandrinischer Text
+Alexandrinischer Text
++++++++++++++++++++++
 
-- Byzantinischer Text (Koine, Mehrheitstext)
+In Alexandria entstanden.
 
-- Westlicher Text (D-Text) Textgruppe, die im wesentlichen aus der
-  D-Majuskel entstanden ist.
+.. _mt:
 
-Der byzantinische Text ist am weitesten verbreitet.  (Offizieller Text.)
-Durch seine Geläufigkeit bei den Schreibern wurden alte Lesarten oft
-durch ihn ersetzt.  Er gilt als minderwertig weil er erst spät
-entstanden ist.
+Majority Text
++++++++++++++
+
+(Byzantinischer Text, Koine, Mehrheitstext)
+
+Der byzantinische Text ist am weitesten verbreitet.  Er war der de facto
+offizielle Text des Mittelalters.  Durch seine Geläufigkeit bei den
+Schreibern wurden andere Lesarten oft durch ihn ersetzt, bewußt oder
+unterbewußt.  Er gilt als minderwertig weil er erst spät entstanden ist.
+
+.. seealso::
+
+   The :ref:`rules to reconstruct the Majority Text <mt_rules>`.
+
+
+.. _tr:
+
+Textus Receptus
++++++++++++++++
 
 Textus Receptus: der von Erasmus von Rotterdam im Jahre 1516 gedruckte
 Text.  Er gilt als besonders minderwertig, da Erasmus überstürzt
 gearbeitet hat und nur wenige Textzeugen verwendet hat.
 
 
+Westlicher Text (D-Text)
+++++++++++++++++++++++++
+
+Textgruppe, die im wesentlichen aus der D-Majuskel entstanden ist.
+
+
 Textkritik
-==========
+----------
 
 Ob die Vorlage eine Minuskel oder eine Maiuskel war, ist oft an
 Schreibfehlern festzustellen. ([NESTLE1923]_ § 103)
@@ -233,10 +261,10 @@ anderen Lesarten am leichtesten erklären läßt.  ([NESTLE1923]_ § 115)
 
 
 Terminologie
-============
+------------
 
 Lesart
-------
+~~~~~~
 
 Eine Lesart hat eine eindeutige Adresse, eine Lesartenbezeichnung
 (Labez), das Suffix einer Lesartenbezeichnung (Labezsuf) und natürlich
@@ -244,134 +272,21 @@ den Text der Lesart selbst.  Das Suffix kennzeichnet z.B. eine
 Fehlerlesart oder ein Orthographicum.
 
 
+.. _variiert:
+
 Variierte Stelle
-----------------
+~~~~~~~~~~~~~~~~
 
-Eine variierte Stelle (variant passage) hat mindestens zwei oder mehr
-Lesarten.
-
-
-Die Datenbank
-=============
-
-Die mysql-Datenbank, die uns zur Verfügung gestellt wurde, enthält 28 +
-28 Tabellen, je zwei für jedes Kapitel der Apostelgeschichte.  Die erste
-Tabelle enthält die Lesarten, die zweite die Lücken (loc, vac).
-
-Aus diesen Tabellen wird der Nestle-Aland automagisch erstellt.
-
-Die Tabellen müssen nun für die CBGM umgeformt werden.  Dafür gibt es
-eine Reihe von Skripten (in perl und python).
-
-Die Tabelle der Lesarten ist ein negativer Apparat.  Sie enthält den Text
-des Archetypus (HS = A) und alle davon abweichenden Stellen.
-
-Für die CBGM benötigen wir einen positiven Apparat.  Dieser wird aus dem
-negativen Apparat und der Tabelle der Lücken erstellt.  Zuerst wird für
-jede Passage und jede Handschrift ein Lückeneintrag erstellt wenn diese
-Handschrift an dieser Passage eine Lücke aufweist.  Dann wird für jede
-Passage und jede Handschrift die Lesart der HS A eingefügt, falls diese
-Handschrift an dieser Passage noch keinen Text oder Lückeneintrag hat.
-Am Ende haben wir für jede Passage und jede Handschrift einen Datensatz.
-
-Die Datenbank wird auch von Lesarten bereinigt, die für den
-Nestle-Aland, aber nicht für die CBGM relevant sind.  Das sind z.B. alle
-Passagen die nur eine Lesart aufweisen (2/3 (!) des NT), alle
-Korrekturen, die nicht von der ersten Hand stammen und Lesarten die auf
-orthographische Fehler oder unterschiedliche orthographische
-Konventionen zurückgehen.
+Eine variierte Stelle (variant passage) ist eine Stelle die zwei oder
+mehr Lesarten aufweist.  Die große Mehrheit der Stellen im NT, etwa 2/3
+davon, weist nur eine einzige Lesart auf, und ist deshalb für die CBGM
+uninteressant.
 
 
-Tabellen und Felder
--------------------
-
-Felder in der Tabelle Att
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-anfadr, endadr
-  Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
-  Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade
-  einen Zwischenraum.
-
-hsnr
-  Interne Handschriftnummer.
-
-hs
-  Siglum der Handschrift.  An das Siglum werden Suffixe angehängt, die
-  die Hand und die Lesung bezeichnen.  Im Laufe der Verarbeitung werden
-  die Lesarten reduziert, bis nur eine Lesart pro Handschrift
-  übrigbleibt.  Parallel dazu werden die Suffixe von den Siglen
-  entfernt.
-
-labez
-  Lesartbezeichnung.  'a' bezeichnet die Lesart im Text und 'b' bis 'y'
-  die Lesarten im Apparat.  Lesarten beginnend mit 'z' haben eine
-  besondere Bedeutung:
-
-  zu
-    Hier nicht zitierbar aufgrund einer übergreifenden Variante.  Diese
-    umfaßte Variante wurde schon in der umfassenden Variante
-    verzeichnet.  Entspricht in der ECM einem Pfeil nach oben.  In der
-    CBGM ist 'zu' wie 'zz' zu behandeln.
-
-  zv
-    There is an illegible addition in the manuscript(s) cited which
-    makes it impossible to ascribe it to a known variant.
-
-  zw
-    What remains of the text of the manuscript(s) cited would allow
-    reconstruction in agreement with two or more different variants.
-    Entspricht in der ECM einem Doppelpfeil nach links-rechts.
-
-    In diesm Fall enthält das Feld labezsuf eine durch "/" getrennte
-    Liste der LesartBezeichnungen, die in Frage kommen.
-
-  zz
-    The reading is too lacunose to be identified.
-
-    Alle Verzeichnungen, die aus der Tabelle der Lacunae erzeugt wurden,
-    erhalten labez = 'zz'.
-
-    Ein Wort steht nicht in der systematischen Lückenliste wenn
-    mindestens ein Buchstabe vorhanden ist.  In diesem Fall steht es in
-    der stellenbezogenen Lückenliste.
-
-  Caveat: die Lesart 'a' kann für dieselbe Passage mehrmals vergeben
-  worden sein, immer dann wenn im Nestle-Aland ein positiver Apparat
-  benutzt wurde.
-
-labezsuf
-  Lesarten können hier mit zusätzlichen Hinweisen versehen werden:
-
-  f
-    Fehler (scribal error)
-
-  o
-    Orthographicum (orthographical difference) z.B. unterschiedliche
-    Schreibweise von Städtenamen.
-
-  durch "/" getrennte Liste bei Lesart 'zw'
-    z.B. "a/b_o/c_f"
-
-base
-  Basistext. Nur relevant bei Fehlversen.
-
-  a
-    Urtext
-
-  b
-    Fehlverse: Textus Receptus
-
-comp
-  x
-    Umfaßte Variante
-
-lekt
-  Lektionen in einem Lektionar.
-
+.. _umfasst:
 
 Umfaßte Varianten
------------------
+~~~~~~~~~~~~~~~~~
 
     Beim Herantreten an die Einzelarbeit ist das erste Erfordernis, die
     zu untersuchende Lesart als solche richtig abzugrenzen.  Die
@@ -391,103 +306,17 @@ Varianten nicht zulassen.  In diesem Fall wird die umfaßte Lesart mit
 'zu' gekennzeichent.
 
 
+.. _fehlvers:
+
 Fehlverse
----------
+~~~~~~~~~
 
 Fehlverse sind in späteren Zeitaltern hinzugefügte Verse.  Bei einem
-Fehlvers muß anstatt der HS A der Textus Receptus als Basis verwendet
-werden.
+Fehlvers muß anstatt der Handschrift 'A' der :ref:`Textus Receptus <tr>`
+als Basis verwendet werden.
 
 
-Abkürzungen, Suffixe
---------------------
-
-Gebräuchliche Abkürzungen, Symbole, Suffixe.  Werden in der Datenbank in
-einigen Feldern benützt aber auch auch an das Siglum der Hs angehängt.
-
-\*
-  Erste, ursprüngliche Hand
-
-C*
-  Von erster Hand korrigiert
-
-C1
-  Erster Korrektor (Korrektoren der ersten Stunde)
-
-C2
-  Zweiter Korrektor (Korrektoren aus späteren Jahrhunderten)
-
-C
-  Korrektor (Korrektor aus ungewisser Epoche)
-
-L1, L2
-  Unterschiedliche Lesungen in einem Lektionar.
-  L2 ist für die CBGM nicht relevant.
-
-T1, T2
-  Unterschiedliche Lesungen des Textes der ersten Hand.  Die erste Hand
-  hat diese Passagen mehrmals abgeschrieben, vielleicht aus
-  unterschiedlicher Quelle.  Bei fehlender Übereinstimmung muß 'zw'
-  gesetzt werden.
-
-A
-  Vom Schreiber selbst gekennzeichnete alternative Lesart.
-  Für die CBGM nicht relevant.
-
-K
-  Varianten im Kommentar einer Handschrift.
-  Für die CBGM nicht relevant.
-
-s, s1, s2
-  (supplement) Nachträgliche Ergänzung verlorener Stellen.  Bei nur
-  einer Ergänzung wird 's' verwendet.  Bei mehreren Ergänzungen werden
-  's1', 's2', etc. für jeweils einen Abschnitt verwendet.  Ergänzungen
-  können nicht die Authorität der jeweiligen Hs beanspruchen.
-
-V, vid
-  (ut videtur) augenscheinlich.  Unsichere aber höchst wahrscheinliche
-  Lesung.  Ist für die CBGM als sichere Lesart zu akzeptieren.
-
-In variants:
-
-lac
-  Fehlendes Substrat (lacuna)
-
-vac
-  Fehlendes Substrat (vacat)
-
-om
-  Fehlender Text (omissio)
-
-
-Tabellen für Genealogische Kohärenz
------------------------------------
-
-Felder in der Tabelle LocStemEd
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-id
-  Primärer Schlüssel
-
-varid
-  id der variierten Stelle
-
-varnew
-  Gleich wie varid oder neue id nach Splitt.
-
-s1
-  Ursprung der Variante
-
-s2
-  Eventueller zweiter Ursprung der Variante.
-
-begadr
-endar
-  Stelle (Passage)
-
-w
-  Flag für "Westlicher Text".  Hat für die CBGM keine Bedeutung.
-
+.. _split:
 
 Splitt
 ~~~~~~
@@ -505,9 +334,11 @@ Zusammenlegung
 ~~~~~~~~~~~~~~
 
 Eine Zusammenlegung wird benötigt um einen Splitt rückgängig zu
-machen???
+machen???[dubious - discuss]
 
 Bei einer Zusammenlegung hast das Feld varnew die Form: [a-y]!.
+
+
 
 ..
   Kritik
@@ -532,7 +363,7 @@ Bei einer Zusammenlegung hast das Feld varnew die Form: [a-y]!.
 
 
 Literatur
-=========
+---------
 
 .. [ALAND1989] Aland, Kurt, und Barbara Aland.  1989.  *Der Text des
    Neuen Testaments: Einführung in die wissenschaftlichen Ausgaben und
@@ -556,7 +387,7 @@ Literatur
 
 .. [MINK2008] Mink, Gerd.  *The Coherence-Based Genealogical Method (CBGM)
    — Introductory Presentation by Gerd Mink.*
-   http://www.uni-muenster.de/INTF/cbgm_presentation/download.html
+   http://www.uni-muenster.de/INTF/cbgm_presentation/CBGM_Presentation.zip
 
 .. [NESTLE1923] Nestle, Eberhard.  1923.  *Eberhard Nestle's Einführung
    in das Griechische Neue Testament. Vierte Auflage.  Völlig

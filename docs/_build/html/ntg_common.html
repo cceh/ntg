@@ -1,0 +1,980 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Common Code &mdash; NTG 0.1.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
+        <link rel="next" title="Transformation tools" href="transform.html"/>
+        <link rel="prev" title="Installation" href="install.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> NTG
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Kurze Einführung in die Textkritik und das Neue Testament</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#editionen">Editionen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#die-textzeugen">Die Textzeugen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#textformen-texttypen">Textformen (Texttypen)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#textkritik">Textkritik</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#terminologie">Terminologie</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#lesart">Lesart</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#variierte-stelle">Variierte Stelle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#umfaszte-varianten">Umfaßte Varianten</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#fehlverse">Fehlverse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#splitt">Splitt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#zusammenlegung">Zusammenlegung</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#literatur">Literatur</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Common Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Database Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Generic Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Transformation tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="transform.html#tabellen-und-felder">Tabellen und Felder</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="transform.html#felder-in-der-tabelle-locstemed">Felder in der Tabelle LocStemEd</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="transform.html#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.server"><code class="docutils literal"><span class="pre">server.server</span></code> — Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.editor"><code class="docutils literal"><span class="pre">server.editor</span></code> — Editor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.security"><code class="docutils literal"><span class="pre">server.security</span></code> — Security</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="appclient.html">Application Client</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id1">Module apparatus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id2">Module d3-stemma-layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id3">Module panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#textflow">Module textflow</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NTG</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Common Code</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/ntg_common.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-ntg_common">
+<span id="common-code"></span><h1>Common Code<a class="headerlink" href="#module-ntg_common" title="Permalink to this headline">¶</a></h1>
+<p>This package contains classes and functions common to the application server
+and the database conversion routines.</p>
+<div class="section" id="module-ntg_common.db">
+<span id="ntg-common-db-database-structure"></span><h2><a class="reference internal" href="#module-ntg_common.db" title="ntg_common.db: Database Structure"><code class="xref py py-mod docutils literal"><span class="pre">ntg_common.db</span></code></a> — Database Structure<a class="headerlink" href="#module-ntg_common.db" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the sqlalchemy classes that create the database structure
+we need for doing the CBGM and running the application server.</p>
+<dl class="class">
+<dt id="ntg_common.db.Affinity">
+<em class="property">class </em><code class="descname">Affinity</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Affinity" title="Permalink to this definition">¶</a></dt>
+<dd><p>A table that contains CBGM output related to each pair of manuscripts.</p>
+<p>This table contains the actual results of applying the CBGM: the priority of
+the manuscripts.  It has one row for each pair of manuscripts that have at
+least one passage in common and each range we are interested in.</p>
+<p>Two sets of data are included, one for the recursive interpretation of the
+locstem data, and one for the backward-compatible non-recurisve
+interpretation (with ‘p_’ prefix).</p>
+<dl class="attribute">
+<dt id="ntg_common.db.Affinity.common">
+<code class="descname">common</code><a class="headerlink" href="#ntg_common.db.Affinity.common" title="Permalink to this definition">¶</a></dt>
+<dd><p>No. of passages defined in both manuscripts.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Affinity.equal">
+<code class="descname">equal</code><a class="headerlink" href="#ntg_common.db.Affinity.equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>No. of passages that have the same reading in both manuscripts.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Affinity.affinity">
+<code class="descname">affinity</code><a class="headerlink" href="#ntg_common.db.Affinity.affinity" title="Permalink to this definition">¶</a></dt>
+<dd><p>equal / common</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Affinity.older">
+<code class="descname">older</code><a class="headerlink" href="#ntg_common.db.Affinity.older" title="Permalink to this definition">¶</a></dt>
+<dd><p>No. of passages that have an older reading in ms1.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Affinity.newer">
+<code class="descname">newer</code><a class="headerlink" href="#ntg_common.db.Affinity.newer" title="Permalink to this definition">¶</a></dt>
+<dd><p>No. of passages that have an newer reading in ms1.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Affinity.unclear">
+<code class="descname">unclear</code><a class="headerlink" href="#ntg_common.db.Affinity.unclear" title="Permalink to this definition">¶</a></dt>
+<dd><p>No. of passages where it is unclear which reading is older.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db.Apparatus">
+<em class="property">class </em><code class="descname">Apparatus</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Apparatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>A table that contains the positive apparatus.</p>
+<dl class="attribute">
+<dt id="ntg_common.db.Apparatus.cbgm">
+<code class="descname">cbgm</code><a class="headerlink" href="#ntg_common.db.Apparatus.cbgm" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if this entry is eligible for CBGM, eg. is by the orginal scribe
+and is 100% certain.  There can be only one entry eligible for CBGM for
+every manuscript and passage.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Apparatus.labezsuf">
+<code class="descname">labezsuf</code><a class="headerlink" href="#ntg_common.db.Apparatus.labezsuf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains auxiliary information about the reading:</p>
+<dl class="data">
+<dt id="ntg_common.db.Apparatus.f">
+<code class="descname">f</code><a class="headerlink" href="#ntg_common.db.Apparatus.f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fehler.  The reading is considered a scribal error.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Apparatus.o">
+<code class="descname">o</code><a class="headerlink" href="#ntg_common.db.Apparatus.o" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orthographicum.  The reading is considered an orthographical variant,
+eg. a variant place name.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Apparatus.certainty">
+<code class="descname">certainty</code><a class="headerlink" href="#ntg_common.db.Apparatus.certainty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Certainty of the reading. There can be only one reading of certainty 1.0,
+but multiple readings of certainty &lt; 1.0.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Apparatus.lesart">
+<code class="descname">lesart</code><a class="headerlink" href="#ntg_common.db.Apparatus.lesart" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual reading offered by the manuscript if different from the
+normalized reading in readings.lesart.  Readings are NULL if they
+correspond exactly to the reading in the readings table.  For ‘f’ and
+‘o’ readings (errors and orthographic variants) the actual reading is
+inserted.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Apparatus.origin">
+<code class="descname">origin</code><a class="headerlink" href="#ntg_common.db.Apparatus.origin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Where does this apparatus entry come from? For debugging purposes.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db.Att">
+<em class="property">class </em><code class="descname">Att</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Att" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input buffer table for the Nestle-Aland ECM_Acts*GVZ tables.</p>
+<p>The Nestle-Aland database contains one table for each chapter (for
+historical reasons). As first step we copy those many tables into one big
+table, this one.</p>
+<p>This table contains a negative apparatus of all manuscripts.  For the CBGM
+the data in this table has to be normalised into our database structure and
+converted into a positive apparatus.</p>
+<dl class="attribute">
+<dt>
+<code class="descname">anfadr, endadr</code></dt>
+<dd><p>Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
+Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade
+einen Zwischenraum.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Att.hsnr">
+<code class="descname">hsnr</code><a class="headerlink" href="#ntg_common.db.Att.hsnr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interne Handschriftnummer.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Att.hs">
+<code class="descname">hs</code><a class="headerlink" href="#ntg_common.db.Att.hs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Siglum der Handschrift.  An das Siglum werden Suffixe angehängt, die
+die Hand und die Lesung bezeichnen.  Im Laufe der Verarbeitung werden
+die Lesarten reduziert, bis nur eine Lesart pro Handschrift
+übrigbleibt.  Parallel dazu werden die Suffixe von den Siglen
+entfernt.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Att.labez">
+<code class="descname">labez</code><a class="headerlink" href="#ntg_common.db.Att.labez" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lesartbezeichnung.  ‘a’ bezeichnet die Lesart im Text und ‘b’ bis ‘y’
+die Lesarten im Apparat. Siehe: <a class="reference internal" href="#labez"><span class="std std-ref">labez</span></a>.</p>
+<p>Caveat: auch die Lesart der Handschrift ‘A’ kann für dieselbe Passage
+mehrmals vergeben worden sein, immer dann wenn im Nestle-Aland ein
+positiver Apparat benutzt wurde.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Att.labezsuf">
+<code class="descname">labezsuf</code><a class="headerlink" href="#ntg_common.db.Att.labezsuf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains auxiliary information about the reading:</p>
+<dl class="data">
+<dt id="ntg_common.db.Att.f">
+<code class="descname">f</code><a class="headerlink" href="#ntg_common.db.Att.f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fehler.  The reading is considered a scribal error.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Att.o">
+<code class="descname">o</code><a class="headerlink" href="#ntg_common.db.Att.o" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orthographicum.  The reading is considered an orthographical variant,
+eg. a variant place name.</p>
+</dd></dl>
+
+<p>If the labez is ‘zw’ labezsuf contains a “/”-separated list of possible
+readings, eg. “a/b_o/c_f” means this reading may be ‘a’ or an
+orthographicum of ‘b’ or a scribal error of ‘c’.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Att.suffix">
+<code class="descname">suffix</code><a class="headerlink" href="#ntg_common.db.Att.suffix" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="data">
+<dt>
+<code class="descname">*</code></dt>
+<dd><p>Erste, ursprüngliche Hand</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<code class="descname">C*</code></dt>
+<dd><p>Von erster Hand korrigiert</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Att.C1">
+<code class="descname">C1</code><a class="headerlink" href="#ntg_common.db.Att.C1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Erster Korrektor (Korrektoren der ersten Stunde)</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Att.C2">
+<code class="descname">C2</code><a class="headerlink" href="#ntg_common.db.Att.C2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zweiter Korrektor (Korrektoren aus späteren Jahrhunderten)</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Att.C">
+<code class="descname">C</code><a class="headerlink" href="#ntg_common.db.Att.C" title="Permalink to this definition">¶</a></dt>
+<dd><p>Korrektor (Korrektor aus ungewisser Epoche)</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<code class="descname">L1, L2</code></dt>
+<dd><p>Unterschiedliche Lesungen in einem Lektionar.
+L2 ist für die CBGM nicht relevant.</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<code class="descname">T1, T2</code></dt>
+<dd><p>Unterschiedliche Lesungen des Textes der ersten Hand.  Die erste Hand
+hat diese Passagen mehrmals abgeschrieben, vielleicht aus
+unterschiedlicher Quelle.  Bei fehlender Übereinstimmung muß ‘zw’
+gesetzt werden.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Att.A">
+<code class="descname">A</code><a class="headerlink" href="#ntg_common.db.Att.A" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vom Schreiber selbst gekennzeichnete alternative Lesart.
+Für die CBGM nicht relevant.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Att.K">
+<code class="descname">K</code><a class="headerlink" href="#ntg_common.db.Att.K" title="Permalink to this definition">¶</a></dt>
+<dd><p>Varianten im Kommentar einer Handschrift.
+Für die CBGM nicht relevant.</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<code class="descname">s, s1, s2</code></dt>
+<dd><p>(supplement) Nachträgliche Ergänzung verlorener Stellen.  Bei nur
+einer Ergänzung wird ‘s’ verwendet.  Bei mehreren Ergänzungen werden
+‘s1’, ‘s2’, etc. für jeweils einen Abschnitt verwendet.  Ergänzungen
+können nicht die Authorität der jeweiligen Hs beanspruchen.</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<code class="descname">V, vid</code></dt>
+<dd><p>(ut videtur) augenscheinlich.  Unsichere aber höchst wahrscheinliche
+Lesung.  Ist für die CBGM als sichere Lesart zu akzeptieren.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Att.base">
+<code class="descname">base</code><a class="headerlink" href="#ntg_common.db.Att.base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basistext. Nur relevant bei <a class="reference internal" href="developer.html#fehlvers"><span class="std std-ref">Fehlversen</span></a>.</p>
+<dl class="data">
+<dt id="ntg_common.db.Att.a">
+<code class="descname">a</code><a class="headerlink" href="#ntg_common.db.Att.a" title="Permalink to this definition">¶</a></dt>
+<dd><p>Urtext</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Att.b">
+<code class="descname">b</code><a class="headerlink" href="#ntg_common.db.Att.b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fehlverse: Textus Receptus.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Att.comp">
+<code class="descname">comp</code><a class="headerlink" href="#ntg_common.db.Att.comp" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="data">
+<dt id="ntg_common.db.Att.x">
+<code class="descname">x</code><a class="headerlink" href="#ntg_common.db.Att.x" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="developer.html#umfasst"><span class="std std-ref">Umfaßte Variante</span></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Att.lekt">
+<code class="descname">lekt</code><a class="headerlink" href="#ntg_common.db.Att.lekt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lektionen in einem Lektionar.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db.Books">
+<em class="property">class </em><code class="descname">Books</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Books" title="Permalink to this definition">¶</a></dt>
+<dd><p>A table that lists all the books of the New Testament.</p>
+<p>This table lists all the books of the NT and the book id given to them.</p>
+<dl class="attribute">
+<dt id="ntg_common.db.Books.bk_id">
+<code class="descname">bk_id</code><a class="headerlink" href="#ntg_common.db.Books.bk_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The book id: 1 - 27 (Matthew - Revelation).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Books.siglum">
+<code class="descname">siglum</code><a class="headerlink" href="#ntg_common.db.Books.siglum" title="Permalink to this definition">¶</a></dt>
+<dd><p>The book siglum, eg. ‘Mt’</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Books.book">
+<code class="descname">book</code><a class="headerlink" href="#ntg_common.db.Books.book" title="Permalink to this definition">¶</a></dt>
+<dd><p>The book name, eg. ‘Matthew’</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Books.irange">
+<code class="descname">irange</code><a class="headerlink" href="#ntg_common.db.Books.irange" title="Permalink to this definition">¶</a></dt>
+<dd><p>The book extent in passages.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db.Cliques">
+<em class="property">class </em><code class="descname">Cliques</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Cliques" title="Permalink to this definition">¶</a></dt>
+<dd><p>A table that contains the cliques at every passage</p>
+<p>A clique is a set of strongly related manuscripts that offer the same
+reading.  A reading may have been originated more than once, while a clique
+has been originated only once.</p>
+<dl class="attribute">
+<dt id="ntg_common.db.Cliques.clique">
+<code class="descname">clique</code><a class="headerlink" href="#ntg_common.db.Cliques.clique" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the Clique. ‘0’, ‘1’, ‘2’ …</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db.Lac">
+<em class="property">class </em><code class="descname">Lac</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Lac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input buffer table for the Nestle-Aland ECM_Acts*GVZLac tables.</p>
+<p>The Nestle-Aland database contains one table for each chapter (for
+historical reasons). As first step we copy those many tables into one big
+table, this one.</p>
+<p>This table contains a list of all lacunae in all manuscripts.  It records
+the start and end of each lacuna.  A lacuna entry generally spans many
+passages in the Att table.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db.LocStem">
+<em class="property">class </em><code class="descname">LocStem</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.LocStem" title="Permalink to this definition">¶</a></dt>
+<dd><p>A table that contains the priority of the cliques at each passage</p>
+<p>This table contains the main output of the editors.  The editors decide
+which reading is derived from which other reading(s) at each passage.</p>
+<dl class="attribute">
+<dt>
+<code class="descname">labez, clique</code></dt>
+<dd><p>The younger reading which was derived from the older reading.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">source_labez, source_clique</code></dt>
+<dd><p>The older reading that was the source of the younger reading or NULL if
+no source reading could be established.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.LocStem.original">
+<code class="descname">original</code><a class="headerlink" href="#ntg_common.db.LocStem.original" title="Permalink to this definition">¶</a></dt>
+<dd><p>This reading was established as the original.  Must also have a
+source_labez of NULL.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db.Manuscripts">
+<em class="property">class </em><code class="descname">Manuscripts</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Manuscripts" title="Permalink to this definition">¶</a></dt>
+<dd><p>A table that lists all the manuscripts.</p>
+<p>This table lists all the manuscripts of New Testament that we have collated
+for the edition.</p>
+<dl class="attribute">
+<dt id="ntg_common.db.Manuscripts.ms_id">
+<code class="descname">ms_id</code><a class="headerlink" href="#ntg_common.db.Manuscripts.ms_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The primary key of the table.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Manuscripts.hsnr">
+<code class="descname">hsnr</code><a class="headerlink" href="#ntg_common.db.Manuscripts.hsnr" title="Permalink to this definition">¶</a></dt>
+<dd><p>The project-internal number of the manuscript.</p>
+<p>This is a six-digit number. The first digit encodes the type of the
+manuscript: 1 = papyrus, 2 = uncial, 3 = minuscule, 4 = lectionary, 5 =
+patristic citations and versions.  The next 4 digits are taken from the
+digits of the Gregory-Aland number, eg. P45 would yield 0045.  The last
+digit encodes supplements: 0 = original, 1 = first supplement, 2 =
+second supplement.</p>
+<p>N.B. Patristic citations and versions are not used in the CBGM, and thus
+purged from the database.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Manuscripts.hs">
+<code class="descname">hs</code><a class="headerlink" href="#ntg_common.db.Manuscripts.hs" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Gregory-Aland number of the manuscript. eg. ‘P45’, ‘03’, or ‘1739’.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db.Ms_Ranges">
+<em class="property">class </em><code class="descname">Ms_Ranges</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Ms_Ranges" title="Permalink to this definition">¶</a></dt>
+<dd><p>A table that contains CBGM output related to each manuscript.</p>
+<p>Here we hold values that are calculated by CBGM related to one manuscript.</p>
+<dl class="attribute">
+<dt id="ntg_common.db.Ms_Ranges.length">
+<code class="descname">length</code><a class="headerlink" href="#ntg_common.db.Ms_Ranges.length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculated: no. of defined passages in the manuscript inside this range.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db.Passages">
+<em class="property">class </em><code class="descname">Passages</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Passages" title="Permalink to this definition">¶</a></dt>
+<dd><p>A table that lists the variant passages.</p>
+<p>This table lists all the passages we established during the collation of the
+manuscripts.  Passages that are the same in all manuscripts (invariant) are
+purged because they are irrelevant to the CBGM.</p>
+<dl class="attribute">
+<dt id="ntg_common.db.Passages.irange">
+<code class="descname">irange</code><a class="headerlink" href="#ntg_common.db.Passages.irange" title="Permalink to this definition">¶</a></dt>
+<dd><p>The extent of the passage.</p>
+<p>The beginning and end of every passage is encoded in this way:</p>
+<blockquote>
+<div>book id * 10,000,000 +
+chapter *    100,000 +
+verse   *      1,000 +
+word    *          2</div></blockquote>
+<p>Words are always even and the space between to words is always odd.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Passages.lemma">
+<code class="descname">lemma</code><a class="headerlink" href="#ntg_common.db.Passages.lemma" title="Permalink to this definition">¶</a></dt>
+<dd><p>The lemma of the passage.  Usually the reconstructed original text.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Passages.spanning">
+<code class="descname">spanning</code><a class="headerlink" href="#ntg_common.db.Passages.spanning" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if this passage is spanning other passages.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Passages.spanned">
+<code class="descname">spanned</code><a class="headerlink" href="#ntg_common.db.Passages.spanned" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if this passage is spanned by other passages.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Passages.fehlvers">
+<code class="descname">fehlvers</code><a class="headerlink" href="#ntg_common.db.Passages.fehlvers" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if this passage is a later addition, eg. the pericope adulterae.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db.Ranges">
+<em class="property">class </em><code class="descname">Ranges</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Ranges" title="Permalink to this definition">¶</a></dt>
+<dd><p>A table that contains the ranges of passages for the CBGM.</p>
+<p>The CBGM is agnostic about the division in books and chapters of the NT.  It
+can be run on any range of passages (in theory even on sets of non-contiguous
+passages, although not yet in this implementation).</p>
+<p>This table contains all ranges we are interested in, that is, one range for
+each chapter of each book and also one range for each whole book.  The
+chapter ranges are named after the chapter mumber, the whole book range is
+called ‘All’.</p>
+<dl class="attribute">
+<dt id="ntg_common.db.Ranges.range">
+<code class="descname">range</code><a class="headerlink" href="#ntg_common.db.Ranges.range" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the range, eg. ‘1’ for Chapter 1.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Ranges.irange">
+<code class="descname">irange</code><a class="headerlink" href="#ntg_common.db.Ranges.irange" title="Permalink to this definition">¶</a></dt>
+<dd><p>The extent of the range.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db.Readings">
+<em class="property">class </em><code class="descname">Readings</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Readings" title="Permalink to this definition">¶</a></dt>
+<dd><p>A table that contains the different readings found at each passage.</p>
+<p>First scribal errors are corrected and orthographical differences are
+normalized, then equal readings are grouped.  Each group of readings is
+assigned an id, the ‘labez’.</p>
+<span class="target" id="labez"></span><dl class="attribute">
+<dt id="ntg_common.db.Readings.labez">
+<code class="descname">labez</code><a class="headerlink" href="#ntg_common.db.Readings.labez" title="Permalink to this definition">¶</a></dt>
+<dd><p>(LesArtBEZeichnung).  Usually ‘a’ indicates the original reading, while
+‘b’…’y’ indicate readings relegated to the apparatus, although this is
+not necessarily so.  Exceptions are the ‘Fehlverse’ and the cases where
+no original reading could be assessed.</p>
+<p>Readings starting with ‘z’ have special meaning:</p>
+<dl class="data">
+<dt id="ntg_common.db.Readings.zu">
+<code class="descname">zu</code><a class="headerlink" href="#ntg_common.db.Readings.zu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hier nicht zitierbar aufgrund einer übergreifenden Variante.  Diese
+umfaßte Variante wurde schon in der umfassenden Variante
+verzeichnet.  Entspricht in der ECM einem Pfeil nach oben.  In der
+CBGM ist ‘zu’ wie ‘zz’ zu behandeln.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Readings.zv">
+<code class="descname">zv</code><a class="headerlink" href="#ntg_common.db.Readings.zv" title="Permalink to this definition">¶</a></dt>
+<dd><p>There is an illegible addition in the manuscript(s) cited which
+makes it impossible to ascribe it to a known variant.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Readings.zw">
+<code class="descname">zw</code><a class="headerlink" href="#ntg_common.db.Readings.zw" title="Permalink to this definition">¶</a></dt>
+<dd><p>What remains of the text of the manuscript(s) cited would allow
+reconstruction in agreement with two or more different variants.
+Entspricht in der ECM einem Doppelpfeil nach links-rechts.</p>
+<p>The reading ‘zw’ is used only in the Att table.  In this table each
+questionable reading will get its own entry with a certainty &lt; 1.0.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Readings.zz">
+<code class="descname">zz</code><a class="headerlink" href="#ntg_common.db.Readings.zz" title="Permalink to this definition">¶</a></dt>
+<dd><p>The reading is too lacunose to be identified.</p>
+<p>Alle Verzeichnungen, die aus der Tabelle der Lacunae erzeugt wurden,
+erhalten labez = ‘zz’.</p>
+<p>Ein Wort steht nicht in der systematischen Lückenliste wenn
+mindestens ein Buchstabe vorhanden ist.  In diesem Fall steht es in
+der stellenbezogenen Lückenliste.</p>
+</dd></dl>
+
+<p>Caveat: die Lesart ‘a’ kann für dieselbe Passage mehrmals vergeben
+worden sein, immer dann wenn im Nestle-Aland ein positiver Apparat
+benutzt wurde.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Readings.lesart">
+<code class="descname">lesart</code><a class="headerlink" href="#ntg_common.db.Readings.lesart" title="Permalink to this definition">¶</a></dt>
+<dd><p>The normalized reading.  Scribal errors are silently corrected and
+orthographic variants are normalized.  Following abbreviations are used:</p>
+<dl class="data">
+<dt id="ntg_common.db.Readings.om">
+<code class="descname">om</code><a class="headerlink" href="#ntg_common.db.Readings.om" title="Permalink to this definition">¶</a></dt>
+<dd><p>Missing text (omissio).  The scribe did not write any text.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Readings.lac">
+<code class="descname">lac</code><a class="headerlink" href="#ntg_common.db.Readings.lac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Missing substrate (lacuna).  The manuscript is damaged or missing.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Readings.vac">
+<code class="descname">vac</code><a class="headerlink" href="#ntg_common.db.Readings.vac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Missing substrate (vacat).  The manuscript is damaged or missing.</p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db.SaveReadings">
+<em class="property">class </em><code class="descname">SaveReadings</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.SaveReadings" title="Permalink to this definition">¶</a></dt>
+<dd><p>A temporary table for readings.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-ntg_common.db_tools">
+<span id="ntg-common-db-tools-database-tools"></span><h2><a class="reference internal" href="#module-ntg_common.db_tools" title="ntg_common.db_tools: Database Tools"><code class="xref py py-mod docutils literal"><span class="pre">ntg_common.db_tools</span></code></a> — Database Tools<a class="headerlink" href="#module-ntg_common.db_tools" title="Permalink to this headline">¶</a></h2>
+<p>This module contains functions for database access.</p>
+<dl class="class">
+<dt id="ntg_common.db_tools.MySQLEngine">
+<em class="property">class </em><code class="descname">MySQLEngine</code><span class="sig-paren">(</span><em>group=None</em>, <em>db=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.MySQLEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Database Interface</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ntg_common.db_tools.PostgreSQLEngine">
+<em class="property">class </em><code class="descname">PostgreSQLEngine</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>PostgreSQL Database Interface</p>
+<dl class="method">
+<dt id="ntg_common.db_tools.PostgreSQLEngine.get_connection_params">
+<code class="descname">get_connection_params</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.get_connection_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get connection parameters from environment.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ntg_common.db_tools.fix">
+<code class="descname">fix</code><span class="sig-paren">(</span><em>conn</em>, <em>msg</em>, <em>check_sql</em>, <em>fix_sql</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.fix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check and eventually fix errors.</p>
+<p>Executes the check_sql statement to check for a possible error conditions
+and, if rows emerge, prints a warning and executes the fix_sql statement.
+The fix_sql statement should be written as to fix the errors reported by the
+check_sql statement.  Finally it executes the check_sql statement again and
+reports an error if the error condition still exists.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>msg</strong> (<em>str</em>) – The warning / error message</li>
+<li><strong>check_sql</strong> (<em>str</em>) – The sql statement that checks for the error condition.</li>
+<li><strong>fix_sql</strong> (<em>str</em>) – The sql statement that fixes the error condition.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="ntg_common.db_tools.local_stemma_to_nx">
+<code class="descname">local_stemma_to_nx</code><span class="sig-paren">(</span><em>conn</em>, <em>pass_id</em>, <em>show_empty_roots=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.local_stemma_to_nx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a passage from the database into an nx Graph.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ntg_common.db_tools.tabulate">
+<code class="descname">tabulate</code><span class="sig-paren">(</span><em>res</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.tabulate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format and output a rowset</p>
+<p>Uses an output format similar to the one produced by the mysql commandline
+utility.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-ntg_common.tools">
+<span id="ntg-common-tools-generic-tools"></span><h2><a class="reference internal" href="#module-ntg_common.tools" title="ntg_common.tools: Generic Tools"><code class="xref py py-mod docutils literal"><span class="pre">ntg_common.tools</span></code></a> — Generic Tools<a class="headerlink" href="#module-ntg_common.tools" title="Permalink to this headline">¶</a></h2>
+<p>This module contains some useful functions.</p>
+<dl class="data">
+<dt id="ntg_common.tools.BOOKS">
+<code class="descname">BOOKS</code><em class="property"> = [(1, 'Mt', 'Matthew', 0), (2, 'Mc', 'Mark', 16), (3, 'L', 'Luke', 0), (4, 'J', 'John', 0), (5, 'Act', 'Acts', 28), (6, 'R', 'Romans', 0), (7, '1K', '1Corinthians', 0), (8, '2K', '2Corinthians', 0), (9, 'G', 'Galatians', 0), (10, 'E', 'Ephesians', 0), (11, 'Ph', 'Philippians', 0), (12, 'Kol', 'Colossians', 0), (13, '1Th', '1Thessalonians', 0), (14, '2Th', '2Thessalonians', 0), (15, '1T', '1Timothy', 0), (16, '2T', '2Timothy', 0), (17, 'Tt', 'Titus', 0), (18, 'Phm', 'Philemon', 0), (19, 'H', 'Hebrews', 0), (20, 'Jc', 'James', 0), (21, '1P', '1Peter', 0), (22, '2P', '2Peter', 0), (23, '1J', '1John', 0), (24, '2J', '2John', 0), (25, '3J', '3John', 0), (26, 'Jd', 'Jude', 0), (27, 'Ap', 'Revelation', 0)]</em><a class="headerlink" href="#ntg_common.tools.BOOKS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Titles of the NT books</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.tools.BYZ_HSNR">
+<code class="descname">BYZ_HSNR</code><em class="property"> = '(300010, 300180, 300350, 303300, 303980, 304240, 312410)'</em><a class="headerlink" href="#ntg_common.tools.BYZ_HSNR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manuscripts attesting the Byzantine Text.</p>
+<p>We use these manuscripts as templates to establish the Byzantine Text according
+to our rules.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.tools.FEHLVERSE">
+<code class="descname">FEHLVERSE</code><em class="property"> = '\n    (\n      anfadr &gt;= 50837002 and endadr &lt;= 50837046 or\n      anfadr &gt;= 51534002 and endadr &lt;= 51534012 or\n      anfadr &gt;= 52406020 and endadr &lt;= 52408014 or\n      anfadr &gt;= 52829002 and endadr &lt;= 52829024\n    )\n    '</em><a class="headerlink" href="#ntg_common.tools.FEHLVERSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verses added in later times.</p>
+<p>These verses were added to the NT in later times. Because they are not original
+they are not included in the text of manuscript ‘A’.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ntg_common.tools.config_from_pyfile">
+<code class="descname">config_from_pyfile</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.config_from_pyfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mimic Flask config files.</p>
+<p>Emulate the Flask config file parser so we can use the same config files for both,
+the server and this script.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ntg_common.tools.graphviz_layout">
+<code class="descname">graphviz_layout</code><span class="sig-paren">(</span><em>dot</em>, <em>format='dot'</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.graphviz_layout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the GraphViz dot program to generate an image but mostly to precompute
+the graph layout.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ntg_common.tools.log">
+<code class="descname">log</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>*aargs</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Low level log function</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="transform.html" class="btn btn-neutral float-right" title="Transformation tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="install.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-17 CCeH - Licensed under the GNU GPL v3 or later.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

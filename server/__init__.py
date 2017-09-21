@@ -1,1 +1,3 @@
-"""An application server for CBGM. """
+"""This package implements the application server for CBGM.
+
+"""
