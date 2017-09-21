@@ -74,7 +74,7 @@ sphinx:
 
 # jsdoc doesn't grok ES6
 jsdoc: js
-	jsdoc -d jsdoc -a all $(JS) && $(BROWSER) jsdoc/index.html
+	jsdoc -c jsdoc.json -d jsdoc -a all $(ES6) $(JS_SRC) && $(BROWSER) jsdoc/index.html
 
 bower_update:
 	bower install --update

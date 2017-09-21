@@ -6,7 +6,15 @@
  * @author Marcello Perathoner
  */
 
-define (['jquery', 'lodash', 'urijs/URI', 'jquery-ui', 'css!navigator-css'], function ($, _, urijs) {
+define ([
+    'jquery',
+    'lodash',
+    'urijs/URI',
+    'jquery-ui',
+    'css!navigator-css',
+],
+
+function ($, _, urijs) {
     var module = {};
 
     /*

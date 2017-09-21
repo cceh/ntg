@@ -1,8 +1,8 @@
 .. -*- encoding: utf-8; bidi-paragraph-direction: left-to-right; fill-column: 72 -*-
 
-
-Kurze Einführung in die Textkritik und das Neue Testament
-=========================================================
+=============================================
+ Kurze thematische Einführung für Entwickler
+=============================================
 
 Dies ist eine kurzgehaltene Einführung für Software-Entwickler, um die
 Grundlagen zu vermitteln, die zum Verstehen des Verfahrens notwendig
@@ -10,7 +10,7 @@ sind.  Sie entspricht nicht dem neuesten Stand der Forschung.
 
 
 Das Neue Testament
-------------------
+==================
 
 Es besteht aus:
 
@@ -36,14 +36,14 @@ Es besteht aus:
 
 
 Editionen
-~~~~~~~~~
+=========
 
 Herausgegeben durch das Institut für neutestamentliche Textforschung,
 Münster.
 
 
 Nestle-Aland
-++++++++++++
+------------
 
 Novum Testamentum Graece, 28. Auflage, 2012, (NA28) (Editio minor)
 
@@ -54,7 +54,7 @@ Startpiunkt der CBGM.
 
 
 Editio Critica Maior
-++++++++++++++++++++
+--------------------
 
 Novum Testamentum Graecum, Editio Critica Maior
 
@@ -78,7 +78,7 @@ CBGM eignen. ([ALAND1998]_ §22)
 
 
 Die Textzeugen
-~~~~~~~~~~~~~~
+==============
 
 Etwa 5000 Handschriften.
 Handschriften des NT verwenden fast ausschließlich das Codex-Format.
@@ -87,7 +87,7 @@ Folgende Arten von Textzeugen werden herangezogen:
 
 
 Papyri
-++++++
+------
 
 Früheste Überlieferungen.  Dem Originaltext am nächsten.
 
@@ -105,7 +105,7 @@ Dokuments wenn das Dokument auf der anderen Seite datiert ist.
 
 
 Majuskeln
-+++++++++
+---------
 
 Ab dem 4. Jahrhundert.  Auf Pergament.  Viele vollständige Abschriften
 des NT sind als Majuskel erhalten.  Sehr unterschiedliche Nähe zum
@@ -134,7 +134,7 @@ codex rescriptus).  ([NESTLE1923]_ § 36)
 
 
 Minuskeln
-+++++++++
+---------
 
 Ab dem 9. Jahrhundert.  Auf Pergament oder Papier.  Die allermeisten
 davon enthalten den byzantinischen Text und sind für uns uninteressant,
@@ -148,7 +148,7 @@ Im 15. Jhd. beginnt das Papier zu überwiegen.  ([NESTLE1923]_ § 36)
 
 
 Lektionare
-++++++++++
+----------
 
 Lektionare (kirchliche Lesebücher) bringen nur ausgewählte Perikopen des
 NT, geordnet nach dem Kirchenjahr.  Es sind 2300 Lektionare bekannt.
@@ -164,7 +164,7 @@ Bezeichnung: 'ℓ' gefolgt von Zahl (z.B. ℓ 1178)
 
 
 Übersetzungen (Versionen)
-+++++++++++++++++++++++++
+-------------------------
 
 Latein, Syrisch, Koptisch, ...
 
@@ -177,7 +177,7 @@ sy\ :sup:`c` für den Cureton-Syrer)
 
 
 Zitate bei den Kirchenvätern (Kommentare)
-+++++++++++++++++++++++++++++++++++++++++
+-----------------------------------------
 
 Haben ergänzende Funktion.
 
@@ -196,17 +196,19 @@ Bezeichnung: Name oder Abkürzung (z.B. Or für Origenes)
 
 
 Textformen (Texttypen)
-~~~~~~~~~~~~~~~~~~~~~~
+======================
 
 Alexandrinischer Text
-+++++++++++++++++++++
+---------------------
+
+.. _at:
 
 In Alexandria entstanden.
 
 .. _mt:
 
 Majority Text
-+++++++++++++
+-------------
 
 (Byzantinischer Text, Koine, Mehrheitstext)
 
@@ -220,24 +222,26 @@ unterbewußt.  Er gilt als minderwertig weil er erst spät entstanden ist.
    The :ref:`rules to reconstruct the Majority Text <mt_rules>`.
 
 
-.. _tr:
+.. _rt:
 
 Textus Receptus
-+++++++++++++++
+---------------
 
 Textus Receptus: der von Erasmus von Rotterdam im Jahre 1516 gedruckte
 Text.  Er gilt als besonders minderwertig, da Erasmus überstürzt
 gearbeitet hat und nur wenige Textzeugen verwendet hat.
 
 
+.. _wt:
+
 Westlicher Text (D-Text)
-++++++++++++++++++++++++
+------------------------
 
 Textgruppe, die im wesentlichen aus der D-Majuskel entstanden ist.
 
 
 Textkritik
-----------
+==========
 
 Ob die Vorlage eine Minuskel oder eine Maiuskel war, ist oft an
 Schreibfehlern festzustellen. ([NESTLE1923]_ § 103)
@@ -261,10 +265,10 @@ anderen Lesarten am leichtesten erklären läßt.  ([NESTLE1923]_ § 115)
 
 
 Terminologie
-------------
+============
 
 Lesart
-~~~~~~
+------
 
 Eine Lesart hat eine eindeutige Adresse, eine Lesartenbezeichnung
 (Labez), das Suffix einer Lesartenbezeichnung (Labezsuf) und natürlich
@@ -275,7 +279,7 @@ Fehlerlesart oder ein Orthographicum.
 .. _variiert:
 
 Variierte Stelle
-~~~~~~~~~~~~~~~~
+----------------
 
 Eine variierte Stelle (variant passage) ist eine Stelle die zwei oder
 mehr Lesarten aufweist.  Die große Mehrheit der Stellen im NT, etwa 2/3
@@ -286,7 +290,7 @@ uninteressant.
 .. _umfasst:
 
 Umfaßte Varianten
-~~~~~~~~~~~~~~~~~
+-----------------
 
     Beim Herantreten an die Einzelarbeit ist das erste Erfordernis, die
     zu untersuchende Lesart als solche richtig abzugrenzen.  Die
@@ -309,17 +313,18 @@ Varianten nicht zulassen.  In diesem Fall wird die umfaßte Lesart mit
 .. _fehlvers:
 
 Fehlverse
-~~~~~~~~~
+---------
 
-Fehlverse sind in späteren Zeitaltern hinzugefügte Verse.  Bei einem
-Fehlvers muß anstatt der Handschrift 'A' der :ref:`Textus Receptus <tr>`
+Fehlverse sind in späteren Zeitaltern hinzugefügte Verse.  Deshalb ist
+die Handschrift 'A' an diesen Stellen nicht definiert.  Bei einem
+Fehlvers muß anstatt der Handschrift 'A' der :ref:`Textus Receptus <rt>`
 als Basis verwendet werden.
 
 
 .. _split:
 
 Splitt
-~~~~~~
+------
 
 Ein Splitt wird benötigt wenn eine Lesart mehrmals unabhängig entstanden
 ist, damit die Abhängigkeiten der Handschriften untereinander nicht
@@ -331,7 +336,7 @@ b2 denselben Wortlaut auf sind aber unabhängig voneinander entstanden.
 
 
 Zusammenlegung
-~~~~~~~~~~~~~~
+--------------
 
 Eine Zusammenlegung wird benötigt um einen Splitt rückgängig zu
 machen???[dubious - discuss]
@@ -342,7 +347,7 @@ Bei einer Zusammenlegung hast das Feld varnew die Form: [a-y]!.
 
 ..
   Kritik
-  ------
+  ======
 
       Once we have tabulated these numbers for all the witnesses included,
       an overall structure emerges which shows the relationships between
@@ -363,7 +368,7 @@ Bei einer Zusammenlegung hast das Feld varnew die Form: [a-y]!.
 
 
 Literatur
----------
+=========
 
 .. [ALAND1989] Aland, Kurt, und Barbara Aland.  1989.  *Der Text des
    Neuen Testaments: Einführung in die wissenschaftlichen Ausgaben und

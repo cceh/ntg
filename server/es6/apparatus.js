@@ -104,6 +104,8 @@ function ($, _, tools, panel) {
     /**
      * Show the attestation in the Coherence panel and scroll to it.
      *
+     * @function goto_attestation
+     *
      * @param {Object} event - The event
      */
 

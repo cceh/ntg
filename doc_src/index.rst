@@ -11,6 +11,7 @@
    intro
    developer
    install
+   database
    ntg_common
    transform
    appserver

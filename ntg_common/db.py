@@ -162,27 +162,29 @@ class Att (Base):
     the data in this table has to be normalised into our database structure and
     converted into a positive apparatus.
 
+    .. _att:
+
     .. attribute:: anfadr, endadr
 
-      Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
-      Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade
-      einen Zwischenraum.
+       Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
+       Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade einen
+       Zwischenraum.
 
     .. attribute:: hsnr
 
-      Interne Handschriftnummer.
+       Interne Handschriftnummer.
 
     .. attribute:: hs
 
-      Siglum der Handschrift.  An das Siglum werden Suffixe angehängt, die
-      die Hand und die Lesung bezeichnen.  Im Laufe der Verarbeitung werden
-      die Lesarten reduziert, bis nur eine Lesart pro Handschrift
-      übrigbleibt.  Parallel dazu werden die Suffixe von den Siglen
-      entfernt.
+       Siglum der Handschrift.  An das Siglum werden :ref:`Suffixe <suffix>`
+       angehängt, die die Hand und die Lesung bezeichnen.  Im Laufe der
+       Verarbeitung werden die Lesarten reduziert, bis nur eine Lesart pro
+       Handschrift übrigbleibt.  Parallel dazu werden die Suffixe von den Siglen
+       entfernt.
 
     .. attribute:: labez
 
-      See the :ref:`description of this field in table readings <labez>`.
+       See the :ref:`description of this field in table readings <labez>`.
 
     .. attribute:: labezsuf
 
@@ -201,83 +203,84 @@ class Att (Base):
        readings, eg. "a/b_o/c_f" means this reading may be 'a' or an
        orthographicum of 'b' or a scribal error of 'c'.
 
+    .. _suffix:
+
     .. attribute:: suffix
 
-      .. data:: \*
+       .. data:: \*
 
-        Erste, ursprüngliche Hand
+          Erste, ursprüngliche Hand
 
-      .. data:: C*
+       .. data:: C*
 
-        Von erster Hand korrigiert
+          Von erster Hand korrigiert
 
-      .. data:: C1
+       .. data:: C1
 
-        Erster Korrektor (Korrektoren der ersten Stunde)
+          Erster Korrektor (Korrektoren der ersten Stunde)
 
-      .. data:: C2
+       .. data:: C2
 
-        Zweiter Korrektor (Korrektoren aus späteren Jahrhunderten)
+          Zweiter Korrektor (Korrektoren aus späteren Jahrhunderten)
 
-      .. data:: C
+       .. data:: C
 
-        Korrektor (Korrektor aus ungewisser Epoche)
+          Korrektor (Korrektor aus ungewisser Epoche)
 
-      .. data:: L1, L2
+       .. data:: L1, L2
 
-        Unterschiedliche Lesungen in einem Lektionar.
-        L2 ist für die CBGM nicht relevant.
+          Unterschiedliche Lesungen in einem Lektionar.  L2 ist für die CBGM
+          nicht relevant.
 
-      .. data:: T1, T2
+       .. data:: T1, T2
 
-        Unterschiedliche Lesungen des Textes der ersten Hand.  Die erste Hand
-        hat diese Passagen mehrmals abgeschrieben, vielleicht aus
-        unterschiedlicher Quelle.  Bei fehlender Übereinstimmung muß 'zw'
-        gesetzt werden.
+          Unterschiedliche Lesungen des Textes der ersten Hand.  Die erste Hand
+          hat diese Passagen mehrmals abgeschrieben, vielleicht aus
+          unterschiedlicher Quelle.  Bei fehlender Übereinstimmung muß 'zw'
+          gesetzt werden.
 
-      .. data:: A
+       .. data:: A
 
-        Vom Schreiber selbst gekennzeichnete alternative Lesart.
-        Für die CBGM nicht relevant.
+          Vom Schreiber selbst gekennzeichnete alternative Lesart.  Für die CBGM
+          nicht relevant.
 
-      .. data:: K
+       .. data:: K
 
-        Varianten im Kommentar einer Handschrift.
-        Für die CBGM nicht relevant.
+          Varianten im Kommentar einer Handschrift.  Für die CBGM nicht relevant.
 
-      .. data:: s, s1, s2
+       .. data:: s, s1, s2
 
-        (supplement) Nachträgliche Ergänzung verlorener Stellen.  Bei nur
-        einer Ergänzung wird 's' verwendet.  Bei mehreren Ergänzungen werden
-        's1', 's2', etc. für jeweils einen Abschnitt verwendet.  Ergänzungen
-        können nicht die Authorität der jeweiligen Hs beanspruchen.
+          (supplement) Nachträgliche Ergänzung verlorener Stellen.  Bei nur
+          einer Ergänzung wird 's' verwendet.  Bei mehreren Ergänzungen werden
+          's1', 's2', etc. für jeweils einen Abschnitt verwendet.  Ergänzungen
+          können nicht die Authorität der jeweiligen Hs beanspruchen.
 
-      .. data:: V, vid
+       .. data:: V, vid
 
-        (ut videtur) augenscheinlich.  Unsichere aber höchst wahrscheinliche
-        Lesung.  Ist für die CBGM als sichere Lesart zu akzeptieren.
+          (ut videtur) augenscheinlich.  Unsichere aber höchst wahrscheinliche
+          Lesung.  Ist für die CBGM als sichere Lesart zu akzeptieren.
 
     .. attribute:: base
 
-      Basistext. Nur relevant bei :ref:`Fehlversen <fehlvers>`.
+       Basistext. Nur relevant bei :ref:`Fehlversen <fehlvers>`.
 
-      .. data:: a
+       .. data:: a
 
-        Urtext
+          Urtext
 
-      .. data:: b
+       .. data:: b
 
-        Fehlverse: Textus Receptus.
+          Fehlverse: :ref:`Textus Receptus <rt>`.
 
     .. attribute:: comp
 
-      .. data:: x
+       .. data:: x
 
-        :ref:`Umfaßte Variante <umfasst>`.
+          :ref:`Umfaßte Variante <umfasst>`.
 
     .. attribute:: lekt
 
-      Lektionen in einem Lektionar.
+       Lektionen in einem Lektionar.
 
     """
 
@@ -334,6 +337,9 @@ class Lac (Base):
     This table contains a list of all lacunae in all manuscripts.  It records
     the start and end of each lacuna.  A lacuna entry generally spans many
     passages in the Att table.
+
+    This table has the same structure as table Att.  For the description of the
+    columns see :ref:`table Att <att>`.
 
     """
 

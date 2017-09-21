@@ -19,6 +19,8 @@ manuscripts as the parent manuscript.
 The program suite consists of scripts for setting up the CBGM database and an
 application server for interactive graphic interrogation of the CBGM database.
 
+The application is online at: http://ntg.cceh.uni-koeln.de
+
 The source code can be found at: https://github.com/cceh/ntg
 
 Author: Marcello Perathoner <marcello.perathoner@uni-koeln.de>

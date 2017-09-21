@@ -15,3 +15,7 @@ Ziele:
   der Datenbasis des ECM.
 
 - Fernziel: Interaktivität auch für externe Nutzer.
+
+Website:  http://ntg.cceh.uni-koeln.de/
+
+Developer documentation: https://cceh.github.io/ntg/

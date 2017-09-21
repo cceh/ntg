@@ -81,6 +81,32 @@ function ($, _, d3, d3c, tools, panel, nav) {
     }
 
     /**
+     * Initialize the module.
+     *
+     * @function init
+     */
+
+    function init (instance) {
+        instance.load_passage = load_passage;
+        $.extend (instance.data, {
+            'type'      : 'rel',
+            'range'     : 'All',
+            'limit'     : '10',
+            'include'   : [],
+            'fragments' : [],
+            'mode'      : 'sim',
+            'labez'     : 'all+lac',
+        });
+
+        // Install handler for reloading
+        $ (document).on ('ntg.panel.reload', function (event, passage) {
+            instance.load_passage (passage);
+        });
+
+        return instance;
+    }
+
+    /**
      * Create a popup panel.
      *
      * @function create_panel
@@ -121,32 +147,6 @@ function ($, _, d3, d3c, tools, panel, nav) {
             // notify others
             changed ();
         });
-    }
-
-    /**
-     * Initialize the module.
-     *
-     * @function init
-     */
-
-    function init (instance) {
-        instance.load_passage = load_passage;
-        $.extend (instance.data, {
-            'type'      : 'rel',
-            'range'     : 'All',
-            'limit'     : '10',
-            'include'   : [],
-            'fragments' : [],
-            'mode'      : 'sim',
-            'labez'     : 'all+lac',
-        });
-
-        // Install handler for reloading
-        $ (document).on ('ntg.panel.reload', function (event, passage) {
-            instance.load_passage (passage);
-        });
-
-        return instance;
     }
 
     return {

@@ -84,11 +84,27 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Kurze Einführung in die Textkritik und das Neue Testament</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#editionen">Editionen</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#die-textzeugen">Die Textzeugen</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#textformen-texttypen">Textformen (Texttypen)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Kurze thematische Einführung für Entwickler</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#editionen">Editionen</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#nestle-aland">Nestle-Aland</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#editio-critica-maior">Editio Critica Maior</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#die-textzeugen">Die Textzeugen</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#papyri">Papyri</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#majuskeln">Majuskeln</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#minuskeln">Minuskeln</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#lektionare">Lektionare</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#ubersetzungen-versionen">Übersetzungen (Versionen)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#zitate-bei-den-kirchenvatern-kommentare">Zitate bei den Kirchenvätern (Kommentare)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#textformen-texttypen">Textformen (Texttypen)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#alexandrinischer-text">Alexandrinischer Text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#majority-text">Majority Text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#textus-receptus">Textus Receptus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#westlicher-text-d-text">Westlicher Text (D-Text)</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="developer.html#textkritik">Textkritik</a></li>
@@ -113,6 +129,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Database Tools</a></li>
@@ -135,9 +152,17 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Application Client</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#id1">Module apparatus</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">Module d3-stemma-layout</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id3">Module panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">Module coherence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">Module comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">Module d3-chord-layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">Module d3-common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id6">Module d3-stemma-layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id7">Module local-stemma</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id8">Module navigator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id9">Module panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id10">Module relatives</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#textflow">Module textflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id12">Module tools</a></li>
 </ul>
 </li>
 </ul>
@@ -225,9 +250,523 @@
 </table>
 </dd></dl>
 
-<span class="target" id="module-d3-stemma-layout"></span></div>
+<dl class="function">
+<dt id="apparatus.module:apparatus.goto_attestation">
+<code class="descclassname">module:apparatus.</code><code class="descname">goto_attestation</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#apparatus.module:apparatus.goto_attestation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the attestation in the Coherence panel and scroll to it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>event</strong> (<em>Object</em>) – The event</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="apparatus.module:apparatus.init">
+<code class="descclassname">module:apparatus.</code><code class="descname">init</code><span class="sig-paren">(</span><em>instance</em><span class="sig-paren">)</span><a class="headerlink" href="#apparatus.module:apparatus.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>instance</strong> (<em>Object</em>) – The panel module instance to inherit from.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – - The module instance object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-coherence"></span></div>
 <div class="section" id="id2">
-<h2>Module d3-stemma-layout<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<h2>Module coherence<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="coherence.module:coherence.init">
+<code class="descclassname">module:coherence.</code><code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#coherence.module:coherence.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the module.</p>
+</dd></dl>
+
+<span class="target" id="module-comparison"></span></div>
+<div class="section" id="id3">
+<h2>Module comparison<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="comparison.module:comparison.deparam">
+<code class="descclassname">module:comparison.</code><code class="descname">deparam</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.deparam" title="Permalink to this definition">¶</a></dt>
+<dd><p>The inverse of the jQuery.param () function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>s</strong> (<em>string</em>) – A string in the form “p=1&amp;q=2”</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – { p : 1, q : 2 }</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="comparison.module:comparison.dir">
+<code class="descclassname">module:comparison.</code><code class="descname">dir</code><span class="sig-paren">(</span><em>older</em>, <em>newer</em><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a direction marker, &lt;, =, or &gt;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>older</strong> (<em>integer</em>) – How many passages are older.</li>
+<li><strong>newer</strong> (<em>integer</em>) – How many passages are newer.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Direction marker.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="comparison.module:comparison.main_row_conversion">
+<code class="descclassname">module:comparison.</code><code class="descname">main_row_conversion</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.main_row_conversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Row conversion function.  Convert numeric values to numeric types and add
+calculated fields.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The converted row</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="comparison.module:comparison.detail_row_conversion">
+<code class="descclassname">module:comparison.</code><code class="descname">detail_row_conversion</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.detail_row_conversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detail row conversion function.  Convert numeric values to numeric types
+and add calculated fields.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The converted row</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="comparison.module:comparison.init_details_table">
+<code class="descclassname">module:comparison.</code><code class="descname">init_details_table</code><span class="sig-paren">(</span><em>$detailsTable</em><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.init_details_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the details table structure.  This has to be done only once.
+On navigation we’ll throw all detail tables away.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>$detailsTable</strong> (<em>jQuery</em>) – The details table root node, which is not really a table node but a tr node containing a table further down.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="comparison.module:comparison.toggle_details_table">
+<code class="descclassname">module:comparison.</code><code class="descname">toggle_details_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.toggle_details_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens a table containing a detailed view of one range.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="comparison.module:comparison.create_main_table">
+<code class="descclassname">module:comparison.</code><code class="descname">create_main_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.create_main_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a skeleton for the main table.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>jQuery</strong> – The HTML skeleton.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="comparison.module:comparison.create_details_table">
+<code class="descclassname">module:comparison.</code><code class="descname">create_details_table</code><span class="sig-paren">(</span><em>ms1</em>, <em>ms2</em>, <em>range</em><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.create_details_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a skeleton for a drill-down table.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>ms1</strong> (<em>string</em>) – Name of the first manuscript to compare.</li>
+<li><strong>ms2</strong> (<em>string</em>) – Name of the second manuscript to compare.</li>
+<li><strong>range</strong> (<em>string</em>) – The range to compare.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>jQuery</strong> – The HTML skeleton.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="comparison.module:comparison.init_main_table">
+<code class="descclassname">module:comparison.</code><code class="descname">init_main_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.init_main_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the main table structure.  This has to be done only once.  On
+navigation we only replace the table data.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="comparison.module:comparison.on_navigation">
+<code class="descclassname">module:comparison.</code><code class="descname">on_navigation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.on_navigation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called after navigation.  Redraws the whole page.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="comparison.module:comparison.init_nav">
+<code class="descclassname">module:comparison.</code><code class="descname">init_nav</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.init_nav" title="Permalink to this definition">¶</a></dt>
+<dd><p>Init the navigation elements.  Also listen for hashtag events.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="comparison.module:comparison.init">
+<code class="descclassname">module:comparison.</code><code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the module.</p>
+</dd></dl>
+
+<span class="target" id="module-d3-chord-layout"></span></div>
+<div class="section" id="id4">
+<h2>Module d3-chord-layout<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="d3-chord-layout.module:d3-chord-layout.load_dot">
+<code class="descclassname">module:d3-chord-layout.</code><code class="descname">load_dot</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-chord-layout.module:d3-chord-layout.load_dot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an SVG graph from a dot file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<em>string</em>) – The url (must serve dot format).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – - A promise resolved when all SVG elements have been created.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-chord-layout.module:d3-chord-layout.init">
+<code class="descclassname">module:d3-chord-layout.</code><code class="descname">init</code><span class="sig-paren">(</span><em>$wrapper</em>, <em>id_prefix</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-chord-layout.module:d3-chord-layout.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>wrapper_selector</strong> (<em>string</em>) – A d3|jQuery selector that points to the element inside of which the graph will be placed.</li>
+<li><strong>id_prefix</strong> (<em>string</em>) – The prefix to add to all ids.  Use if you have more than one graph on a page.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Graph</strong> – - A graph instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-d3-common"></span></div>
+<div class="section" id="id5">
+<h2>Module d3-common<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="d3-common.module:d3-common.color_string_to_palette">
+<code class="descclassname">module:d3-common.</code><code class="descname">color_string_to_palette</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.color_string_to_palette" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a string of hex RGB to a D3 scale.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>s</strong> (<em>string</em>) – The color palette as string</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – The color palette as D3 scale.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-common.module:d3-common.generate_css_palette">
+<code class="descclassname">module:d3-common.</code><code class="descname">generate_css_palette</code><span class="sig-paren">(</span><em>labez_scale</em>, <em>clique_scale</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.generate_css_palette" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a CSS color palette from a D3 scale.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>labez_scale</strong> (<em>d3.scale</em>) – The color palette for labez as D3 scale.</li>
+<li><strong>clique_scale</strong> (<em>d3.scale</em>) – The color palette for cliques as D3 scale.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>string</strong> – - The color palette as CSS</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-common.module:d3-common.insert_css_palette">
+<code class="descclassname">module:d3-common.</code><code class="descname">insert_css_palette</code><span class="sig-paren">(</span><em>css</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.insert_css_palette" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a CSS color palette into the DOM making it active.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>css</strong> (<em>string</em>) – The color palette as CSS.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-common.module:d3-common.to_jquery">
+<code class="descclassname">module:d3-common.</code><code class="descname">to_jquery</code><span class="sig-paren">(</span><em>d3_selection</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.to_jquery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a D3 selection object into a jQuery selection object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>d3_selection</strong> (<em>d3.selection</em>) – The D3 selection object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>jQuery.selection</strong> – - The jQuery selection object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-common.module:d3-common.to_d3">
+<code class="descclassname">module:d3-common.</code><code class="descname">to_d3</code><span class="sig-paren">(</span><em>jquery_selection</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.to_d3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a jQuery selection object into a D3 selection object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>jquery_selection</strong> (<em>jQuery.selection</em>) – The jQuery selection object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>D3.selection</strong> – - The D3 selection object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-common.module:d3-common.append_marker">
+<code class="descclassname">module:d3-common.</code><code class="descname">append_marker</code><span class="sig-paren">(</span><em>svg</em>, <em>id_prefix</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.append_marker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append a triangular marker def to the SVG.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>svg</strong> (<em>jQuery.selection|d3.selection</em>) – The SVG element.</li>
+<li><strong>id_prefix</strong> (<em>string</em>) – The id prefix.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-common.module:d3-common.parse_pt">
+<code class="descclassname">module:d3-common.</code><code class="descname">parse_pt</code><span class="sig-paren">(</span><em>commasep</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.parse_pt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse point coordinates from .dot format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>commasep</strong> (<em>string</em>) – The pt as comma-separated values.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – The point as dictionary { x, y }</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-common.module:d3-common.parse_bbox">
+<code class="descclassname">module:d3-common.</code><code class="descname">parse_bbox</code><span class="sig-paren">(</span><em>commasep</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.parse_bbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse bounding box coordinates from .dot format.</p>
+<p>From the .dot format docs: rect: “%f,%f,%f,%f” The rectangle
+llx,lly,urx,ury gives the coordinates, in points, of the lower-left
+corner (llx,lly) and the upper-right corner (urx,ury).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>commasep</strong> (<em>string</em>) – The bbox as comma-separated values.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – The bbox as dictionary { x, y, width, height }</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-common.module:d3-common.parse_path">
+<code class="descclassname">module:d3-common.</code><code class="descname">parse_path</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.parse_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse edge path .dot format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>string</em>) – The path in .dot format</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Array</strong> – The path as array of objects  { x, y }</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-common.module:d3-common.parse_path_svg">
+<code class="descclassname">module:d3-common.</code><code class="descname">parse_path_svg</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.parse_path_svg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse edge path .dot format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>string</em>) – The path in .dot format</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>string</strong> – The path as ‘Mx,y Cx,y x,y x,y …’</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-common.module:d3-common.inflate_bbox">
+<code class="descclassname">module:d3-common.</code><code class="descname">inflate_bbox</code><span class="sig-paren">(</span><em>bbox</em>, <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.inflate_bbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inflate a bbox.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>bbox</strong> (<em>Object</em>) – The bbox as dictionary of x, y, width, height</li>
+<li><strong>len</strong> (<em>float</em>) – The bbox will be twice this wider and taller.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – The bbox as dictionary of x, y, width, height</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-common.module:d3-common.dot">
+<code class="descclassname">module:d3-common.</code><code class="descname">dot</code><span class="sig-paren">(</span><em>url</em>, <em>callback</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.dot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a .dot file into lists of subgraphs, nodes, edges, and graph attributes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<em>string</em>) – The url</li>
+<li><strong>callback</strong> (<em>function</em>) – The callback function.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> –</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="d3-common.module:d3-common.bfs">
+<code class="descclassname">module:d3-common.</code><code class="descname">bfs</code><span class="sig-paren">(</span><em>edges</em>, <em>start</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.bfs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Breadth first search in graph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>edges</strong> (<em>Object</em>) – The edges list</li>
+<li><strong>start</strong> (<em>string</em>) – The start node id</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of node ids in breadth-first order</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-d3-stemma-layout"></span></div>
+<div class="section" id="id6">
+<h2>Module d3-stemma-layout<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="d3-stemma-layout.module:d3-stemma-layout.init">
 <code class="descclassname">module:d3-stemma-layout.</code><code class="descname">init</code><span class="sig-paren">(</span><em>$wrapper</em>, <em>id_prefix</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-stemma-layout.module:d3-stemma-layout.init" title="Permalink to this definition">¶</a></dt>
@@ -269,9 +808,218 @@
 </table>
 </dd></dl>
 
+<span class="target" id="module-local-stemma"></span></div>
+<div class="section" id="id7">
+<h2>Module local-stemma<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="local-stemma.module:local-stemma.return_to_base">
+<code class="descclassname">module:local-stemma.</code><code class="descname">return_to_base</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#local-stemma.module:local-stemma.return_to_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the node back to the original position.</p>
+<p>If the user drops the node ‘nowhere’ then this function slides the node
+back to the original position.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>node</strong> (<em>Object</em>) – The node to slide back.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="local-stemma.module:local-stemma.highlight">
+<code class="descclassname">module:local-stemma.</code><code class="descname">highlight</code><span class="sig-paren">(</span><em>node</em>, <em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#local-stemma.module:local-stemma.highlight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Highlight or unhighlight a node</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>node</strong> (<em>Object</em>) – The node to highlight</li>
+<li><strong>b</strong> (<em>bool</em>) – Whether to highlight or unhighlight</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="local-stemma.module:local-stemma.dragListener">
+<code class="descclassname">module:local-stemma.</code><code class="descname">dragListener</code><span class="sig-paren">(</span><em>panel</em><span class="sig-paren">)</span><a class="headerlink" href="#local-stemma.module:local-stemma.dragListener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drag and drop handler</p>
+<p>Creates a d3-drag object that implements the drag-and-drop local stemma
+editor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>panel</strong> (<em>Object</em>) – The panel we are attached to.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="local-stemma.module:local-stemma.trow">
+<code class="descclassname">module:local-stemma.</code><code class="descname">trow</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#local-stemma.module:local-stemma.trow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output one menu item</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>Object</em>) – A dictionary</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>jQuery</strong> – The table row object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="local-stemma.module:local-stemma.open_contextmenu">
+<code class="descclassname">module:local-stemma.</code><code class="descname">open_contextmenu</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#local-stemma.module:local-stemma.open_contextmenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the context menu.</p>
+<p>The context menu can be used to split the attestation, reassign source
+nodes or to merge a split.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>event</strong> (<em>Object</em>) – The event</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="local-stemma.module:local-stemma.load_passage">
+<code class="descclassname">module:local-stemma.</code><code class="descname">load_passage</code><span class="sig-paren">(</span><em>passage</em><span class="sig-paren">)</span><a class="headerlink" href="#local-stemma.module:local-stemma.load_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a new passage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>passage</strong> (<em>Object</em>) – Which passage to load.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="local-stemma.module:local-stemma.init">
+<code class="descclassname">module:local-stemma.</code><code class="descname">init</code><span class="sig-paren">(</span><em>instance</em>, <em>graph_module</em>, <em>id_prefix</em><span class="sig-paren">)</span><a class="headerlink" href="#local-stemma.module:local-stemma.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>instance</strong> (<em>Object</em>) – The panel module instance to inherit from.</li>
+<li><strong>graph_module</strong> (<em>Object</em>) – The graph module to use.</li>
+<li><strong>id_prefix</strong> (<em>string</em>) – The prefix to use for all generated ids.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – - The module instance object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-navigator"></span></div>
+<div class="section" id="id8">
+<h2>Module navigator<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="navigator.module:navigator.set_passage">
+<code class="descclassname">module:navigator.</code><code class="descname">set_passage</code><span class="sig-paren">(</span><em>pass_id</em><span class="sig-paren">)</span><a class="headerlink" href="#navigator.module:navigator.set_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a new passage.  Programmatically set a new passage, eg. at page load.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pass_id</strong> (<em>int</em>) – The new passage id</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="navigator.module:navigator.suggest">
+<code class="descclassname">module:navigator.</code><code class="descname">suggest</code><span class="sig-paren">(</span><em>data</em>, <em>complete</em><span class="sig-paren">)</span><a class="headerlink" href="#navigator.module:navigator.suggest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of suggestions from the server</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<em>Object</em>) – Request object with ‘term’ property, which refers to the value currently in the text input.</li>
+<li><strong>complete</strong> (<em>function</em>) – The callback</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="navigator.module:navigator.on_nav">
+<code class="descclassname">module:navigator.</code><code class="descname">on_nav</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#navigator.module:navigator.on_nav" title="Permalink to this definition">¶</a></dt>
+<dd><p>Answer the user input on the navigator buttons.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>event</strong> (<em>Object</em>) – The event</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">false</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="navigator.module:navigator.init">
+<code class="descclassname">module:navigator.</code><code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#navigator.module:navigator.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>Object</strong> – - The module object.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <span class="target" id="module-panel"></span></div>
-<div class="section" id="id3">
-<h2>Module panel<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id9">
+<h2>Module panel<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="panel.module:panel.init">
 <code class="descclassname">module:panel.</code><code class="descname">init</code><span class="sig-paren">(</span><em>$panel</em><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.init" title="Permalink to this definition">¶</a></dt>
@@ -404,9 +1152,64 @@ div.panel-closable panes.</p>
 <dd><p>Setup the minimize, maximize, and close button event handlers.</p>
 </dd></dl>
 
+<span class="target" id="module-relatives"></span></div>
+<div class="section" id="id10">
+<h2>Module relatives<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="relatives.module:relatives.get_ms_ids_from_popups">
+<code class="descclassname">module:relatives.</code><code class="descname">get_ms_ids_from_popups</code><span class="sig-paren">(</span><em>what</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.get_ms_ids_from_popups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of the mss. currently displayed in any open panel.  Get either
+the ‘source’ ms. – the ms. the panel is all about – or the target
+mss. – the mss. related to the ‘source’ ms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>what</strong> (<em>string</em>) – ‘source’ or ‘target’</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – - Array of ms_ids</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="relatives.module:relatives.load_passage">
+<code class="descclassname">module:relatives.</code><code class="descname">load_passage</code><span class="sig-paren">(</span><em>passage</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.load_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load new data.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="relatives.module:relatives.create_panel">
+<code class="descclassname">module:relatives.</code><code class="descname">create_panel</code><span class="sig-paren">(</span><em>ms_id</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.create_panel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a popup panel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ms_id</strong> (<em>integer</em>) – The manuscript id.</li>
+<li><strong>target</strong> (<em>DOM</em>) – A DOM element relative to which to position the popup.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="relatives.module:relatives.init">
+<code class="descclassname">module:relatives.</code><code class="descname">init</code><span class="sig-paren">(</span><em>instance</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the module.</p>
+</dd></dl>
+
 <span class="target" id="module-textflow"></span></div>
 <div class="section" id="textflow">
-<span id="id4"></span><h2>Module textflow<a class="headerlink" href="#textflow" title="Permalink to this headline">¶</a></h2>
+<span id="id11"></span><h2>Module textflow<a class="headerlink" href="#textflow" title="Permalink to this headline">¶</a></h2>
 <p>The javascript module that displays the textflow diagrams.</p>
 <dl class="function">
 <dt id="textflow.module:textflow.init">
@@ -467,6 +1270,112 @@ div.panel-closable panes.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<span class="target" id="module-tools"></span></div>
+<div class="section" id="id12">
+<h2>Module tools<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tools.module:tools.format">
+<code class="descclassname">module:tools.</code><code class="descname">format</code><span class="sig-paren">(</span><em>s</em>, <em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a string in python fashion.  “{count} items found”</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>s</strong> (<em>string</em>) – The string to format</li>
+<li><strong>data</strong> (<em>dict</em>) – A dictionary of key: value</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>string</strong> – - The formatted string</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.module:tools.natural_sort">
+<code class="descclassname">module:tools.</code><code class="descname">natural_sort</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.natural_sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform a string so that numbers in the string sort naturally.</p>
+<p>Transform any contiguous run of digits so that it sorts
+naturally during an alphabetical sort. Every run of digits gets
+the length of the run prepended, eg. 123 =&gt; 3123, 123456 =&gt;
+6123456.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>s</strong> (<em>string</em>) – The input string</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>string</strong> – - The transformed string</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.module:tools.get_query_params">
+<code class="descclassname">module:tools.</code><code class="descname">get_query_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.get_query_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a map of the query parameters in the url of this page.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>Oject</strong> – A map of parameter = value</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.module:tools.svg_contextmenu">
+<code class="descclassname">module:tools.</code><code class="descname">svg_contextmenu</code><span class="sig-paren">(</span><em>menu</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.svg_contextmenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Position a context menu aside an svg element.</p>
+<p>Since jQuery doesn’t grok the SVG DOM, we have to calculate the
+position of the menu manually.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>menu</strong> (<em>Object</em>) – The menu</li>
+<li><strong>target</strong> (<em>Object</em>) – The DOM object to attach the menu to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.module:tools.xhr_alert">
+<code class="descclassname">module:tools.</code><code class="descname">xhr_alert</code><span class="sig-paren">(</span><em>xhr</em>, <em>$panel</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.xhr_alert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display an auto-closing alert window.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>xhr</strong> (<em>Object</em>) – The server response containing the message.  The JSON response must contain an Object with a message field.</li>
+<li><strong>$panel</strong> (<em>jQuery</em>) – The panel to append the window to.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.module:tools.init">
+<code class="descclassname">module:tools.</code><code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initilaize the module.</p>
 </dd></dl>
 
 </div>

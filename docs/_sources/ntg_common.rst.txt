@@ -7,6 +7,8 @@
    :members:
 
 
+.. _db:
+
 :mod:`ntg_common.db` --- Database Structure
 ===========================================
 

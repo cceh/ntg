@@ -37,7 +37,7 @@
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
         <link rel="next" title="Transformation tools" href="transform.html"/>
-        <link rel="prev" title="Installation" href="install.html"/> 
+        <link rel="prev" title="Database Structure" href="database.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -85,11 +85,27 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Kurze Einführung in die Textkritik und das Neue Testament</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#editionen">Editionen</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#die-textzeugen">Die Textzeugen</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#textformen-texttypen">Textformen (Texttypen)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Kurze thematische Einführung für Entwickler</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#editionen">Editionen</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#nestle-aland">Nestle-Aland</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#editio-critica-maior">Editio Critica Maior</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#die-textzeugen">Die Textzeugen</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#papyri">Papyri</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#majuskeln">Majuskeln</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#minuskeln">Minuskeln</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#lektionare">Lektionare</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#ubersetzungen-versionen">Übersetzungen (Versionen)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#zitate-bei-den-kirchenvatern-kommentare">Zitate bei den Kirchenvätern (Kommentare)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="developer.html#textformen-texttypen">Textformen (Texttypen)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#alexandrinischer-text">Alexandrinischer Text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#majority-text">Majority Text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#textus-receptus">Textus Receptus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer.html#westlicher-text-d-text">Westlicher Text (D-Text)</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="developer.html#textkritik">Textkritik</a></li>
@@ -114,6 +130,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Common Code</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Database Tools</a></li>
@@ -136,9 +153,17 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appclient.html">Application Client</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#id1">Module apparatus</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id2">Module d3-stemma-layout</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#id3">Module panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id2">Module coherence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id3">Module comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id4">Module d3-chord-layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id5">Module d3-common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id6">Module d3-stemma-layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id7">Module local-stemma</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id8">Module navigator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id9">Module panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id10">Module relatives</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#textflow">Module textflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#id12">Module tools</a></li>
 </ul>
 </li>
 </ul>
@@ -209,7 +234,7 @@
 <p>This package contains classes and functions common to the application server
 and the database conversion routines.</p>
 <div class="section" id="module-ntg_common.db">
-<span id="ntg-common-db-database-structure"></span><h2><a class="reference internal" href="#module-ntg_common.db" title="ntg_common.db: Database Structure"><code class="xref py py-mod docutils literal"><span class="pre">ntg_common.db</span></code></a> — Database Structure<a class="headerlink" href="#module-ntg_common.db" title="Permalink to this headline">¶</a></h2>
+<span id="ntg-common-db-database-structure"></span><span id="db"></span><h2><a class="reference internal" href="#module-ntg_common.db" title="ntg_common.db: Database Structure"><code class="xref py py-mod docutils literal"><span class="pre">ntg_common.db</span></code></a> — Database Structure<a class="headerlink" href="#module-ntg_common.db" title="Permalink to this headline">¶</a></h2>
 <p>This module contains the sqlalchemy classes that create the database structure
 we need for doing the CBGM and running the application server.</p>
 <dl class="class">
@@ -326,12 +351,12 @@ table, this one.</p>
 <p>This table contains a negative apparatus of all manuscripts.  For the CBGM
 the data in this table has to be normalised into our database structure and
 converted into a positive apparatus.</p>
-<dl class="attribute">
+<span class="target" id="att"></span><dl class="attribute">
 <dt>
 <code class="descname">anfadr, endadr</code></dt>
 <dd><p>Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
-Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade
-einen Zwischenraum.</p>
+Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade einen
+Zwischenraum.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -343,10 +368,10 @@ einen Zwischenraum.</p>
 <dl class="attribute">
 <dt id="ntg_common.db.Att.hs">
 <code class="descname">hs</code><a class="headerlink" href="#ntg_common.db.Att.hs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Siglum der Handschrift.  An das Siglum werden Suffixe angehängt, die
-die Hand und die Lesung bezeichnen.  Im Laufe der Verarbeitung werden
-die Lesarten reduziert, bis nur eine Lesart pro Handschrift
-übrigbleibt.  Parallel dazu werden die Suffixe von den Siglen
+<dd><p>Siglum der Handschrift.  An das Siglum werden <a class="reference internal" href="#suffix"><span class="std std-ref">Suffixe</span></a>
+angehängt, die die Hand und die Lesung bezeichnen.  Im Laufe der
+Verarbeitung werden die Lesarten reduziert, bis nur eine Lesart pro
+Handschrift übrigbleibt.  Parallel dazu werden die Suffixe von den Siglen
 entfernt.</p>
 </dd></dl>
 
@@ -378,7 +403,7 @@ readings, eg. “a/b_o/c_f” means this reading may be ‘a’ or an
 orthographicum of ‘b’ or a scribal error of ‘c’.</p>
 </dd></dl>
 
-<dl class="attribute">
+<span class="target" id="suffix"></span><dl class="attribute">
 <dt id="ntg_common.db.Att.suffix">
 <code class="descname">suffix</code><a class="headerlink" href="#ntg_common.db.Att.suffix" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="data">
@@ -414,8 +439,8 @@ orthographicum of ‘b’ or a scribal error of ‘c’.</p>
 <dl class="data">
 <dt>
 <code class="descname">L1, L2</code></dt>
-<dd><p>Unterschiedliche Lesungen in einem Lektionar.
-L2 ist für die CBGM nicht relevant.</p>
+<dd><p>Unterschiedliche Lesungen in einem Lektionar.  L2 ist für die CBGM
+nicht relevant.</p>
 </dd></dl>
 
 <dl class="data">
@@ -430,15 +455,14 @@ gesetzt werden.</p>
 <dl class="data">
 <dt id="ntg_common.db.Att.A">
 <code class="descname">A</code><a class="headerlink" href="#ntg_common.db.Att.A" title="Permalink to this definition">¶</a></dt>
-<dd><p>Vom Schreiber selbst gekennzeichnete alternative Lesart.
-Für die CBGM nicht relevant.</p>
+<dd><p>Vom Schreiber selbst gekennzeichnete alternative Lesart.  Für die CBGM
+nicht relevant.</p>
 </dd></dl>
 
 <dl class="data">
 <dt id="ntg_common.db.Att.K">
 <code class="descname">K</code><a class="headerlink" href="#ntg_common.db.Att.K" title="Permalink to this definition">¶</a></dt>
-<dd><p>Varianten im Kommentar einer Handschrift.
-Für die CBGM nicht relevant.</p>
+<dd><p>Varianten im Kommentar einer Handschrift.  Für die CBGM nicht relevant.</p>
 </dd></dl>
 
 <dl class="data">
@@ -472,7 +496,7 @@ Lesung.  Ist für die CBGM als sichere Lesart zu akzeptieren.</p>
 <dl class="data">
 <dt id="ntg_common.db.Att.b">
 <code class="descname">b</code><a class="headerlink" href="#ntg_common.db.Att.b" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fehlverse: Textus Receptus.</p>
+<dd><p>Fehlverse: <a class="reference internal" href="developer.html#rt"><span class="std std-ref">Textus Receptus</span></a>.</p>
 </dd></dl>
 
 </dd></dl>
@@ -552,6 +576,8 @@ table, this one.</p>
 <p>This table contains a list of all lacunae in all manuscripts.  It records
 the start and end of each lacuna.  A lacuna entry generally spans many
 passages in the Att table.</p>
+<p>This table has the same structure as table Att.  For the description of the
+columns see <a class="reference internal" href="#att"><span class="std std-ref">table Att</span></a>.</p>
 </dd></dl>
 
 <dl class="class">
@@ -913,7 +939,7 @@ the graph layout.</p>
         <a href="transform.html" class="btn btn-neutral float-right" title="Transformation tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="install.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="database.html" class="btn btn-neutral" title="Database Structure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

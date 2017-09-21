@@ -11,7 +11,9 @@ define ([
     'lodash',
     'pegjs',
     'text!/static/js/dot-grammar.pegjs',
-], function ($, d3, _, peg, parser_src) {
+],
+
+function ($, d3, _, peg, parser_src) {
     var dot_parser = peg.generate (parser_src);
 
     /**
@@ -26,21 +28,28 @@ define ([
      */
     var dot2css = 96.0 / 72.0;
 
-    function brighten_range (range, dummy_k) {
-        return range.map (function (c) {
-            var clr = d3.color (c);
-            clr.opacity = 0.2;
-            return clr.toString ();
-        });
-    }
+    /* A color palette for labez. */
+    var Labez =
+        '8888881f77b42ca02cd62728e7ba52ff7f0e9467bd8c564be377c217becf' +
+        'aec7e8ffbb7898df8aff9896c5b0d5c49c94f7b6d2dbdb8d9edae57f7f7f';
 
-    /* pilfered from d3-scale-chromatic.js */
+    /* A color palette for cliques.  Pilfered from d3-scale-chromatic.js */
     var Greys = 'fffffff0f0f0d9d9d9bdbdbd969696737373525252252525000000';
 
-    function color_string_to_range (s) {
-        return s.match (/.{6}/g).map (function (x) {
-            return '#' + x;
-        });
+    /**
+     * Convert a string of hex RGB to a D3 scale.
+     *
+     * @function color_string_to_palette
+     *
+     * @param {string} s - The color palette as string
+     *
+     * @returns {Object} The color palette as D3 scale.
+     */
+
+    function color_string_to_palette (s) {
+        var no_of_colors = s.length () / 6;
+        var range = s.match (/.{6}/g).map (x => '#' + x);
+        return d3.scaleOrdinal (range).domain (d3.range (no_of_colors));
     }
 
     /**
@@ -48,22 +57,14 @@ define ([
      *
      * @var {d3.scale} labez_palette
      */
-    var labez_palette = d3.scaleOrdinal ()
-        .domain (d3.range (20))
-        .range ([
-            '#888888', '#1f77b4', '#2ca02c', '#d62728',
-            '#e7ba52', '#ff7f0e', '#9467bd', '#8c564b',
-            '#e377c2', '#17becf', '#aec7e8', '#ffbb78',
-            '#98df8a', '#ff9896', '#c5b0d5', '#c49c94',
-            '#f7b6d2', '#dbdb8d', '#9edae5', '#7f7f7f',
-        ]);
+    var labez_palette = color_string_to_palette (Labez);
 
     /**
      * A D3 color palette suitable for cliques.
      *
      * @var {d3.scale} cliques_palette
      */
-    var cliques_palette = d3.scaleOrdinal (color_string_to_range (Greys)).domain (d3.range (9));
+    var cliques_palette = color_string_to_palette (Greys);
 
     /**
      * Generates a CSS color palette from a D3 scale.
@@ -363,7 +364,6 @@ define ([
     return {
         'append_marker'        : append_marker,
         'bfs'                  : bfs,
-        'brighten_range'       : brighten_range,
         'cliques_palette'      : cliques_palette,
         'dot'                  : dot,
         'generate_css_palette' : generate_css_palette,
