@@ -70,7 +70,7 @@ csslint: css
 doc: sphinx
 
 sphinx:
-	cd docs; make html; cd ..
+	cd doc_src; make html; cd ..
 
 # jsdoc doesn't grok ES6
 jsdoc: js
