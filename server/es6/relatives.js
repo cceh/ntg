@@ -54,9 +54,6 @@ function ($, _, d3, d3c, tools, panel, nav) {
         var ms_id = instance.$panel.attr ('data-ms-id');
         var url   = 'relatives.html/' + passage.pass_id + '/' + ms_id
             + '?' + $.param (instance.data); // we must use GET, not POST
-        var $heading_wrap = instance.$panel.find ('div.panel-relatives-metrics');
-        var $table_wrap   = instance.$panel.find ('div.panel-relatives-content');
-
         var p0 = $.get (url);
         var p1 = panel.load_labez_dropdown (
             instance.$toolbar.find ('div.toolbar-labez'), passage.pass_id, 'labez',
@@ -67,6 +64,10 @@ function ($, _, d3, d3c, tools, panel, nav) {
 
         p0.done (function (html) {
             var $html = $ (html);
+            var $caption_wrap = instance.$panel.find ('div.panel-relatives-caption div');
+            var $heading_wrap = instance.$panel.find ('div.panel-relatives-metrics');
+            var $table_wrap   = instance.$panel.find ('div.panel-relatives-content');
+            $caption_wrap.html ($html.find ('div.relatives-caption'));
             $heading_wrap.html ($html.find ('div.relatives-metrics'));
             $table_wrap.html   ($html.find ('table.relatives'));
         });

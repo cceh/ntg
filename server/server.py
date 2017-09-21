@@ -302,34 +302,14 @@ def relatives_skeleton (hs_hsnr_id, passage_or_id):
     """
 
     chapter = request.args.get ('range') or 'All'
-    caption = _('Relatives for')
 
     with current_app.config.dba.engine.begin () as conn:
 
-        passage   = Passage (conn, passage_or_id)
-        ms        = Manuscript (conn, hs_hsnr_id)
-        ms.length = ms.get_length (passage, chapter)
-
-        # Get the attestation(s) of the manuscript
-        res = execute (conn, """
-        SELECT labez
-        FROM apparatus_view_agg
-        WHERE ms_id = :ms_id AND pass_id = :pass_id
-        """, dict (parameters, ms_id = ms.ms_id, pass_id = passage.pass_id))
-        ms.labez,  = res.fetchone ()
-
-        mt = Bag ()
-
-        # Get the reading of MT
-        res = execute (conn, """
-        SELECT labez, clique, labez_clique
-        FROM apparatus_view
-        WHERE ms_id = 2 AND pass_id = :pass_id
-        """, dict (parameters, pass_id = passage.pass_id))
-        mt.labez, mt.clique, mt.labez_clique = res.fetchone ()
+        passage = Passage (conn, passage_or_id)
+        ms      = Manuscript (conn, hs_hsnr_id)
 
     # convert tuples to lists
-    return flask.render_template ('relatives-skeleton.html', caption = caption, ms = ms, mt = mt)
+    return flask.render_template ('relatives-skeleton.html', ms = ms)
 
 
 @app.endpoint ('relatives.html')
@@ -380,6 +360,14 @@ def relatives_html (hs_hsnr_id, passage_or_id):
         ms        = Manuscript (conn, hs_hsnr_id)
         ms.length = ms.get_length (passage, chapter)
         rg_id     = passage.range_id (chapter)
+
+        # Get the attestation(s) of the manuscript
+        res = execute (conn, """
+        SELECT labez
+        FROM apparatus_view_agg
+        WHERE ms_id = :ms_id AND pass_id = :pass_id
+        """, dict (parameters, ms_id = ms.ms_id, pass_id = passage.pass_id))
+        ms.labez,  = res.fetchone ()
 
         # Get the affinity of the manuscript to all manuscripts
         res = execute (conn, """
@@ -486,7 +474,7 @@ def relatives_html (hs_hsnr_id, passage_or_id):
         )
         relatives = list (map (Relatives._make, res))
 
-        return flask.render_template ('relatives.html', ms = ms, mt = mt, rows = relatives)
+        return flask.render_template ('relatives.html', caption = caption, ms = ms, mt = mt, rows = relatives)
 
 
 def remove_z_leaves (G, group_field):

@@ -1,5 +1,10 @@
 <div>
 
+  <div class="relatives-caption">
+    <span>{{caption}}</span>
+    <span class="fg_labez" data-labez="{{ms.labez}}"><span class="ms hilite-source" data-ms-id="{{ms.ms_id}}">{{ms.hs}}</span> (<span class="labez">{{ms.labez}}</span>) {{ms.length}}</span>
+  </div>
+
   <div class="relatives-metrics">
     {% if ms.hs != 'MT' %}
     <span class="mt fg_labez" data-labez="{{mt.labez}}"><span class="ms hilite-target" data-ms-id="1">MT </span>({{mt.labez}})</span>
