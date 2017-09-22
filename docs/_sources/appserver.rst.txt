@@ -7,24 +7,24 @@
    :members:
 
 
-:mod:`server.server` --- Server
--------------------------------
+:mod:`server.server` --- Main Module
+------------------------------------
 
 .. automodule:: server.server
    :synopsis: Main Module
    :members:
 
 
-:mod:`server.editor` --- Editor
--------------------------------
+:mod:`server.editor` --- Editor Module
+--------------------------------------
 
 .. automodule:: server.editor
    :synopsis: Editor Module
    :members:
 
 
-:mod:`server.security` --- Security
------------------------------------
+:mod:`server.security` --- User Management Module
+-------------------------------------------------
 
 .. automodule:: server.security
    :synopsis: User Management Module

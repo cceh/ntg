@@ -1,8 +1,8 @@
 .. -*- encoding: utf-8; bidi-paragraph-direction: left-to-right; fill-column: 72 -*-
 
-=============================================
- Kurze thematische Einführung für Entwickler
-=============================================
+===================================================
+ Short Introduction in the Problem Domain (German)
+===================================================
 
 Dies ist eine kurzgehaltene Einführung für Software-Entwickler, um die
 Grundlagen zu vermitteln, die zum Verstehen des Verfahrens notwendig

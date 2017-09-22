@@ -5,12 +5,22 @@
  NTG Documentation
 ===================
 
+User Manual
+===========
+
 .. toctree::
    :maxdepth: 2
 
    intro
-   developer
    install
+
+Developer Manual
+================
+
+.. toctree::
+   :maxdepth: 2
+
+   developer
    database
    appserver
    appclient

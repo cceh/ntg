@@ -83,9 +83,20 @@
               
             
             
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Kurze thematische Einführung für Entwickler</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Short Introduction in the Problem Domain (German)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developer.html#editionen">Editionen</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="developer.html#nestle-aland">Nestle-Aland</a></li>
@@ -121,15 +132,6 @@
 <li class="toctree-l2"><a class="reference internal" href="developer.html#literatur">Literatur</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="database.html#source-tables">Source Tables</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="database.html#locstemed">LocStemEd</a></li>
@@ -138,9 +140,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.server"><code class="docutils literal"><span class="pre">server.server</span></code> — Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.editor"><code class="docutils literal"><span class="pre">server.editor</span></code> — Editor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.security"><code class="docutils literal"><span class="pre">server.security</span></code> — Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.server"><code class="docutils literal"><span class="pre">server.server</span></code> — Main Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.editor"><code class="docutils literal"><span class="pre">server.editor</span></code> — Editor Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.security"><code class="docutils literal"><span class="pre">server.security</span></code> — User Management Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Application Client</a><ul>
@@ -579,9 +581,10 @@ nodes or to merge a split.</p>
 <dl class="function">
 <dt id="relatives.module:relatives.get_ms_ids_from_popups">
 <code class="descclassname">module:relatives.</code><code class="descname">get_ms_ids_from_popups</code><span class="sig-paren">(</span><em>what</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.get_ms_ids_from_popups" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a list of the mss. currently displayed in any open panel.  Get either
-the ‘source’ ms. – the ms. the panel is all about – or the target
-mss. – the mss. related to the ‘source’ ms.</p>
+<dd><p>Get a list of the mss. currently displayed in the panel.</p>
+<p>Get either the ‘source’ ms. – the ms. the panel is all about – or the
+‘target’ mss. – the mss. related to the ‘source’ ms.  Only returns
+target mss. if the panel body is open.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -602,6 +605,19 @@ mss. – the mss. related to the ‘source’ ms.</p>
 <dt id="relatives.module:relatives.load_passage">
 <code class="descclassname">module:relatives.</code><code class="descname">load_passage</code><span class="sig-paren">(</span><em>passage</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.load_passage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load new data.</p>
+<p>Display new data in the popup after the user navigated to a different
+passage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>passage</strong> (<em>Object</em>) – The new passage</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -626,6 +642,17 @@ mss. – the mss. related to the ‘source’ ms.</p>
 <dt id="relatives.module:relatives.init">
 <code class="descclassname">module:relatives.</code><code class="descname">init</code><span class="sig-paren">(</span><em>instance</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>instance</strong> (<em>Object</em>) – The panel module instance to inherit from.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

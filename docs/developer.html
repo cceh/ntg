@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Kurze thematische Einführung für Entwickler &mdash; NTG 0.1.1 documentation</title>
+  <title>Short Introduction in the Problem Domain (German) &mdash; NTG 0.1.1 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
-        <link rel="next" title="Installation" href="install.html"/>
-        <link rel="prev" title="Introduction" href="intro.html"/> 
+        <link rel="next" title="Database Structure" href="database.html"/>
+        <link rel="prev" title="Installation" href="install.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -83,9 +83,20 @@
               
             
             
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Kurze thematische Einführung für Entwickler</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Short Introduction in the Problem Domain (German)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#das-neue-testament">Das Neue Testament</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#editionen">Editionen</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#nestle-aland">Nestle-Aland</a></li>
@@ -121,15 +132,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#literatur">Literatur</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="database.html#source-tables">Source Tables</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="database.html#locstemed">LocStemEd</a></li>
@@ -138,9 +140,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.server"><code class="docutils literal"><span class="pre">server.server</span></code> — Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.editor"><code class="docutils literal"><span class="pre">server.editor</span></code> — Editor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.security"><code class="docutils literal"><span class="pre">server.security</span></code> — Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.server"><code class="docutils literal"><span class="pre">server.server</span></code> — Main Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.editor"><code class="docutils literal"><span class="pre">server.editor</span></code> — Editor Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.security"><code class="docutils literal"><span class="pre">server.security</span></code> — User Management Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appclient.html">Application Client</a><ul>
@@ -212,7 +214,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Kurze thematische Einführung für Entwickler</li>
+      <li>Short Introduction in the Problem Domain (German)</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -231,8 +233,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="kurze-thematische-einfuhrung-fur-entwickler">
-<h1>Kurze thematische Einführung für Entwickler<a class="headerlink" href="#kurze-thematische-einfuhrung-fur-entwickler" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="short-introduction-in-the-problem-domain-german">
+<h1>Short Introduction in the Problem Domain (German)<a class="headerlink" href="#short-introduction-in-the-problem-domain-german" title="Permalink to this headline">¶</a></h1>
 <p>Dies ist eine kurzgehaltene Einführung für Software-Entwickler, um die
 Grundlagen zu vermitteln, die zum Verstehen des Verfahrens notwendig
 sind.  Sie entspricht nicht dem neuesten Stand der Forschung.</p>
@@ -570,10 +572,10 @@ and Appendix by the Editors</em>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="install.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="database.html" class="btn btn-neutral float-right" title="Database Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="intro.html" class="btn btn-neutral" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="install.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

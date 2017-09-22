@@ -2,8 +2,10 @@
  * This module implements the popups that show the relatives of a manuscript.
  *
  * @module relatives
+ *
  * @author Marcello Perathoner
  */
+
 define ([
     'jquery',
     'lodash',
@@ -21,9 +23,11 @@ function ($, _, d3, d3c, tools, panel, nav) {
     }
 
     /**
-     * Get a list of the mss. currently displayed in any open panel.  Get either
-     * the 'source' ms. -- the ms. the panel is all about -- or the target
-     * mss. -- the mss. related to the 'source' ms.
+     * Get a list of the mss. currently displayed in the panel.
+     *
+     * Get either the 'source' ms. -- the ms. the panel is all about -- or the
+     * 'target' mss. -- the mss. related to the 'source' ms.  Only returns
+     * target mss. if the panel body is open.
      *
      * @function get_ms_ids_from_popups
      *
@@ -43,7 +47,12 @@ function ($, _, d3, d3c, tools, panel, nav) {
     /**
      * Load new data.
      *
+     * Display new data in the popup after the user navigated to a different
+     * passage.
+     *
      * @function load_passage
+     *
+     * @param {Object} passage - The new passage
      */
 
     function load_passage (passage) {
@@ -64,6 +73,7 @@ function ($, _, d3, d3c, tools, panel, nav) {
 
         p0.done (function (html) {
             var $html = $ (html);
+            // replace inner div to keep close button etc.
             var $caption_wrap = instance.$panel.find ('div.panel-relatives-caption div');
             var $heading_wrap = instance.$panel.find ('div.panel-relatives-metrics');
             var $table_wrap   = instance.$panel.find ('div.panel-relatives-content');
@@ -85,6 +95,8 @@ function ($, _, d3, d3c, tools, panel, nav) {
      * Initialize the module.
      *
      * @function init
+     *
+     * @param {Object} instance - The panel module instance to inherit from.
      */
 
     function init (instance) {
@@ -117,8 +129,9 @@ function ($, _, d3, d3c, tools, panel, nav) {
      */
 
     function create_panel (ms_id, target) {
+        // get the popup skeleton
         $.get ('relatives/' + nav.passage.pass_id + '/' + ms_id, function (html) {
-            // create
+            // append the skeleton to the floating panels section
             var $popup = $ (html).hide ();
             $popup.appendTo ('#floating-panels');
             $popup.fadeIn ();
