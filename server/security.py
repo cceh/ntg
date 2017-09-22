@@ -15,6 +15,8 @@ def declare_user_model (db): # db = flask_sqlalchemy.SQLAlchemy ()
     global User, Role, Roles_Users
 
     class User (db.Model, dbx._User, UserMixin):
+        __tablename__ = 'user'
+
         roles = db.relationship (
             'Role',
             secondary = 'roles_users',
@@ -22,9 +24,13 @@ def declare_user_model (db): # db = flask_sqlalchemy.SQLAlchemy ()
         )
 
     class Role (db.Model, dbx._Role):
+        __tablename__ = 'role'
+
         pass
 
     class Roles_Users (db.Model, dbx._Roles_Users):
+        __tablename__ = 'roles_users'
+
         pass
 
 
