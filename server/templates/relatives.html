@@ -2,7 +2,7 @@
 
   <div class="relatives-caption">
     <span>{{caption}}</span>
-    <span class="fg_labez" data-labez="{{ms.labez}}"><span class="ms hilite-source" data-ms-id="{{ms.ms_id}}">{{ms.hs}}</span> (<span class="labez">{{ms.labez}}</span>) {{ms.length}}</span>
+    <span class="fg_labez" data-labez="{{ms.labez}}"><span class="ms hilite-source" data-ms-id="{{ms.ms_id}}">{{ms.hs}} (W1)</span> (<span class="labez">{{ms.labez}}</span>) {{ms.length}}</span>
   </div>
 
   <div class="relatives-metrics">
@@ -29,57 +29,60 @@
 
   <table class="relatives table table-condensed">
     <tr>
+      <th class="ms"
+          title="Witness 2: Witnesses compared to W1"
+          >W2</th>
       <th class="rank"
-          title="The ancestral rank according to the degree of agreement"
+          title="Ancestral rank according to the degree of agreement (Perc)"
           >NR</th>
       <th class="direction"
-          title="The genealogical direction"
+          title="Genealogical direction, potential ancestors indicated by “>”"
           >D</th>
-      <th class="ms"
-          title="The Gergory-Aland number of the witness"
-          >Witn</th>
       <th class="labez"
-          title="The reading offered by the witness"
+          title="The reading offered by W2"
           >Rdg</th>
+      <!--
       <th class="length"
-          title="The number of variant passages defined in this witness"
+          title="The number of variant passages attested by W2"
           >Len</th>
+      -->
       <th class="perc"
-          title="The percentage of variant passages that agree in both witnesses"
+          title="Percentaged agreement of W1 and W2 at the variant passages attested by both (Pass)"
           >Perc</th>
       <th class="equal"
-          title="The number of variant passages that agree in both witnesses"
-          >=</th>
+          title="Number of agreements of W1 and W2 at the variant passages attested by both (Pass)"
+          >Eq</th>
       <th class="common"
-          title="The number of variant passages defined in both witnesses"
-          >Com</th>
+          title="Total number of passages where W1 and W2 are both extant"
+          >Pass</th>
       <th class="older"
-          title="The number of prior variants offered by this witness"
-          >Old</th>
+          title="Number of variants in W2 that are prior to those in W1"
+          >W1&lt;W2</th>
       <th class="newer"
-          title="The number of posterior variants offered by this witness"
-          >New</th>
+          title="Number of variants in W1 that are prior to those in W2"
+          >W1&gt;W2</th>
       <th class="unclear"
-          title="The number of passages where no decision has been made about priority"
-          >?</th>
+          title="Number of variants where no decision has been made about priority"
+          >Uncl</th>
       <th class="norel"
-          title="The number of passages where the offered variants are unrelated"
-          >&lt; &gt;</th>
+          title="Number of passages where the respective variants are unrelated"
+          >NoRel</th>
     </tr>
     {% for r in rows %}
     <tr data-labez="{{r.labez}}" class="fg_labez comparison{% if loop.first %} first{% endif %}"
         data-ms2-id="{{ms.ms_id}}" data-ms1-id="{{r.ms_id}}">
+      <th class="ms"><span class="ms hilite-target" data-ms-id="{{r.ms_id}}">{{r.hs|e}}</span></th>
       <td class="rank">{{(r.rank or '')}}</td>
       <td class="direction">{{r.direction|e}}</td>
-      <th class="ms"><span class="ms hilite-target" data-ms-id="{{r.ms_id}}">{{r.hs|e}}</span></th>
       <td class="labez">({{r.labez}})</td>
-      <td class="length">{{r.length}}</td>
+      <!--
+          <td class="length">{{r.length}}</td>
+      -->
       <td class="perc">{{ '{0:0.2f}'.format (100.0 * r.equal / r.common) }}%</td>
       <td class="equal">{{r.equal}}</td>
       <td class="common">{{r.common}}</td>
-      {# Actually older. r.newer because the query refers to the title bar ms. #}
-      <td class="older">{{r.newer}}</td>
-      <td class="newer">{{r.older}}</td>
+      <td class="older">{{r.older}}</td>
+      <td class="newer">{{r.newer}}</td>
       <td class="unclear">{{r.unclear}}</td>
       <td class="norel">{{r.norel}}</td>
     </tr>

@@ -40,26 +40,6 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
     }];
 
     /**
-     * The inverse of the jQuery.param () function.
-     *
-     * @function deparam
-     *
-     * @param {string} s - A string in the form "p=1&q=2"
-     *
-     * @return {Object} { p : 1, q : 2 }
-     */
-
-    function deparam(s) {
-        return s.split('&').reduce(function (params, param) {
-            var paramSplit = param.split('=').map(function (value) {
-                return decodeURIComponent(value.replace('+', ' '));
-            });
-            params[paramSplit[0]] = paramSplit[1];
-            return params;
-        }, {});
-    }
-
-    /**
      * Return a direction marker, <, =, or >.
      *
      * @function dir
@@ -259,7 +239,7 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
      */
 
     function create_main_table() {
-        return $('\n            <table class="comparison table table-bordered table-condensed table-hover" cellspacing="0">\n              <thead>\n                <tr>\n                  <th class="details-control"></th>\n                  <th class="range exportable">Chapter</th>\n                  <th class="length length1 exportable">W1 defined</th>\n                  <th class="length length2 exportable">W2 defined</th>\n                  <th class="common exportable">Both defined</th>\n                  <th class="eq exportable">=</th>\n                  <th class="perc exportable">%</th>\n                  <th class="older exportable">W1 older</th>\n                  <th class="direction exportable">Dir</th>\n                  <th class="newer exportable">W2 older</th>\n                  <th class="uncl exportable">?</th>\n                  <th class="norel exportable">&lt; &gt;</th>\n                  <th class="rank exportable">Rank</th>\n                </tr>\n              </thead>\n              <tbody>\n              </tbody>\n            </table>');
+        return $('\n            <table class="comparison table table-bordered table-condensed table-hover" cellspacing="0">\n              <thead>\n                <tr>\n                  <th class="details-control"></th>\n\n                  <th class="range exportable">Chapter</th>\n                  <th class="direction exportable">Dir</th>\n                  <th class="rank exportable">NR</th>\n\n                  <th class="perc exportable">Perc</th>\n                  <th class="eq exportable">Eq</th>\n                  <th class="common exportable">Pass</th>\n\n                  <th class="older exportable">W1&gt;W2</th>\n                  <th class="newer exportable">W1&lt;W2</th>\n                  <th class="uncl exportable">Uncl</th>\n                  <th class="norel exportable">NoRel</th>\n                  <!--\n                    <th class="length length1 exportable">W1 defined</th>\n                    <th class="length length2 exportable">W2 defined</th>\n                  -->\n                </tr>\n              </thead>\n              <tbody>\n              </tbody>\n            </table>');
     }
 
     /**
@@ -305,26 +285,23 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
                 },
                 'class': 'range'
             }, {
-                'data': 'length1',
-                'class': 'length length1'
+                'data': 'direction',
+                'class': 'direction'
             }, {
-                'data': 'length2',
-                'class': 'length length2'
-            }, {
-                'data': 'common',
-                'class': 'common'
-            }, {
-                'data': 'equal',
+                'data': 'rank',
                 'class': 'equal'
             }, {
                 'data': 'affinity',
                 'class': 'equal'
             }, {
+                'data': 'equal',
+                'class': 'equal'
+            }, {
+                'data': 'common',
+                'class': 'common'
+            }, {
                 'data': 'older',
                 'class': 'older'
-            }, {
-                'data': 'direction',
-                'class': 'direction'
             }, {
                 'data': 'newer',
                 'class': 'newer'
@@ -334,9 +311,6 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
             }, {
                 'data': 'norel',
                 'class': 'norel'
-            }, {
-                'data': 'rank',
-                'class': 'equal'
             }],
             'order': [[1, 'asc']],
             'createdRow': function createdRow(row, data, dummy_index) {
@@ -369,7 +343,7 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
     function on_navigation() {
         var hash = window.location.hash.substring(1);
         if (hash) {
-            var p = deparam(hash);
+            var p = tools.deparam(hash);
 
             var p1 = $.getJSON('manuscript.json/' + p.ms1, function (json) {
                 module.ms1 = json.data;
@@ -405,10 +379,12 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
                     var table = $('table.comparison');
                     var data_table = table.DataTable(); // eslint-disable-line new-cap
                     data_table.clear().rows.add(csv).draw();
-                    table.find('th.older').text(module.ms1.hs + ' older');
-                    table.find('th.newer').text(module.ms2.hs + ' older');
-                    table.find('th.length1').text(module.ms1.hs + ' defined');
-                    table.find('th.length2').text(module.ms2.hs + ' defined');
+                    /*
+                    table.find ('th.older').text   (module.ms1.hs + ' older');
+                    table.find ('th.newer').text   (module.ms2.hs + ' older');
+                    table.find ('th.length1').text (module.ms1.hs + ' defined');
+                    table.find ('th.length2').text (module.ms2.hs + ' defined');
+                    */
                 });
             });
         }

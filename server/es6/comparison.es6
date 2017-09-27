@@ -272,18 +272,23 @@ function ($, d3, tools) {
               <thead>
                 <tr>
                   <th class="details-control"></th>
+
                   <th class="range exportable">Chapter</th>
-                  <th class="length length1 exportable">W1 defined</th>
-                  <th class="length length2 exportable">W2 defined</th>
-                  <th class="common exportable">Both defined</th>
-                  <th class="eq exportable">=</th>
-                  <th class="perc exportable">%</th>
-                  <th class="older exportable">W1 older</th>
                   <th class="direction exportable">Dir</th>
-                  <th class="newer exportable">W2 older</th>
-                  <th class="uncl exportable">?</th>
-                  <th class="norel exportable">&lt; &gt;</th>
-                  <th class="rank exportable">Rank</th>
+                  <th class="rank exportable">NR</th>
+
+                  <th class="perc exportable">Perc</th>
+                  <th class="eq exportable">Eq</th>
+                  <th class="common exportable">Pass</th>
+
+                  <th class="older exportable">W1&gt;W2</th>
+                  <th class="newer exportable">W1&lt;W2</th>
+                  <th class="uncl exportable">Uncl</th>
+                  <th class="norel exportable">NoRel</th>
+                  <!--
+                    <th class="length length1 exportable">W1 defined</th>
+                    <th class="length length2 exportable">W2 defined</th>
+                  -->
                 </tr>
               </thead>
               <tbody>
@@ -355,6 +360,7 @@ function ($, d3, tools) {
                     'data'           : null,
                     'defaultContent' : '',
                 },
+
                 {
                     'data' : function (r, type /* , val, meta */) {
                         if (type === 'sort') {
@@ -365,32 +371,30 @@ function ($, d3, tools) {
                     'class' : 'range',
                 },
                 {
-                    'data'  : 'length1',
-                    'class' : 'length length1',
+                    'data'  : 'direction',
+                    'class' : 'direction',
                 },
                 {
-                    'data'  : 'length2',
-                    'class' : 'length length2',
+                    'data'  : 'rank',
+                    'class' : 'equal',
                 },
+
                 {
-                    'data'  : 'common',
-                    'class' : 'common',
+                    'data'  : 'affinity',
+                    'class' : 'equal',
                 },
                 {
                     'data'  : 'equal',
                     'class' : 'equal',
                 },
                 {
-                    'data'  : 'affinity',
-                    'class' : 'equal',
+                    'data'  : 'common',
+                    'class' : 'common',
                 },
+
                 {
                     'data'  : 'older',
                     'class' : 'older',
-                },
-                {
-                    'data'  : 'direction',
-                    'class' : 'direction',
                 },
                 {
                     'data'  : 'newer',
@@ -404,10 +408,16 @@ function ($, d3, tools) {
                     'data'  : 'norel',
                     'class' : 'norel',
                 },
+                /*
                 {
-                    'data'  : 'rank',
-                    'class' : 'equal',
+                    'data'  : 'length1',
+                    'class' : 'length length1',
                 },
+                {
+                    'data'  : 'length2',
+                    'class' : 'length length2',
+                },
+                */
             ],
             'order'      : [[1, 'asc']],
             'createdRow' : function (row, data, dummy_index) {
@@ -476,10 +486,12 @@ function ($, d3, tools) {
                     var table = $ ('table.comparison');
                     var data_table = table.DataTable (); // eslint-disable-line new-cap
                     data_table.clear ().rows.add (csv).draw ();
+                    /*
                     table.find ('th.older').text   (module.ms1.hs + ' older');
                     table.find ('th.newer').text   (module.ms2.hs + ' older');
                     table.find ('th.length1').text (module.ms1.hs + ' defined');
                     table.find ('th.length2').text (module.ms2.hs + ' defined');
+                    */
                 });
             });
         }
