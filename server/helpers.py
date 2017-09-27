@@ -379,7 +379,7 @@ def dot_skeleton (width = 960.0, fontsize = 10.0, ranksep = 0.4, nodesep = 0.1):
     )]
 
 
-def nx_to_dot (nxg, width = 960.0, fontsize = 10.0, nodesep = 0.1):
+def nx_to_dot (G, width = 960.0, fontsize = 10.0, nodesep = 0.1):
     """Convert an nx graph into a dot file.
 
     We'd like to sort the nodes in the graph, but nx internally uses
@@ -392,12 +392,12 @@ def nx_to_dot (nxg, width = 960.0, fontsize = 10.0, nodesep = 0.1):
     dot = dot_skeleton (width = width, fontsize = fontsize, nodesep = nodesep);
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
-    for n, nodedata in sorted (nxg.nodes (data = True)):
+    for n, nodedata in sorted (G.nodes (data = True)):
         dot.append ("\"%s\" [%s];" %
                     (n, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in nodedata.items ()])))
 
     # Copy edges and sort them.
-    for u, v, edgedata in sorted (nxg.edges_iter (data = True)):
+    for u, v, edgedata in sorted (G.edges (data = True)):
         dot.append ("\"%s\" -> \"%s\" [%s];" %
                     (u, v, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in edgedata.items ()])))
 
@@ -406,7 +406,7 @@ def nx_to_dot (nxg, width = 960.0, fontsize = 10.0, nodesep = 0.1):
     return '\n'.join (dot)
 
 
-def nx_to_dot_subgraphs (nxg, field, width = 960.0, fontsize = 10.0):
+def nx_to_dot_subgraphs (G, field, width = 960.0, fontsize = 10.0):
     """Convert an nx graph into a dot file.
 
     We'd like to sort the nodes in the graph, but nx internally uses
@@ -419,8 +419,8 @@ def nx_to_dot_subgraphs (nxg, field, width = 960.0, fontsize = 10.0):
     dot = dot_skeleton (width = width, fontsize = fontsize, ranksep = 1.2);
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
-    sorted_nodes = sorted (nxg, key = lambda n: (nxg.node[n][field], nxg.node[n]['hsnr']))
-    for key, nodes_for_key in itertools.groupby (sorted_nodes, key = lambda n: nxg.node[n][field]):
+    sorted_nodes = sorted (G, key = lambda n: (G.node[n][field], G.node[n]['hsnr']))
+    for key, nodes_for_key in itertools.groupby (sorted_nodes, key = lambda n: G.node[n][field]):
         dot.append ("subgraph \"cluster_%s\" {" % key)
         dot.append ("style=rounded")
         dot.append ("labeljust=l")
@@ -428,13 +428,13 @@ def nx_to_dot_subgraphs (nxg, field, width = 960.0, fontsize = 10.0):
         dot.append ("rank=%s" % ('source' if key in ('a', 'a1') else 'same'))
         dot.append ("label=\"%s\"" % key)
         for n in nodes_for_key:
-            attr = nxg.node[n]
+            attr = G.node[n]
             dot.append ("\"%s\" [%s];" %
                         (n, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in attr.items ()])))
         dot.append ("}")
 
     # Copy edges and sort them.
-    for u, v, edgedata in sorted (nxg.edges_iter (data = True)):
+    for u, v, edgedata in sorted (G.edges (data = True)):
         dot.append ("\"%s\" -> \"%s\" [%s];" %
                     (u, v, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in edgedata.items ()])))
 

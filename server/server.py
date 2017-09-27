@@ -481,7 +481,7 @@ def remove_z_leaves (G, group_field):
     """ Removes leaves (recursively) if they read z. """
 
     # We cannot use DFS because we don't know the root.
-    for n in nx.topological_sort (G, reverse = True):
+    for n in reversed (list (nx.topological_sort (G))):
         atts = G.node[n]
         if G.out_degree (n) == 0 and group_field in atts and atts[group_field][0] == 'z':
             G.remove_node (n)
@@ -636,7 +636,7 @@ def textflow (passage_or_id):
                 attrs['clique']       = ''
                 attrs['labez_clique'] = hyp_a[0]
             # FIXME: attrs['shape'] = SHAPES.get (attrs['labez'], SHAPES['a'])
-            G.add_node (ms.ms_id, attrs)
+            G.add_node (ms.ms_id, **attrs)
 
         # Step 1: A node that has ancestors within the same attestation keeps
         # only the top-ranked one as parent.
@@ -677,7 +677,7 @@ def textflow (passage_or_id):
         if not show_z:
             remove_z_leaves (G, group_field);
 
-        G.remove_nodes_from (nx.isolates (G))
+        G.remove_nodes_from (list (nx.isolates (G)))
 
         if var_only:
             # Remove non-variant links
@@ -686,7 +686,7 @@ def textflow (passage_or_id):
             for n in G:
                 gf = G.node[n][group_field]
                 if gf == 'zz' or '/' in gf:
-                    pred = G.predecessors (n)
+                    pred = list (G.predecessors (n))
                     if pred:
                         G.remove_edge (pred[0], n)
                     for succ in G.successors (n):
@@ -709,30 +709,30 @@ def textflow (passage_or_id):
                             G.remove_edge (p, n)
 
             # remove edges between nodes within the same attestation
-            for u, v in G.edges ():
+            for u, v in list (G.edges ()):
                 if G.node[u][group_field] == G.node[v][group_field]:
                     G.remove_edge (u, v)
 
             # remove now isolated nodes
-            G.remove_nodes_from (nx.isolates (G))
+            G.remove_nodes_from (list (nx.isolates (G)))
 
             # unconstrain backward edges
             for u, v in G.edges ():
                 if G.node[u][group_field] > G.node[v][group_field]:
-                    G.edge[u][v]['constraint'] = 'false'
+                    G.adj[u][v]['constraint'] = 'false'
 
         else:
             for n in G:
                 # Use a different label if the parent's labez_clique differs from this
                 # node's labez_clique.
-                pred = G.predecessors (n)
+                pred = list (G.predecessors (n))
                 attrs = G.node[n]
                 if not pred:
                     attrs['label'] = "%s: %s" % (attrs['labez_clique'], attrs['hs'])
                 for p in pred:
                     if attrs['labez_clique'] != G.node[p]['labez_clique']:
                         attrs['label'] = "%s: %s" % (attrs['labez_clique'], attrs['hs'])
-                        G.edge[p][n]['style'] = 'dashed'
+                        G.adj[p][n]['style'] = 'dashed'
 
     if var_only:
         dot = helpers.nx_to_dot_subgraphs (G, group_field, width, fontsize)
