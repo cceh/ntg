@@ -819,8 +819,10 @@ def comparison_summary ():
     """
 
     with current_app.config.dba.engine.begin () as conn:
-        ms1 = Manuscript (conn, request.args.get ('ms1') or 'A')
-        ms2 = Manuscript (conn, request.args.get ('ms2') or 'A')
+
+        # FIXME: the affinity matrix should be transposed
+        ms2 = Manuscript (conn, request.args.get ('ms1') or 'A')
+        ms1 = Manuscript (conn, request.args.get ('ms2') or 'A')
 
         res = execute (conn, """
         (WITH ranks AS (
@@ -831,13 +833,10 @@ def comparison_summary ():
           ORDER BY affinity DESC
         )
 
-        SELECT a.rg_id, ch.range, a.common, a.equal,
-               a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, r.rank, c1.length, c2.length
-        FROM affinity a
+        SELECT a.rg_id, a.range, a.common, a.equal,
+               a.older, a.newer, a.unclear, a.affinity, r.rank, ms1_length, ms2_length
+        FROM {view} a
         JOIN ranks r     USING (rg_id, ms_id1, ms_id2)
-        JOIN ranges ch USING (rg_id)
-        JOIN ms_ranges c1 ON a.ms_id1 = c1.ms_id AND a.rg_id = c1.rg_id
-        JOIN ms_ranges c2 ON a.ms_id2 = c2.ms_id AND a.rg_id = c2.rg_id
         WHERE a.ms_id1 = :ms_id1 AND a.ms_id2 = :ms_id2
         )
 
@@ -851,28 +850,22 @@ def comparison_summary ():
           ORDER BY affinity DESC
         )
 
-        SELECT a.rg_id, ch.range, a.common, a.equal,
-               a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, r.rank, c1.length, c2.length
-        FROM affinity a
-        JOIN ranks2 r    USING (rg_id, ms_id1, ms_id2)
-        JOIN ranges ch USING (rg_id)
-        JOIN ms_ranges c1 ON a.ms_id1 = c1.ms_id AND a.rg_id = c1.rg_id
-        JOIN ms_ranges c2 ON a.ms_id2 = c2.ms_id AND a.rg_id = c2.rg_id
+        SELECT a.rg_id, a.range, a.common, a.equal,
+               a.older, a.newer, a.unclear, a.affinity, r.rank, ms1_length, ms2_length
+        FROM {view} a
+        JOIN ranks2 r USING (rg_id, ms_id1, ms_id2)
         WHERE a.ms_id1 = :ms_id1 AND a.ms_id2 = :ms_id2
         )
 
         UNION
 
-        SELECT a.rg_id, ch.range, a.common, a.equal,
-               a.{prefix}older, a.{prefix}newer, a.{prefix}unclear, a.affinity, NULL, c1.length, c2.length
-        FROM affinity a
-        JOIN ranges ch USING (rg_id)
-        JOIN ms_ranges c1 ON a.ms_id1 = c1.ms_id AND a.rg_id = c1.rg_id
-        JOIN ms_ranges c2 ON a.ms_id2 = c2.ms_id AND a.rg_id = c2.rg_id
-        WHERE a.ms_id1 = :ms_id1 AND a.ms_id2 = :ms_id2 AND a.{prefix}newer = a.{prefix}older
+        SELECT a.rg_id, a.range, a.common, a.equal,
+               a.older, a.newer, a.unclear, a.affinity, NULL, ms1_length, ms2_length
+        FROM {view} a
+        WHERE a.ms_id1 = :ms_id1 AND a.ms_id2 = :ms_id2 AND a.newer = a.older
 
         ORDER BY rg_id
-        """, dict (parameters, ms_id1 = ms1.ms_id, ms_id2 = ms2.ms_id, prefix = ''))
+        """, dict (parameters, ms_id1 = ms1.ms_id, ms_id2 = ms2.ms_id, view = 'affinity_p_view', prefix = 'p_'))
 
         return list (map (_ComparisonRowCalcFields._make, res))
 

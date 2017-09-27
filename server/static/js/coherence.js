@@ -110,7 +110,7 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
         });
 
         // Click on a comparison row in the apparatus or in a relatives popup.
-        $ (document).on ('click', 'tr.comparison[data-ms1-id]', function (event) {
+        $ (document).on ('click', 'tr.comparison[data-ms2-id]', function (event) {
             event.stopPropagation ();
             var ms1_id = $ (event.currentTarget).attr ('data-ms1-id');
             var ms2_id = $ (event.currentTarget).attr ('data-ms2-id');

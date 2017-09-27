@@ -191,8 +191,8 @@ function ($, d3, tools) {
                 'order'      : [[0, 'asc']],
                 'createdRow' : function (r, d /* , index */) {
                     var $row = $ (r);
-                    $row.toggleClass ('older', d.older);
                     $row.toggleClass ('newer', d.newer);
+                    $row.toggleClass ('older', d.older);
                 },
                 'buttons' : {
                     'buttons' : buttons,
@@ -281,8 +281,8 @@ function ($, d3, tools) {
                   <th class="eq exportable">Eq</th>
                   <th class="common exportable">Pass</th>
 
-                  <th class="older exportable">W1&gt;W2</th>
                   <th class="newer exportable">W1&lt;W2</th>
+                  <th class="older exportable">W1&gt;W2</th>
                   <th class="uncl exportable">Uncl</th>
                   <th class="norel exportable">NoRel</th>
                   <!--
@@ -393,12 +393,12 @@ function ($, d3, tools) {
                 },
 
                 {
-                    'data'  : 'older',
-                    'class' : 'older',
-                },
-                {
                     'data'  : 'newer',
                     'class' : 'newer',
+                },
+                {
+                    'data'  : 'older',
+                    'class' : 'older',
                 },
                 {
                     'data'  : 'unclear',

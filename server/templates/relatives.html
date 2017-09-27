@@ -70,7 +70,7 @@
     </tr>
     {% for r in rows %}
     <tr data-labez="{{r.labez}}" class="fg_labez comparison{% if loop.first %} first{% endif %}"
-        data-ms2-id="{{ms.ms_id}}" data-ms1-id="{{r.ms_id}}">
+        data-ms1-id="{{ms.ms_id}}" data-ms2-id="{{r.ms_id}}">
       <th class="ms"><span class="ms hilite-target" data-ms-id="{{r.ms_id}}">{{r.hs|e}}</span></th>
       <td class="rank">{{(r.rank or '')}}</td>
       <td class="direction">{{r.direction|e}}</td>

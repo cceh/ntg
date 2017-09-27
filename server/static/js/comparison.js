@@ -166,8 +166,8 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
             'order': [[0, 'asc']],
             'createdRow': function createdRow(r, d /* , index */) {
                 var $row = $(r);
-                $row.toggleClass('older', d.older);
                 $row.toggleClass('newer', d.newer);
+                $row.toggleClass('older', d.older);
             },
             'buttons': {
                 'buttons': buttons,
@@ -239,7 +239,7 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
      */
 
     function create_main_table() {
-        return $('\n            <table class="comparison table table-bordered table-condensed table-hover" cellspacing="0">\n              <thead>\n                <tr>\n                  <th class="details-control"></th>\n\n                  <th class="range exportable">Chapter</th>\n                  <th class="direction exportable">Dir</th>\n                  <th class="rank exportable">NR</th>\n\n                  <th class="perc exportable">Perc</th>\n                  <th class="eq exportable">Eq</th>\n                  <th class="common exportable">Pass</th>\n\n                  <th class="older exportable">W1&gt;W2</th>\n                  <th class="newer exportable">W1&lt;W2</th>\n                  <th class="uncl exportable">Uncl</th>\n                  <th class="norel exportable">NoRel</th>\n                  <!--\n                    <th class="length length1 exportable">W1 defined</th>\n                    <th class="length length2 exportable">W2 defined</th>\n                  -->\n                </tr>\n              </thead>\n              <tbody>\n              </tbody>\n            </table>');
+        return $('\n            <table class="comparison table table-bordered table-condensed table-hover" cellspacing="0">\n              <thead>\n                <tr>\n                  <th class="details-control"></th>\n\n                  <th class="range exportable">Chapter</th>\n                  <th class="direction exportable">Dir</th>\n                  <th class="rank exportable">NR</th>\n\n                  <th class="perc exportable">Perc</th>\n                  <th class="eq exportable">Eq</th>\n                  <th class="common exportable">Pass</th>\n\n                  <th class="newer exportable">W1&lt;W2</th>\n                  <th class="older exportable">W1&gt;W2</th>\n                  <th class="uncl exportable">Uncl</th>\n                  <th class="norel exportable">NoRel</th>\n                  <!--\n                    <th class="length length1 exportable">W1 defined</th>\n                    <th class="length length2 exportable">W2 defined</th>\n                  -->\n                </tr>\n              </thead>\n              <tbody>\n              </tbody>\n            </table>');
     }
 
     /**
@@ -300,11 +300,11 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
                 'data': 'common',
                 'class': 'common'
             }, {
-                'data': 'older',
-                'class': 'older'
-            }, {
                 'data': 'newer',
                 'class': 'newer'
+            }, {
+                'data': 'older',
+                'class': 'older'
             }, {
                 'data': 'unclear',
                 'class': 'unclear'

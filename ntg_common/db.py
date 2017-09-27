@@ -1001,7 +1001,7 @@ view ('apparatus_view_agg', Base2.metadata, '''
    ''')
 
 view ('affinity_view', Base2.metadata, '''
-    SELECT ch.bk_id, ch.rg_id, ms_id1, ms_id2, common, equal,
+    SELECT ch.bk_id, ch.rg_id, ch.range, ms_id1, ms_id2, common, equal,
            older, newer, unclear,
            affinity,
            ch1.length AS ms1_length,
@@ -1013,7 +1013,7 @@ view ('affinity_view', Base2.metadata, '''
     ''')
 
 view ('affinity_p_view', Base2.metadata, '''
-    SELECT ch.bk_id, ch.rg_id, ms_id1, ms_id2, common, equal,
+    SELECT ch.bk_id, ch.rg_id, ch.range, ms_id1, ms_id2, common, equal,
            p_older as older, p_newer as newer, p_unclear as unclear,
            affinity,
            ch1.length AS ms1_length,
