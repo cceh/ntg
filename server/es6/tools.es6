@@ -45,20 +45,22 @@ function () {
     }
 
     /**
-     * Return a map of the query parameters in the url of this page.
+     * The inverse of the jQuery.param () function.
      *
-     * @function get_query_params
+     * @function deparam
      *
-     * @return {Oject} A map of parameter = value
+     * @param {string} s - A string in the form "p=1&q=2"
+     *
+     * @return {Object} { p : 1, q : 2 }
      */
 
-    function get_query_params () {
-        var query = {};
-        location.search.substr (1).split ('&').forEach (function (item) {
-            var s = item.split ('=');
-            query[s[0]] = s[1];
+    function deparam (s) {
+        var params = {};
+        s.split ('&').forEach (item => {
+            var s = item.split ('=').map (i => decodeURIComponent (i.replace ('+', ' ')));
+            params[s[0]] = s[1];
         });
-        return query;
+        return params;
     }
 
     /**
@@ -134,7 +136,7 @@ function () {
     return {
         'format'           : format,
         'natural_sort'     : natural_sort,
-        'get_query_params' : get_query_params,
+        'deparam'          : deparam,
         'init'             : init,
         'svg_contextmenu'  : svg_contextmenu,
         'xhr_alert'        : xhr_alert,

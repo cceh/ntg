@@ -113,7 +113,6 @@ The javascript module that displays the textflow diagrams.
 
 .. module:: comparison
 
-.. autofunction:: module:comparison~deparam(s)
 .. autofunction:: module:comparison~dir(older, newer)
 .. autofunction:: module:comparison~main_row_conversion(d)
 .. autofunction:: module:comparison~detail_row_conversion(d)
@@ -158,7 +157,7 @@ Useful functions that don't fit anywhere else.
 
 .. autofunction:: module:tools~format(s, data)
 .. autofunction:: module:tools~natural_sort(s)
-.. autofunction:: module:tools~get_query_params()
+.. autofunction:: module:tools~deparam(s)
 .. autofunction:: module:tools~svg_contextmenu(menu, target)
 .. autofunction:: module:tools~xhr_alert(xhr, $panel)
 .. autofunction:: module:tools~init()

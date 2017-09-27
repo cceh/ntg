@@ -58,26 +58,6 @@ function ($, d3, tools) {
     ];
 
     /**
-     * The inverse of the jQuery.param () function.
-     *
-     * @function deparam
-     *
-     * @param {string} s - A string in the form "p=1&q=2"
-     *
-     * @return {Object} { p : 1, q : 2 }
-     */
-
-    function deparam (s) {
-        return s.split ('&').reduce (function (params, param) {
-            var paramSplit = param.split ('=').map (function (value) {
-                return decodeURIComponent (value.replace ('+', ' '));
-            });
-            params[paramSplit[0]] = paramSplit[1];
-            return params;
-        }, {});
-    }
-
-    /**
      * Return a direction marker, <, =, or >.
      *
      * @function dir
@@ -460,7 +440,7 @@ function ($, d3, tools) {
     function on_navigation () {
         var hash = window.location.hash.substring (1);
         if (hash) {
-            var p = deparam (hash);
+            var p = tools.deparam (hash);
 
             var p1 = $.getJSON ('manuscript.json/' + p.ms1, function (json) {
                 module.ms1 = json.data;
