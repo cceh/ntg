@@ -72,7 +72,6 @@ doc: sphinx
 sphinx:
 	cd doc_src; make html; cd ..
 
-# jsdoc doesn't grok ES6
 jsdoc: js
 	jsdoc -c jsdoc.json -d jsdoc -a all $(ES6) $(JS_SRC) && $(BROWSER) jsdoc/index.html
 
@@ -100,10 +99,10 @@ $(STATIC)/css/%.css : $(SERVER)/less/%.less
 	gzip < $? > $@
 
 install-prerequisites:
-	sudo apt-get install libpq-dev postgresql-9.6-python3-multicorn graphviz
-	sudo pip3 install \
+	sudo apt-get install libpq-dev graphviz
+	sudo pip3 install --upgrade \
 		numpy six networkx matplotlib Pillow rtree \
-		psycopg2 mysqlclient sqlalchemy sqlalchemy-utils intervals multicorn \
+		psycopg2 mysqlclient sqlalchemy sqlalchemy-utils intervals \
 		flask babel flask-babel flask-sqlalchemy jinja2 flask-user
 
 ### Localization ###
