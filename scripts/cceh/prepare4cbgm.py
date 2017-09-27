@@ -2011,9 +2011,9 @@ if __name__ == '__main__':
         sqlalchemy_logger = logging.getLogger ('sqlalchemy.engine')
         sqlalchemy_logger.setLevel (logging.WARN)
 
-    dbsrc1 = db.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_ECM_DB'])
-    dbsrc2 = db.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_VG_DB'])
-    dbdest = db.PostgreSQLEngine (**config)
+    dbsrc1 = db_tools.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_ECM_DB'])
+    dbsrc2 = db_tools.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_VG_DB'])
+    dbdest = db_tools.PostgreSQLEngine (**config)
 
     db.fdw ('app_fdw', db.Base.metadata,  dbdest, dbsrc1)
     db.fdw ('var_fdw', db.Base2.metadata, dbdest, dbsrc2)
