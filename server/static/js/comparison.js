@@ -209,8 +209,8 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
             }
 
             var params2 = {
-                'ms1': module.ms1.hsnr,
-                'ms2': module.ms2.hsnr,
+                'ms1': 'id' + module.ms1.ms_id,
+                'ms2': 'id' + module.ms2.ms_id,
                 'range': $tr.attr('data-range')
             };
 
@@ -355,8 +355,8 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
             $.when(p1, p2).done(function () {
                 // update the input form
                 var $form = $('form.manuscripts-selector');
-                $('input[name="ms1"]', $form).val(module.ms1.hs + '.');
-                $('input[name="ms2"]', $form).val(module.ms2.hs + '.');
+                $('input[name="ms1"]', $form).val(module.ms1.hs);
+                $('input[name="ms2"]', $form).val(module.ms2.hs);
 
                 // update the headers
                 var caption = tools.format('Comparison of {ms1} and {ms2}', {
@@ -369,8 +369,8 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
 
                 // reload table
                 var url = 'comparison-summary.csv?' + $.param({
-                    'ms1': module.ms1.hsnr,
-                    'ms2': module.ms2.hsnr
+                    'ms1': 'id' + module.ms1.ms_id,
+                    'ms2': 'id' + module.ms2.ms_id
                 });
                 d3.csv(url, main_row_conversion, function (error, csv) {
                     if (error) {
@@ -397,20 +397,9 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
      */
 
     function init_nav() {
-        function fix(s) {
-            var re = /^\d+$/;
-            s += '';
-            if (re.test(s) && s.length < 6) {
-                return s + '.';
-            }
-            return s;
-        }
-
         // User hit 'Go'
         $('form.manuscripts-selector').on('submit', function (event) {
             var q = $(event.currentTarget).serializeArray();
-            q[0].value = fix(q[0].value);
-            q[1].value = fix(q[1].value);
             window.location.hash = '#' + $.param(q);
             event.preventDefault();
         });

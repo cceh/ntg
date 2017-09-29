@@ -58,9 +58,9 @@ class Bag (object):
 class Manuscript (object):
     """ Represent one manuscript. """
 
-    RE_HSNR = re.compile (r'^\d{6}$')             # 123456
-    RE_MSID = re.compile (r'^\d+$')               # 123
-    RE_HS   = re.compile (r'^[PL]?[s\d]+[.]?$|^A$|^MT$')   # 01.
+    RE_HSNR = re.compile (r'^\d{6}$')             # 300180
+    RE_MSID = re.compile (r'^id\d+$')             # id123
+    RE_HS   = re.compile (r'^([PL]?[s\d]+|A|MT)$', re.I)   # 01.
 
     def __init__ (self, conn, manuscript_id_or_hs_or_hsnr):
         """ Initialize from manuscript id or hs or hsnr. """
@@ -74,10 +74,9 @@ class Manuscript (object):
             param = int (param)
         elif Manuscript.RE_MSID.search (param):
             where = 'ms_id = :param'
-            param = int (param)
+            param = int (param[2:])
         elif Manuscript.RE_HS.search (param):
             where = 'hs = :param'
-            param = param.strip ('.')
         else:
             return
 

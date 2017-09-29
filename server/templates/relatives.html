@@ -2,7 +2,8 @@
 
   <div class="relatives-caption">
     <span>{{caption}}</span>
-    <span class="fg_labez" data-labez="{{ms.labez}}"><span class="ms hilite-source" data-ms-id="{{ms.ms_id}}">{{ms.hs}} (W1)</span> (<span class="labez">{{ms.labez}}</span>) {{ms.length}}</span>
+    <span class="ms">W1: </span>
+    <span class="fg_labez" data-labez="{{ms.labez}}"><span class="ms hilite-source" data-ms-id="{{ms.ms_id}}">{{ms.hs}}</span> (<span class="labez">{{ms.labez}}</span>) {{ms.length}}</span>
   </div>
 
   <div class="relatives-metrics">
@@ -81,8 +82,8 @@
       <td class="perc">{{ '{0:0.2f}'.format (100.0 * r.equal / r.common) }}%</td>
       <td class="equal">{{r.equal}}</td>
       <td class="common">{{r.common}}</td>
-      <td class="older">{{r.older}}</td>
-      <td class="newer">{{r.newer}}</td>
+      <td class="older">{{r.newer}}</td>
+      <td class="newer">{{r.older}}</td>
       <td class="unclear">{{r.unclear}}</td>
       <td class="norel">{{r.norel}}</td>
     </tr>

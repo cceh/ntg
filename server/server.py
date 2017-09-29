@@ -819,10 +819,8 @@ def comparison_summary ():
     """
 
     with current_app.config.dba.engine.begin () as conn:
-
-        # FIXME: the affinity matrix should be transposed
-        ms2 = Manuscript (conn, request.args.get ('ms1') or 'A')
-        ms1 = Manuscript (conn, request.args.get ('ms2') or 'A')
+        ms1 = Manuscript (conn, request.args.get ('ms1') or 'A')
+        ms2 = Manuscript (conn, request.args.get ('ms2') or 'A')
 
         res = execute (conn, """
         (WITH ranks AS (

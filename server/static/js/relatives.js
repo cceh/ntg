@@ -61,7 +61,7 @@ function ($, _, d3, d3c, tools, panel, nav) {
 
         // replace content
         var ms_id = instance.$panel.attr ('data-ms-id');
-        var url   = 'relatives.html/' + passage.pass_id + '/' + ms_id
+        var url   = 'relatives.html/' + passage.pass_id + '/id' + ms_id
             + '?' + $.param (instance.data); // we must use GET, not POST
         var p0 = $.get (url);
         var p1 = panel.load_labez_dropdown (
@@ -130,7 +130,7 @@ function ($, _, d3, d3c, tools, panel, nav) {
 
     function create_panel (ms_id, target) {
         // get the popup skeleton
-        $.get ('relatives/' + nav.passage.pass_id + '/' + ms_id, function (html) {
+        $.get ('relatives/' + nav.passage.pass_id + '/id' + ms_id, function (html) {
             // append the skeleton to the floating panels section
             var $popup = $ (html).hide ();
             $popup.appendTo ('#floating-panels');

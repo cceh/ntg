@@ -52,14 +52,14 @@ define([], function () {
      *
      * @function deparam
      *
-     * @param {string} s - A string in the form "p=1&q=2"
+     * @param {string} query_string - A string in the form "p=1&q=2"
      *
      * @return {Object} { p : 1, q : 2 }
      */
 
-    function deparam(s) {
+    function deparam(query_string) {
         var params = {};
-        s.split('&').forEach(function (item) {
+        query_string.split('&').forEach(function (item) {
             var s = item.split('=').map(function (i) {
                 return decodeURIComponent(i.replace('+', ' '));
             });
