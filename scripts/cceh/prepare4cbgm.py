@@ -1199,11 +1199,11 @@ def fill_cliques_table (db, parameters):
         ORDER BY r.pass_id, r.labez
         """, parameters)
 
-        # copy default '0' readings into cliques
+        # copy default readings into cliques
 
         execute (conn, """
-        INSERT INTO cliques (pass_id, labez, clique)
-        SELECT r.pass_id, r.labez, '0'
+        INSERT INTO cliques (pass_id, labez)
+        SELECT r.pass_id, r.labez
         FROM readings r
         """, parameters)
 
@@ -1226,8 +1226,6 @@ def fill_cliques_table (db, parameters):
         HAVING count (*) > 1
         """, parameters)
 
-        log (logging.INFO, "        : 1 ...")
-
         # warn (conn, "Cliques in VarGen but not in Cliques", """
         # SELECT p.pass_id, ms.ms_id, v.varnew
         #   FROM tmp_var v
@@ -1244,7 +1242,7 @@ def fill_cliques_table (db, parameters):
         # SELECT p.pass_id, varnew2labez (v.varnew) AS labez, varnew2clique (v.varnew) AS clique
         # FROM tmp_var v
         # JOIN passages p ON (p.anfadr, p.endadr) = (v.begadr, v.endadr)
-        # WHERE varnew2clique (v.varnew) > '0' AND v.varnew !~ '^z[uvw]'
+        # WHERE varnew2clique (v.varnew) > '1' AND v.varnew !~ '^z[uvw]'
         # GROUP BY pass_id, labez, clique
         # """, parameters)
 
@@ -1266,6 +1264,8 @@ def fill_apparatus_table (dba, parameters):
         # See paper: "Arbeitsablauf CBGM auf Datenbankebene, I. Vorbereitung der
         # Datenbasis für CBGM"
 
+        log (logging.INFO, "          Filling default readings of 'A' ...")
+
         execute (conn, """
         INSERT INTO apparatus (ms_id, pass_id, labez, cbgm, labezsuf, certainty, lesart, origin)
         SELECT ms.ms_id, p.pass_id, a.labez, true, a.labezsuf, 1.0, NULLIF (a.lesart, r.lesart), 'DEF'
@@ -1283,6 +1283,8 @@ def fill_apparatus_table (dba, parameters):
         # There is only one entry for each lacuna in the lacunae table even if
         # it spans multiple passages.  We need to unroll every lacuna onto every
         # passages it spans.
+
+        log (logging.INFO, "          Unrolling lacunae ...")
 
         execute (conn, """
         UPDATE apparatus app
@@ -1305,6 +1307,8 @@ def fill_apparatus_table (dba, parameters):
         #
         # N.B. must be done after lacunae unrolling because readings
         # in att do "override" lacunae
+
+        log (logging.INFO, "          Filling in readings from negative apparatus ...")
 
         execute (conn, """
         UPDATE apparatus app
@@ -1340,6 +1344,8 @@ def fill_apparatus_table (dba, parameters):
 
         # Data entry fixes
 
+        log (logging.INFO, "          Doing sanity checks ...")
+
         fix (conn, "Readings in tmp_var != Apparatus", """
         SELECT a.pass_id, a.anfadr, a.endadr, a.ms_id, a.hs, a.hsnr, a.labez, v.varid, v.varnew
         FROM tmp_var v
@@ -1358,6 +1364,8 @@ def fill_apparatus_table (dba, parameters):
         WHERE (v.begadr, v.endadr, v.ms) = (a.anfadr, a.endadr, a.hsnr)
           AND (a.anfadr, a.endadr, a.labez, v.varid) = (51122038, 51122040, 'a', 'b');
         """, parameters)
+
+        log (logging.INFO, "          Doing sanity checks ...")
 
         fix (conn, "Original reading uncertain but apparatus doesn't read zz", """
         SELECT a.*, l.varid, l.varnew, l.s1
@@ -1378,6 +1386,8 @@ def fill_apparatus_table (dba, parameters):
 
         # Update the clique no. in Apparatus
 
+        log (logging.INFO, "          Filling in clique numbers ...")
+
         execute (conn, """
         UPDATE apparatus u
         SET clique = varnew2clique (v.varnew)
@@ -1388,6 +1398,7 @@ def fill_apparatus_table (dba, parameters):
           AND cq.clique = varnew2clique (v.varnew)
           AND cq.irange = int4range (v.begadr, v.endadr + 1)
           AND v.varnew !~ '^z[uvw]'
+          AND varnew2clique (v.varnew) != '1'
         """, parameters)
 
 
@@ -1423,17 +1434,18 @@ def build_byzantine_text (dba, parameters):
         """, parameters)
 
         execute (conn, """
-        INSERT INTO apparatus (ms_id, pass_id, labez, cbgm, origin)
-          SELECT 2, pass_id, labez[1], true, 'BYZ'
+        INSERT INTO apparatus (ms_id, pass_id, labez, clique, cbgm, origin)
+          SELECT 2, pass_id, labez[1], clique[1], true, 'BYZ'
           FROM (
             SELECT pass_id,
-                   ARRAY_AGG (labez ORDER BY cnt DESC) AS labez,
-                   ARRAY_AGG (cnt   ORDER BY cnt DESC) AS mask
+                   ARRAY_AGG (labez  ORDER BY cnt DESC) AS labez,
+                   ARRAY_AGG (clique ORDER BY cnt DESC) AS clique,
+                   ARRAY_AGG (cnt    ORDER BY cnt DESC) AS mask
             FROM (
-              SELECT pass_id, labez, count (*) AS cnt
+              SELECT pass_id, labez, clique, count (*) AS cnt
               FROM apparatus_view a
               WHERE hsnr IN {byzlist}
-              GROUP BY pass_id, labez
+              GROUP BY pass_id, labez, clique
             ) AS q1
             GROUP BY pass_id
           ) AS q2

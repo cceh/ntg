@@ -665,7 +665,7 @@ class Cliques (Base2):
 
     pass_id   = Column (Integer,    nullable = False)
     labez     = Column (String (2), nullable = False)
-    clique    = Column (String (2), nullable = False)
+    clique    = Column (String (2), nullable = False, server_default = '1')
 
     __table_args__ = (
         PrimaryKeyConstraint ('pass_id', 'labez', 'clique'),
@@ -718,7 +718,7 @@ class Apparatus (Base2):
 
     pass_id   = Column (Integer,       nullable = False)
     labez     = Column (String (2),    nullable = False)
-    clique    = Column (String (2),    nullable = False, server_default = '0')
+    clique    = Column (String (2),    nullable = False, server_default = '1')
     ms_id     = Column (Integer,       nullable = False)
 
     cbgm      = Column (Boolean,       nullable = False)
@@ -763,7 +763,7 @@ class LocStem (Base2):
 
     pass_id       = Column (Integer,    nullable = False)
     labez         = Column (String (2), nullable = False)
-    clique        = Column (String (2), nullable = False)
+    clique        = Column (String (2), nullable = False, server_default = '1')
 
     source_labez  = Column (String (2), nullable = True)
     source_clique = Column (String (2), nullable = True)
@@ -911,7 +911,7 @@ SELECT REGEXP_REPLACE (varnew, '[0-9]+$', '')
 ''', volatility = 'IMMUTABLE')
 
 function ('varnew2clique', Base2.metadata, 'varnew CHAR (2)', 'CHAR', '''
-SELECT COALESCE (NULLIF (REGEXP_REPLACE (varnew, '^[^0-9]+', ''), ''), '0')
+SELECT COALESCE (NULLIF (REGEXP_REPLACE (varnew, '^[^0-9]+', ''), ''), '1')
 ''', volatility = 'IMMUTABLE')
 
 function ('source2labez', Base2.metadata, 'source CHAR (2)', 'CHAR', '''
@@ -927,7 +927,7 @@ SELECT CASE WHEN source = '*' THEN true ELSE false END
 ''', volatility = 'IMMUTABLE')
 
 function ('labez_clique', Base2.metadata, 'labez CHAR, clique CHAR', 'CHAR', '''
-SELECT labez || COALESCE (clique, '0')
+SELECT labez || COALESCE (clique, '1')
 ''', volatility = 'IMMUTABLE')
 
 generic (Base2.metadata, '''
