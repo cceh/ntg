@@ -49,14 +49,14 @@ function () {
      *
      * @function deparam
      *
-     * @param {string} s - A string in the form "p=1&q=2"
+     * @param {string} query_string - A string in the form "p=1&q=2"
      *
      * @return {Object} { p : 1, q : 2 }
      */
 
-    function deparam (s) {
+    function deparam (query_string) {
         var params = {};
-        s.split ('&').forEach (item => {
+        query_string.split ('&').forEach (item => {
             var s = item.split ('=').map (i => decodeURIComponent (i.replace ('+', ' ')));
             params[s[0]] = s[1];
         });
@@ -134,11 +134,11 @@ function () {
     }
 
     return {
-        'format'           : format,
-        'natural_sort'     : natural_sort,
-        'deparam'          : deparam,
-        'init'             : init,
-        'svg_contextmenu'  : svg_contextmenu,
-        'xhr_alert'        : xhr_alert,
+        'format'          : format,
+        'natural_sort'    : natural_sort,
+        'deparam'         : deparam,
+        'init'            : init,
+        'svg_contextmenu' : svg_contextmenu,
+        'xhr_alert'       : xhr_alert,
     };
 });
