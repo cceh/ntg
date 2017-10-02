@@ -89,6 +89,7 @@ function ($, d3, tools) {
 
     function main_row_conversion (d) {
         return {
+            'rg_id'     : +d.rg_id,
             'range'     : d.range,
             'length1'   : +d.length1,
             'length2'   : +d.length2,
@@ -115,7 +116,7 @@ function ($, d3, tools) {
 
     function detail_row_conversion (d) {
         return {
-            'pass_id'       : d.pass_id,
+            'pass_id'       : +d.pass_id,
             'pass_hr'       : d.pass_hr,
             'labez_clique1' : d.labez_clique1,
             'lesart1'       : d.lesart1,
@@ -149,11 +150,12 @@ function ($, d3, tools) {
                     {
                         'data' : function (r, type /* , val, meta */) {
                             if (type === 'sort') {
-                                return tools.natural_sort (r.pass_id);
+                                return r.pass_id;
                             }
                             return '<a href="coherence#' + r.pass_id + '">' + r.pass_hr + '</a>';
                         },
                         'class' : 'passage',
+                        'type'  : 'num',
                     },
                     {
                         'data'  : 'lesart1',
@@ -174,9 +176,9 @@ function ($, d3, tools) {
                                 return '<';
                             }
                             if (r.unclear) {
-                                return '?';
+                                return 'Uncl';
                             }
-                            return '< >';
+                            return 'NoRel';
                         },
                     },
                     {
@@ -273,18 +275,37 @@ function ($, d3, tools) {
                 <tr>
                   <th class="details-control"></th>
 
-                  <th class="range exportable">Chapter</th>
-                  <th class="direction exportable">Dir</th>
-                  <th class="rank exportable">NR</th>
+                  <th class="range exportable"
+                      >Chapter</th>
+                  <th class="direction exportable"
+                      title="Genealogical direction, potential ancestors indicated by “>”"
+                      >Dir</th>
+                  <th class="rank exportable"
+                      title="Ancestral rank according to the degree of agreement (Perc)"
+                      >NR</th>
 
-                  <th class="perc exportable">Perc</th>
-                  <th class="eq exportable">Eq</th>
-                  <th class="common exportable">Pass</th>
+                  <th class="perc exportable"
+                      title="Percentaged agreement of W1 and W2 at the variant passages attested by both (Pass)"
+                      >Perc</th>
+                  <th class="eq exportable"
+                      title="Number of agreements of W1 and W2 at the variant passages attested by both (Pass)"
+                      >Eq</th>
+                  <th class="common exportable"
+                      title="Total number of passages where W1 and W2 are both extant"
+                      >Pass</th>
 
-                  <th class="newer exportable">W1&lt;W2</th>
-                  <th class="older exportable">W1&gt;W2</th>
-                  <th class="uncl exportable">Uncl</th>
-                  <th class="norel exportable">NoRel</th>
+                  <th class="older exportable"
+                      title="Number of variants in W2 that are prior to those in W1"
+                      >W1&lt;W2</th>
+                  <th class="newer exportable"
+                      title="Number of variants in W1 that are prior to those in W2"
+                      >W1&gt;W2</th>
+                  <th class="uncl exportable"
+                      title="Number of variants where no decision has been made about priority"
+                      >Uncl</th>
+                  <th class="norel exportable"
+                      title="Number of passages where the respective variants are unrelated"
+                      >NoRel</th>
                   <!--
                     <th class="length length1 exportable">W1 defined</th>
                     <th class="length length2 exportable">W2 defined</th>
@@ -364,11 +385,12 @@ function ($, d3, tools) {
                 {
                     'data' : function (r, type /* , val, meta */) {
                         if (type === 'sort') {
-                            return tools.natural_sort (r.range);
+                            return r.rg_id;
                         }
                         return r.range;
                     },
                     'class' : 'range',
+                    'type'  : 'num',
                 },
                 {
                     'data'  : 'direction',

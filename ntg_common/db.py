@@ -1053,6 +1053,20 @@ function ('is_unclear', Base2.metadata, 'passage_id INTEGER, labez1 CHAR, clique
 SELECT EXISTS (SELECT * FROM locstem_rec WHERE source_labez IS NULL AND original = false);
 ''', volatility = 'STABLE')
 
+function ('is_p_older', Base2.metadata, 'passage_id INTEGER, labez2 CHAR, clique2 CHAR, labez1 CHAR, clique1 CHAR', 'BOOLEAN', '''
+SELECT EXISTS (SELECT * FROM locstem
+               WHERE pass_id = passage_id AND
+                     labez = labez1 AND clique = clique1 AND
+                     source_labez = labez2 AND source_clique = clique2);
+''', volatility = 'STABLE')
+
+function ('is_p_unclear', Base2.metadata, 'passage_id INTEGER, labez1 CHAR, clique1 CHAR', 'BOOLEAN', '''
+SELECT EXISTS (SELECT * FROM locstem
+               WHERE pass_id = passage_id AND
+                     labez = labez1 AND clique = clique1 AND
+                     source_labez IS NULL AND original = false);
+''', volatility = 'STABLE')
+
 
 # Tables for flask_login / flask_user / flask_security / whatever
 

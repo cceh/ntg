@@ -348,9 +348,9 @@ def relatives_html (hs_hsnr_id, passage_or_id):
         where += " AND labez = '%s'" % labez
 
     if 'fragments' in fragments:
-        f_where = ''
+        frag_where = ''
     else:
-        f_where = 'AND aff.common > aff.ms1_length / 2'
+        frag_where = 'AND aff.common > aff.ms1_length / 2'
 
     limit = '' if limit == 0 else ' LIMIT %d' % limit
 
@@ -425,12 +425,12 @@ def relatives_html (hs_hsnr_id, passage_or_id):
         res = execute (conn, """
         /* get the LIMIT closest ancestors for this node */
         WITH ranks AS (
-          SELECT ms_id1, ms_id2, rank () OVER (ORDER BY affinity DESC) AS rank, affinity
+          SELECT ms_id1, ms_id2,
+            rank () OVER (ORDER BY affinity DESC, common, older, newer DESC, ms_id2) AS rank,
+            affinity
           FROM {view} aff
-          JOIN ms_ranges ch
-            ON ch.ms_id = aff.ms_id1 AND ch.rg_id = aff.rg_id
           WHERE ms_id1 = :ms_id1 AND aff.rg_id = :rg_id AND ms_id2 NOT IN :exclude
-            AND newer > older AND aff.common > ch.length / 2
+            AND newer > older {frag_where}
           ORDER BY affinity DESC
         )
 
@@ -461,10 +461,10 @@ def relatives_html (hs_hsnr_id, passage_or_id):
           ON r.ms_id2 = aff.ms_id2
         WHERE aff.ms_id2 NOT IN :exclude AND aff.ms_id1 = :ms_id1
               AND aff.rg_id = :rg_id AND aff.common > 0
-              AND a.pass_id = :pass_id {where} {f_where}
+              AND a.pass_id = :pass_id {where} {frag_where}
         ORDER BY affinity DESC, r.rank, newer DESC, older DESC, hsnr
         {limit}
-        """, dict (parameters, where = where, f_where = f_where, ms_id1 = ms.ms_id, hsnr = ms.hsnr,
+        """, dict (parameters, where = where, frag_where = frag_where, ms_id1 = ms.ms_id, hsnr = ms.hsnr,
                    pass_id = passage.pass_id, rg_id = rg_id, limit = limit,
                    view = view, exclude = tuple (exclude)))
 
@@ -477,13 +477,13 @@ def relatives_html (hs_hsnr_id, passage_or_id):
         return flask.render_template ('relatives.html', caption = caption, ms = ms, mt = mt, rows = relatives)
 
 
-def remove_z_leaves (G, group_field):
+def remove_z_leaves (G):
     """ Removes leaves (recursively) if they read z. """
 
     # We cannot use DFS because we don't know the root.
     for n in reversed (list (nx.topological_sort (G))):
         atts = G.node[n]
-        if G.out_degree (n) == 0 and group_field in atts and atts[group_field][0] == 'z':
+        if G.out_degree (n) == 0 and 'labez' in atts and atts['labez'][0] == 'z':
             G.remove_node (n)
 
 
@@ -506,22 +506,33 @@ def textflow (passage_or_id):
     fragments = 'fragments' in fragments
     var_only  = 'var_only'  in var_only
     cliques   = 'cliques'   in cliques
-    show_z    = 'Z'         in include
+    leaf_z    = 'Z'         in include    # show leaf z nodes in global textflow?
 
-    prefix = '' if mode == 'rec' else 'p_'
+    view = 'affinity_view' if mode == 'rec' else 'affinity_p_view'
+
+    global_textflow = not ((labez != '') or var_only)
+    rank_z = False  # include z nodes in ranking?
+
+    if global_textflow:
+        connectivity = 1
+        rank_z = True
     if connectivity == 21:
         connectivity = 9999
 
-    if fragments:
-        f_where = ''
-    else:
-        f_where = 'AND a.common > c.length / 2'
-
     labez_where = ''
+    frag_where = ''
+    z_where = ''
+
     if labez != '':
-        labez_where = 'AND a.cbgm AND a.labez = :labez'
+        labez_where = 'AND app.cbgm AND app.labez = :labez'
         if hyp_a != 'A':
-            labez_where = 'AND a.cbgm AND (a.labez = :labez OR (a.ms_id = 1 AND :hyp_a = :labez))'
+            labez_where = 'AND app.cbgm AND (app.labez = :labez OR (app.ms_id = 1 AND :hyp_a = :labez))'
+
+    if not fragments:
+        frag_where = 'AND a.common > a.ms1_length / 2'
+
+    if not rank_z:
+        z_where = "AND app.labez !~ '^z' AND app.certainty = 1.0"
 
     group_field = 'labez' if cliques else 'labez_clique'
 
@@ -539,10 +550,6 @@ def textflow (passage_or_id):
         """, dict (parameters, bk_id = passage.bk_id, range_ = chapter))
         rg_id, = res.fetchone ()
 
-        G = nx.DiGraph ()
-
-        Nodes = collections.namedtuple ('Nodes', 'ms_id')
-
         # get ids of nodes to exclude
         res = execute (conn, """
         SELECT ms_id
@@ -551,76 +558,73 @@ def textflow (passage_or_id):
         ORDER BY ms_id
         """, dict (parameters, include = tuple (include)))
 
-        exclude = set ([str (n.ms_id) for n in map (Nodes._make, res)])
-        exclude.add (-1) # a non-existing id to avoid SQL syntax error if empty
+        exclude = tuple ( row[0] for row in res )
+        exclude = exclude + (-1, ) # a non-existing id to avoid SQL syntax error if empty
 
+        # nodes query
+        #
         # get all nodes or all nodes (hypothetically) attesting labez
+
         res = execute (conn, """
         SELECT ms_id
-        FROM apparatus a
-        WHERE pass_id = :pass_id {labez_where} AND ms_id NOT IN :exclude
+        FROM apparatus app
+        WHERE pass_id = :pass_id AND ms_id NOT IN :exclude {labez_where} {z_where}
         """, dict (parameters, exclude = tuple (exclude),
                    pass_id = passage.pass_id, labez = labez,
-                   hyp_a = hyp_a, labez_where = labez_where))
+                   hyp_a = hyp_a, labez_where = labez_where, z_where = z_where))
 
-        nodes = list (map (Nodes._make, res))
+        nodes = tuple ( row[0] for row in res )
 
-        for n in nodes:
-            G.add_node (n.ms_id)
-
-        order = 'affinity DESC, common, older, newer DESC, ms_id2' # id2 is a tiebreaker
-
+        # rank query
+        #
         # query to get the closest ancestors for every node with rank <= connectivity
+
         query = """
         SELECT ms_id1, ms_id2, rank
         FROM (
-          SELECT ms_id1, ms_id2, rank () OVER (PARTITION BY ms_id1 ORDER BY {order}) AS rank
-          FROM affinity a
-          JOIN ms_ranges c
-            ON c.ms_id = a.ms_id1 AND c.rg_id = a.rg_id
+          SELECT ms_id1, ms_id2, rank () OVER (PARTITION BY ms_id1
+             ORDER BY affinity DESC, common, older, newer DESC, ms_id2) AS rank
+          FROM {view} a
           WHERE ms_id1 IN :nodes AND a.rg_id = :rg_id AND ms_id2 NOT IN :exclude
-            AND {prefix}newer > {prefix}older {f_where}
+            AND newer > older {frag_where}
         ) AS r
         WHERE rank <= :connectivity
         ORDER BY rank
         """
 
-        global_textflow = not ((labez != '') or var_only)
-        if global_textflow:
-            connectivity = 1
-
         res = execute (conn, query,
-                       dict (parameters, nodes = tuple (G.nodes ()), exclude = tuple (exclude),
-                             rg_id = rg_id, pass_id = passage.pass_id, prefix = prefix,
-                             labez = labez, connectivity = connectivity, order = order,
-                             f_where = f_where, hyp_a = hyp_a, labez_where = labez_where))
+                       dict (parameters, nodes = tuple (nodes), exclude = tuple (exclude),
+                             rg_id = rg_id, pass_id = passage.pass_id, view = view,
+                             labez = labez, connectivity = connectivity,
+                             frag_where = frag_where, hyp_a = hyp_a))
 
         Ranks = collections.namedtuple ('Ranks', 'ms_id1 ms_id2 rank')
         ranks = list (map (Ranks._make, res))
 
-        # Initially build a graph with all nodes.  We will remove unused nodes
-        # later.
+        # Initially build an unconnected graph with one node for each
+        # manuscript.  We will connect the nodes later.  Finally we will remove
+        # unconnected nodes.
+
+        G = nx.DiGraph ()
+
         dest_nodes = set ([r.ms_id1 for r in ranks])
         src_nodes  = set ([r.ms_id2 for r in ranks])
 
         res = execute (conn, """
-        SELECT ms.ms_id, ms.hs, ms.hsnr, av.labez, av.clique, av.labez_clique
-        FROM manuscripts ms
-        JOIN (
-          SELECT ms_id,
-                 labez_agg (labez order by labez) as labez,
-                 labez_agg (clique order by clique) as clique,
-                 labez_agg (labez_clique order by labez_clique) as labez_clique
-          FROM apparatus_view
-          WHERE pass_id = :pass_id
-          GROUP BY ms_id
-        ) AS av
-        USING (ms_id)
-        WHERE ms.ms_id IN :ms_ids
+        SELECT ms_id,
+               MAX (hs) AS hs,
+               MAX (hsnr) AS hsnr,
+               labez_agg (labez ORDER BY labez) AS labez,
+               labez_agg (clique ORDER BY clique) AS clique,
+               labez_agg (labez_clique ORDER BY labez_clique) AS labez_clique
+        FROM apparatus_view
+        WHERE pass_id = :pass_id AND ms_id IN :ms_ids
+        GROUP BY ms_id
         """, dict (parameters, ms_ids = tuple (src_nodes | dest_nodes), pass_id = passage.pass_id))
 
         Mss = collections.namedtuple ('Mss', 'ms_id hs hsnr labez clique labez_clique')
         mss = list (map (Mss._make, res))
+
         for ms in mss:
             attrs = {}
             attrs['hs']           = ms.hs
@@ -638,44 +642,55 @@ def textflow (passage_or_id):
             # FIXME: attrs['shape'] = SHAPES.get (attrs['labez'], SHAPES['a'])
             G.add_node (ms.ms_id, **attrs)
 
-        # Step 1: A node that has ancestors within the same attestation keeps
-        # only the top-ranked one as parent.
+        # Connect the nodes
         #
-        # Step 2: A node without ancestors within the same attestation keeps one
-        # top-ranked parent for every other attestation.
+        # Step 1: A node that has ancestors within the same attestation keeps
+        # the top-ranked one of those as the only parent.
+        #
+        # Step 2: A node without ancestors from step 1 keeps as parents the
+        # top-ranked parent for each other attestation.
         #
         # Assumption: ranks are sorted top-ranked first
+
+        def is_z_node (n):
+            labez = n['labez']
+            return (labez[0] == 'z') or ('/' in labez)
 
         tags = set ()
         for step in (1, 2):
             for r in ranks:
                 a1 = G.node[r.ms_id1];
                 a2 = G.node[r.ms_id2];
-                if not (global_textflow) and (a1[group_field][0] == 'z' or a2[group_field][0] == 'z'):
+                if not (global_textflow) and is_z_node (a2):
                     # disregard lacunae
                     continue
                 if step == 1 and a1[group_field] != a2[group_field]:
                     # differing attestations are handled in step 2
                     continue
                 if r.ms_id1 in tags:
-                    # the node's ancestor within the same attestation was
-                    # already seen.  we need not look into other attestations
+                    # an ancestor of this node that lays within the node's
+                    # attestation was already seen.  we need not look into other
+                    # attestations
                     continue
                 if str (r.ms_id1) + a2[group_field] in tags:
-                    # the node's ancestor within this attestation was already
-                    # seen.  we need not look into further nodes
+                    # an ancestor of this node that lays within this attestation
+                    # was already seen.  we need not look into further nodes
                     continue;
+                # add a new parent
                 if r.rank > 1:
                     G.add_edge (r.ms_id2, r.ms_id1, rank = r.rank, headlabel = r.rank)
                 else:
                     G.add_edge (r.ms_id2, r.ms_id1)
+
                 if a1[group_field] == a2[group_field]:
+                    # tag: has ancestor node within the same attestation
                     tags.add (r.ms_id1)
                 else:
+                    # tag: has ancestor node with this other attestation
                     tags.add (str (r.ms_id1) + a2[group_field])
 
-        if not show_z:
-            remove_z_leaves (G, group_field);
+        if not leaf_z:
+            remove_z_leaves (G);
 
         G.remove_nodes_from (list (nx.isolates (G)))
 
@@ -683,9 +698,8 @@ def textflow (passage_or_id):
             # Remove non-variant links
             #
             # remove nodes attesting zz/zw and link the children up
-            for n in G:
-                gf = G.node[n][group_field]
-                if gf == 'zz' or '/' in gf:
+            if 0: # for n in G:
+                if is_z_node (G.node[n]):
                     pred = list (G.predecessors (n))
                     if pred:
                         G.remove_edge (pred[0], n)
@@ -904,10 +918,10 @@ def comparison_detail ():
         res = execute (conn, """
         SELECT p.pass_id, p.anfadr, p.endadr, v1.labez_clique, v1.lesart,
                                               v2.labez_clique, v2.lesart,
-          is_older (p.pass_id, v1.labez, v1.clique, v2.labez, v2.clique) AS older,
-          is_older (p.pass_id, v2.labez, v2.clique, v1.labez, v1.clique) AS newer,
-          is_unclear (p.pass_id, v1.labez, v1.clique) OR
-          is_unclear (p.pass_id, v2.labez, v2.clique) AS unclear
+          is_p_older (p.pass_id, v1.labez, v1.clique, v2.labez, v2.clique) AS older,
+          is_p_older (p.pass_id, v2.labez, v2.clique, v1.labez, v1.clique) AS newer,
+          is_p_unclear (p.pass_id, v1.labez, v1.clique) OR
+          is_p_unclear (p.pass_id, v2.labez, v2.clique) AS unclear
         FROM (SELECT * FROM ranges WHERE range = :range_) r
           JOIN passages p ON (r.irange @> p.irange )
           JOIN apparatus_view v1 USING (pass_id)

@@ -99,9 +99,9 @@ $(STATIC)/css/%.css : $(SERVER)/less/%.less
 	gzip < $? > $@
 
 install-prerequisites:
-	sudo apt-get install libpq-dev graphviz
+	sudo apt-get install apache libapache2-mod-wsgi-py3 postgres libpg-dev mysql python3 python3-pip graphviz git
 	sudo pip3 install --upgrade \
-		numpy six networkx matplotlib Pillow rtree \
+		numpy networkx matplotlib Pillow \
 		psycopg2 mysqlclient sqlalchemy sqlalchemy-utils intervals \
 		flask babel flask-babel flask-sqlalchemy jinja2 flask-user
 

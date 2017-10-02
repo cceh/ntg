@@ -9,7 +9,6 @@ import logging
 import os
 import os.path
 
-import six
 import networkx as nx
 import sqlalchemy
 import sqlalchemy_utils
@@ -19,7 +18,7 @@ from .tools import log
 from .config import args
 
 
-MYSQL_DEFAULT_GROUP  = 'ntg-local'
+MYSQL_DEFAULT_GROUP = 'ntg'
 
 
 def execute (conn, sql, parameters, debug_level = logging.DEBUG):
@@ -126,7 +125,7 @@ def tabulate (res):
             if row[i] is None:
                 newrow.append ('NULL')
             else:
-                newrow.append (six.text_type (row[i]))
+                newrow.append (str (row[i]))
         rows.append (newrow)
 
     # calculate column widths
@@ -158,11 +157,7 @@ def tabulate (res):
 class MySQLEngine (object):
     """ Database Interface """
 
-    def __init__ (self, group = None, db = None):
-        if group is None:
-            group = MYSQL_DEFAULT_GROUP
-        if db is None:
-            db = ''
+    def __init__ (self, group = MYSQL_DEFAULT_GROUP, db = ''):
 
         log (logging.INFO, 'MySQLEngine: Reading init group: {group}'.format (group = group))
         log (logging.INFO, 'MySQLEngine: Connecting to db: {db}'.format (db = db))

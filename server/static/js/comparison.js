@@ -71,6 +71,7 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
 
     function main_row_conversion(d) {
         return {
+            'rg_id': +d.rg_id,
             'range': d.range,
             'length1': +d.length1,
             'length2': +d.length2,
@@ -97,7 +98,7 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
 
     function detail_row_conversion(d) {
         return {
-            'pass_id': d.pass_id,
+            'pass_id': +d.pass_id,
             'pass_hr': d.pass_hr,
             'labez_clique1': d.labez_clique1,
             'lesart1': d.lesart1,
@@ -130,11 +131,12 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
             'columns': [{
                 'data': function data(r, type /* , val, meta */) {
                     if (type === 'sort') {
-                        return tools.natural_sort(r.pass_id);
+                        return r.pass_id;
                     }
                     return '<a href="coherence#' + r.pass_id + '">' + r.pass_hr + '</a>';
                 },
-                'class': 'passage'
+                'class': 'passage',
+                'type': 'num'
             }, {
                 'data': 'lesart1',
                 'class': 'lesart lesart1'
@@ -152,9 +154,9 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
                         return '<';
                     }
                     if (r.unclear) {
-                        return '?';
+                        return 'Uncl';
                     }
-                    return '< >';
+                    return 'NoRel';
                 }
             }, {
                 'data': 'labez_clique2',
@@ -239,7 +241,7 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
      */
 
     function create_main_table() {
-        return $('\n            <table class="comparison table table-bordered table-condensed table-hover" cellspacing="0">\n              <thead>\n                <tr>\n                  <th class="details-control"></th>\n\n                  <th class="range exportable">Chapter</th>\n                  <th class="direction exportable">Dir</th>\n                  <th class="rank exportable">NR</th>\n\n                  <th class="perc exportable">Perc</th>\n                  <th class="eq exportable">Eq</th>\n                  <th class="common exportable">Pass</th>\n\n                  <th class="newer exportable">W1&lt;W2</th>\n                  <th class="older exportable">W1&gt;W2</th>\n                  <th class="uncl exportable">Uncl</th>\n                  <th class="norel exportable">NoRel</th>\n                  <!--\n                    <th class="length length1 exportable">W1 defined</th>\n                    <th class="length length2 exportable">W2 defined</th>\n                  -->\n                </tr>\n              </thead>\n              <tbody>\n              </tbody>\n            </table>');
+        return $('\n            <table class="comparison table table-bordered table-condensed table-hover" cellspacing="0">\n              <thead>\n                <tr>\n                  <th class="details-control"></th>\n\n                  <th class="range exportable"\n                      >Chapter</th>\n                  <th class="direction exportable"\n                      title="Genealogical direction, potential ancestors indicated by \u201C>\u201D"\n                      >Dir</th>\n                  <th class="rank exportable"\n                      title="Ancestral rank according to the degree of agreement (Perc)"\n                      >NR</th>\n\n                  <th class="perc exportable"\n                      title="Percentaged agreement of W1 and W2 at the variant passages attested by both (Pass)"\n                      >Perc</th>\n                  <th class="eq exportable"\n                      title="Number of agreements of W1 and W2 at the variant passages attested by both (Pass)"\n                      >Eq</th>\n                  <th class="common exportable"\n                      title="Total number of passages where W1 and W2 are both extant"\n                      >Pass</th>\n\n                  <th class="older exportable"\n                      title="Number of variants in W2 that are prior to those in W1"\n                      >W1&lt;W2</th>\n                  <th class="newer exportable"\n                      title="Number of variants in W1 that are prior to those in W2"\n                      >W1&gt;W2</th>\n                  <th class="uncl exportable"\n                      title="Number of variants where no decision has been made about priority"\n                      >Uncl</th>\n                  <th class="norel exportable"\n                      title="Number of passages where the respective variants are unrelated"\n                      >NoRel</th>\n                  <!--\n                    <th class="length length1 exportable">W1 defined</th>\n                    <th class="length length2 exportable">W2 defined</th>\n                  -->\n                </tr>\n              </thead>\n              <tbody>\n              </tbody>\n            </table>');
     }
 
     /**
@@ -279,11 +281,12 @@ define(['jquery', 'd3', 'tools', 'datatables.net', 'datatables.net-bs', 'datatab
             }, {
                 'data': function data(r, type /* , val, meta */) {
                     if (type === 'sort') {
-                        return tools.natural_sort(r.range);
+                        return r.rg_id;
                     }
                     return r.range;
                 },
-                'class': 'range'
+                'class': 'range',
+                'type': 'num'
             }, {
                 'data': 'direction',
                 'class': 'direction'

@@ -114,7 +114,7 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
             event.stopPropagation ();
             var ms1_id = $ (event.currentTarget).attr ('data-ms1-id');
             var ms2_id = $ (event.currentTarget).attr ('data-ms2-id');
-            var win = window.open ('comparison#ms1=' + ms1_id + '&ms2=' + ms2_id, '_blank');
+            var win = window.open ('comparison#ms1=id' + ms1_id + '&ms2=id' + ms2_id, '_blank');
             win.focus ();
         });
 

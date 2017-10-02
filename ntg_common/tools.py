@@ -11,8 +11,6 @@ import subprocess
 import sys
 import types
 
-import six
-
 from .config import args
 
 BOOKS = [
@@ -89,7 +87,7 @@ def log (level, msg, *aargs, **kwargs):
     """
 
     d = {
-        'delta': six.text_type (datetime.datetime.now () - args.start_time),
+        'delta': str (datetime.datetime.now () - args.start_time),
         'hilite' : LOG_HILITE.get (level, ('', ''))
     }
     logger.log (level, msg, *aargs, extra = d)

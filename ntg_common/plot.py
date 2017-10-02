@@ -8,7 +8,6 @@ from __future__ import unicode_literals
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
-import six
 
 
 def mss_labels (mss):

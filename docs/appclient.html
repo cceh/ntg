@@ -89,9 +89,11 @@
 <li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
 </ul>
 </li>
 </ul>
@@ -691,7 +693,7 @@ the passage.</p>
 <tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
 <li><strong>$group</strong> (<em>jQuery</em>) – The button group</li>
 <li><strong>pass_id</strong> (<em>int|string</em>) – The passage id</li>
-<li><strong>name</strong> (<em>string</em>) – The button(s) name</li>
+<li><strong>input_name</strong> (<em>string</em>) – &lt;input name=name …&gt;</li>
 <li><strong>prefixes</strong> (<em>Array</em>) – Strings to prepend to the list.</li>
 <li><strong>suffixes</strong> (<em>Array</em>) – Strings to append to the list.</li>
 </ul>
@@ -716,7 +718,7 @@ the passage.</p>
 <tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
 <li><strong>$group</strong> (<em>jQuery</em>) – The button group</li>
 <li><strong>pass_id</strong> (<em>int|string</em>) – The passage id</li>
-<li><strong>name</strong> (<em>string</em>) – The button(s) name</li>
+<li><strong>input_name</strong> (<em>string</em>) – The button(s) name</li>
 <li><strong>prefixes</strong> (<em>Array</em>) – Strings to prepend to the list.</li>
 <li><strong>suffixes</strong> (<em>Array</em>) – Strings to append to the list.</li>
 </ul>
@@ -1341,7 +1343,7 @@ the length of the run prepended, eg. 123 =&gt; 3123, 123456 =&gt;
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>s</strong> (<em>string</em>) – A string in the form “p=1&amp;q=2”</li>
+<li><strong>query_string</strong> (<em>string</em>) – A string in the form “p=1&amp;q=2”</li>
 </ul>
 </td>
 </tr>

@@ -151,7 +151,7 @@ function ($, _, tools) {
                 }
                 var $dropdown = $group.parent ().closest ('.btn-group').find ('button[data-toggle="dropdown"]');
                 $dropdown.attr ('data-' + key, value);
-                var i18n = $.trim ($group.find ('label.btn[data-' + key + '="' + value + '"]').text ());
+                var i18n = $.trim ($group.find (`label.btn[data-${key}="${value}"]`).text ());
                 $dropdown.find ('span.btn_text').text (i18n);
                 break;
             default:
@@ -169,31 +169,68 @@ function ($, _, tools) {
      *
      * @param {jQuery} $group      - The button group
      * @param {int|string} pass_id - The passage id
-     * @param {string} name        - The button(s) name
+     * @param {string} input_name  - <input name=name ...>
      * @param {Array} prefixes     - Strings to prepend to the list.
      * @param {Array} suffixes     - Strings to append to the list.
      *
      * @return {Promise} Promise, resolved when the buttons are loaded.
      */
 
-    function load_labez_dropdown ($group, pass_id, name, prefixes, suffixes) {
+    function load_labez_dropdown ($group, pass_id, input_name, prefixes, suffixes) {
+        var deferred = $.Deferred ();
         var $menu = $group.find ('div[data-toggle="buttons"]');
 
-        var promise = $.getJSON ('passage.json/' + pass_id);
-        promise.done (function (json) {
+        $.getJSON ('passage.json/' + pass_id, json => {
             $menu.empty ();
             var readings = prefixes.concat (json.data.readings).concat (suffixes);
-            _.forEach (readings, function (value) {
-                var data = { 'name' : name, 'labez' : value[0], 'labez_i18n' : value[1] };
-                var $item = $ (tools.format (
-                    '<label class="btn btn-primary btn-labez bg_labez" data-labez="{labez}">' +
-                        '<input type="radio" data-type="dropdown" name="{name}" ' +
-                        'data-opt="{labez}">{labez_i18n}</input></label>', data
-                ));
-                $menu.append ($item);
-            });
+            for (const [labez, labez_i18n] of readings) {
+                if (labez[0] !== 'z') {
+                    $menu.append (`<label class="btn btn-primary btn-labez bg_labez" data-labez="${labez}">
+                                     <input type="radio" data-type="dropdown" name="${input_name}"
+                                            data-opt="${labez}">${labez_i18n}</input>
+                                   </label>`);
+                }
+            };
+            deferred.resolve ();
         });
-        return promise;
+        return deferred.promise ();
+    }
+
+    /**
+     * Loads the buttons in the cliques dropdown.
+     *
+     * Loads the buttons in the cliques dropdown with the cliques of the
+     * passage.
+     *
+     * @function load_cliques_dropdown
+     *
+     * @param {jQuery} $group      - The button group
+     * @param {int|string} pass_id - The passage id
+     * @param {string} input_name  - <input name=name ...>
+     * @param {Array} prefixes     - Strings to prepend to the list.
+     * @param {Array} suffixes     - Strings to append to the list.
+     *
+     * @return {Promise} Promise, resolved when the buttons are loaded.
+     */
+
+    function load_cliques_dropdown ($group, pass_id, input_name, prefixes, suffixes) {
+        var deferred = $.Deferred ();
+        var $menu = $group.find ('div[data-toggle="buttons"]');
+
+        $.getJSON ('passage.json/' + pass_id, json => {
+            $menu.empty ();
+            var cliques = prefixes.concat (json.data.cliques).concat (suffixes);
+            for (const [labez, , clique] of cliques) {
+                if (labez[0] !== 'z') {
+                    $menu.append (`<label class="btn btn-primary btn-labez bg_labez" data-labez="${labez}">
+                                     <input type="radio" data-type="dropdown" name="${input_name}"
+                                            data-opt="${clique}">${clique}</input>
+                                   </label>`);
+                }
+            };
+            deferred.resolve ();
+        });
+        return deferred.promise ();
     }
 
     /**
@@ -205,31 +242,29 @@ function ($, _, tools) {
      *
      * @param {jQuery} $group      - The button group
      * @param {int|string} pass_id - The passage id
-     * @param {string} name        - The button(s) name
+     * @param {string} input_name  - The button(s) name
      * @param {Array} prefixes     - Strings to prepend to the list.
      * @param {Array} suffixes     - Strings to append to the list.
      *
      * @return {Promise} Promise, resolved when the buttons are loaded.
      */
 
-    function load_range_dropdown ($group, pass_id, name, prefixes, suffixes) {
+    function load_range_dropdown ($group, pass_id, input_name, prefixes, suffixes) {
+        var deferred = $.Deferred ();
         var $menu = $group.find ('div[data-toggle="buttons"]');
 
-        var promise = $.getJSON ('ranges.json/' + pass_id);
-        promise.done (function (json) {
+        $.getJSON ('ranges.json/' + pass_id, json => {
             $menu.empty ();
             var ranges = prefixes.concat (json.data.ranges).concat (suffixes);
-            _.forEach (ranges, function (data) {
-                data.name = name;
-                var $item = $ (tools.format (
-                    '<label class="btn btn-primary btn-range" data-range="{value}">' +
-                        '<input type="radio" data-type="dropdown" name="{name}" ' +
-                        'data-opt="{value}">{range}</input></label>', data
-                ));
-                $menu.append ($item);
-            });
+            for (const range of ranges) {
+                $menu.append (`<label class="btn btn-primary btn-range" data-range="${range.value}">
+                                 <input type="radio" data-type="dropdown" name="${input_name}"
+                                        data-opt="${range.value}">${range.range}</input>
+                               </label>`);
+            };
+            deferred.resolve ();
         });
-        return promise;
+        return deferred.promise ();
     }
 
     /**
@@ -358,6 +393,7 @@ function ($, _, tools) {
         'init'                  : init,
         'set_toolbar_buttons'   : set_toolbar_buttons,
         'load_labez_dropdown'   : load_labez_dropdown,
+        'load_cliques_dropdown' : load_cliques_dropdown,
         'load_range_dropdown'   : load_range_dropdown,
         'create_panel_controls' : create_panel_controls,
     };

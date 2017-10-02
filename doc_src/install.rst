@@ -2,6 +2,16 @@
  Installation
 ==============
 
+1. Install the software:
+
+   .. code-block:: shell
+
+      sudo apt-get install git make
+      git clone https://github.com/cceh/ntg
+      cd ntg
+      make install-prerequisites
+
+
 Database Access
 ===============
 
@@ -9,47 +19,59 @@ Database Access
 MySQL database
 --------------
 
-Edit (or create) your :file:`~/.my.cnf` and add these sections:
+1. Edit (or create) your :file:`~/.my.cnf` and add this section:
 
-.. code-block:: ini
+   .. code-block:: ini
 
-    [ntg-local]
-    host='localhost'
-    database='apparat'
-    user='username'
-    password='password'
-    default-character-set='utf8'
+       [ntg]
+       host='localhost'
+       user='<username>'
+       password='<password>'
+       default-character-set='utf8'
 
-    [ntg-remote]
-    host='remote'
-    database='apparat'
-    user='username'
-    password='password'
-    default-character-set='utf8'
+   Replace *<username>* and *<password>* with your own MySQL username and password.
 
-Replace *username* and *password* with your own username and password.
+   .. warning::
 
-.. warning::
+      Make sure :file:`~/.my.cnf` is readable only by yourself!
 
-   Make sure :file:`~/.my.cnf` is readable only by yourself!
+2. Create databases for ECM and VarGenAtt:
+
+   .. code-block:: shell
+
+      sudo mysql -e "CREATE DATABASE VarGenAtt_ActPh4"
+      sudo mysql -e "CREATE DATABASE ECM_ActsPh4"
+
 
 
 Postgres database
 -----------------
 
-1. Create a postgres user. Login to postgres as superuser and say:
+1. Create a postgres user and a foreign data wrapper for MySQL.  The FDW allows
+   Postgres to access the MySQL databases.
+
+   Login to postgres as superuser and say:
+
+   .. code-block:: shell
+
+      sudo -u postgres psql
 
    .. code-block:: psql
 
-      CREATE USER <username> CREATEDB PASSWORD '<password>';
+      CREATE USER ntg CREATEDB PASSWORD '<password>';
+      CREATE DATABASE ntg_user OWNER ntg;
+      CREATE DATABASE ntg_ph4 OWNER ntg;
+      CREATE EXTENSION mysql_fdw;
+      GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
+      \q
+
+   Replace <password> with a real password.
 
 2. Edit (or create) your :file:`~/.pgpass` and add this line:
 
    .. code-block:: none
 
-      localhost:5432:ntg:<username>:<password>
-
-   Replace <username> and <password> with your own username and password.
+      localhost:5432:*:ntg:<password>
 
    .. warning::
 
@@ -57,33 +79,17 @@ Postgres database
 
    .. note::
 
-      You can now login to the Postgres database as user <username> without having
+      You can now login to the Postgres database as user ntg without having
       to enter your password:
 
       .. code-block:: shell
 
-         psql -h localhost -U <username> -d <database>
-
-
-3. Create MySQL Foreign Data Wrapper
-
-   Allows Postgres to access the MySQL databases in the prepare4cbgm.py script.
-
-   As postgres superuser do:
-
-   .. code-block:: shell
-
-      $ psql -U postgres -h /var/run/postgresql/ -d ntg
-
-   .. code-block:: psql
-
-      CREATE EXTENSION mysql_fdw;
-      GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO <username>;
+         psql -h localhost -U ntg -d ntg_ph4
 
 
 
 Application server
-------------------
+==================
 
 1. Configure the global settings for the application server.  This concerns the
    user management database that holds user credentials and has to send
@@ -134,12 +140,42 @@ Application server
       MYSQL_VG_DB="VarGenAtt_ActPh4"
 
 
-3. Add an administrator for the application server.
+3. Initialize the user management database and add an administrator user for the
+   application server.  You'll need this user to login in the browser.
 
    .. note::
 
-      This is not the same user (and password) as the database user above!
+      This should not be the same username (and password) as the database user
+      above!
 
    .. code-block:: shell
 
-      python3 -m scripts.mk_user -e <email> -u <username> -p <password>
+      python3 -m scripts.cceh.mk_user -e <email> -u <username> -p <password>
+
+
+CBGM
+====
+
+1. Get database dumps from Münster (exercise left to the reader) and import
+   them:
+
+   .. code-block:: shell
+
+      mysql -D "VarGenAtt_ActPh4" < VarGenAtt_ActPh4.dump
+      mysql -D "ECM_ActsPh4"      < ECM_ActsPh4.dump
+
+2. Now run the CBGM process. This will fill the Postgres database.
+
+   .. code-block:: shell
+
+      python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/ph4.conf
+
+
+Run Server
+==========
+
+1. Run the application server:
+
+   .. code-block:: shell
+
+      make server
