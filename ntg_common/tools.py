@@ -16,7 +16,7 @@ from .config import args
 BOOKS = [
     # id, siglum, name, no. of chapters
     ( 1, "Mt",  "Matthew",        0),
-    ( 2, "Mc",  "Mark",          16),
+    ( 2, "Mc",  "Mark",           0), # 16
     ( 3, "L",   "Luke",           0),
     ( 4, "J",   "John",           0),
     ( 5, "Act", "Acts",          28),
