@@ -9,6 +9,9 @@ div.bs-docs-header h1 {
 div.bs-docs-header h1 span.appname {
   float: right;
 }
+div.helpmenu {
+  float: right;
+}
 a.biglink {
   display: block;
   font-size: 150%;

@@ -49,6 +49,9 @@
           </div>
         </div>
         {% block menu %}
+        <div class="helpmenu">
+          <a href="/static/pdf/GenQ4_Guide.pdf" target="_blank">Short Guide (PDF)</a>
+        </div>
         {% endblock %}
         {% block flash_messages %}
           {%- with messages = get_flashed_messages (with_categories = True) -%}
