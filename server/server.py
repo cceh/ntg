@@ -23,8 +23,6 @@ import flask
 import sqlalchemy
 import flask_sqlalchemy
 from flask import request, current_app
-import flask_babel
-from flask_babel import gettext as _, ngettext as n_, lazy_gettext as l_
 import flask_user
 from flask_user import login_required, roles_required
 import flask_login
@@ -32,11 +30,10 @@ import flask_mail
 import networkx as nx
 
 from . import helpers
-from .helpers import parameters, Bag, Passage, Manuscript, LANGUAGES, LABEZ_I18N, make_json_response
+from .helpers import parameters, Bag, Passage, Manuscript, make_json_response
 from . import security
 from . import editor
 
-from ntg_common import db
 from ntg_common.db_tools import execute
 from ntg_common.config import args
 from ntg_common import tools
@@ -331,14 +328,14 @@ def relatives_html (hs_hsnr_id, passage_or_id):
 
     view = 'affinity_view' if mode == 'rec' else 'affinity_p_view'
 
-    caption = _('Relatives for')
+    caption = 'Relatives for'
     where = ''
     if type_ == 'anc':
         where =  ' AND older < newer'
-        caption = _('Ancestors for')
+        caption = 'Ancestors for'
     if type_ == 'des':
         where =  ' AND older >= newer'
-        caption = _('Descendants for')
+        caption = 'Descendants for'
 
     if labez == 'all':
         where += " AND labez !~ '^z'"
@@ -1087,9 +1084,6 @@ if __name__ == "__main__":
     LOG_LEVELS = { 0: logging.CRITICAL, 1: logging.ERROR, 2: logging.WARN, 3: logging.INFO, 4: logging.DEBUG }
     args.log_level = LOG_LEVELS.get (args.verbose + 1, logging.CRITICAL)
 
-    babel = flask_babel.Babel ()
-    babel.localeselector (helpers.get_locale)
-
     logging.basicConfig (format = '%(asctime)s - %(levelname)s - %(message)s')
     logging.getLogger ('sqlalchemy.engine').setLevel (args.log_level)
     logging.getLogger ('server').setLevel (args.log_level)
@@ -1106,7 +1100,6 @@ if __name__ == "__main__":
     dba.init_app (static_app)
     mail.init_app (static_app)
     user_manager.init_app (static_app, login_manager = login_manager, make_safe_url_function = make_safe_url)
-    babel.init_app (static_app)
 
     for fn in glob.glob (args.config_path.rstrip ('/') + '/*.conf'):
         if fn.endswith ('/_global.conf'):
@@ -1155,12 +1148,8 @@ if __name__ == "__main__":
         dba.init_app (sub_app)
         mail.init_app (sub_app)
         user_manager.init_app (sub_app, login_manager = login_manager, make_safe_url_function = make_safe_url)
-        babel.init_app (sub_app)
 
         instances[sub_app.config['APPLICATION_ROOT']] = sub_app
-
-    tools.log (logging.INFO, "Found translations for: {translations}".format (
-        translations = ', '.join ([l.get_display_name () for l in babel.list_translations ()])))
 
     dispatcher = DispatcherMiddleware (static_app, instances)
     run_simple ('localhost', 5000, dispatcher)

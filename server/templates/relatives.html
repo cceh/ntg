@@ -8,24 +8,24 @@
 
   <div class="relatives-metrics">
     {% if ms.hs != 'MT' %}
-    <span class="mt fg_labez" data-labez="{{mt.labez}}"><span class="ms hilite-target" data-ms-id="1">MT </span>({{mt.labez}})</span>
+    <span class="mt fg_labez" data-labez="{{mt.labez}}"><span class="ms hilite-target" data-ms-id="2">MT </span>({{mt.labez}})</span>
     •
     <span
         title="The percentage of majority readings at passages where the manuscript is extant and MT is defined."
-        >{{_('MT %(mt)s',    mt  = "{:.2%}".format (mt.mt))}}</span>
+        >{{'MT {:.2%}'.format (mt.mt)}}</span>
     •
     <span
         title="The percentage of majority readings at passages where the manuscript is extant."
-        >{{_('MT/P %(mtp)s', mtp = "{:.2%}".format (mt.mtp))}}</span>
+        >{{'MT/P {:.2%}'.format (mt.mtp)}}</span>
     •
     {% endif %}
     <span
         title="The average agreement with all witnesses included."
-        >{{_('AA %(aa)s',    aa  = "{:.2%}".format (ms.aa))}}</span>
+        >{{'AA {:.2%}'.format (ms.aa)}}</span>
     •
     <span
         title="The median agreement with all witnesses included."
-        >{{_('MA %(ma)s',    ma  = "{:.2%}".format (ms.ma))}}</span>
+        >{{'MA {:.2%}'.format (ms.ma)}}</span>
   </div>
 
   <table class="relatives table table-condensed">

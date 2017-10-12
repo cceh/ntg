@@ -44,8 +44,8 @@ users:
 	scripts/cceh/mk_users.py -vvv server/instance/_global.conf
 
 db_upload:
-	pg_dump --clean --if-exists ntg_current | bzip2 > /tmp/ntg_current.pg_dump.sql.bz2
-	scp /tmp/ntg_current.pg_dump.sql.bz2 $(NTG_USER)@$(NTG_VM):~/
+	/usr/lib/postgresql/9.6/bin/pg_dump -p $(PSQL_PORT) --clean --if-exists ntg_ph4 | bzip2 > /tmp/ntg_ph4.pg_dump.sql.bz2
+	scp /tmp/ntg_ph4.pg_dump.sql.bz2 $(NTG_USER)@$(NTG_VM):~/
 
 clean:
 	find . -depth -name "*~" -delete
@@ -70,6 +70,7 @@ csslint: css
 doc: sphinx
 
 sphinx:
+	rm docs/_images/*
 	cd doc_src; make html; cd ..
 
 jsdoc: js
@@ -81,6 +82,10 @@ bower_update:
 upload:
 	$(RSYNC) --exclude "**/__pycache__"  --exclude "*.pyc"  ntg_common $(NTG_ROOT)/
 	$(RSYNC) --exclude "**/instance/**"       server     $(NTG_ROOT)/
+
+sqlcodegen:
+	sqlacodegen mysql:///ECM_ActsPh4?read_default_group=ntg
+	sqlacodegen mysql:///VarGenAtt_ActPh4?read_default_group=ntg
 
 css: $(CSS)
 

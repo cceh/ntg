@@ -19,8 +19,6 @@ import flask
 import sqlalchemy
 import flask_sqlalchemy
 from flask import request, current_app
-import flask_babel
-from flask_babel import gettext as _, ngettext as n_, lazy_gettext as l_
 import flask_user
 from flask_user import login_required
 import flask_mail
@@ -40,13 +38,13 @@ LANGUAGES = {
 
 
 LABEZ_I18N = {
-    'zu':      l_('Overlap'),
-    'zv':      l_('Lac'),
-    'zw':      l_('Dub'),
-    'zz':      l_('Lac'),
-    'lac':     l_('Lac'),
-    'all':     l_('All'),
-    'all+lac': l_('All+Lac'),
+    'zu':      'Overlap',
+    'zv':      'Lac',
+    'zw':      'Dub',
+    'zz':      'Lac',
+    'lac':     'Lac',
+    'all':     'All',
+    'all+lac': 'All+Lac',
 }
 
 

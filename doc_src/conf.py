@@ -39,10 +39,15 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.imgconverter',
     'sphinx.ext.githubpages',
+    'sphinxcontrib.plantuml',
+    'sphinxcontrib.sadisp',
 ]
 
 js_source_path = '../server/es6'
 jsdoc_config_path = '../jsdoc.json'
+
+sadisplay_default_render = 'graphviz' # plantuml
+graphviz = 'dot -Tpng'.split()
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

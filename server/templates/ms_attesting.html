@@ -3,7 +3,7 @@
 {% block page_class %}ms_attesting{% endblock %}
 
 {% block head %}
-<title>{{_('Attestation for %(passage)s %(labez)s', passage = passage.to_hr (), labez = labez)}}</title>
+<title>Attestation for {{passage.to_hr ()}} {{labez}}</title>
 
 <script>
   require ([
@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block h1 %}
-  <h1>{{_('Attestation for %(passage)s %(labez)s', passage = passage.to_hr (), labez = labez)}}</h1>
+  <h1>Attestation for {{passage.to_hr ()}} {{labez}}</h1>
 {% endblock %}
 
 {% block content %}

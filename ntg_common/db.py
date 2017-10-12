@@ -152,7 +152,9 @@ def generic (metadata, create_cmd, drop_cmd):
 Base = declarative_base ()
 
 class Att (Base):
-    """Input buffer table for the Nestle-Aland ECM_Acts*GVZ tables.
+    """
+
+    Input buffer table for the Nestle-Aland ECM_Acts*GVZ tables.
 
     The Nestle-Aland database contains one table for each chapter (for
     historical reasons). As first step we copy those many tables into one big
@@ -162,13 +164,11 @@ class Att (Base):
     the data in this table has to be normalised into our database structure and
     converted into a positive apparatus.
 
+    .. sadisplay::
+       :module: ntg_common.db
+       :include: Att
+
     .. _att:
-
-    .. attribute:: anfadr, endadr
-
-       Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
-       Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade einen
-       Zwischenraum.
 
     .. attribute:: hsnr
 
@@ -181,6 +181,12 @@ class Att (Base):
        Verarbeitung werden die Lesarten reduziert, bis nur eine Lesart pro
        Handschrift übrigbleibt.  Parallel dazu werden die Suffixe von den Siglen
        entfernt.
+
+    .. attribute:: anfadr, endadr
+
+       Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
+       Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade einen
+       Zwischenraum.
 
     .. attribute:: labez
 
@@ -320,10 +326,9 @@ class Att (Base):
     category     = Column (String(1),     server_default = '')
     irange       = Column (IntRangeType,  nullable = False)
     created      = Column (DateTime)
-    deleted      = Column (Boolean, nullable = False, server_default = 'false')
 
     __table_args__ = (
-        Index ('unique_att_hs_irange', hs, irange, unique = True, postgresql_where = certainty == 1.0),
+        Index ('ix_att_hs_irange', hs, irange, unique = True, postgresql_where = certainty == 1.0),
     )
 
 
@@ -340,6 +345,10 @@ class Lac (Base):
 
     This table has the same structure as table Att.  For the description of the
     columns see :ref:`table Att <att>`.
+
+    .. sadisplay::
+       :module: ntg_common.db
+       :include: Lac
 
     """
 
@@ -376,11 +385,10 @@ class Lac (Base):
     category  = Column (String(1),     server_default = '')
     irange    = Column (IntRangeType,  nullable = False)
     created   = Column (DateTime)
-    deleted   = Column (Boolean, nullable = False, server_default = 'false')
 
     __table_args__ = (
-        Index ('lac_irange_gist_idx', 'irange', postgresql_using = 'gist'),
-        UniqueConstraint ('hs', 'irange', name = 'unique_lac_hs_irange')
+        Index ('ix_lac_irange_gist', irange, postgresql_using = 'gist'),
+        UniqueConstraint (hs, irange)
     )
 
 
@@ -433,6 +441,10 @@ class Manuscripts (Base2):
     This table lists all the manuscripts of New Testament that we have collated
     for the edition.
 
+    .. sadisplay::
+       :module: ntg_common.db
+       :include: Manuscripts
+
     .. attribute:: ms_id
 
         The primary key of the table.
@@ -469,6 +481,10 @@ class Books (Base2):
 
     This table lists all the books of the NT and the book id given to them.
 
+    .. sadisplay::
+       :module: ntg_common.db
+       :include: Books
+
     .. attribute:: bk_id
 
         The book id: 1 - 27 (Matthew - Revelation).
@@ -496,9 +512,9 @@ class Books (Base2):
     irange    = Column (IntRangeType,  nullable = False)
 
     __table_args__ = (
-        UniqueConstraint ('siglum'),
-        UniqueConstraint ('book'),
-        Index ('books_irange_gist_idx', 'irange', postgresql_using = 'gist'),
+        UniqueConstraint (siglum),
+        UniqueConstraint (book),
+        Index ('ix_books_irange_gist', irange, postgresql_using = 'gist'),
     )
 
 
@@ -508,6 +524,10 @@ class Passages (Base2):
     This table lists all the passages we established during the collation of the
     manuscripts.  Passages that are the same in all manuscripts (invariant) are
     purged because they are irrelevant to the CBGM.
+
+    .. sadisplay::
+       :module: ntg_common.db
+       :include: Passages
 
     .. attribute:: irange
 
@@ -525,6 +545,11 @@ class Passages (Base2):
     .. attribute:: lemma
 
         The lemma of the passage.  Usually the reconstructed original text.
+
+    .. attribute:: variant
+
+        True if this passage is a variant passage.  (It has at least two
+        different certain readings.)
 
     .. attribute:: spanning
 
@@ -544,21 +569,21 @@ class Passages (Base2):
 
     pass_id   = Column (Integer,       primary_key = True, autoincrement = True)
 
-    bk_id     = Column (Integer,       nullable = False)
+    bk_id     = Column (Integer,       ForeignKey ('books.bk_id'), nullable = False)
 
     anfadr    = Column (Integer,       nullable = False)
     endadr    = Column (Integer,       nullable = False)
-
     irange    = Column (IntRangeType,  nullable = False)
+
     lemma     = Column (String (1024), nullable = False, server_default = '')
+    variant   = Column (Boolean,       nullable = False, server_default = 'False')
     spanning  = Column (Boolean,       nullable = False, server_default = 'False')
     spanned   = Column (Boolean,       nullable = False, server_default = 'False')
     fehlvers  = Column (Boolean,       nullable = False, server_default = 'False')
 
     __table_args__ = (
-        UniqueConstraint ('irange', name = 'unique_passages_irange'), # needs name
-        ForeignKeyConstraint (['bk_id'], ['books.bk_id']),
-        Index ('passages_irange_gist_idx', 'irange', postgresql_using = 'gist'),
+        UniqueConstraint (irange, name = 'unique_passages_irange'), # needs name
+        Index ('ix_passages_irange_gist', irange, postgresql_using = 'gist'),
     )
 
 
@@ -568,6 +593,10 @@ class Readings (Base2):
     First scribal errors are corrected and orthographical differences are
     normalized, then equal readings are grouped.  Each group of readings is
     assigned an id, the 'labez'.
+
+    .. sadisplay::
+       :module: ntg_common.db
+       :include: Readings
 
     .. _labez:
 
@@ -637,14 +666,13 @@ class Readings (Base2):
 
     __tablename__ = 'readings'
 
-    pass_id   = Column (Integer,       nullable = False)
+    pass_id   = Column (Integer,       ForeignKey ('passages.pass_id'), nullable = False)
     labez     = Column (String (2),    nullable = False)
 
     lesart    = Column (String (1024), nullable = False)
 
     __table_args__ = (
-        PrimaryKeyConstraint ('pass_id', 'labez'),
-        ForeignKeyConstraint (['pass_id'], ['passages.pass_id']),
+        PrimaryKeyConstraint (pass_id, labez),
     )
 
 
@@ -654,6 +682,10 @@ class Cliques (Base2):
     A clique is a set of strongly related manuscripts that offer the same
     reading.  A reading may have been originated more than once, while a clique
     has been originated only once.
+
+    .. sadisplay::
+       :module: ntg_common.db
+       :include: Cliques
 
     .. attribute:: clique
 
@@ -668,13 +700,17 @@ class Cliques (Base2):
     clique    = Column (String (2), nullable = False, server_default = '1')
 
     __table_args__ = (
-        PrimaryKeyConstraint ('pass_id', 'labez', 'clique'),
-        ForeignKeyConstraint (['pass_id', 'labez'], ['readings.pass_id', 'readings.labez']),
+        PrimaryKeyConstraint (pass_id, labez, clique),
+        ForeignKeyConstraint ([pass_id, labez], ['readings.pass_id', 'readings.labez']),
     )
 
 
 class Apparatus (Base2):
     """A table that contains the positive apparatus.
+
+    .. sadisplay::
+       :module: ntg_common.db
+       :include: Apparatus
 
     .. attribute:: cbgm
 
@@ -716,10 +752,10 @@ class Apparatus (Base2):
 
     __tablename__ = 'apparatus'
 
+    ms_id     = Column (Integer,       ForeignKey ('manuscripts.ms_id'), nullable = False, index = True)
     pass_id   = Column (Integer,       nullable = False)
     labez     = Column (String (2),    nullable = False)
     clique    = Column (String (2),    nullable = False, server_default = '1')
-    ms_id     = Column (Integer,       nullable = False)
 
     cbgm      = Column (Boolean,       nullable = False)
     labezsuf  = Column (String (32),   nullable = False, server_default = '')
@@ -728,11 +764,9 @@ class Apparatus (Base2):
     origin    = Column (String (3),    nullable = False)
 
     __table_args__ = (
-        PrimaryKeyConstraint ('pass_id', 'ms_id', 'labez'),
-        Index ('apparatus_ms_id', 'ms_id'),
-        Index ('apparatus_unique_cbgm', 'pass_id', 'ms_id', unique = True, postgresql_where = cbgm == True),
-        ForeignKeyConstraint (['pass_id', 'labez', 'clique'], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
-        ForeignKeyConstraint (['ms_id'],                      ['manuscripts.ms_id']),
+        PrimaryKeyConstraint (pass_id, ms_id, labez),
+        Index ('ix_apparatus_pass_id_ms_id', pass_id, ms_id, unique = True, postgresql_where = cbgm == True),
+        ForeignKeyConstraint ([pass_id, labez, clique], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
         CheckConstraint ('certainty > 0.0 AND certainty <= 1.0'),
         CheckConstraint ('(certainty = 1.0) >= cbgm'),  # cbgm implies 100% certainty
     )
@@ -743,6 +777,10 @@ class LocStem (Base2):
 
     This table contains the main output of the editors.  The editors decide
     which reading is derived from which other reading(s) at each passage.
+
+    .. sadisplay::
+       :module: ntg_common.db
+       :include: LocStem
 
     .. attribute:: labez, clique
 
@@ -771,10 +809,10 @@ class LocStem (Base2):
     original      = Column (Boolean,    nullable = False, server_default = 'false')
 
     __table_args__ = (
-        PrimaryKeyConstraint ('pass_id', 'labez', 'clique'),
-        Index ('unique_locstem_original', 'pass_id', unique = True, postgresql_where = original == True),
-        ForeignKeyConstraint (['pass_id', 'labez', 'clique'], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
-        ForeignKeyConstraint (['pass_id', 'source_labez', 'source_clique'], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
+        PrimaryKeyConstraint (pass_id, labez, clique),
+        Index ('ix_locstem_pass_id', pass_id, unique = True, postgresql_where = original == True),
+        ForeignKeyConstraint ([pass_id, labez, clique], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
+        ForeignKeyConstraint ([pass_id, source_labez, source_clique], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
         CheckConstraint ('original <= (source_labez is null)'), # original implies source is null
     )
 
@@ -791,6 +829,10 @@ class Ranges (Base2):
     chapter ranges are named after the chapter mumber, the whole book range is
     called 'All'.
 
+    .. sadisplay::
+       :module: ntg_common.db
+       :include: Ranges
+
     .. attribute:: range
 
         The name of the range, eg. '1' for Chapter 1.
@@ -805,16 +847,14 @@ class Ranges (Base2):
 
     rg_id     = Column (Integer,          primary_key = True, autoincrement = True)
 
-    bk_id     = Column (Integer,          nullable = False)
+    bk_id     = Column (Integer,          ForeignKey ('books.bk_id'), nullable = False)
 
     range_    = Column ('range', String,  nullable = False)
 
     irange    = Column (IntRangeType,     nullable = False)
 
     __table_args__ = (
-        ForeignKeyConstraint (['bk_id'], ['books.bk_id']),
-        UniqueConstraint ('bk_id', 'range'),
-        Index ('ranges_irange_gist_idx', 'irange', postgresql_using = 'gist'),
+        Index ('ix_ranges_irange_gist', irange, postgresql_using = 'gist'),
     )
 
 
@@ -822,6 +862,10 @@ class Ms_Ranges (Base2):
     """A table that contains CBGM output related to each manuscript.
 
     Here we hold values that are calculated by CBGM related to one manuscript.
+
+    .. sadisplay::
+       :module: ntg_common.db
+       :include: Ms_Ranges
 
     .. attribute:: length
 
@@ -837,7 +881,7 @@ class Ms_Ranges (Base2):
     length     = Column (Integer)
 
     __table_args__ = (
-        PrimaryKeyConstraint ('rg_id', 'ms_id'),
+        PrimaryKeyConstraint (rg_id, ms_id),
     )
 
 
@@ -851,6 +895,10 @@ class Affinity (Base2):
     Two sets of data are included, one for the recursive interpretation of the
     locstem data, and one for the backward-compatible non-recurisve
     interpretation (with 'p\_' prefix).
+
+    .. sadisplay::
+       :module: ntg_common.db
+       :include: Affinity
 
     .. attribute:: common
 
@@ -880,9 +928,9 @@ class Affinity (Base2):
 
     __tablename__ = 'affinity'
 
-    rg_id      = Column (Integer,       ForeignKey ('ranges.rg_id'),      nullable = False)
-    ms_id1     = Column (Integer,       ForeignKey ('manuscripts.ms_id'), nullable = False)
-    ms_id2     = Column (Integer,       ForeignKey ('manuscripts.ms_id'), nullable = False)
+    rg_id      = Column (Integer,       nullable = False)
+    ms_id1     = Column (Integer,       nullable = False)
+    ms_id2     = Column (Integer,       nullable = False)
 
     affinity   = Column (Float,         nullable = False, server_default = '0')
 
@@ -898,7 +946,10 @@ class Affinity (Base2):
     p_unclear  = Column (Integer,       nullable = False)
 
     __table_args__ = (
-        PrimaryKeyConstraint ('rg_id', 'ms_id1', 'ms_id2'),
+        PrimaryKeyConstraint (rg_id, ms_id1, ms_id2),
+        Index ('ix_affinity_rg_id_ms_id2', rg_id, ms_id2),
+        ForeignKeyConstraint ([rg_id, ms_id1], ['ms_ranges.rg_id', 'ms_ranges.ms_id']),
+        ForeignKeyConstraint ([rg_id, ms_id2], ['ms_ranges.rg_id', 'ms_ranges.ms_id']),
     )
 
 

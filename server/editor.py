@@ -21,13 +21,11 @@ import urllib.parse
 
 import flask
 from flask import request, current_app
-from flask_babel import gettext as _, ngettext as n_, lazy_gettext as l_
 from flask_user import roles_required
 import flask_login
 import networkx as nx
 import sqlalchemy
 
-from ntg_common import db
 from ntg_common import tools
 from ntg_common import db_tools
 from ntg_common.db_tools import execute, rollback
@@ -46,9 +44,9 @@ class EditException (Exception):
 
     default_status_code = 400
 
-    def __init__(self, message, status_code=None, payload=None):
+    def __init__ (self, message, status_code=None, payload=None):
         Exception.__init__ (self)
-        self.message     = _ ('Error:') + ' ' + message
+        self.message     = 'Error: ' + message
         self.status_code = status_code or self.default_status_code
         self.payload     = payload
 
@@ -85,18 +83,18 @@ def stemma_edit (passage_or_id):
     """
 
     if not flask_login.current_user.has_role ('editor'):
-        raise PrivilegeError (_('You don\'t have editor privilege.'))
+        raise PrivilegeError ('You don\'t have editor privilege.')
 
     action = request.args.get ('action')
 
     if (action not in ('split', 'merge', 'move', 'move-manuscripts')):
-        raise EditError (_('Bad request'))
+        raise EditError ('Bad request')
 
     params = { 'original' : False }
     for n in 'labez_old labez_new'.split ():
         params[n] = request.args.get (n)
         if not RE_VALID_LABEZ.match (params[n]):
-            raise EditError (_('Bad request'))
+            raise EditError ('Bad request')
         if params[n] == '*':
             params['original'] = True
         if params[n] in ('*', '?'):
@@ -104,7 +102,7 @@ def stemma_edit (passage_or_id):
     for n in 'clique_old clique_new'.split ():
         params[n] = request.args.get (n)
         if not RE_VALID_CLIQUE.match (params[n]):
-            raise EditError (_('Bad request'))
+            raise EditError ('Bad request')
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -119,19 +117,19 @@ def stemma_edit (passage_or_id):
                 """, dict (parameters, **params))
             except sqlalchemy.exc.IntegrityError as e:
                 if 'unique_locstem_original' in str (e):
-                    raise EditError (_('Only one original reading allowed. If you want to change the original reading, first remove the old original reading.'))
-                raise EditError (_(str (e)))
+                    raise EditError ('Only one original reading allowed. If you want to change the original reading, first remove the old original reading.')
+                raise EditError (str (e))
             except sqlalchemy.exc.DatabaseError as e:
-                raise EditError (_(str (e)))
+                raise EditError (str (e))
 
             if res.rowcount > 1:
-                raise EditError (_(
+                raise EditError (
                     'Too many rows ({count}) affected while moving {labez_old}{clique_old} to {labez_new}{clique_new}'
-                ).format (count = res.rowcount, **params))
+                .format (count = res.rowcount, **params))
             if res.rowcount == 0:
-                raise EditError (_(
+                raise EditError (
                     'Could not move {labez_old}{clique_old} to {labez_new}{clique_new}'
-                ).format (**params))
+                .format (**params))
 
             # test the still uncommited changes
 
@@ -139,15 +137,15 @@ def stemma_edit (passage_or_id):
 
             # test: not a DAG
             if not nx.is_directed_acyclic_graph (G):
-                raise EditError (_('The graph is not a DAG anymore.'))
+                raise EditError ('The graph is not a DAG anymore.')
             # test: not connected
             G.add_edge ('?', '*')
             if nx.isolates (G):
-                raise EditError (_('The graph is not connected anymore.'))
+                raise EditError ('The graph is not connected anymore.')
             # test: x derived from x
             for e in G.edges_iter ():
                 if e[0][0] == e[1][0]:
-                    raise EditError (_('A reading cannot be derived from the same reading.  If you want to <b>merge</b> instead, use shift + drag.'))
+                    raise EditError ('A reading cannot be derived from the same reading.  If you want to <b>merge</b> instead, use shift + drag.')
 
         elif action == 'split':
             res = execute (conn, """
@@ -203,4 +201,4 @@ def stemma_edit (passage_or_id):
         passage = Passage (conn, passage_or_id)
         return make_json_response (passage.to_json ())
 
-    raise EditError (_('Could not edit local stemma.'))
+    raise EditError ('Could not edit local stemma.')

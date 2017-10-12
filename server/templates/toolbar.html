@@ -6,13 +6,13 @@
     {% if mode == 'relatives' %}
     <div class="relatives-type btn-group btn-group-xs" data-toggle="buttons">
       <label class="btn btn-primary">
-        <input type="radio" name="type" data-opt="rel">{{_('Rel')}}</input>
+        <input type="radio" name="type" data-opt="rel">Rel</input>
       </label>
       <label class="btn btn-primary">
-        <input type="radio" name="type" data-opt="anc">{{_('Anc')}}</input>
+        <input type="radio" name="type" data-opt="anc">Anc</input>
       </label>
       <label class="btn btn-primary">
-        <input type="radio" name="type" data-opt="des">{{_('Des')}}</input>
+        <input type="radio" name="type" data-opt="des">Des</input>
       </label>
     </div>
 
@@ -24,7 +24,7 @@
         <input type="radio" name="limit" data-opt="20">20</input>
       </label>
       <label class="btn btn-primary">
-        <input type="radio" name="limit" data-opt="0">{{_('All')}}</input>
+        <input type="radio" name="limit" data-opt="0">All</input>
       </label>
     </div>
     {% endif %}
@@ -32,7 +32,7 @@
     {% if mode in ('apparatus', 'variant') %}
     <div class="apparatus-cliques btn-group btn-group-xs" data-toggle="buttons">
 	  <label class="btn btn-primary">
-        <input type="checkbox" name="cliques" data-opt="cliques">{{_('Splits')}}</input>
+        <input type="checkbox" name="cliques" data-opt="cliques">Splits</input>
 	  </label>
     </div>
     {% endif %}
@@ -41,7 +41,7 @@
     <div class="toolbar-labez btn-group btn-group-xs">
       <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-labez bg_labez"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        {{_('Variant')}}:
+        Variant:
         <span class="btn_text"></span> <span class="caret"></span>
       </button>
       <div class="dropdown-menu dropdown-menu-horiz dropdown-menu-labez">
@@ -55,7 +55,7 @@
     {% if mode in ('local', 'variant') %}
     <div class="toolbar-connectivity btn-group btn-group-xs" data-toggle="buttons">
       <label class="btn btn-primary">
-        {{_('Conn:')}}
+        Conn:
         <span class="connectivity-label"></span>
         <input type="text" data-type="slider" name="connectivity" />
       </label>
@@ -66,7 +66,7 @@
     <div class="toolbar-range btn-group btn-group-xs">
       <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-range"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        {{_('Chapter')}}:
+        Chapter:
         <span class="btn_text"></span> <span class="caret"></span>
       </button>
       <div class="dropdown-menu dropdown-menu-horiz dropdown-menu-range">
@@ -78,14 +78,14 @@
 
     <div class="toolbar-include btn-group btn-group-xs" data-toggle="buttons">
       <label class="btn btn-primary">
-        <input type="checkbox" name="include" data-opt="A">{{_('A')}}</input>
+        <input type="checkbox" name="include" data-opt="A">A</input>
       </label>
       <label class="btn btn-primary">
-        <input type="checkbox" name="include" data-opt="MT">{{_('MT')}}</input>
+        <input type="checkbox" name="include" data-opt="MT">MT</input>
       </label>
       {% if mode in ('global', ) %}
       <label class="btn btn-primary">
-        <input type="checkbox" name="include" data-opt="Z">{{_('Z')}}</input>
+        <input type="checkbox" name="include" data-opt="Z">Z</input>
       </label>
       {% endif %}
     </div>
@@ -94,7 +94,7 @@
     {% if mode in ('local', 'relatives') %}
     <div class="coherence-fragments btn-group btn-group-xs" data-toggle="buttons">
 	  <label class="btn btn-primary">
-        <input type="checkbox" name="fragments" data-opt="fragments">{{_('Frag')}}</input>
+        <input type="checkbox" name="fragments" data-opt="fragments">Frag</input>
 	  </label>
     </div>
     {% endif %}
@@ -102,10 +102,10 @@
     {% if mode in ('global', 'local', 'variant', 'relatives') %}
     <div class="toolbar-mode btn-group btn-group-xs" data-toggle="buttons">
       <label class="btn btn-primary">
-        <input type="radio" name="mode" data-opt="rec">{{_('Rec')}}</input>
+        <input type="radio" name="mode" data-opt="rec">Rec</input>
       </label>
       <label class="btn btn-primary">
-        <input type="radio" name="mode" data-opt="sim">{{_('Sim')}}</input>
+        <input type="radio" name="mode" data-opt="sim">Sim</input>
       </label>
     </div>
     {% endif %}
@@ -127,9 +127,9 @@
     {% if mode in ('stemma', 'global', 'local', 'variant') %}
     <div class="coherence-dot btn-group btn-group-xs" data-toggle="buttons">
       <a type="button" class="btn btn-primary" name="png" data-opt="png"
-         title="{{_('Download graph in PNG format')}}">{{_('PNG')}}</a>
+         title="Download graph in PNG format">PNG</a>
       <a type="button" class="btn btn-primary" name="dot" data-opt="dot"
-         title="{{_('Download graph in GraphViz .dot format')}}">{{_('DOT')}}</a>
+         title="Download graph in GraphViz .dot format">DOT</a>
     </div>
     {% endif %}
 

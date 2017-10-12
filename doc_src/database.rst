@@ -2,46 +2,60 @@
  Database Structure
 ====================
 
+
+:mod:`ntg_common.db` --- Work Database
+======================================
+
 .. figure:: uml.*
 
-   Diagram of the CBGM database
+   Overview of the CBGM database (some columns omitted)
 
-To the :ref:`description of tables and fields <db>`.
+The work database is build
+from the :mod:`source database <ntg_common.src_db>`
+by the :mod:`prepare4cbgm <scripts.cceh.prepare4cbgm>` script.
+The :mod:`online application <server>` reads this database.
+The database system is PostgreSQL.
+
+.. sadisplay::
+   :module: ntg_common.db
+   :include: Books, Passages, Readings, Cliques, LocStem, Manuscripts, Apparatus, Ranges, Ms_Ranges, Affinity
 
 
-Source Tables
-=============
+Tables
+------
 
-Description of the source tables.
+.. automodule:: ntg_common.db
+   :synopsis: Database Structure
+   :members:
 
 
-LocStemEd
----------
+:mod:`ntg_common.src_db` --- Source Database
+============================================
 
-.. attribute:: id
+This is the legacy database used in Münster.
+There are 28 instances of each table, one for each chapter of Acts.
+These tables are only used once for building the :mod:`work database <ntg_common.db>`.
+The database system is MySQL.
 
-   Primary key
+.. sadisplay::
+   :module: ntg_common.src_db
+   :include: Acts01GVZ, Acts01GVZlac, LocStemEdAct01, RdgAct01, VarGenAttAct01
 
-.. attribute:: varid
 
-   Same as :ref:`labez <labez>`.
+Tables
+------
 
-.. attribute:: varnew
+.. autoclass:: ntg_common.src_db.Acts01GVZ
+   :members:
 
-   This is the :ref:`labez <labez>` concatenated with the number of the :ref:`split <split>`.
+.. autoclass:: ntg_common.src_db.Acts01GVZlac
+   :members:
 
-.. attribute:: s1
+.. autoclass:: ntg_common.src_db.LocStemEdAct01
+   :members:
 
-   Source of this reading.
+.. autoclass:: ntg_common.src_db.RdgAct01
+   :members:
 
-.. attribute:: s2
-
-   Optionally second source of reading.
-
-.. attribute:: begadr, endar
-
-   The passage.
-
-.. attribute:: w
-
-   Flag :ref:`"Western Text" <wt>`.  Not needed for the CBGM.
+.. autoclass:: ntg_common.src_db.VarGenAttAct01
+   :members:

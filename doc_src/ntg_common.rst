@@ -1,19 +1,9 @@
-=============
- Common Code
-=============
+===================
+ Various Functions
+===================
 
 .. automodule:: ntg_common
-   :synopsis: Common Code
-   :members:
-
-
-.. _db:
-
-:mod:`ntg_common.db` --- Database Structure
-===========================================
-
-.. automodule:: ntg_common.db
-   :synopsis: Database Structure
+   :synopsis: Various Functions
    :members:
 
 

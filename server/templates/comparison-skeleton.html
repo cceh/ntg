@@ -3,7 +3,7 @@
 {% block page_class %}comparison{% endblock %}
 
 {% block head %}
-  <title>{{_('Comparison of Manuscripts')}}</title>
+  <title>Comparison of Manuscripts</title>
 
   <script>
     require (['comparison'], function (comp) { comp.init () });
@@ -21,15 +21,15 @@
   <div class="navigator">
     <form class="manuscripts-selector form-inline">
       <div class="form-group">
-        <label>{{_('Witness')}} 1:</label>
+        <label>Witness 1:</label>
         <input type="text" class="form-control" name="ms1"
-               title="{{_('Enter the Gregory-Aland no. of the first witness (\'A\' for the initial text).')}}" />
-        <label>{{_('Witness')}} 2:</label>
+               title="Enter the Gregory-Aland no. of the first witness ('A' for the initial text)." />
+        <label>Witness 2:</label>
         <input type="text" class="form-control" name="ms2"
-               title="{{_('Enter the Gregory-Aland no. of the second witness (\'A\' for the initial text).')}}" />
+               title="Enter the Gregory-Aland no. of the second witness ('A' for the initial text)." />
       </div>
       <button type="submit" data="Go" class="btn btn-primary"
-              title="{{_('Start the comparison.')}}">{{_('Go')}}</button>
+              title="Start the comparison.">Go</button>
     </form>
   </div>
 

@@ -84,7 +84,11 @@
             
             
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#database-preparation">Database preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#online-application">Online Application</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
@@ -135,8 +139,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="database.html#source-tables">Source Tables</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="database.html#locstemed">LocStemEd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-db-work-database"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Work Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#module-ntg_common.db">Tables</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#id1">Tables</a></li>
 </ul>
 </li>
 </ul>
@@ -166,8 +174,7 @@
 <li class="toctree-l2"><a class="reference internal" href="scripts.html#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Various Functions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Various Functions for Database Access</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Various Functions</a></li>
 </ul>
@@ -378,9 +385,63 @@ we build a global stemma of manuscripts by using the most similar prior
 manuscripts as the parent manuscript.</p>
 <p>The program suite consists of scripts for setting up the CBGM database and an
 application server for interactive graphic interrogation of the CBGM database.</p>
+<div class="section" id="database-preparation">
+<h2>Database preparation<a class="headerlink" href="#database-preparation" title="Permalink to this headline">¶</a></h2>
+<p>The input is 2 MySQL databases.  The ECM database contains an apparatus and the
+VarGen database records editorial decisions about the priority of readings.</p>
+<p>The preparation step copies and normalizes the input data into a new database
+and computes an affinity matrix.</p>
+<div class="figure align-center" id="id2">
+<p class="plantuml">
+<img src="_images/plantuml-92027a3a7105c0cb90f490a8e7ff5c1a2f78c92a.png" alt="skinparam handwritten true
+
+database db [
+ ECM
+....
+VarGen
+]
+component &quot;prepare4cbgm&quot; as p4c
+database &quot;Phase4&quot; as db2
+
+db -r-&gt; p4c
+p4c -&gt; db2" />
+</p>
+<p class="caption"><span class="caption-text">Database Preparation</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="online-application">
+<h2>Online Application<a class="headerlink" href="#online-application" title="Permalink to this headline">¶</a></h2>
+<p>A Javascript library calls an application server and displays the results
+graphically.</p>
+<div class="figure align-center" id="id3">
+<p class="plantuml">
+<img src="_images/plantuml-140b16ed87760f0656ebea8e9a62c9afc219a490.png" alt="skinparam handwritten true
+skinparam NodeSep 100
+skinparam RankSep 50
+
+cloud &quot;Application Server\n&quot; as server {
+   database &quot;Phase4&quot;
+   [Python/Flask] as Flask
+   file &quot;JS\nCSS&quot; AS JS
+   [Apache]
+
+   [Flask]  &lt;--&gt; Phase4
+   [Flask]  &lt;-&gt; [Apache]
+   [Apache]  &lt;--&gt; JS
+}
+
+rectangle &quot;Application Client&quot; as client {
+   [Browser\nClient Library] as Browser
+}
+
+[Apache] &lt;-&gt; [Browser]" />
+</p>
+<p class="caption"><span class="caption-text">Online Application</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
 <p>The application is online at: <a class="reference external" href="http://ntg.cceh.uni-koeln.de">http://ntg.cceh.uni-koeln.de</a></p>
 <p>The source code is online at: <a class="reference external" href="https://github.com/cceh/ntg">https://github.com/cceh/ntg</a></p>
 <p>Author: Marcello Perathoner &lt;<a class="reference external" href="mailto:marcello&#46;perathoner&#37;&#52;&#48;uni-koeln&#46;de">marcello<span>&#46;</span>perathoner<span>&#64;</span>uni-koeln<span>&#46;</span>de</a>&gt;</p>
+</div>
 </div>
 
 

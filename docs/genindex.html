@@ -83,7 +83,11 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#database-preparation">Database preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#online-application">Online Application</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
@@ -134,8 +138,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="database.html#source-tables">Source Tables</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="database.html#locstemed">LocStemEd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-db-work-database"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Work Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#module-ntg_common.db">Tables</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#id1">Tables</a></li>
 </ul>
 </li>
 </ul>
@@ -165,8 +173,7 @@
 <li class="toctree-l2"><a class="reference internal" href="scripts.html#module-scripts.cceh.prepare4cbgm"><code class="docutils literal"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Common Code</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Various Functions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal"><span class="pre">ntg_common.db_tools</span></code> — Various Functions for Database Access</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal"><span class="pre">ntg_common.tools</span></code> — Various Functions</a></li>
 </ul>
@@ -261,47 +268,51 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="database.html#ntg_common.src_db.Acts01GVZ">Acts01GVZ (class in ntg_common.src_db)</a>
+</li>
+      <li><a href="database.html#ntg_common.src_db.Acts01GVZlac">Acts01GVZlac (class in ntg_common.src_db)</a>
+</li>
       <li><a href="appserver.html#server.server.acts_phase4">acts_phase4() (in module server.server)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Affinity.affinity">affinity (Affinity attribute)</a>
+      <li><a href="database.html#ntg_common.db.Affinity.affinity">affinity (Affinity attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Affinity">Affinity (class in ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Affinity">Affinity (class in ntg_common.db)</a>
 </li>
       <li><a href="appserver.html#server.security.AnonymousUserMixin">AnonymousUserMixin (class in server.security)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Apparatus">Apparatus (class in ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Apparatus">Apparatus (class in ntg_common.db)</a>
 </li>
       <li><a href="appclient.html#module-apparatus">apparatus (module)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Apparatus.f">Apparatus.f (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Apparatus.f">Apparatus.f (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Apparatus.o">Apparatus.o (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Apparatus.o">Apparatus.o (in module ntg_common.db)</a>
 </li>
       <li><a href="appserver.html#server.server.apparatus_json">apparatus_json() (in module server.server)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att">Att (class in ntg_common.db)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Att.A">Att.A (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Att">Att (class in ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att.a">Att.a (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Att.A">Att.A (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att.b">Att.b (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Att.a">Att.a (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att.C">Att.C (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Att.b">Att.b (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att.C1">Att.C1 (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Att.C">Att.C (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att.C2">Att.C2 (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Att.C1">Att.C1 (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att.f">Att.f (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Att.C2">Att.C2 (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att.K">Att.K (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Att.f">Att.f (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att.o">Att.o (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Att.K">Att.K (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att.x">Att.x (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Att.o">Att.o (in module ntg_common.db)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.Att.x">Att.x (in module ntg_common.db)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -309,15 +320,15 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Att.base">base (Att attribute)</a>
+      <li><a href="database.html#ntg_common.db.Att.base">base (Att attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Books.bk_id">bk_id (Books attribute)</a>
+      <li><a href="database.html#ntg_common.db.Books.bk_id">bk_id (Books attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Books.book">book (Books attribute)</a>
+      <li><a href="database.html#ntg_common.db.Books.book">book (Books attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Books">Books (class in ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Books">Books (class in ntg_common.db)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.BOOKS">BOOKS (in module ntg_common.tools)</a>
 </li>
@@ -335,15 +346,15 @@
 </li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.calculate_mss_similarity_preco">calculate_mss_similarity_preco() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Apparatus.cbgm">cbgm (Apparatus attribute)</a>
+      <li><a href="database.html#ntg_common.db.Apparatus.cbgm">cbgm (Apparatus attribute)</a>
 </li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.CBGM_Params">CBGM_Params (class in scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Apparatus.certainty">certainty (Apparatus attribute)</a>
+      <li><a href="database.html#ntg_common.db.Apparatus.certainty">certainty (Apparatus attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Cliques.clique">clique (Cliques attribute)</a>
+      <li><a href="database.html#ntg_common.db.Cliques.clique">clique (Cliques attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Cliques">Cliques (class in ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Cliques">Cliques (class in ntg_common.db)</a>
 </li>
       <li><a href="appserver.html#server.server.cliques_json">cliques_json() (in module server.server)</a>
 </li>
@@ -351,9 +362,9 @@
 </li>
       <li><a href="appserver.html#server.server.coherence_skeleton">coherence_skeleton() (in module server.server)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Affinity.common">common (Affinity attribute)</a>
+      <li><a href="database.html#ntg_common.db.Affinity.common">common (Affinity attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att.comp">comp (Att attribute)</a>
+      <li><a href="database.html#ntg_common.db.Att.comp">comp (Att attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -407,7 +418,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Affinity.equal">equal (Affinity attribute)</a>
+      <li><a href="database.html#ntg_common.db.Affinity.equal">equal (Affinity attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -415,7 +426,7 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Passages.fehlvers">fehlvers (Passages attribute)</a>
+      <li><a href="database.html#ntg_common.db.Passages.fehlvers">fehlvers (Passages attribute)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.FEHLVERSE">FEHLVERSE (in module ntg_common.tools)</a>
 </li>
@@ -449,18 +460,18 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Att.hs">hs (Att attribute)</a>
+      <li><a href="database.html#ntg_common.db.Att.hs">hs (Att attribute)</a>
 
       <ul>
-        <li><a href="ntg_common.html#ntg_common.db.Manuscripts.hs">(Manuscripts attribute)</a>
+        <li><a href="database.html#ntg_common.db.Manuscripts.hs">(Manuscripts attribute)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Att.hsnr">hsnr (Att attribute)</a>
+      <li><a href="database.html#ntg_common.db.Att.hsnr">hsnr (Att attribute)</a>
 
       <ul>
-        <li><a href="ntg_common.html#ntg_common.db.Manuscripts.hsnr">(Manuscripts attribute)</a>
+        <li><a href="database.html#ntg_common.db.Manuscripts.hsnr">(Manuscripts attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -469,18 +480,18 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="database.html#id">id</a>
+      <li><a href="database.html#ntg_common.db.LocStemEdAct01.id">id (LocStemEdAct01 attribute)</a>
 </li>
       <li><a href="appserver.html#server.server.index">index() (in module server.server)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Books.irange">irange (Books attribute)</a>
+      <li><a href="database.html#ntg_common.db.Books.irange">irange (Books attribute)</a>
 
       <ul>
-        <li><a href="ntg_common.html#ntg_common.db.Passages.irange">(Passages attribute)</a>
+        <li><a href="database.html#ntg_common.db.Passages.irange">(Passages attribute)</a>
 </li>
-        <li><a href="ntg_common.html#ntg_common.db.Ranges.irange">(Ranges attribute)</a>
+        <li><a href="database.html#ntg_common.db.Ranges.irange">(Ranges attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -489,39 +500,41 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Att.labez">labez (Att attribute)</a>
+      <li><a href="database.html#ntg_common.db.Att.labez">labez (Att attribute)</a>
 
       <ul>
-        <li><a href="ntg_common.html#ntg_common.db.Readings.labez">(Readings attribute)</a>
+        <li><a href="database.html#ntg_common.db.Readings.labez">(Readings attribute)</a>
 </li>
       </ul></li>
-      <li><a href="ntg_common.html#ntg_common.db.Apparatus.labezsuf">labezsuf (Apparatus attribute)</a>
+      <li><a href="database.html#ntg_common.db.Apparatus.labezsuf">labezsuf (Apparatus attribute)</a>
 
       <ul>
-        <li><a href="ntg_common.html#ntg_common.db.Att.labezsuf">(Att attribute)</a>
+        <li><a href="database.html#ntg_common.db.Att.labezsuf">(Att attribute)</a>
 </li>
       </ul></li>
-      <li><a href="ntg_common.html#ntg_common.db.Lac">Lac (class in ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Lac">Lac (class in ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att.lekt">lekt (Att attribute)</a>
+      <li><a href="database.html#ntg_common.db.Att.lekt">lekt (Att attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Passages.lemma">lemma (Passages attribute)</a>
+      <li><a href="database.html#ntg_common.db.Passages.lemma">lemma (Passages attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Ms_Ranges.length">length (Ms_Ranges attribute)</a>
+      <li><a href="database.html#ntg_common.db.Ms_Ranges.length">length (Ms_Ranges attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Apparatus.lesart">lesart (Apparatus attribute)</a>
+      <li><a href="database.html#ntg_common.db.Apparatus.lesart">lesart (Apparatus attribute)</a>
 
       <ul>
-        <li><a href="ntg_common.html#ntg_common.db.Readings.lesart">(Readings attribute)</a>
+        <li><a href="database.html#ntg_common.db.Readings.lesart">(Readings attribute)</a>
 </li>
       </ul></li>
       <li><a href="appclient.html#module-local-stemma">local-stemma (module)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db_tools.local_stemma_to_nx">local_stemma_to_nx() (in module ntg_common.db_tools)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.LocStem">LocStem (class in ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.LocStem">LocStem (class in ntg_common.db)</a>
+</li>
+      <li><a href="database.html#ntg_common.src_db.LocStemEdAct01">LocStemEdAct01 (class in ntg_common.src_db)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.log">log() (in module ntg_common.tools)</a>
 </li>
@@ -533,7 +546,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appserver.html#server.server.manuscript_json">manuscript_json() (in module server.server)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Manuscripts">Manuscripts (class in ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Manuscripts">Manuscripts (class in ntg_common.db)</a>
 </li>
       <li><a href="appclient.html#apparatus.module:apparatus.goto_attestation">module:apparatus.goto_attestation() (module:apparatus method)</a>
 </li>
@@ -665,9 +678,9 @@
 </li>
       <li><a href="appserver.html#server.server.ms_attesting">ms_attesting() (in module server.server)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Manuscripts.ms_id">ms_id (Manuscripts attribute)</a>
+      <li><a href="database.html#ntg_common.db.Manuscripts.ms_id">ms_id (Manuscripts attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Ms_Ranges">Ms_Ranges (class in ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Ms_Ranges">Ms_Ranges (class in ntg_common.db)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db_tools.MySQLEngine">MySQLEngine (class in ntg_common.db_tools)</a>
 </li>
@@ -679,11 +692,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appclient.html#module-navigator">navigator (module)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Affinity.newer">newer (Affinity attribute)</a>
+      <li><a href="database.html#ntg_common.db.Affinity.newer">newer (Affinity attribute)</a>
 </li>
       <li><a href="ntg_common.html#module-ntg_common">ntg_common (module)</a>
 </li>
-      <li><a href="ntg_common.html#module-ntg_common.db">ntg_common.db (module)</a>
+      <li><a href="database.html#module-ntg_common.db">ntg_common.db (module)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -701,13 +714,13 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Affinity.older">older (Affinity attribute)</a>
+      <li><a href="database.html#ntg_common.db.Affinity.older">older (Affinity attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Apparatus.origin">origin (Apparatus attribute)</a>
+      <li><a href="database.html#ntg_common.db.Apparatus.origin">origin (Apparatus attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.LocStem.original">original (LocStem attribute)</a>
+      <li><a href="database.html#ntg_common.db.LocStem.original">original (LocStem attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -721,7 +734,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Passages">Passages (class in ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Passages">Passages (class in ntg_common.db)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db_tools.PostgreSQLEngine">PostgreSQLEngine (class in ntg_common.db_tools)</a>
 </li>
@@ -731,29 +744,31 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Ranges.range">range (Ranges attribute)</a>
+      <li><a href="database.html#ntg_common.db.Ranges.range">range (Ranges attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Ranges">Ranges (class in ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Ranges">Ranges (class in ntg_common.db)</a>
 </li>
       <li><a href="appserver.html#server.server.ranges_json">ranges_json() (in module server.server)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Readings">Readings (class in ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.src_db.RdgAct01">RdgAct01 (class in ntg_common.src_db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Readings.lac">Readings.lac (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Readings">Readings (class in ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Readings.om">Readings.om (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Readings.lac">Readings.lac (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Readings.vac">Readings.vac (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Readings.om">Readings.om (in module ntg_common.db)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.Readings.vac">Readings.vac (in module ntg_common.db)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Readings.zu">Readings.zu (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Readings.zu">Readings.zu (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Readings.zv">Readings.zv (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Readings.zv">Readings.zv (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Readings.zw">Readings.zw (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Readings.zw">Readings.zw (in module ntg_common.db)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Readings.zz">Readings.zz (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Readings.zz">Readings.zz (in module ntg_common.db)</a>
 </li>
       <li><a href="appclient.html#module-relatives">relatives (module)</a>
 </li>
@@ -769,11 +784,11 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="database.html#s1">s1</a>
+      <li><a href="database.html#ntg_common.db.LocStemEdAct01.s1">s1 (LocStemEdAct01 attribute)</a>
 </li>
-      <li><a href="database.html#s2">s2</a>
+      <li><a href="database.html#ntg_common.db.LocStemEdAct01.s2">s2 (LocStemEdAct01 attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.SaveReadings">SaveReadings (class in ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.SaveReadings">SaveReadings (class in ntg_common.db)</a>
 </li>
       <li><a href="scripts.html#module-scripts">scripts (module)</a>
 </li>
@@ -787,11 +802,11 @@
 </li>
       <li><a href="appserver.html#module-server.server">server.server (module)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Books.siglum">siglum (Books attribute)</a>
+      <li><a href="database.html#ntg_common.db.Books.siglum">siglum (Books attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Passages.spanned">spanned (Passages attribute)</a>
+      <li><a href="database.html#ntg_common.db.Passages.spanned">spanned (Passages attribute)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Passages.spanning">spanning (Passages attribute)</a>
+      <li><a href="database.html#ntg_common.db.Passages.spanning">spanning (Passages attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -815,7 +830,7 @@
 </li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step07">step07() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.db.Att.suffix">suffix (Att attribute)</a>
+      <li><a href="database.html#ntg_common.db.Att.suffix">suffix (Att attribute)</a>
 </li>
       <li><a href="appserver.html#server.server.suggest_json">suggest_json() (in module server.server)</a>
 </li>
@@ -841,7 +856,7 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ntg_common.html#ntg_common.db.Affinity.unclear">unclear (Affinity attribute)</a>
+      <li><a href="database.html#ntg_common.db.Affinity.unclear">unclear (Affinity attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -851,11 +866,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.vacuum">vacuum() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
+      <li><a href="database.html#ntg_common.src_db.VarGenAttAct01">VarGenAttAct01 (class in ntg_common.src_db)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="database.html#varid">varid</a>
+      <li><a href="database.html#ntg_common.db.Passages.variant">variant (Passages attribute)</a>
 </li>
-      <li><a href="database.html#varnew">varnew</a>
+      <li><a href="database.html#ntg_common.db.LocStemEdAct01.varid">varid (LocStemEdAct01 attribute)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.LocStemEdAct01.varnew">varnew (LocStemEdAct01 attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -863,7 +882,7 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="database.html#w">w</a>
+      <li><a href="database.html#ntg_common.db.LocStemEdAct01.w">w (LocStemEdAct01 attribute)</a>
 </li>
   </ul></td>
 </tr></table>

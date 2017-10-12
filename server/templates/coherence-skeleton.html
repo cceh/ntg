@@ -12,7 +12,7 @@
 
 {% block h1 %}
   <h1>
-    {{_('Attestation for')}}
+    Attestation for
     <span class="passage"></span>
     <span class="appname">{{config['APPLICATION_NAME']}}</span>
   </h1>
@@ -23,7 +23,7 @@
 
   <div class="panel panel-default panel-apparatus">
     <div class="panel-heading panel-caption panel-apparatus-caption">
-      {{_('Apparatus')}}
+      Apparatus
     </div>
 
     {{ tt.toolbar ('apparatus', 'apparatus') }}
@@ -34,7 +34,7 @@
 
   <div class="panel panel-default panel-local-stemma">
     <div class="panel-heading panel-caption panel-local-stemma-caption">
-      {{_('Local Stemma')}}
+      Local Stemma
     </div>
 
     {{ tt.toolbar ('stemma', 'stemma') }}
@@ -45,7 +45,7 @@
 
   <div class="panel panel-default panel-textflow panel-variant-textflow">
     <div class="panel-heading panel-caption panel-variant-textflow-caption">
-      {{_('Coherence at Variant Passages')}} {{_('(GraphViz)')}}
+      Coherence at Variant Passages (GraphViz)
     </div>
 
     {{ tt.toolbar ('variant', 'variant') }}
@@ -56,7 +56,7 @@
 
   <div class="panel panel-default panel-textflow panel-variant-textflow-2">
     <div class="panel-heading panel-caption panel-variant-textflow-caption">
-      {{_('Coherence at Variant Passages')}} {{_('(Chord)')}}
+      Coherence at Variant Passages (Chord)
     </div>
 
     {{ tt.toolbar ('variant-2', 'variant') }}
@@ -67,7 +67,7 @@
 
   <div class="panel panel-default panel-textflow panel-local-textflow">
     <div class="panel-heading panel-caption panel-local-textflow-caption">
-      {{_('Coherence in Attestations')}}
+      Coherence in Attestations
     </div>
 
     {{ tt.toolbar ('local', 'local') }}
@@ -78,7 +78,7 @@
 
   <div class="panel panel-default panel-textflow panel-global-textflow">
     <div class="panel-heading panel-caption panel-global-textflow-caption">
-      {{_('General Textual Flow')}}
+      General Textual Flow
     </div>
 
     {{ tt.toolbar ('global', 'global') }}
