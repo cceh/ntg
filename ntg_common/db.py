@@ -978,7 +978,7 @@ SELECT CASE WHEN source = '*' THEN true ELSE false END
 ''', volatility = 'IMMUTABLE')
 
 function ('labez_clique', Base2.metadata, 'labez CHAR, clique CHAR', 'CHAR', '''
-SELECT labez || COALESCE (clique, '1')
+SELECT labez || COALESCE (NULLIF (clique, '1'), '')
 ''', volatility = 'IMMUTABLE')
 
 generic (Base2.metadata, '''

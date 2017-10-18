@@ -38,7 +38,7 @@ function ($, _, tools, panel) {
 
         $.getJSON ('apparatus.json/' + passage.pass_id, function (json) {
             var labez_grouper  = function (g) { return g.labez; };
-            var clique_grouper = function (g) { return g.labez + (g.clique || ''); };
+            var clique_grouper = function (g) { return g.labez_clique; };
 
             var grouper = _.includes (instance.data.cliques, 'cliques') ? clique_grouper : labez_grouper;
 
@@ -53,10 +53,10 @@ function ($, _, tools, panel) {
             // group manuscripts and loop over groups
             _.forEach (_.groupBy (_.sortBy (json.data.manuscripts, grouper), grouper), function (group) {
                 var data = {
-                    'pass_id' : passage.pass_id,
-                    'labez'   : group[0].labez,
-                    'clique'  : group[0].clique || '',
-                    'group'   : grouper (group[0]),
+                    'pass_id'      : passage.pass_id,
+                    'labez'        : group[0].labez,
+                    'labez_clique' : group[0].labez_clique,
+                    'group'        : grouper (group[0]),
                 };
 
                 data.reading = _.get (readings, data.labez, 'Error: no reading found');
