@@ -70,7 +70,7 @@ csslint: css
 doc: sphinx
 
 sphinx:
-	rm docs/_images/*
+	-rm docs/_images/*
 	cd doc_src; make html; cd ..
 
 jsdoc: js
@@ -104,11 +104,13 @@ $(STATIC)/css/%.css : $(SERVER)/less/%.less
 	gzip < $? > $@
 
 install-prerequisites:
-	sudo apt-get install apache libapache2-mod-wsgi-py3 postgres libpg-dev mysql python3 python3-pip graphviz git
+	sudo apt-get install apache2 libapache2-mod-wsgi-py3 postgres libpg-dev mysql python3 python3-pip \
+		graphviz git plantuml
 	sudo pip3 install --upgrade \
 		numpy networkx matplotlib Pillow \
 		psycopg2 mysqlclient sqlalchemy sqlalchemy-utils intervals \
-		flask babel flask-babel flask-sqlalchemy jinja2 flask-user
+		flask babel flask-babel flask-sqlalchemy jinja2 flask-user \
+		sphinx sphinx_rtd_theme sphinx_js sphinxcontrib-plantuml
 
 ### Localization ###
 

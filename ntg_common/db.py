@@ -165,8 +165,7 @@ class Att (Base):
     converted into a positive apparatus.
 
     .. sadisplay::
-       :module: ntg_common.db
-       :include: Att
+       :include: att
 
     .. _att:
 
@@ -347,8 +346,7 @@ class Lac (Base):
     columns see :ref:`table Att <att>`.
 
     .. sadisplay::
-       :module: ntg_common.db
-       :include: Lac
+       :include: lac
 
     """
 
@@ -442,12 +440,14 @@ class Manuscripts (Base2):
     for the edition.
 
     .. sadisplay::
-       :module: ntg_common.db
-       :include: Manuscripts
+       :include: manuscripts
 
     .. attribute:: ms_id
 
-        The primary key of the table.
+       The primary key.  We use a surrogate integer key because we need to
+       interface with numpy, which only allows for integer row and column
+       indices.  If we every lose this requirement, hsnr will become our primary
+       key.
 
     .. attribute:: hsnr
 
@@ -482,8 +482,7 @@ class Books (Base2):
     This table lists all the books of the NT and the book id given to them.
 
     .. sadisplay::
-       :module: ntg_common.db
-       :include: Books
+       :include: books
 
     .. attribute:: bk_id
 
@@ -526,8 +525,14 @@ class Passages (Base2):
     purged because they are irrelevant to the CBGM.
 
     .. sadisplay::
-       :module: ntg_common.db
-       :include: Passages
+       :include: passages
+
+    .. attribute:: pass_id
+
+       The primary key.  We use a surrogate integer key because we need to
+       interface with numpy, which only allows for integer row and column
+       indices.  If we every lose this requirement, irange will become our
+       primary key (but join performance should also be considered).
 
     .. attribute:: irange
 
@@ -595,8 +600,7 @@ class Readings (Base2):
     assigned an id, the 'labez'.
 
     .. sadisplay::
-       :module: ntg_common.db
-       :include: Readings
+       :include: readings
 
     .. _labez:
 
@@ -684,8 +688,7 @@ class Cliques (Base2):
     has been originated only once.
 
     .. sadisplay::
-       :module: ntg_common.db
-       :include: Cliques
+       :include: cliques
 
     .. attribute:: clique
 
@@ -709,8 +712,7 @@ class Apparatus (Base2):
     """A table that contains the positive apparatus.
 
     .. sadisplay::
-       :module: ntg_common.db
-       :include: Apparatus
+       :include: apparatus
 
     .. attribute:: cbgm
 
@@ -779,8 +781,7 @@ class LocStem (Base2):
     which reading is derived from which other reading(s) at each passage.
 
     .. sadisplay::
-       :module: ntg_common.db
-       :include: LocStem
+       :include: locstem
 
     .. attribute:: labez, clique
 
@@ -826,12 +827,11 @@ class Ranges (Base2):
 
     This table contains all ranges we are interested in, that is, one range for
     each chapter of each book and also one range for each whole book.  The
-    chapter ranges are named after the chapter mumber, the whole book range is
-    called 'All'.
+    ranges corresponding to chapters are named by the chapter number, '1', '2',
+    ...  The whole book range is called 'All'.
 
     .. sadisplay::
-       :module: ntg_common.db
-       :include: Ranges
+       :include: ranges
 
     .. attribute:: range
 
@@ -864,8 +864,7 @@ class Ms_Ranges (Base2):
     Here we hold values that are calculated by CBGM related to one manuscript.
 
     .. sadisplay::
-       :module: ntg_common.db
-       :include: Ms_Ranges
+       :include: ms_ranges
 
     .. attribute:: length
 
@@ -897,8 +896,7 @@ class Affinity (Base2):
     interpretation (with 'p\_' prefix).
 
     .. sadisplay::
-       :module: ntg_common.db
-       :include: Affinity
+       :include: affinity
 
     .. attribute:: common
 

@@ -17,8 +17,7 @@ The :mod:`online application <server>` reads this database.
 The database system is PostgreSQL.
 
 .. sadisplay::
-   :module: ntg_common.db
-   :include: Books, Passages, Readings, Cliques, LocStem, Manuscripts, Apparatus, Ranges, Ms_Ranges, Affinity
+   :include: books, passages, ranges, readings, cliques, locstem, manuscripts, apparatus, ms_ranges, affinity
 
 
 Tables
@@ -38,8 +37,12 @@ These tables are only used once for building the :mod:`work database <ntg_common
 The database system is MySQL.
 
 .. sadisplay::
-   :module: ntg_common.src_db
-   :include: Acts01GVZ, Acts01GVZlac, LocStemEdAct01, RdgAct01, VarGenAttAct01
+   :url: mysql:///ECM_ActsPh4?read_default_group=ntg
+   :include: Acts01GVZ, Acts01GVZlac
+
+.. sadisplay::
+   :url: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
+   :include: LocStemEdAct01, RdgAct01, VarGenAttAct01
 
 
 Tables

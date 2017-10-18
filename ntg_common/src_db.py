@@ -21,7 +21,7 @@ class Acts01GVZ (Base):
     """This table contains a negative apparatus.
 
     .. sadisplay::
-       :module: ntg_common.src_db
+       :url: mysql:///ECM_ActsPh4?read_default_group=ntg
        :include: Acts01GVZ
 
     """
@@ -72,7 +72,7 @@ class Acts01GVZlac (Base):
     """This table contains a list of lacunae.
 
     .. sadisplay::
-       :module: ntg_common.src_db
+       :url: mysql:///ECM_ActsPh4?read_default_group=ntg
        :include: Acts01GVZlac
 
     """
@@ -127,7 +127,7 @@ class LocStemEdAct01 (Base):
     which reading is derived from which other reading(s) at each passage.
 
     .. sadisplay::
-       :module: ntg_common.src_db
+       :url: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
        :include: LocStemEdAct01
 
     .. attribute:: id
@@ -180,7 +180,7 @@ class RdgAct01 (Base):
     """This table contains readings.
 
     .. sadisplay::
-       :module: ntg_common.src_db
+       :url: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
        :include: RdgAct01
 
     """
@@ -218,7 +218,7 @@ class VarGenAttAct01 (Base):
     """This table relates splits to manuscripts.
 
     .. sadisplay::
-       :module: ntg_common.src_db
+       :url: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
        :include: VarGenAttAct01
 
     """

@@ -40,14 +40,15 @@ extensions = [
     'sphinx.ext.imgconverter',
     'sphinx.ext.githubpages',
     'sphinxcontrib.plantuml',
-    'sphinxcontrib.sadisp',
+    'sadisplay.sadisp',
 ]
 
 js_source_path = '../server/es6'
 jsdoc_config_path = '../jsdoc.json'
 
-sadisplay_default_render = 'graphviz' # plantuml
-graphviz = 'dot -Tpng'.split()
+# sadisplay_default_render = 'plantuml'
+sadisplay_url = 'postgresql+psycopg2://ntg@localhost:5433/ntg_ph4'
+sadisplay_dot_table = 'bgcolor=#e7f2fa&color=#2980B9'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
