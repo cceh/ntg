@@ -1,6 +1,6 @@
 *~
 \#*\#
-*.dot
+pylintgraph.dot
 bower_components/
 node_modules/
 jsdoc/

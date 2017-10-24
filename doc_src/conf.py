@@ -40,15 +40,14 @@ extensions = [
     'sphinx.ext.imgconverter',
     'sphinx.ext.githubpages',
     'sphinxcontrib.plantuml',
-    'sadisplay.sadisp',
+    'sauml.sauml',
 ]
 
 js_source_path = '../server/es6'
 jsdoc_config_path = '../jsdoc.json'
 
-# sadisplay_default_render = 'plantuml'
-sadisplay_url = 'postgresql+psycopg2://ntg@localhost:5433/ntg_ph4'
-sadisplay_dot_table = 'bgcolor=#e7f2fa&color=#2980B9'
+sauml_arguments = ['postgresql+psycopg2://ntg@localhost:5433/ntg_ph4']
+sauml_dot_table = 'bgcolor=#e7f2fa&color=#2980B9'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -135,7 +134,6 @@ html_theme = "sphinx_rtd_theme" # nature
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
 html_theme_options = {
     'collapse_navigation': False,
     'display_version': False,
@@ -143,8 +141,10 @@ html_theme_options = {
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+def setup (app):
+    app.add_stylesheet ('my_theme.css')
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.

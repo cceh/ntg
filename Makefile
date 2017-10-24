@@ -32,6 +32,10 @@ PY_SOURCES  := scripts/cceh/*.py ntg_common/*.py server/*.py
 .PHONY: upload upload_po update_pot update_po update_mo update_libs vpn server restart psql
 .PHONY: js css doc jsdoc sphinx lint pylint jslint csslint
 
+css: $(CSS)
+
+js:	$(JS)
+
 restart: js css server
 
 server: css js
@@ -69,7 +73,24 @@ csslint: css
 
 doc: sphinx
 
-sphinx:
+.PRECIOUS: doc_src/%.jsgraph.dot
+
+doc_src/%.jsgraph.dot : $(STATIC)/js/%.js $(JS)
+	madge --dot $< | \
+	sed -e "s/static\/js\///g" \
+		-e "s/static\/bower_components\///g" \
+		-e "s/G {/G {\ngraph [rankdir=\"LR\"]/" > $@
+
+doc_src/%.nolibs.jsgraph.dot : doc_src/%.jsgraph.dot
+	sed -e "s/.*\/.*//g" $< > $@
+
+%.jsgraph.png : %.jsgraph.dot
+	dot -Tpng $? > $@
+
+jsgraphs: doc_src/coherence.jsgraph.dot doc_src/comparison.jsgraph.dot \
+			doc_src/coherence.nolibs.jsgraph.dot doc_src/comparison.nolibs.jsgraph.dot
+
+sphinx: jsgraphs
 	-rm docs/_images/*
 	cd doc_src; make html; cd ..
 
@@ -77,19 +98,15 @@ jsdoc: js
 	jsdoc -c jsdoc.json -d jsdoc -a all $(ES6) $(JS_SRC) && $(BROWSER) jsdoc/index.html
 
 bower_update:
-	bower install --update
+	bower update
 
 upload:
 	$(RSYNC) --exclude "**/__pycache__"  --exclude "*.pyc"  ntg_common $(NTG_ROOT)/
-	$(RSYNC) --exclude "**/instance/**"       server     $(NTG_ROOT)/
+	$(RSYNC) --exclude "**/instance/**"                     server     $(NTG_ROOT)/
 
-sqlcodegen:
+sqlacodegen:
 	sqlacodegen mysql:///ECM_ActsPh4?read_default_group=ntg
 	sqlacodegen mysql:///VarGenAtt_ActPh4?read_default_group=ntg
-
-css: $(CSS)
-
-js:	$(JS)
 
 $(STATIC)/js/%.js : $(SERVER)/es6/%.es6
 	./node_modules/.bin/babel $? --out-file $@ --source-maps

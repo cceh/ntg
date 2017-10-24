@@ -20,8 +20,7 @@ Base = declarative_base ()
 class Acts01GVZ (Base):
     """This table contains a negative apparatus.
 
-    .. sadisplay::
-       :url: mysql:///ECM_ActsPh4?read_default_group=ntg
+    .. sauml:: mysql:///ECM_ActsPh4?read_default_group=ntg
        :include: Acts01GVZ
 
     """
@@ -71,8 +70,7 @@ class Acts01GVZ (Base):
 class Acts01GVZlac (Base):
     """This table contains a list of lacunae.
 
-    .. sadisplay::
-       :url: mysql:///ECM_ActsPh4?read_default_group=ntg
+    .. sauml:: mysql:///ECM_ActsPh4?read_default_group=ntg
        :include: Acts01GVZlac
 
     """
@@ -126,8 +124,7 @@ class LocStemEdAct01 (Base):
     This table contains the main output of the editors.  The editors decide
     which reading is derived from which other reading(s) at each passage.
 
-    .. sadisplay::
-       :url: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
+    .. sauml:: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
        :include: LocStemEdAct01
 
     .. attribute:: id
@@ -179,8 +176,7 @@ class LocStemEdAct01 (Base):
 class RdgAct01 (Base):
     """This table contains readings.
 
-    .. sadisplay::
-       :url: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
+    .. sauml:: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
        :include: RdgAct01
 
     """
@@ -217,8 +213,7 @@ class RdgAct01 (Base):
 class VarGenAttAct01 (Base):
     """This table relates splits to manuscripts.
 
-    .. sadisplay::
-       :url: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
+    .. sauml:: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
        :include: VarGenAttAct01
 
     """

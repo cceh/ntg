@@ -6,11 +6,18 @@
 
 The Javascript client on the browser.
 
+There are two main entry points: the :mod:`coherence` page and the
+:mod:`comparison` page.
+
 
 :mod:`coherence` --- The Coherence Page
 =======================================
 
 .. module:: coherence
+
+.. graphviz:: coherence.nolibs.jsgraph.dot
+   :caption: Module dependencies for :mod:`coherence`.
+   :align: center
 
 .. autofunction:: module:coherence~init()
 
@@ -71,7 +78,8 @@ The javascript module that displays the textflow diagrams.
 
 .. autofunction:: module:relatives~get_ms_ids_from_popups(what)
 .. autofunction:: module:relatives~load_passage(passage)
-.. autofunction:: module:relatives~create_panel(ms_id, target)
+.. autofunction:: module:relatives~create_popup(ms_id, passage, target)
+.. autofunction:: module:relatives~position_popup(target)
 .. autofunction:: module:relatives~init(instance)
 
 
@@ -113,6 +121,10 @@ The javascript module that displays the textflow diagrams.
 
 .. module:: comparison
 
+.. graphviz:: comparison.nolibs.jsgraph.dot
+   :caption: Module dependencies for :mod:`comparison`.
+   :align: center
+
 .. autofunction:: module:comparison~dir(older, newer)
 .. autofunction:: module:comparison~main_row_conversion(d)
 .. autofunction:: module:comparison~detail_row_conversion(d)
@@ -145,7 +157,6 @@ Useful functions for wrestling with D3.
 .. autofunction:: module:d3-common~parse_path_svg(path)
 .. autofunction:: module:d3-common~inflate_bbox(bbox, len)
 .. autofunction:: module:d3-common~dot(url, callback)
-.. autofunction:: module:d3-common~bfs(edges, start)
 
 
 :mod:`tools` --- Various Functions
@@ -160,4 +171,5 @@ Useful functions that don't fit anywhere else.
 .. autofunction:: module:tools~deparam(s)
 .. autofunction:: module:tools~svg_contextmenu(menu, target)
 .. autofunction:: module:tools~xhr_alert(xhr, $panel)
+.. autofunction:: module:tools~bfs(edges, start)
 .. autofunction:: module:tools~init()

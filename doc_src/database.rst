@@ -16,8 +16,14 @@ by the :mod:`prepare4cbgm <scripts.cceh.prepare4cbgm>` script.
 The :mod:`online application <server>` reads this database.
 The database system is PostgreSQL.
 
-.. sadisplay::
-   :include: books, passages, ranges, readings, cliques, locstem, manuscripts, apparatus, ms_ranges, affinity
+.. sauml::
+   :include: books passages ranges readings cliques locstem manuscripts apparatus ms_ranges affinity
+   :caption: Work database structure
+   :align: center
+
+   { rank=same; passages, ranges, manuscripts }
+   { rank=same; cliques, ms_ranges }
+   { rank=same; locstem, apparatus, affinity }
 
 
 Tables
@@ -36,13 +42,14 @@ There are 28 instances of each table, one for each chapter of Acts.
 These tables are only used once for building the :mod:`work database <ntg_common.db>`.
 The database system is MySQL.
 
-.. sadisplay::
-   :url: mysql:///ECM_ActsPh4?read_default_group=ntg
-   :include: Acts01GVZ, Acts01GVZlac
+.. sauml:: mysql:///ECM_ActsPh4?read_default_group=ntg
+   :include: Acts01GVZ Acts01GVZlac
+   :align: center
 
-.. sadisplay::
-   :url: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
-   :include: LocStemEdAct01, RdgAct01, VarGenAttAct01
+.. sauml:: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
+   :include: LocStemEdAct01 RdgAct01 VarGenAttAct01
+   :caption: Source database structure
+   :align: center
 
 
 Tables

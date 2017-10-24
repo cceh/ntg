@@ -30,6 +30,8 @@
   
 
   
+    <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
+  
 
   
         <link rel="index" title="Index"
@@ -245,8 +247,85 @@
   <div class="section" id="application-client">
 <h1>Application Client<a class="headerlink" href="#application-client" title="Permalink to this headline">¶</a></h1>
 <p>The Javascript client on the browser.</p>
+<p>There are two main entry points: the <a class="reference internal" href="#coherence" title="coherence"><code class="xref js js-mod docutils literal"><span class="pre">coherence</span></code></a> page and the
+<a class="reference internal" href="#comparison" title="comparison"><code class="xref js js-mod docutils literal"><span class="pre">comparison</span></code></a> page.</p>
 <div class="section" id="module-coherence">
 <span id="coherence-the-coherence-page"></span><h2><a class="reference internal" href="#coherence" title="coherence"><code class="xref js js-mod docutils literal"><span class="pre">coherence</span></code></a> — The Coherence Page<a class="headerlink" href="#module-coherence" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-center" id="id1">
+<img src="_images/graphviz-94845621ad4497a804790d991da5071a2f4006cc.png" alt="digraph G {
+graph [rankdir=&quot;LR&quot;]
+
+
+
+
+
+
+
+
+  &quot;apparatus.js&quot;;
+  &quot;panel.js&quot;;
+  &quot;tools.js&quot;;
+  &quot;coherence.js&quot;;
+  &quot;d3-chord-layout.js&quot;;
+  &quot;d3-common.js&quot;;
+  &quot;d3-stemma-layout.js&quot;;
+  &quot;local-stemma.js&quot;;
+  &quot;navigator.js&quot;;
+  &quot;relatives.js&quot;;
+  &quot;textflow.js&quot;;
+  &quot;dot-grammar.pegjs&quot;;
+
+
+
+
+  &quot;apparatus.js&quot; -&gt; &quot;panel.js&quot;;
+  &quot;apparatus.js&quot; -&gt; &quot;tools.js&quot;;
+
+  &quot;coherence.js&quot; -&gt; &quot;apparatus.js&quot;;
+  &quot;coherence.js&quot; -&gt; &quot;d3-chord-layout.js&quot;;
+  &quot;coherence.js&quot; -&gt; &quot;d3-common.js&quot;;
+  &quot;coherence.js&quot; -&gt; &quot;d3-stemma-layout.js&quot;;
+  &quot;coherence.js&quot; -&gt; &quot;local-stemma.js&quot;;
+  &quot;coherence.js&quot; -&gt; &quot;navigator.js&quot;;
+  &quot;coherence.js&quot; -&gt; &quot;panel.js&quot;;
+  &quot;coherence.js&quot; -&gt; &quot;relatives.js&quot;;
+  &quot;coherence.js&quot; -&gt; &quot;textflow.js&quot;;
+
+
+
+  &quot;d3-chord-layout.js&quot; -&gt; &quot;d3-common.js&quot;;
+
+
+
+
+  &quot;d3-common.js&quot; -&gt; &quot;dot-grammar.pegjs&quot;;
+
+
+
+  &quot;d3-stemma-layout.js&quot; -&gt; &quot;d3-common.js&quot;;
+
+
+
+  &quot;local-stemma.js&quot; -&gt; &quot;tools.js&quot;;
+
+
+
+
+
+
+
+
+
+
+  &quot;relatives.js&quot; -&gt; &quot;panel.js&quot;;
+  &quot;relatives.js&quot; -&gt; &quot;tools.js&quot;;
+
+
+  &quot;textflow.js&quot; -&gt; &quot;panel.js&quot;;
+  &quot;textflow.js&quot; -&gt; &quot;tools.js&quot;;
+}" />
+<p class="caption"><span class="caption-text">Module dependencies for <a class="reference internal" href="#coherence" title="coherence"><code class="xref js js-mod docutils literal"><span class="pre">coherence</span></code></a>.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
 <dl class="function">
 <dt id="coherence.module:coherence.init">
 <code class="descclassname">module:coherence.</code><code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#coherence.module:coherence.init" title="Permalink to this definition">¶</a></dt>
@@ -630,8 +709,8 @@ passage.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="relatives.module:relatives.create_panel">
-<code class="descclassname">module:relatives.</code><code class="descname">create_panel</code><span class="sig-paren">(</span><em>ms_id</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.create_panel" title="Permalink to this definition">¶</a></dt>
+<dt id="relatives.module:relatives.create_popup">
+<code class="descclassname">module:relatives.</code><code class="descname">create_popup</code><span class="sig-paren">(</span><em>ms_id</em>, <em>passage</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.create_popup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a popup panel.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -639,6 +718,24 @@ passage.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
 <li><strong>ms_id</strong> (<em>integer</em>) – The manuscript id.</li>
+<li><strong>passage</strong> (<em>Object</em>) – The passage.</li>
+<li><strong>target</strong> (<em>DOM</em>) – A DOM element relative to which to position the popup.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="relatives.module:relatives.position_popup">
+<code class="descclassname">module:relatives.</code><code class="descname">position_popup</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.position_popup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Position the popup panel relative to the element that created the popup.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
 <li><strong>target</strong> (<em>DOM</em>) – A DOM element relative to which to position the popup.</li>
 </ul>
 </td>
@@ -890,6 +987,40 @@ div.panel-closable panes.</p>
 </div>
 <div class="section" id="module-comparison">
 <span id="comparison-the-comparison-page"></span><h2><a class="reference internal" href="#comparison" title="comparison"><code class="xref js js-mod docutils literal"><span class="pre">comparison</span></code></a> — The Comparison Page<a class="headerlink" href="#module-comparison" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-center" id="id2">
+<img src="_images/graphviz-c3aa780d1a82036a7d45261bea0137c3b405a6be.png" alt="digraph G {
+graph [rankdir=&quot;LR&quot;]
+
+
+
+
+
+
+
+  &quot;comparison.js&quot;;
+  &quot;tools.js&quot;;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  &quot;comparison.js&quot; -&gt; &quot;tools.js&quot;;
+}" />
+<p class="caption"><span class="caption-text">Module dependencies for <a class="reference internal" href="#comparison" title="comparison"><code class="xref js js-mod docutils literal"><span class="pre">comparison</span></code></a>.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
 <dl class="function">
 <dt id="comparison.module:comparison.dir">
 <code class="descclassname">module:comparison.</code><code class="descname">dir</code><span class="sig-paren">(</span><em>older</em>, <em>newer</em><span class="sig-paren">)</span><a class="headerlink" href="#comparison.module:comparison.dir" title="Permalink to this definition">¶</a></dt>
@@ -1271,27 +1402,6 @@ corner (llx,lly) and the upper-right corner (urx,ury).</p>
 </table>
 </dd></dl>
 
-<dl class="function">
-<dt id="d3-common.module:d3-common.bfs">
-<code class="descclassname">module:d3-common.</code><code class="descname">bfs</code><span class="sig-paren">(</span><em>edges</em>, <em>start</em><span class="sig-paren">)</span><a class="headerlink" href="#d3-common.module:d3-common.bfs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Breadth first search in graph</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>edges</strong> (<em>Object</em>) – The edges list</li>
-<li><strong>start</strong> (<em>string</em>) – The start node id</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of node ids in breadth-first order</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </div>
 <div class="section" id="module-tools">
 <span id="tools-various-functions"></span><h2><a class="reference internal" href="#tools" title="tools"><code class="xref js js-mod docutils literal"><span class="pre">tools</span></code></a> — Various Functions<a class="headerlink" href="#module-tools" title="Permalink to this headline">¶</a></h2>
@@ -1393,6 +1503,27 @@ position of the menu manually.</p>
 <li><strong>xhr</strong> (<em>Object</em>) – The server response containing the message.  The JSON response must contain an Object with a message field.</li>
 <li><strong>$panel</strong> (<em>jQuery</em>) – The panel to append the window to.</li>
 </ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.module:tools.bfs">
+<code class="descclassname">module:tools.</code><code class="descname">bfs</code><span class="sig-paren">(</span><em>edges</em>, <em>start</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.bfs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Breadth first search in graph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>edges</strong> (<em>Object</em>) – The edges list</li>
+<li><strong>start</strong> (<em>string</em>) – The start node id</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of node ids in breadth-first order</p>
 </td>
 </tr>
 </tbody>

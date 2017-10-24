@@ -1,0 +1,11 @@
+{
+    "requireConfig": "server/static/js/config.require.js",
+    "baseDir": "server",
+    "fileExtensions" : ["js", "es6"],
+    "excludeRegExp" : ["css$"],
+    "graphVizOptions": {
+        "G": {
+            "rankdir": "LR"
+        }
+    }
+}

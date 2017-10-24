@@ -1,0 +1,72 @@
+digraph G {
+graph [rankdir="LR"]
+
+
+
+
+
+
+
+
+  "apparatus.js";
+  "panel.js";
+  "tools.js";
+  "coherence.js";
+  "d3-chord-layout.js";
+  "d3-common.js";
+  "d3-stemma-layout.js";
+  "local-stemma.js";
+  "navigator.js";
+  "relatives.js";
+  "textflow.js";
+  "dot-grammar.pegjs";
+
+
+
+
+  "apparatus.js" -> "panel.js";
+  "apparatus.js" -> "tools.js";
+
+  "coherence.js" -> "apparatus.js";
+  "coherence.js" -> "d3-chord-layout.js";
+  "coherence.js" -> "d3-common.js";
+  "coherence.js" -> "d3-stemma-layout.js";
+  "coherence.js" -> "local-stemma.js";
+  "coherence.js" -> "navigator.js";
+  "coherence.js" -> "panel.js";
+  "coherence.js" -> "relatives.js";
+  "coherence.js" -> "textflow.js";
+
+
+
+  "d3-chord-layout.js" -> "d3-common.js";
+
+
+
+
+  "d3-common.js" -> "dot-grammar.pegjs";
+
+
+
+  "d3-stemma-layout.js" -> "d3-common.js";
+
+
+
+  "local-stemma.js" -> "tools.js";
+
+
+
+
+
+
+
+
+
+
+  "relatives.js" -> "panel.js";
+  "relatives.js" -> "tools.js";
+
+
+  "textflow.js" -> "panel.js";
+  "textflow.js" -> "tools.js";
+}

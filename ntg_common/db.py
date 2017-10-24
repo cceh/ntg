@@ -164,7 +164,7 @@ class Att (Base):
     the data in this table has to be normalised into our database structure and
     converted into a positive apparatus.
 
-    .. sadisplay::
+    .. sauml::
        :include: att
 
     .. _att:
@@ -345,7 +345,7 @@ class Lac (Base):
     This table has the same structure as table Att.  For the description of the
     columns see :ref:`table Att <att>`.
 
-    .. sadisplay::
+    .. sauml::
        :include: lac
 
     """
@@ -439,7 +439,7 @@ class Manuscripts (Base2):
     This table lists all the manuscripts of New Testament that we have collated
     for the edition.
 
-    .. sadisplay::
+    .. sauml::
        :include: manuscripts
 
     .. attribute:: ms_id
@@ -481,7 +481,7 @@ class Books (Base2):
 
     This table lists all the books of the NT and the book id given to them.
 
-    .. sadisplay::
+    .. sauml::
        :include: books
 
     .. attribute:: bk_id
@@ -524,7 +524,7 @@ class Passages (Base2):
     manuscripts.  Passages that are the same in all manuscripts (invariant) are
     purged because they are irrelevant to the CBGM.
 
-    .. sadisplay::
+    .. sauml::
        :include: passages
 
     .. attribute:: pass_id
@@ -599,7 +599,7 @@ class Readings (Base2):
     normalized, then equal readings are grouped.  Each group of readings is
     assigned an id, the 'labez'.
 
-    .. sadisplay::
+    .. sauml::
        :include: readings
 
     .. _labez:
@@ -687,7 +687,7 @@ class Cliques (Base2):
     reading.  A reading may have been originated more than once, while a clique
     has been originated only once.
 
-    .. sadisplay::
+    .. sauml::
        :include: cliques
 
     .. attribute:: clique
@@ -711,7 +711,7 @@ class Cliques (Base2):
 class Apparatus (Base2):
     """A table that contains the positive apparatus.
 
-    .. sadisplay::
+    .. sauml::
        :include: apparatus
 
     .. attribute:: cbgm
@@ -780,7 +780,7 @@ class LocStem (Base2):
     This table contains the main output of the editors.  The editors decide
     which reading is derived from which other reading(s) at each passage.
 
-    .. sadisplay::
+    .. sauml::
        :include: locstem
 
     .. attribute:: labez, clique
@@ -830,7 +830,7 @@ class Ranges (Base2):
     ranges corresponding to chapters are named by the chapter number, '1', '2',
     ...  The whole book range is called 'All'.
 
-    .. sadisplay::
+    .. sauml::
        :include: ranges
 
     .. attribute:: range
@@ -863,7 +863,7 @@ class Ms_Ranges (Base2):
 
     Here we hold values that are calculated by CBGM related to one manuscript.
 
-    .. sadisplay::
+    .. sauml::
        :include: ms_ranges
 
     .. attribute:: length
@@ -895,7 +895,7 @@ class Affinity (Base2):
     locstem data, and one for the backward-compatible non-recurisve
     interpretation (with 'p\_' prefix).
 
-    .. sadisplay::
+    .. sauml::
        :include: affinity
 
     .. attribute:: common
