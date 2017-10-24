@@ -10,11 +10,13 @@
 define ([
     'jquery',
     'lodash',
-    'tools',
+    'bootstrap',
+    'bootstrap-slider',
     'css!panel-css',
+    'css!bootstrap-slider-css',
 ],
 
-function ($, _, tools) {
+function ($, _) {
     function on_maximizing_panel_visibility (event) {
         var instance = event.data;
 

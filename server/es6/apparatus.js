@@ -12,7 +12,6 @@ define ([
     'lodash',
     'tools',
     'panel',
-    'bootstrap',
     'css!apparatus-css',
 ],
 

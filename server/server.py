@@ -291,7 +291,7 @@ def ms_attesting (passage_or_id, labez):
 
 
 @app.endpoint ('relatives-skeleton')
-def relatives_skeleton (hs_hsnr_id, passage_or_id):
+def relatives_skeleton (hs_hsnr_id):
     """Endpoint. Serve a skeleton for the relatives popup.
 
     An endpoint that serves an empty skeleton for the relatives popup.
@@ -301,9 +301,7 @@ def relatives_skeleton (hs_hsnr_id, passage_or_id):
     chapter = request.args.get ('range') or 'All'
 
     with current_app.config.dba.engine.begin () as conn:
-
-        passage = Passage (conn, passage_or_id)
-        ms      = Manuscript (conn, hs_hsnr_id)
+        ms = Manuscript (conn, hs_hsnr_id)
 
     # convert tuples to lists
     return flask.render_template ('relatives-skeleton.html', ms = ms)
@@ -1126,7 +1124,7 @@ if __name__ == "__main__":
             Rule ('/cliques.json/<passage_or_id>',                endpoint = 'cliques.json'),
             Rule ('/ranges.json/<passage_or_id>',                 endpoint = 'ranges.json'),
             Rule ('/ms_attesting/<passage_or_id>/<labez>',        endpoint = 'ms_attesting'),
-            Rule ('/relatives/<passage_or_id>/<hs_hsnr_id>',      endpoint = 'relatives-skeleton'),
+            Rule ('/relatives/<hs_hsnr_id>',                      endpoint = 'relatives-skeleton'),
             Rule ('/relatives.html/<passage_or_id>/<hs_hsnr_id>', endpoint = 'relatives.html'),
             Rule ('/apparatus.json/<passage_or_id>',              endpoint = 'apparatus.json'),
             Rule ('/attestation.json/<passage_or_id>',            endpoint = 'attestation.json'),

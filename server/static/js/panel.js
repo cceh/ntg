@@ -11,7 +11,7 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
  * @author Marcello Perathoner
  */
 
-define(['jquery', 'lodash', 'tools', 'css!panel-css'], function ($, _, tools) {
+define(['jquery', 'lodash', 'bootstrap', 'bootstrap-slider', 'css!panel-css', 'css!bootstrap-slider-css'], function ($, _) {
     function on_maximizing_panel_visibility(event) {
         var instance = event.data;
 

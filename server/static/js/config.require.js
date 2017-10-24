@@ -1,5 +1,5 @@
 requirejs.config ({
-    'urlArgs' : 'bust=' + server_start_time,
+    'urlArgs' : 'bust=' + (typeof server_start_time === 'undefined' ? '0' : server_start_time),
     'paths'   : {
         // public libs
         'bootstrap'                    : '/static/bower_components/bootstrap/dist/js/bootstrap',
@@ -35,8 +35,8 @@ requirejs.config ({
         'bootstrap-css'                : '/static/bower_components/bootstrap/dist/css/bootstrap',
         'bootstrap-slider-css'         : '/static/bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider',
         'jquery-ui-css'                : '/static/bower_components/jquery-ui/themes/smoothness/jquery-ui',
-        'datatables-bs-css'            : '/static/bower_components/datatables.net-bs/css/dataTables.bootstrap',
-        'datatables-buttons-bs-css'    : '/static/bower_components/datatables.net-buttons-bs/css/buttons.bootstrap',
+        'datatables.net-bs-css'        : '/static/bower_components/datatables.net-bs/css/dataTables.bootstrap',
+        'datatables.net-buttons-bs-css': '/static/bower_components/datatables.net-buttons-bs/css/buttons.bootstrap',
         // private css
         'site-css'                     : '/static/css/site',
         'apparatus-css'                : '/static/css/apparatus',

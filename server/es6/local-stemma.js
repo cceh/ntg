@@ -9,12 +9,10 @@ define ([
     'jquery',
     'lodash',
     'd3',
-    'd3-common',
-    'navigator',
     'tools',
 ],
 
-function ($, _, d3, d3common, navigator, tools) {
+function ($, _, d3, tools) {
     function changed () {
         // currently unused
         $ (document).trigger ('changed.ntg.local-stemma');
@@ -82,6 +80,8 @@ function ($, _, d3, d3common, navigator, tools) {
      */
 
     function dragListener (panel) {
+        var passage = this.passage;
+
         return d3.drag ()
             .on ('start', function (dummy_d) {
                 // do nothing (yet)
@@ -115,7 +115,7 @@ function ($, _, d3, d3common, navigator, tools) {
                         action = (dragged_node.datum ().labez === target_node.datum ().labez)
                             ? 'merge' : 'split';
                     }
-                    var xhr = $.getJSON ('stemma-edit/' + navigator.passage.pass_id, {
+                    var xhr = $.getJSON ('stemma-edit/' + passage.pass_id, {
                         'action'     : action,
                         'labez_old'  : dragged_node.datum ().labez,
                         'clique_old' : dragged_node.datum ().clique,
@@ -178,7 +178,8 @@ function ($, _, d3, d3common, navigator, tools) {
     function open_contextmenu (event) {
         event.preventDefault ();
 
-        var xhr = $.getJSON ('cliques.json/' + navigator.passage.pass_id);
+        var passage = this.passage;
+        var xhr = $.getJSON ('cliques.json/' + passage.pass_id);
         xhr.done (function (json) {
             var dataset = event.target.dataset;
             var data = {
@@ -248,7 +249,7 @@ function ($, _, d3, d3common, navigator, tools) {
 
                     // console.log ('Selected: ' + $ (tr).text ());
 
-                    var xhr2 = $.getJSON ('stemma-edit/' + navigator.passage.pass_id, tr.dataset);
+                    var xhr2 = $.getJSON ('stemma-edit/' + passage.pass_id, tr.dataset);
                     xhr2.done (function (json2) {
                         // stemma-edit returns the changed passage
                         $ (document).trigger ('ntg.panel.reload', json2.data);
@@ -272,6 +273,7 @@ function ($, _, d3, d3common, navigator, tools) {
      */
     function load_passage (passage) {
         var instance = this;
+        instance.passage = passage;
 
         var params = ['width', 'fontsize'];
 

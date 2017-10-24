@@ -16,11 +16,11 @@ define ([
     'datatables.net-bs',
     'datatables.net-buttons',
     'datatables.net-buttons-bs',
-    'datatables.net-buttons-html5',
+    // 'datatables.net-buttons-html5',
     'datatables.net-buttons-print',
     'css!bootstrap-css',
-    'css!datatables-bs-css',
-    'css!datatables-buttons-bs-css',
+    'css!datatables.net-bs-css',
+    'css!datatables.net-buttons-bs-css',
     'css!site-css',
     'css!comparison-css'],
 
@@ -488,10 +488,7 @@ function ($, d3, tools) {
                 $ ('input[name="ms2"]', $form).val (module.ms2.hs);
 
                 // update the headers
-                var caption  = tools.format ('Comparison of {ms1} and {ms2}', {
-                    'ms1' : module.ms1.hs,
-                    'ms2' : module.ms2.hs,
-                });
+                var caption  = `Comparison of ${module.ms1.hs} and ${module.ms2.hs}`;
                 $ ('title').text (caption);
                 $ ('h1 span.caption').text (caption);
                 $ ('div.panel-comparison-header span.caption').text (caption);

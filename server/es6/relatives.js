@@ -9,15 +9,12 @@
 define ([
     'jquery',
     'lodash',
-    'd3',
-    'd3-common',
     'tools',
     'panel',
-    'navigator',
     'css!relatives-css',
 ],
 
-function ($, _, d3, d3c, tools, panel, nav) {
+function ($, _, tools, panel) {
     function changed () {
         $ (document).trigger ('changed.ntg.relatives');
     }
@@ -92,6 +89,29 @@ function ($, _, d3, d3c, tools, panel, nav) {
     }
 
     /**
+     * Position the popup panel relative to the element that created the popup.
+     *
+     * @function position_popup
+     *
+     * @param {DOM} target    - A DOM element relative to which to position the popup.
+     */
+
+    function position_popup (target) {
+        var instance = this;
+
+        var rect = target.getBoundingClientRect ();
+        var bodyRect = document.body.getBoundingClientRect (); // account for scrolling
+        var event = new $.Event ('click');
+        event.pageY = rect.top  - bodyRect.top  + (rect.height / 2.0);
+        event.pageX = rect.left - bodyRect.left + (rect.width / 2.0);
+        instance.$panel.position ({
+            'my'        : 'center bottom-15',
+            'collision' : 'flipfit flip',
+            'of'        : event,
+        });
+    };
+
+    /**
      * Initialize the module.
      *
      * @function init
@@ -101,6 +121,7 @@ function ($, _, d3, d3c, tools, panel, nav) {
 
     function init (instance) {
         instance.load_passage = load_passage;
+        instance.position_popup = position_popup;
         $.extend (instance.data, {
             'type'      : 'rel',
             'range'     : 'All',
@@ -122,15 +143,16 @@ function ($, _, d3, d3c, tools, panel, nav) {
     /**
      * Create a popup panel.
      *
-     * @function create_panel
+     * @function create_popup
      *
-     * @param {integer} ms_id - The manuscript id.
-     * @param {DOM} target    - A DOM element relative to which to position the popup.
+     * @param {integer} ms_id  - The manuscript id.
+     * @param {Object} passage - The passage.
+     * @param {DOM} target     - A DOM element relative to which to position the popup.
      */
 
-    function create_panel (ms_id, target) {
+    function create_popup (ms_id, passage, target) {
         // get the popup skeleton
-        $.get ('relatives/' + nav.passage.pass_id + '/id' + ms_id, function (html) {
+        $.get ('relatives/id' + ms_id, function (html) {
             // append the skeleton to the floating panels section
             var $popup = $ (html).hide ();
             $popup.appendTo ('#floating-panels');
@@ -138,26 +160,14 @@ function ($, _, d3, d3c, tools, panel, nav) {
             $popup.on ('changed.panel.visibility', changed);
 
             var instance = init (panel.init ($popup));
-            instance.load_passage (nav.passage).done (function () {
-                // position popup
-                var rect = target.getBoundingClientRect ();
-                var bodyRect = document.body.getBoundingClientRect (); // account for scrolling
-                var event = new $.Event ('click');
-                event.pageY = rect.top - bodyRect.top;
-                event.pageX = rect.left - bodyRect.left + (rect.width / 2.0);
-                $popup.position ({
-                    'my'        : 'center bottom-3',
-                    'collision' : 'flipfit flip',
-                    'of'        : event,
-                });
+            instance.load_passage (passage).done (function () {
+                instance.position_popup (target);
             });
 
             panel.create_panel_controls ($popup);
             $popup.draggable ();
-            $popup.on ('dragstart', function () {
-                // FIXME: $popup.appendTo ('#floating-panels'); // bring to top
-            });
 
+            deferred.resolve ();
             // notify others
             changed ();
         });
@@ -165,7 +175,7 @@ function ($, _, d3, d3c, tools, panel, nav) {
 
     return {
         'init'                   : init,
-        'create_panel'           : create_panel,
+        'create_popup'           : create_popup,
         'get_ms_ids_from_popups' : get_ms_ids_from_popups,
     };
 });

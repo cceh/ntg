@@ -301,40 +301,8 @@ define(['jquery', 'd3', 'lodash', 'pegjs', 'text!/static/js/dot-grammar.pegjs'],
         });
     }
 
-    /**
-     * Breadth first search in graph
-     *
-     * @function bfs
-     *
-     * @param {Object} edges - The edges list
-     * @param {string} start - The start node id
-     *
-     * @return A list of node ids in breadth-first order
-     */
-
-    function bfs(edges, start) {
-        var ids = [start];
-        var queue = [];
-        var cur = start;
-        function is_adjacent(edge) {
-            return edge.elems[0].id === cur;
-        }
-        while (cur) {
-            _.forEach(_.filter(edges, is_adjacent), function (n) {
-                var id = n.elems[1].id;
-                if (_.indexOf(ids, id) === -1) {
-                    ids.push(id);
-                    queue.push(id);
-                }
-            });
-            cur = queue.shift();
-        }
-        return ids;
-    }
-
     return {
         'append_marker': append_marker,
-        'bfs': bfs,
         'cliques_palette': cliques_palette,
         'dot': dot,
         'generate_css_palette': generate_css_palette,

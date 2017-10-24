@@ -8,9 +8,6 @@
 
 define ([
     'jquery',
-    'lodash',
-    'tools',
-    'd3',
     'd3-common',
     'd3-stemma',
     'd3-chord',
@@ -20,15 +17,13 @@ define ([
     'relatives',
     'textflow',
     'local-stemma',
-    'bootstrap',
     'css!bootstrap-css',
-    'css!bootstrap-slider-css',
     'css!jquery-ui-css',
     'css!site-css',
     'css!coherence-css',
 ],
 
-function ($, _, tools, d3, d3common, d3stemma, d3chord,
+function ($, d3common, d3stemma, d3chord,
     apparatus, navigator, panel, relatives, textflow, locstem) {
     var module = {}; // singleton
 
@@ -106,7 +101,7 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
         $ (document).on ('click', '.ms[data-ms-id]', function (event) {
             event.stopPropagation ();
             var ms_id = $ (event.target).attr ('data-ms-id');
-            relatives.create_panel (ms_id, event.target);
+            relatives.create_popup (ms_id, module.navigator.passage, event.target);
         });
 
         // Click on a comparison row in the apparatus or in a relatives popup.
@@ -121,7 +116,7 @@ function ($, _, tools, d3, d3common, d3stemma, d3chord,
         // Click on a node in the textflow diagram.
         $ (document).on ('click', 'div.panel-textflow g.node', function (event) {
             var ms_id = $ (event.currentTarget).attr ('data-ms-id'); // the g.node, not the circle
-            relatives.create_panel (ms_id, event.currentTarget);
+            relatives.create_popup (ms_id, module.navigator.passage, event.currentTarget);
         });
 
         // Click on canvas to close context menus

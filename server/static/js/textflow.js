@@ -13,16 +13,11 @@ define ([
     'jquery',
     'lodash',
     'panel',
-    'navigator',
     'tools',
-    'd3-common',
-    'bootstrap',
-    'bootstrap-slider',
-    'jquery-ui',
     'css!textflow-css',
 ],
 
-function ($, _, panel, navigator, tools, d3common) {
+function ($, _, panel, tools) {
     function changed () {
         // currently unused
         $ (document).trigger ('ntg.textflow.changed');
@@ -37,6 +32,8 @@ function ($, _, panel, navigator, tools, d3common) {
      */
     function load_passage (passage) {
         var instance = this;
+        instance.passage = passage;
+
         var params = [
             'labez', 'connectivity', 'range', 'include', 'fragments',
             'mode', 'hyp_a', 'var_only', 'width', 'fontsize', 'cliques',
@@ -95,7 +92,8 @@ function ($, _, panel, navigator, tools, d3common) {
     function open_contextmenu (event) {
         event.preventDefault ();
 
-        var xhr = $.getJSON ('cliques.json/' + navigator.passage.pass_id);
+        var passage = this.passage;
+        var xhr = $.getJSON ('cliques.json/' + passage.pass_id);
         xhr.done (function (json) {
             var instance = event.data;
             var msid     = event.target.parentNode.dataset.msId;
@@ -143,12 +141,12 @@ function ($, _, panel, navigator, tools, d3common) {
                     // console.log ('Selected: ' + $ (tr).text ());
 
                     var xhr2 = $.getJSON (
-                        'stemma-edit/' + navigator.passage.pass_id,
+                        'stemma-edit/' + passage.pass_id,
                         // do not extend the dataset itself,
                         // because arrays cannot be part of
                         // datasets
                         $.extend ({}, tr.dataset, {
-                            'ms_ids' : d3common.bfs (instance.graph.edges, msid),
+                            'ms_ids' : tools.bfs (instance.graph.edges, msid),
                         })
                     );
                     xhr2.done (function (json2) {
