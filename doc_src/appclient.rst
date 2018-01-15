@@ -43,6 +43,16 @@ There are two main entry points: the :mod:`coherence` page and the
 .. autofunction:: module:apparatus~init(instance)
 
 
+:mod:`notes` --- The Notes Panel
+================================
+
+.. module:: notes
+
+.. autofunction:: module:notes~load_passage(passage)
+.. autofunction:: module:notes~save_passage(instance)
+.. autofunction:: module:notes~init(instance, dummy_id_prefix)
+
+
 :mod:`local-stemma` --- The Local Stemma Panel
 ==============================================
 

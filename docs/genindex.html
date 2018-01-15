@@ -103,7 +103,7 @@
 </li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Short Introduction in the Problem Domain (German)</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Short Introduction to the Problem Domain (German)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developer.html#editionen">Editionen</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="developer.html#nestle-aland">Nestle-Aland</a></li>
@@ -160,6 +160,7 @@
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-coherence"><code class="docutils literal"><span class="pre">coherence</span></code> — The Coherence Page</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-navigator"><code class="docutils literal"><span class="pre">navigator</span></code> — The Navigator Gadget</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-apparatus"><code class="docutils literal"><span class="pre">apparatus</span></code> — The Apparatus Panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-notes"><code class="docutils literal"><span class="pre">notes</span></code> — The Notes Panel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-local-stemma"><code class="docutils literal"><span class="pre">local-stemma</span></code> — The Local Stemma Panel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-textflow"><code class="docutils literal"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-relatives"><code class="docutils literal"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
@@ -390,6 +391,8 @@
 </li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.copy_table">copy_table() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.copy_table_fdw">copy_table_fdw() (in module scripts.cceh.prepare4cbgm)</a>
+</li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.count_by_range">count_by_range() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.create_labez_matrix">create_labez_matrix() (in module scripts.cceh.prepare4cbgm)</a>
@@ -616,10 +619,10 @@
 </li>
       <li><a href="appclient.html#local-stemma.module:local-stemma.highlight">module:local-stemma.highlight() (module:local-stemma method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appclient.html#local-stemma.module:local-stemma.init">module:local-stemma.init() (module:local-stemma method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appclient.html#local-stemma.module:local-stemma.load_passage">module:local-stemma.load_passage() (module:local-stemma method)</a>
 </li>
       <li><a href="appclient.html#local-stemma.module:local-stemma.open_contextmenu">module:local-stemma.open_contextmenu() (module:local-stemma method)</a>
@@ -635,6 +638,12 @@
       <li><a href="appclient.html#navigator.module:navigator.set_passage">module:navigator.set_passage() (module:navigator method)</a>
 </li>
       <li><a href="appclient.html#navigator.module:navigator.suggest">module:navigator.suggest() (module:navigator method)</a>
+</li>
+      <li><a href="appclient.html#notes.module:notes.init">module:notes.init() (module:notes method)</a>
+</li>
+      <li><a href="appclient.html#notes.module:notes.load_passage">module:notes.load_passage() (module:notes method)</a>
+</li>
+      <li><a href="appclient.html#notes.module:notes.save_passage">module:notes.save_passage() (module:notes method)</a>
 </li>
       <li><a href="appclient.html#panel.module:panel.create_panel_controls">module:panel.create_panel_controls() (module:panel method)</a>
 </li>
@@ -698,12 +707,16 @@
 </li>
       <li><a href="database.html#ntg_common.db.Affinity.newer">newer (Affinity attribute)</a>
 </li>
-      <li><a href="ntg_common.html#module-ntg_common">ntg_common (module)</a>
+      <li><a href="appclient.html#module-notes">notes (module)</a>
 </li>
-      <li><a href="database.html#module-ntg_common.db">ntg_common.db (module)</a>
+      <li><a href="appserver.html#server.editor.notes">notes() (in module server.editor)</a>
+</li>
+      <li><a href="ntg_common.html#module-ntg_common">ntg_common (module)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="database.html#module-ntg_common.db">ntg_common.db (module)</a>
+</li>
       <li><a href="ntg_common.html#module-ntg_common.db_tools">ntg_common.db_tools (module)</a>
 </li>
       <li><a href="ntg_common.html#module-ntg_common.tools">ntg_common.tools (module)</a>

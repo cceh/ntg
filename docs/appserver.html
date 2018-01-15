@@ -104,7 +104,7 @@
 </li>
 </ul>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Short Introduction in the Problem Domain (German)</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Short Introduction to the Problem Domain (German)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developer.html#editionen">Editionen</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="developer.html#nestle-aland">Nestle-Aland</a></li>
@@ -161,6 +161,7 @@
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-coherence"><code class="docutils literal"><span class="pre">coherence</span></code> — The Coherence Page</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-navigator"><code class="docutils literal"><span class="pre">navigator</span></code> — The Navigator Gadget</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-apparatus"><code class="docutils literal"><span class="pre">apparatus</span></code> — The Apparatus Panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-notes"><code class="docutils literal"><span class="pre">notes</span></code> — The Notes Panel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-local-stemma"><code class="docutils literal"><span class="pre">local-stemma</span></code> — The Local Stemma Panel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-textflow"><code class="docutils literal"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-relatives"><code class="docutils literal"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
@@ -452,6 +453,12 @@ the database.</p>
 <dt id="server.editor.EditException">
 <em class="property">exception </em><code class="descname">EditException</code><span class="sig-paren">(</span><em>message</em>, <em>status_code=None</em>, <em>payload=None</em><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.EditException" title="Permalink to this definition">¶</a></dt>
 <dd><p>See: <a class="reference external" href="http://flask.pocoo.org/docs/0.12/patterns/apierrors/">http://flask.pocoo.org/docs/0.12/patterns/apierrors/</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.editor.notes">
+<code class="descname">notes</code><span class="sig-paren">(</span><em>passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.notes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the editor notes for a passage</p>
 </dd></dl>
 
 <dl class="function">

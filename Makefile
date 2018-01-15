@@ -121,8 +121,10 @@ $(STATIC)/css/%.css : $(SERVER)/less/%.less
 	gzip < $? > $@
 
 install-prerequisites:
-	sudo apt-get install apache2 libapache2-mod-wsgi-py3 postgres libpg-dev mysql python3 python3-pip \
-		graphviz git plantuml
+	sudo apt-get install apache2 libapache2-mod-wsgi-py3 \
+		postgres libpg-dev postgresql-10-mysql-fdw \
+		mysql default-libmysqlclient-dev \
+		python3 python3-pip graphviz git plantuml
 	sudo pip3 install --upgrade \
 		numpy networkx matplotlib Pillow \
 		psycopg2 mysqlclient sqlalchemy sqlalchemy-utils intervals \

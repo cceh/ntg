@@ -1,16 +1,17 @@
 /**
- * This module implements the local stemma drag-and-drop editing.
+ * This module implements the editor notes panel.
  *
- * @module local-stemma
+ * @module notes
  * @author Marcello Perathoner
  */
 
 define ([
     'jquery',
+    'tools',
     'css!notes-css',
 ],
 
-function ($) {
+function ($, tools) {
     function dyn_resize (instance) {
         let $ta = instance.$textarea;
         let old_height = $ta.prop ('clientHeight');
@@ -22,7 +23,7 @@ function ($) {
 
     function changed (instance) {
         dyn_resize (instance);
-        instance.$save_button.prop ('disabled', instance.original_text == instance.$textarea.val ());
+        instance.$save_button.prop ('disabled', instance.original_text === instance.$textarea.val ());
         $ (document).trigger ('changed.ntg.notes');
     }
 
@@ -50,16 +51,23 @@ function ($) {
         });
     }
 
+    /**
+     * Save an edited passage.
+     *
+     * @function save_passage
+     *
+     * @param {Object} instance - The module instance
+     */
     function save_passage (instance) {
         let url = 'notes.txt/' + instance.passage.pass_id;
-        $.ajax ({
-            'url'     : url,
-            'method'  : 'PUT',
-            'data'    : { 'remarks' : instance.$textarea.val () },
-            'success' : function (result) {
-                instance.original_text = instance.$textarea.val ();
-                changed (instance);
-            }
+        let xhr = $.ajax ({
+            'url'    : url,
+            'method' : 'PUT',
+            'data'   : { 'remarks' : instance.$textarea.val () },
+        }).done (function (dummy_result) {
+            instance.original_text = instance.$textarea.val ();
+            changed (instance);
+            tools.xhr_alert (xhr, instance.$wrapper);
         });
     }
 
@@ -76,7 +84,8 @@ function ($) {
     function init (instance, dummy_id_prefix) {
         instance.load_passage = load_passage;
         $.extend (instance.data, {});
-        instance.$textarea = instance.$panel.find ('.panel-content textarea');
+        instance.$wrapper  = instance.$panel.find ('.panel-content');
+        instance.$textarea = instance.$wrapper.find ('textarea');
         instance.$textarea.on ('input', () => {
             changed (instance);
         });

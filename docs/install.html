@@ -38,7 +38,7 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
-        <link rel="next" title="Short Introduction in the Problem Domain (German)" href="developer.html"/>
+        <link rel="next" title="Short Introduction to the Problem Domain (German)" href="developer.html"/>
         <link rel="prev" title="Introduction" href="intro.html"/> 
 
   
@@ -104,7 +104,7 @@
 </li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Short Introduction in the Problem Domain (German)</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Short Introduction to the Problem Domain (German)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developer.html#editionen">Editionen</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="developer.html#nestle-aland">Nestle-Aland</a></li>
@@ -161,6 +161,7 @@
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-coherence"><code class="docutils literal"><span class="pre">coherence</span></code> — The Coherence Page</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-navigator"><code class="docutils literal"><span class="pre">navigator</span></code> — The Navigator Gadget</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-apparatus"><code class="docutils literal"><span class="pre">apparatus</span></code> — The Apparatus Panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-notes"><code class="docutils literal"><span class="pre">notes</span></code> — The Notes Panel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-local-stemma"><code class="docutils literal"><span class="pre">local-stemma</span></code> — The Local Stemma Panel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-textflow"><code class="docutils literal"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-relatives"><code class="docutils literal"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
@@ -295,6 +296,7 @@ Postgres to access the MySQL databases.</p>
 <div class="highlight-psql"><div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">USER</span> <span class="n">ntg</span> <span class="n">CREATEDB</span> <span class="k">PASSWORD</span> <span class="s1">&#39;&lt;password&gt;&#39;</span><span class="p">;</span>
 <span class="go">CREATE DATABASE ntg_user OWNER ntg;</span>
 <span class="go">CREATE DATABASE ntg_ph4 OWNER ntg;</span>
+<span class="go">\c ntg_ph4</span>
 <span class="go">CREATE EXTENSION mysql_fdw;</span>
 <span class="go">GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;</span>
 <span class="go">\q</span>
@@ -420,7 +422,7 @@ mysql -D <span class="s2">&quot;ECM_ActsPh4&quot;</span>      &lt; ECM_ActsPh4.d
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="developer.html" class="btn btn-neutral float-right" title="Short Introduction in the Problem Domain (German)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="developer.html" class="btn btn-neutral float-right" title="Short Introduction to the Problem Domain (German)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="intro.html" class="btn btn-neutral" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

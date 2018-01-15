@@ -66,6 +66,7 @@
         "no-mixed-operators"   : ["error", { "allowSamePrecedence" : true }],
         "no-spaced-func"       : "off",
         "no-underscore-dangle" : "off",
+        "no-restricted-syntax" : "off",
 
         // best practices
         "no-multi-spaces"   : "off",

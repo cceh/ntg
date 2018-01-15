@@ -17,6 +17,7 @@ graph [rankdir="LR"]
   "d3-stemma-layout.js";
   "local-stemma.js";
   "navigator.js";
+  "notes.js";
   "relatives.js";
   "textflow.js";
   "dot-grammar.pegjs";
@@ -33,6 +34,7 @@ graph [rankdir="LR"]
   "coherence.js" -> "d3-stemma-layout.js";
   "coherence.js" -> "local-stemma.js";
   "coherence.js" -> "navigator.js";
+  "coherence.js" -> "notes.js";
   "coherence.js" -> "panel.js";
   "coherence.js" -> "relatives.js";
   "coherence.js" -> "textflow.js";
@@ -57,6 +59,8 @@ graph [rankdir="LR"]
   "navigator.js" -> "jquery/dist/jquery.js";
   "navigator.js" -> "lodash/lodash.js";
   "navigator.js" -> "urijs/src/URI.fragmentQuery.js";
+  "notes.js" -> "jquery/dist/jquery.js";
+  "notes.js" -> "tools.js";
   "panel.js" -> "bootstrap/dist/js/bootstrap.js";
   "panel.js" -> "jquery/dist/jquery.js";
   "panel.js" -> "lodash/lodash.js";
@@ -69,4 +73,5 @@ graph [rankdir="LR"]
   "textflow.js" -> "lodash/lodash.js";
   "textflow.js" -> "panel.js";
   "textflow.js" -> "tools.js";
+  "tools.js" -> "lodash/lodash.js";
 }

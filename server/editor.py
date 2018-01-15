@@ -224,7 +224,7 @@ def notes (passage_or_id):
                        pass_id = passage.pass_id,
                        remarks = request.form['remarks']))
 
-            return make_text_response ('Notes updated OK')
+            return make_json_response (message = 'Notes saved.')
         else:
             res = execute (conn, """
             SELECT remarks

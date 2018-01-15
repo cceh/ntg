@@ -7,9 +7,12 @@ A program suite for doing CBGM.
 The CBGM is a method for inferring global manuscript stemmata from local
 stemmata in the manuscripts' texts.
 
+..
+   http://ntg.cceh.uni-koeln.de/ph4/coherence#51528030-4
+
 .. graphviz:: local-stemma-example.dot
    :align: center
-   :caption: A example of local stemma
+   :caption: An example of a local stemma
 
 In the CBGM we assume that a manuscript is prior to another manuscript if it
 contains a greater percentage of prior readings than posterior readings.  Then

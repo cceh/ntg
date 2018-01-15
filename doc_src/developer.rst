@@ -1,7 +1,7 @@
 .. -*- encoding: utf-8; bidi-paragraph-direction: left-to-right; fill-column: 72 -*-
 
 ===================================================
- Short Introduction in the Problem Domain (German)
+ Short Introduction to the Problem Domain (German)
 ===================================================
 
 Dies ist eine kurzgehaltene Einführung für Software-Entwickler, um die

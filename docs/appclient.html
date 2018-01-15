@@ -104,7 +104,7 @@
 </li>
 </ul>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Short Introduction in the Problem Domain (German)</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Short Introduction to the Problem Domain (German)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developer.html#editionen">Editionen</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="developer.html#nestle-aland">Nestle-Aland</a></li>
@@ -161,6 +161,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-coherence"><code class="docutils literal"><span class="pre">coherence</span></code> — The Coherence Page</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-navigator"><code class="docutils literal"><span class="pre">navigator</span></code> — The Navigator Gadget</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-apparatus"><code class="docutils literal"><span class="pre">apparatus</span></code> — The Apparatus Panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-notes"><code class="docutils literal"><span class="pre">notes</span></code> — The Notes Panel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-local-stemma"><code class="docutils literal"><span class="pre">local-stemma</span></code> — The Local Stemma Panel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-textflow"><code class="docutils literal"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-relatives"><code class="docutils literal"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
@@ -252,7 +253,7 @@
 <div class="section" id="module-coherence">
 <span id="coherence-the-coherence-page"></span><h2><a class="reference internal" href="#coherence" title="coherence"><code class="xref js js-mod docutils literal"><span class="pre">coherence</span></code></a> — The Coherence Page<a class="headerlink" href="#module-coherence" title="Permalink to this headline">¶</a></h2>
 <div class="figure align-center" id="id1">
-<img src="_images/graphviz-94845621ad4497a804790d991da5071a2f4006cc.png" alt="digraph G {
+<img src="_images/graphviz-cce006736ce92c9bf5c998a2708643901e7eb306.png" alt="digraph G {
 graph [rankdir=&quot;LR&quot;]
 
 
@@ -271,6 +272,7 @@ graph [rankdir=&quot;LR&quot;]
   &quot;d3-stemma-layout.js&quot;;
   &quot;local-stemma.js&quot;;
   &quot;navigator.js&quot;;
+  &quot;notes.js&quot;;
   &quot;relatives.js&quot;;
   &quot;textflow.js&quot;;
   &quot;dot-grammar.pegjs&quot;;
@@ -287,6 +289,7 @@ graph [rankdir=&quot;LR&quot;]
   &quot;coherence.js&quot; -&gt; &quot;d3-stemma-layout.js&quot;;
   &quot;coherence.js&quot; -&gt; &quot;local-stemma.js&quot;;
   &quot;coherence.js&quot; -&gt; &quot;navigator.js&quot;;
+  &quot;coherence.js&quot; -&gt; &quot;notes.js&quot;;
   &quot;coherence.js&quot; -&gt; &quot;panel.js&quot;;
   &quot;coherence.js&quot; -&gt; &quot;relatives.js&quot;;
   &quot;coherence.js&quot; -&gt; &quot;textflow.js&quot;;
@@ -312,6 +315,8 @@ graph [rankdir=&quot;LR&quot;]
 
 
 
+  &quot;notes.js&quot; -&gt; &quot;tools.js&quot;;
+
 
 
 
@@ -323,6 +328,7 @@ graph [rankdir=&quot;LR&quot;]
 
   &quot;textflow.js&quot; -&gt; &quot;panel.js&quot;;
   &quot;textflow.js&quot; -&gt; &quot;tools.js&quot;;
+
 }" />
 <p class="caption"><span class="caption-text">Module dependencies for <a class="reference internal" href="#coherence" title="coherence"><code class="xref js js-mod docutils literal"><span class="pre">coherence</span></code></a>.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </div>
@@ -462,6 +468,64 @@ graph [rankdir=&quot;LR&quot;]
 </dd></dl>
 
 </div>
+<div class="section" id="module-notes">
+<span id="notes-the-notes-panel"></span><h2><a class="reference internal" href="#notes" title="notes"><code class="xref js js-mod docutils literal"><span class="pre">notes</span></code></a> — The Notes Panel<a class="headerlink" href="#module-notes" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="notes.module:notes.load_passage">
+<code class="descclassname">module:notes.</code><code class="descname">load_passage</code><span class="sig-paren">(</span><em>passage</em><span class="sig-paren">)</span><a class="headerlink" href="#notes.module:notes.load_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a new passage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>passage</strong> (<em>Object</em>) – Which passage to load.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="notes.module:notes.save_passage">
+<code class="descclassname">module:notes.</code><code class="descname">save_passage</code><span class="sig-paren">(</span><em>instance</em><span class="sig-paren">)</span><a class="headerlink" href="#notes.module:notes.save_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save an edited passage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>instance</strong> (<em>Object</em>) – The module instance</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="notes.module:notes.init">
+<code class="descclassname">module:notes.</code><code class="descname">init</code><span class="sig-paren">(</span><em>instance</em>, <em>dummy_id_prefix</em><span class="sig-paren">)</span><a class="headerlink" href="#notes.module:notes.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>instance</strong> (<em>Object</em>) – The panel module instance to inherit from.</li>
+<li><strong>id_prefix</strong> (<em>string</em>) – The prefix to use for all generated ids.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – - The module instance object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 <div class="section" id="module-local-stemma">
 <span id="local-stemma-the-local-stemma-panel"></span><h2><a class="reference internal" href="#local-stemma" title="local-stemma"><code class="xref js js-mod docutils literal"><span class="pre">local-stemma</span></code></a> — The Local Stemma Panel<a class="headerlink" href="#module-local-stemma" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
@@ -512,7 +576,7 @@ editor.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>panel</strong> (<em>Object</em>) – The panel we are attached to.</li>
+<li><strong>instance</strong> (<em>Object</em>) – The instance</li>
 </ul>
 </td>
 </tr>
@@ -988,8 +1052,9 @@ div.panel-closable panes.</p>
 <div class="section" id="module-comparison">
 <span id="comparison-the-comparison-page"></span><h2><a class="reference internal" href="#comparison" title="comparison"><code class="xref js js-mod docutils literal"><span class="pre">comparison</span></code></a> — The Comparison Page<a class="headerlink" href="#module-comparison" title="Permalink to this headline">¶</a></h2>
 <div class="figure align-center" id="id2">
-<img src="_images/graphviz-c3aa780d1a82036a7d45261bea0137c3b405a6be.png" alt="digraph G {
+<img src="_images/graphviz-9169a77cbc0cd632fd1f5aed62b929801f1582f0.png" alt="digraph G {
 graph [rankdir=&quot;LR&quot;]
+
 
 
 
@@ -1018,6 +1083,7 @@ graph [rankdir=&quot;LR&quot;]
 
 
   &quot;comparison.js&quot; -&gt; &quot;tools.js&quot;;
+
 }" />
 <p class="caption"><span class="caption-text">Module dependencies for <a class="reference internal" href="#comparison" title="comparison"><code class="xref js js-mod docutils literal"><span class="pre">comparison</span></code></a>.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
