@@ -109,7 +109,7 @@ function ($, _, tools, panel) {
             'collision' : 'flipfit flip',
             'of'        : event,
         });
-    };
+    }
 
     /**
      * Initialize the module.
@@ -167,7 +167,6 @@ function ($, _, tools, panel) {
             panel.create_panel_controls ($popup);
             $popup.draggable ();
 
-            deferred.resolve ();
             // notify others
             changed ();
         });

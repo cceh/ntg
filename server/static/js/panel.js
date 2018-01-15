@@ -212,7 +212,6 @@ define(['jquery', 'lodash', 'bootstrap', 'bootstrap-slider', 'css!panel-css', 'c
                 }
             }
 
-            ;
             deferred.resolve();
         });
         return deferred.promise();
@@ -274,7 +273,6 @@ define(['jquery', 'lodash', 'bootstrap', 'bootstrap-slider', 'css!panel-css', 'c
                 }
             }
 
-            ;
             deferred.resolve();
         });
         return deferred.promise();
@@ -328,7 +326,6 @@ define(['jquery', 'lodash', 'bootstrap', 'bootstrap-slider', 'css!panel-css', 'c
                 }
             }
 
-            ;
             deferred.resolve();
         });
         return deferred.promise();

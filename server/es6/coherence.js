@@ -17,6 +17,7 @@ define ([
     'relatives',
     'textflow',
     'local-stemma',
+    'notes',
     'css!bootstrap-css',
     'css!jquery-ui-css',
     'css!site-css',
@@ -24,7 +25,7 @@ define ([
 ],
 
 function ($, d3common, d3stemma, d3chord,
-    apparatus, navigator, panel, relatives, textflow, locstem) {
+    apparatus, navigator, panel, relatives, textflow, locstem, notes) {
     var module = {}; // singleton
 
     /**
@@ -48,6 +49,14 @@ function ($, d3common, d3stemma, d3chord,
             d3stemma,
             'ls_'
         );
+
+        // only editors will have this
+        if (is_editor && $ ('div.panel-notes').length) {
+            module.notes = notes.init  (
+                panel.init ($ ('div.panel-notes')),
+                'notes_'
+            );
+        }
 
         module.vtextflow    = textflow.init  (
             panel.init ($ ('div.panel-variant-textflow')),

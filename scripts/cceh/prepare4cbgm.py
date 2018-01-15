@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 import argparse
 import collections
 import datetime
+import html
 import itertools
 import logging
 import math
@@ -56,6 +57,18 @@ def copy_table (conn, source_table, dest_table):
     DROP TABLE IF EXISTS {dest_table};
     SELECT * INTO {dest_table} FROM {source_table}
     """, dict (parameters, dest_table = dest_table, source_table = source_table))
+
+
+def copy_table_fdw (conn, fdw, source_table, dest_table):
+    """ Make a copy of a table. """
+
+    execute (conn, """
+    DROP TABLE IF EXISTS {dest_table};
+    """, dict (parameters, dest_table = dest_table))
+
+    execute (conn, """
+    SELECT * INTO {dest_table} FROM  {fdw}."{source_table}"
+    """, dict (parameters, fdw = fdw, dest_table = dest_table, source_table = source_table))
 
 
 def concat_tables (conn, meta, dest_table, fdw, source_tables):
@@ -855,7 +868,6 @@ def copy_genealogical_data (dbsrcvg, dbdest, parameters):
     apparatus changed? At least it doesn't do any damage because there should be
     no passages in att that are not in locstemed also.
 
-
     """
 
     dbsrcvg_meta = sqlalchemy.schema.MetaData (bind = dbsrcvg.engine)
@@ -869,6 +881,7 @@ def copy_genealogical_data (dbsrcvg, dbdest, parameters):
         copy_table (dest, 'tmp_locstemed', 'original_locstemed');
         copy_table (dest, 'tmp_rdg',       'original_rdg');
         copy_table (dest, 'tmp_var',       'original_var');
+        copy_table_fdw (dest, 'var_fdw', 'Memo', 'memo')
 
         execute (dest, """
         DELETE FROM tmp_var
@@ -1014,6 +1027,33 @@ def copy_genealogical_data (dbsrcvg, dbdest, parameters):
         WHERE begadr = 50111044 AND endadr = 50111044 AND witn = '321'
         """, parameters)
 
+        execute (dest, """
+        UPDATE memo
+        SET remarks = TRIM (BOTH FROM REGEXP_REPLACE (remarks, '\s*\r?\n', E'\n', 'g'));
+        UPDATE memo
+        SET remarks = NULL
+        WHERE remarks = ''
+        """, parameters)
+
+        res = execute (dest, """
+        SELECT id, remarks
+        FROM memo
+        WHERE remarks ~ '&'
+        """, parameters)
+
+        params = []
+        for row in res.fetchall ():
+            params.append ([
+                html.unescape (row['remarks']),
+                row['id'],
+            ])
+
+        executemany_raw (dest, """
+        UPDATE memo
+        SET remarks = %s
+        WHERE id = %s
+        """, parameters, params)
+
 
 def fill_passages_table (dba, parameters):
     """ Create the Passages table. """
@@ -1082,6 +1122,15 @@ def fill_passages_table (dba, parameters):
         SET fehlvers = True
         WHERE {fehlverse}
         """, dict (parameters, fehlverse = tools.FEHLVERSE))
+
+        # Insert remarks
+
+        execute (conn, """
+        UPDATE passages p
+        SET remarks = m.remarks
+        FROM memo m
+        WHERE (p.anfadr, p.endadr) = (m.anfadr, m.endadr)
+        """, parameters)
 
 
 def fill_manuscripts_table (dba, parameters):

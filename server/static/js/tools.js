@@ -8,7 +8,7 @@
  * @author Marcello Perathoner
  */
 
-define([], function () {
+define(['lodash'], function (_) {
     /**
      * Format a string in python fashion.  "{count} items found"
      *

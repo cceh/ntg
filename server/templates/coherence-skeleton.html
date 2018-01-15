@@ -43,6 +43,20 @@
     </div>
   </div>
 
+  {% if is_editor %}
+  <div class="panel panel-default panel-notes">
+    <div class="panel-heading panel-caption panel-notes-caption">
+      Notes
+    </div>
+
+    {{ tt.toolbar ('notes', 'notes') }}
+
+    <div class="panel-content panel-slidable notes-wrapper">
+      <textarea></textarea>
+    </div>
+  </div>
+  {% endif %}
+
   <div class="panel panel-default panel-textflow panel-variant-textflow">
     <div class="panel-heading panel-caption panel-variant-textflow-caption">
       Coherence at Variant Passages (GraphViz)

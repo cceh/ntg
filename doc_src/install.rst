@@ -61,6 +61,7 @@ Postgres database
       CREATE USER ntg CREATEDB PASSWORD '<password>';
       CREATE DATABASE ntg_user OWNER ntg;
       CREATE DATABASE ntg_ph4 OWNER ntg;
+      \c ntg_ph4
       CREATE EXTENSION mysql_fdw;
       GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
       \q

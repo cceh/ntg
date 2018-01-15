@@ -124,6 +124,13 @@
     </div>
     {% endif %}
 
+    {% if mode in ('notes', ) %}
+    <div class="coherence-notes btn-group btn-group-xs" data-toggle="buttons">
+      <button type="button" class="btn btn-primary" name="save" data-opt="save"
+         title="Save Notes">Save</button>
+    </div>
+    {% endif %}
+
     {% if mode in ('stemma', 'global', 'local', 'variant') %}
     <div class="coherence-dot btn-group btn-group-xs" data-toggle="buttons">
       <a type="button" class="btn btn-primary" name="png" data-opt="png"

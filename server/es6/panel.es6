@@ -192,7 +192,7 @@ function ($, _) {
                                             data-opt="${labez}">${labez_i18n}</input>
                                    </label>`);
                 }
-            };
+            }
             deferred.resolve ();
         });
         return deferred.promise ();
@@ -229,7 +229,7 @@ function ($, _) {
                                             data-opt="${clique}">${clique}</input>
                                    </label>`);
                 }
-            };
+            }
             deferred.resolve ();
         });
         return deferred.promise ();
@@ -263,7 +263,7 @@ function ($, _) {
                                  <input type="radio" data-type="dropdown" name="${input_name}"
                                         data-opt="${range.value}">${range.range}</input>
                                </label>`);
-            };
+            }
             deferred.resolve ();
         });
         return deferred.promise ();

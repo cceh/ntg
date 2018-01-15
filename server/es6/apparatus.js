@@ -33,9 +33,8 @@ function ($, _, tools, panel) {
 
         var instance = this;
         var new_list;
-        var json_deferred = new $.Deferred ();
 
-        $.getJSON ('apparatus.json/' + passage.pass_id, function (json) {
+        var xhr = $.getJSON ('apparatus.json/' + passage.pass_id, function (json) {
             var labez_grouper  = function (g) { return g.labez; };
             var clique_grouper = function (g) { return g.labez_clique; };
 
@@ -80,16 +79,15 @@ function ($, _, tools, panel) {
                 html.push ('</li>');
             });
             new_list = $ (html.join (''));
-            json_deferred.resolve ();
         });
 
         var faded_promise = this.$wrapper.animate ({ 'opacity' : 0.0 }, 300);
 
-        $.when (json_deferred.promise (), faded_promise).done (function () {
+        $.when (xhr, faded_promise).done (function () {
             var $wrapper = instance.$wrapper;
-            var old_height = $wrapper.get (0).scrollHeight;
+            var old_height = $wrapper.prop ('scrollHeight');
             $wrapper.html (new_list);
-            var new_height = $wrapper.get (0).scrollHeight;
+            var new_height = $wrapper.prop ('scrollHeight');
             $wrapper.height (old_height);
             $wrapper.animate ({ 'height' : new_height }, 300, function () {
                 $wrapper.height ('auto');

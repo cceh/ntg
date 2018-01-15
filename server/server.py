@@ -782,7 +782,8 @@ def coherence_skeleton ():
 
     """
 
-    return flask.render_template ('coherence-skeleton.html')
+    return flask.render_template ('coherence-skeleton.html',
+                                  is_editor = flask_login.current_user.has_role ('editor'))
 
 
 @app.endpoint ('comparison-skeleton')
@@ -1132,6 +1133,7 @@ if __name__ == "__main__":
             Rule ('/stemma.png/<passage_or_id>',                  endpoint = 'stemma.png'),
             Rule ('/textflow.dot/<passage_or_id>',                endpoint = 'textflow.dot'),
             Rule ('/textflow.png/<passage_or_id>',                endpoint = 'textflow.png'),
+            Rule ('/notes.txt/<passage_or_id>',                   endpoint = 'notes.txt', methods = ['GET', 'PUT']),
             Rule ('/stemma-edit/<passage_or_id>',                 endpoint = 'stemma-edit'),
         ])
 

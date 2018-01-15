@@ -585,6 +585,7 @@ class Passages (Base2):
     spanning  = Column (Boolean,       nullable = False, server_default = 'False')
     spanned   = Column (Boolean,       nullable = False, server_default = 'False')
     fehlvers  = Column (Boolean,       nullable = False, server_default = 'False')
+    remarks   = Column (String,        nullable = True)
 
     __table_args__ = (
         UniqueConstraint (irange, name = 'unique_passages_irange'), # needs name

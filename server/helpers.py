@@ -326,6 +326,10 @@ def make_json_response (json = None, status = 200, message = None):
     return flask.make_response (flask.json.jsonify (d), status)
 
 
+def make_text_response (text = None, status = 200):
+    return flask.make_response ((text, status, { 'content-type' : 'text/plain;charset=utf-8' }))
+
+
 DOT_SKELETON = """
 strict digraph G {{
         graph [nodesep={nodesep},

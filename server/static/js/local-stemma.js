@@ -76,11 +76,12 @@ function ($, _, d3, tools) {
      *
      * @function dragListener
      *
-     * @param {Object} panel - The panel we are attached to.
+     * @param {Object} instance - The instance
      */
 
-    function dragListener (panel) {
-        var passage = this.passage;
+    function dragListener (instance) {
+        var $panel  = instance.$wrapper;
+        var passage = instance.passage;
 
         return d3.drag ()
             .on ('start', function (dummy_d) {
@@ -127,7 +128,7 @@ function ($, _, d3, tools) {
                         $ (document).trigger ('ntg.panel.reload', json.data);
                     });
                     xhr.fail (function (xhrobj) {
-                        tools.xhr_alert (xhrobj, panel);
+                        tools.xhr_alert (xhrobj, $panel);
                         return_to_base (dragged_node_ref);
                     });
                     highlight (target_node, false);
@@ -178,7 +179,7 @@ function ($, _, d3, tools) {
     function open_contextmenu (event) {
         event.preventDefault ();
 
-        var passage = this.passage;
+        var passage = event.data.passage;
         var xhr = $.getJSON ('cliques.json/' + passage.pass_id);
         xhr.done (function (json) {
             var dataset = event.target.dataset;
@@ -294,7 +295,7 @@ function ($, _, d3, tools) {
             if (is_editor) {
                 // Drag a node.
                 d3.selectAll ('div.panel-local-stemma g.node.draggable')
-                    .call (dragListener (instance.$wrapper));
+                    .call (dragListener (instance));
                 d3.selectAll ('div.panel-local-stemma g.node.droptarget')
                     .on ('mouseover', function (dummy_d) {
                         if (dragged_node && d3.select (this) !== dragged_node) {

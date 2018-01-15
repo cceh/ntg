@@ -8,7 +8,7 @@ NTG_USER    := ntg
 NTG_DB      := ntg
 NTG         := $(NTG_USER)@$(NTG_VM)
 NTG_ROOT    := $(NTG):/home/$(NTG_USER)/prj/ntg/ntg
-PSQL_PORT   := 5433
+PSQL_PORT   := 5432
 SERVER      := server
 STATIC      := $(SERVER)/static
 
@@ -48,7 +48,7 @@ users:
 	scripts/cceh/mk_users.py -vvv server/instance/_global.conf
 
 db_upload:
-	/usr/lib/postgresql/9.6/bin/pg_dump -p $(PSQL_PORT) --clean --if-exists ntg_ph4 | bzip2 > /tmp/ntg_ph4.pg_dump.sql.bz2
+	pg_dump -p $(PSQL_PORT) --clean --if-exists ntg_ph4 | bzip2 > /tmp/ntg_ph4.pg_dump.sql.bz2
 	scp /tmp/ntg_ph4.pg_dump.sql.bz2 $(NTG_USER)@$(NTG_VM):~/
 
 clean:

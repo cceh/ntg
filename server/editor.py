@@ -32,7 +32,7 @@ from ntg_common.db_tools import execute, rollback
 from ntg_common.config import args
 
 from . import helpers
-from .helpers import parameters, Bag, Passage, Manuscript, make_json_response
+from .helpers import parameters, Bag, Passage, Manuscript, make_json_response, make_text_response
 
 RE_VALID_LABEZ  = re.compile ('^[*]|[?]|[a-y]|z[u-z]$')
 RE_VALID_CLIQUE = re.compile ('^[0-9]$')
@@ -116,7 +116,7 @@ def stemma_edit (passage_or_id):
                 WHERE pass_id = :pass_id AND labez = :labez_old AND clique = :clique_old
                 """, dict (parameters, **params))
             except sqlalchemy.exc.IntegrityError as e:
-                if 'unique_locstem_original' in str (e):
+                if 'unique constraint' in str (e):
                     raise EditError ('Only one original reading allowed. If you want to change the original reading, first remove the old original reading.')
                 raise EditError (str (e))
             except sqlalchemy.exc.DatabaseError as e:
@@ -139,11 +139,11 @@ def stemma_edit (passage_or_id):
             if not nx.is_directed_acyclic_graph (G):
                 raise EditError ('The graph is not a DAG anymore.')
             # test: not connected
-            G.add_edge ('?', '*')
-            if nx.isolates (G):
+            G.add_edge ('*', '?')
+            if not (nx.is_weakly_connected (G)):
                 raise EditError ('The graph is not connected anymore.')
             # test: x derived from x
-            for e in G.edges_iter ():
+            for e in G.edges:
                 if e[0][0] == e[1][0]:
                     raise EditError ('A reading cannot be derived from the same reading.  If you want to <b>merge</b> instead, use shift + drag.')
 
@@ -196,9 +196,40 @@ def stemma_edit (passage_or_id):
 
             tools.log (logging.INFO, 'Moved ms_ids: ' + str (ms_ids))
 
-
         # return the changed passage
         passage = Passage (conn, passage_or_id)
         return make_json_response (passage.to_json ())
 
     raise EditError ('Could not edit local stemma.')
+
+
+@app.endpoint ('notes.txt')
+def notes (passage_or_id):
+    """Get the editor notes for a passage
+
+    """
+
+    if not flask_login.current_user.has_role ('editor'):
+        raise PrivilegeError ('You don\'t have editor privilege.')
+
+    with current_app.config.dba.engine.begin () as conn:
+        passage = Passage (conn, passage_or_id)
+
+        if request.method == 'PUT':
+            res = execute (conn, """
+            UPDATE passages
+            SET remarks = :remarks
+            WHERE pass_id = :pass_id
+            """, dict (parameters,
+                       pass_id = passage.pass_id,
+                       remarks = request.form['remarks']))
+
+            return make_text_response ('Notes updated OK')
+        else:
+            res = execute (conn, """
+            SELECT remarks
+            FROM passages
+            WHERE pass_id = :pass_id
+            """, dict (parameters, pass_id = passage.pass_id))
+
+            return make_text_response (res.fetchone ()[0] or '')

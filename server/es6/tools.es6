@@ -7,9 +7,10 @@
  */
 
 define ([
+    'lodash',
 ],
 
-function () {
+function (_) {
     /**
      * Format a string in python fashion.  "{count} items found"
      *

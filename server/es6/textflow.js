@@ -92,7 +92,7 @@ function ($, _, panel, tools) {
     function open_contextmenu (event) {
         event.preventDefault ();
 
-        var passage = this.passage;
+        var passage = event.data.passage;
         var xhr = $.getJSON ('cliques.json/' + passage.pass_id);
         xhr.done (function (json) {
             var instance = event.data;
