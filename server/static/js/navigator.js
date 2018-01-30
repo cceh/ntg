@@ -123,7 +123,7 @@ define(['jquery', 'lodash', 'urijs/URI', 'jquery-ui', 'css!navigator-css'], func
                     var pass_id = items[0].pass_id;
                     var tmp = _.map(items, 'lemma').join(' ');
                     var classes = [];
-                    if (tmp === 'om') {
+                    if (items[0].anfadr % 2 === 1) {
                         classes.push('leitzeile-insert');
                         tmp = '';
                     } else {

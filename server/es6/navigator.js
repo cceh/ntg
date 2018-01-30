@@ -102,7 +102,7 @@ function ($, _, urijs) {
                 let pass_id = items[0].pass_id;
                 let tmp = _.map (items, 'lemma').join (' ');
                 let classes = [];
-                if (tmp === 'om') {
+                if ((items[0].anfadr % 2) === 1) {
                     classes.push ('leitzeile-insert');
                     tmp = '';
                 } else {
