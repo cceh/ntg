@@ -26,7 +26,35 @@ define ([
 
 function ($, d3common, d3stemma, d3chord,
     apparatus, navigator, panel, relatives, textflow, locstem, notes) {
-    var module = {}; // singleton
+    let module = {}; // singleton
+
+    /**
+     * Create a new popup managed by the relatives module.
+     *
+     * We have to create these dynamically because there may be many open at once.
+     *
+     * @function create_relatives_popup
+     *
+     * @param {integer} ms_id - The manuscript id
+     * @param {Object} passage - The passage
+     * @param {jQuery} target - An element. The popup will be positioned relative to this element.
+     *
+     * @returns {Promise} Resolved when popup is created.
+     */
+
+    function create_relatives_popup (ms_id, passage, target) {
+        let $popup = $ ($ ('#relatives-template').html ());
+        $popup.hide ().appendTo ('#floating-panels').fadeIn ();
+        $popup.draggable ();
+        $popup.data ('ms-id', ms_id);
+        let instance = relatives.init (panel.init ($popup));
+        instance.load (passage).done (() => {
+            instance.position_popup (target);
+        });
+        panel.create_panel_controls ($popup);
+        // notify others
+        relatives.changed ();
+    }
 
     /**
      * Initialize the module.
@@ -109,33 +137,39 @@ function ($, d3common, d3stemma, d3chord,
         // Click on a ms. in the apparatus or in a relatives popup.
         $ (document).on ('click', '.ms[data-ms-id]', function (event) {
             event.stopPropagation ();
-            var ms_id = $ (event.target).attr ('data-ms-id');
-            relatives.create_popup (ms_id, module.navigator.passage, event.target);
+            let ms_id = $ (event.target).attr ('data-ms-id');
+            create_relatives_popup (ms_id, module.navigator.passage, event.target);
         });
 
         // Click on a comparison row in the apparatus or in a relatives popup.
         $ (document).on ('click', 'tr.comparison[data-ms2-id]', function (event) {
             event.stopPropagation ();
-            var ms1_id = $ (event.currentTarget).attr ('data-ms1-id');
-            var ms2_id = $ (event.currentTarget).attr ('data-ms2-id');
-            var win = window.open ('comparison#ms1=id' + ms1_id + '&ms2=id' + ms2_id, '_blank');
+            let ms1_id = $ (event.currentTarget).attr ('data-ms1-id');
+            let ms2_id = $ (event.currentTarget).attr ('data-ms2-id');
+            let win = window.open ('comparison#ms1=id' + ms1_id + '&ms2=id' + ms2_id, '_blank');
             win.focus ();
         });
 
         // Click on a node in the textflow diagram.
         $ (document).on ('click', 'div.panel-textflow g.node', function (event) {
-            var ms_id = $ (event.currentTarget).attr ('data-ms-id'); // the g.node, not the circle
-            relatives.create_popup (ms_id, module.navigator.passage, event.currentTarget);
+            let ms_id = $ (event.currentTarget).attr ('data-ms-id'); // the g.node, not the circle
+            create_relatives_popup (ms_id, module.navigator.passage, event.currentTarget);
         });
 
         // Click on canvas to close context menus
         $ (document).on ('click', function (dummy_event) {
-            $ ('table.contextmenu').fadeOut (function () { $ (this).remove (); });
+            let $menu = $ ('table.contextmenu');
+            $menu.fadeOut (() => $menu.remove ());
+        });
+
+        // The user navigated to a new passage.
+        $ (document).on ('ntg.panel.reload', (event, passage) => {
+            $ ('div.panel').trigger ('ntg.panel.reload', passage);
         });
 
         // Simulate user navigation set the passage on all modules.
         if (window.location.hash) {
-            var hash = window.location.hash.substring (1);
+            let hash = window.location.hash.substring (1);
             module.navigator.set_passage (hash);
         }
     }

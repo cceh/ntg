@@ -25,23 +25,23 @@ function ($, d3, d3_common, _) {
      * @returns {Promise} - A promise resolved when all SVG elements have been created.
      */
     function load_dot (url) {
-        var instance = this; // instance
-        // var dot_dpi = 72;
-        var css_dpi = 96;
+        let instance = this; // instance
+        // let dot_dpi = 72;
+        let css_dpi = 96;
 
-        var svg = this.svg;
+        let svg = instance.svg;
         svg.selectAll ('g').transition ().duration (300).style ('opacity', 0.0)
             .remove ();
-        var deferred = new $.Deferred ();
+        let deferred = new $.Deferred ();
 
-        d3_common.dot (url, function (graph) {
+        d3_common.dot (url, (graph) => {
             // if we have subgraphs, retrieve their nodes too
-            _.forEach (graph.subgraphs, function (subgraph) {
-                var subgraph_nodes = _.keyBy (_.filter (subgraph.stmts,
-                    function (o) { return o.type === 'node'; }), 'id');
+            _.forEach (graph.subgraphs, (subgraph) => {
+                let subgraph_nodes = _.keyBy (_.filter (subgraph.stmts,
+                    o => o.type === 'node'), 'id');
                 _.assign (graph.nodes, subgraph_nodes); // copy
                 subgraph.attrs = _.keyBy (_.filter (subgraph.stmts,
-                    function (o) { return o.type === 'attr'; }), 'attrType');
+                    o => o.type === 'attr'), 'attrType');
                 subgraph.attrs.graph.attrs.bbox = d3_common.parse_bbox (subgraph.attrs.graph.attrs.bb);
                 subgraph.attrs.graph.attrs.lp   = d3_common.parse_pt   (subgraph.attrs.graph.attrs.lp);
             });
@@ -51,9 +51,9 @@ function ($, d3, d3_common, _) {
 
             instance.edges = graph.edges;
 
-            var node_width  = graph.attrs.node.attrs.width;     // in inches
-            var node_height = graph.attrs.node.attrs.height;    // in inches
-            var font_size   = graph.attrs.graph.attrs.fontsize; // in points
+            let node_width  = graph.attrs.node.attrs.width;     // in inches
+            let node_height = graph.attrs.node.attrs.height;    // in inches
+            let font_size   = graph.attrs.graph.attrs.fontsize; // in points
 
             svg.style ('opacity', 0.0);
             svg.style ('font-size', font_size + 'pt');
@@ -67,135 +67,117 @@ function ($, d3, d3_common, _) {
                 .style ('opacity', 1.0);
 
             // put id also inside node attrs
-            _.forEach (graph.nodes, function (v, k) {
-                v.attrs.id = k;
-            });
+            _.forEach (graph.nodes, (v, k) => { v.attrs.id = k; });
 
             // give all links an id
-            _.forEach (graph.edges, function (link, i) {
+            _.forEach (graph.edges, (link, i) => {
                 link.id = instance.id_prefix + 'link_' + i;
             });
 
-            var g = svg.append ('g')
+            let g = svg.append ('g')
                 // shift a little bit to avoid 'shaving' nodes at the view boundary
                 .attr ('transform', 'translate(' + -instance.bbox.x + ',' + -instance.bbox.y + ')');
 
             // draw the subgraphs: a rectangle with a label
 
-            var sg = g.append ('g')
+            let sg = g.append ('g')
                 .attr ('class', 'subgraphs');
 
-            var subgraph = sg.selectAll ('.subgraph')
+            let subgraph = sg.selectAll ('.subgraph')
                 .data (_.map (graph.subgraphs, 'attrs.graph.attrs'))
                 .enter ();
 
             subgraph.append ('rect')
-                .attr ('x',      function (d) { return d.bbox.x; })
-                .attr ('y',      function (d) { return d.bbox.y; })
-                .attr ('width',  function (d) { return d.bbox.width; })
-                .attr ('height', function (d) { return d.bbox.height; })
-                .attr ('class',  function (d) {
-                    return 'subgraph' + (/rounded/.test (d.style) ? ' rounded' : '');
-                });
+                .attr ('x',      d => d.bbox.x)
+                .attr ('y',      d => d.bbox.y)
+                .attr ('width',  d => d.bbox.width)
+                .attr ('height', d => d.bbox.height)
+                .attr ('class',  d => 'subgraph' + (/rounded/.test (d.style) ? ' rounded' : ''));
 
             subgraph.append ('text')
                 .attr ('class', 'subgraph')
                 // lp indicates the center of the label
-                .attr ('x', function (d) { return d.lp.x; })
-                .attr ('y', function (d) { return d.lp.y; })
-                .style ('font-size', function (d) {
-                    return (d.fontsize || font_size) + 'pt';
-                })
-                .text (function (d) { return d.label; });
+                .attr ('x', d => d.lp.x)
+                .attr ('y', d => d.lp.y)
+                .style ('font-size', d => (d.fontsize || font_size) + 'pt')
+                .text (d => d.label);
 
             // draw the links: a path and a text
 
-            var lg = g.append ('g').attr ('class', 'links');
+            let lg = g.append ('g').attr ('class', 'links');
 
-            var link = lg.selectAll ('.link')
+            let link = lg.selectAll ('.link')
                 .data (graph.edges)
                 .enter ();
 
-            link.filter (function (d) { return d.attrs && d.attrs.head_lp; })
-                .each (function (d) {
+            link.filter (d => d.attrs && d.attrs.head_lp)
+                .each ((d) => {
                     d.attrs.head_lp = d3_common.parse_pt (d.attrs.head_lp);
                 });
 
             link.append ('path')
-                .attr ('id', function (d) { return d.id; })
-                .attr ('data-labez', function (d) {
-                    return graph.nodes[d.elems[0].id].attrs.labez;
-                })
-                .attr ('class', function (d) {
+                .attr ('id', d => d.id)
+                .attr ('data-labez', d => graph.nodes[d.elems[0].id].attrs.labez)
+                .attr ('class', d => {
                     return 'link fg_labez ' +
                         instance.id_prefix + 'sid-' + d.elems[0].id + ' ' +
                         instance.id_prefix + 'tid-' + d.elems[1].id +
                         (/dashed/.test (d.attrs.style) ? ' dashed' : '');
                 })
                 .attr ('marker-end', 'url(#' + instance.id_prefix + 'triangle)')
-                .attr ('d', function (d) { return d3_common.parse_path_svg (d.attrs.pos); });
+                .attr ('d', d => d3_common.parse_path_svg (d.attrs.pos));
 
-            link.filter (function (d) { return d.attrs && d.attrs.head_lp && d.attrs.headlabel; })
+            link.filter (d => d.attrs && d.attrs.head_lp && d.attrs.headlabel)
                 .append ('text')
-                .attr ('data-labez', function (d) {
-                    return graph.nodes[d.elems[0].id].attrs.labez;
-                })
-                .attr ('class', function (d) {
+                .attr ('data-labez', d => graph.nodes[d.elems[0].id].attrs.labez)
+                .attr ('class', (d) => {
                     return 'link bg_labez ' +
                         instance.id_prefix + 'sid-' + d.elems[0].id + ' ' +
                         instance.id_prefix + 'tid-' + d.elems[1].id;
                 })
-                .attr ('x', function (d) { return d.attrs.head_lp.x; })
-                .attr ('y', function (d) { return d.attrs.head_lp.y; })
-                .text (function (d) { return d.attrs.headlabel; });
+                .attr ('x', d => d.attrs.head_lp.x)
+                .attr ('y', d => d.attrs.head_lp.y)
+                .text (d => d.attrs.headlabel);
 
             // draw the nodes: a circle and a text in a group
 
-            var ng = g.append ('g').attr ('class', 'nodes');
+            let ng = g.append ('g').attr ('class', 'nodes');
 
-            var node = ng.selectAll ('g.node')
+            let node = ng.selectAll ('g.node')
                 .data (_.map (graph.nodes, 'attrs'))
                 .enter ();
 
-            node.filter (function (d) { return d.pos; })
-                .each (function (d) {
-                    d.pos = d3_common.parse_pt (d.pos);
-                });
+            node.filter (d => d.pos)
+                .each (d => { d.pos = d3_common.parse_pt (d.pos); });
 
-            var groups = node.append ('g')
-                .attr ('data-ms-id',     function (d) { return d.ms_id; })
-                .attr ('data-label',     function (d) { return d.label ? d.label : d.id; })
-                .attr ('class', function (d) {
+            let groups = node.append ('g')
+                .attr ('data-ms-id',     d => d.ms_id)
+                .attr ('data-label',     d => d.label ? d.label : d.id)
+                .attr ('class', d => {
                     return 'node node-'
                         + (d.children   ? 'internal' : 'leaf')
                         + (d.clickable  ? ' clickable' : '')
                         + (d.draggable  ? ' draggable' : '')
                         + (d.droptarget ? ' droptarget' : '');
                 })
-                .attr ('transform', function (d) {
-                    return 'translate(' + d.pos.x + ',' + d.pos.y + ')';
-                });
+                .attr ('transform', d => 'translate(' + d.pos.x + ',' + d.pos.y + ')');
 
-            var valid = new RegExp ('^[-_A-Za-z0-9]+$');
+            let valid = new RegExp ('^[-_A-Za-z0-9]+$');
 
             groups.append ('ellipse')
                 .attr ('class', 'node fg_labez bg_clique')
-                .attr ('data-labez',        function (d) { return d.labez; })
-                .attr ('data-clique',       function (d) { return d.clique; })
-                .attr ('data-labez-clique', function (d) { return d.labez_clique; })
-                .attr ('rx', function (d) {
-                    return (d.width  || node_width) * css_dpi / 2;
-                })
-                .attr ('ry', function (d) {
-                    return (d.height || node_height) * css_dpi / 2;
-                })
-                .on ('mouseenter', function (d) {
+                .attr ('data-labez',        d => d.labez)
+                .attr ('data-clique',       d => d.clique)
+                .attr ('data-labez-clique', d => d.labez_clique)
+                .attr ('rx', d => (d.width  || node_width)  * css_dpi / 2)
+                .attr ('ry', d => (d.height || node_height) * css_dpi / 2)
+                .on ('mouseenter', (d) => {
                     if (valid.test (d.id)) {
                         d3.selectAll ('.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover hi-source', true);
                         d3.selectAll ('.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hover hi-target', true);
                     }
                 })
-                .on ('mouseleave', function (d) {
+                .on ('mouseleave', (d) => {
                     if (valid.test (d.id)) {
                         d3.selectAll ('.link.' + instance.id_prefix + 'sid-' + d.id).classed ('hover hi-source', false);
                         d3.selectAll ('.link.' + instance.id_prefix + 'tid-' + d.id).classed ('hover hi-target', false);
@@ -204,7 +186,7 @@ function ($, d3, d3_common, _) {
 
             groups.append ('text')
                 .attr ('class', 'node')
-                .text (function (d) { return d.label ? d.label : d.id; });
+                .text (d => d.label ? d.label : d.id);
 
             // done
 
@@ -227,7 +209,7 @@ function ($, d3, d3_common, _) {
      * @returns {Graph} - A graph instance.
      */
     function init ($wrapper, id_prefix) {
-        var svg = d3.select ($wrapper.get (0)).append ('svg');
+        let svg = d3.select ($wrapper.get (0)).append ('svg');
 
         d3_common.append_marker (svg, id_prefix);
 

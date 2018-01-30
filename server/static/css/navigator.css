@@ -53,3 +53,34 @@ form.passage-selector span.glyphicon {
   border-width: 0;
   background: #ccc;
 }
+form.passage-selector {
+  margin-bottom: 20px;
+}
+form.passage-selector input[type=text] {
+  width: 12em;
+}
+div.leitzeile {
+  margin-bottom: 20px;
+  font-size: larger;
+}
+div.leitzeile .leitzeile-current {
+  color: #d62728;
+  pointer-events: none;
+}
+div.leitzeile .leitzeile-spanned {
+  border-bottom: 1px dotted grey;
+}
+div.leitzeile .leitzeile-one::before {
+  content: '⸀';
+  /* 2e00 */
+}
+div.leitzeile .leitzeile-insert::before {
+  content: '⸆';
+  /* 2e06 */
+}
+div.leitzeile .leitzeile-many::before {
+  content: '⸂';
+}
+div.leitzeile .leitzeile-many::after {
+  content: '⸃';
+}

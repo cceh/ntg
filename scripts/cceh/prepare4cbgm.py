@@ -818,6 +818,17 @@ def delete_passages_without_variants (dba, parameters):
         """, parameters)
 
 
+def copy_nestle (dbsrc3, dbdest, parameters):
+    with dbdest.engine.begin () as dest:
+        copy_table_fdw (dest, 'nestle_fdw', 'Nestle29', 'original_nestle')
+
+        execute (dest, """
+        INSERT INTO nestle (anfadr, endadr, irange, lemma)
+        SELECT adr, adr, int4range (adr, adr + 1), content
+        FROM original_nestle
+        """, parameters)
+
+
 class CBGM_Params (object):
     """ Structure for intermediate results of the CBGM. """
 
@@ -1091,10 +1102,10 @@ def fill_passages_table (dba, parameters):
         # The Passages Table
 
         execute (conn, """
-        INSERT INTO passages (anfadr, endadr, irange, lemma, bk_id)
+        INSERT INTO passages (anfadr, endadr, irange, lemma, variant, bk_id)
         SELECT anfadr, endadr, int4range (anfadr, endadr + 1),
                MODE () WITHIN GROUP (ORDER BY lemma) AS lemma,
-               bk_id
+               True, bk_id
         FROM att a
         JOIN books b ON b.irange @> anfadr
         GROUP BY anfadr, endadr, int4range (anfadr, endadr + 1), bk_id
@@ -1449,6 +1460,48 @@ def fill_apparatus_table (dba, parameters):
           AND varnew2clique (v.varnew) != '1'
         """, parameters)
 
+        # Mark passages without variants
+        #
+        # An diese Stelle versetzt damit sie nur einmal aufgerufen werden muß.
+        # Wir wollen die Leitzeile darstellen, deshalb können wir Stellen ohne
+        # Varianten nicht mehr löschen.  Sie werden stattdessen in Passages als
+        # solche markiert.
+        #
+        # Stellen ohne Varianten sind für die CBGM irrelevant.  Stellen mit
+        # ausschließlich 'z[u-z]' Lesearten ebenso.
+        #
+        # Aus: prepare4cbgm_5.py
+        #
+        #     Stellen löschen, an denen nur eine oder mehrere f- oder o-Lesarten
+        #     vom A-Text abweichen. Hier gibt es also keine Variante.
+        #
+        #     Nicht löschen, wenn an dieser variierten Stelle eine Variante 'b'
+        #     - 'y' erscheint.
+        #
+        #     Änderung 2014-12-16: Act 28,29/22 gehört zu einem Fehlvers.  Dort
+        #     gibt es u.U. keine Variante neben b, sondern nur ein
+        #     Orthographicum.  Wir suchen also nicht mehr nach einer Variante
+        #     'b' bis 'y', sondern zählen die Varianten.  Liefert getReadings
+        #     nur 1 zurück, gibt es keine Varianten.
+        #
+
+        with dba.engine.begin () as conn:
+
+            execute (conn, """
+            UPDATE passages p
+            SET variant = False
+            WHERE pass_id IN (
+              SELECT pass_id
+              FROM (
+                SELECT DISTINCT pass_id, labez
+                FROM apparatus
+                WHERE labez !~ '^z' AND certainty = 1.0
+              ) AS i
+              GROUP BY pass_id
+              HAVING count (*) <= 1
+            )
+            """, parameters)
+
 
 def build_byzantine_text (dba, parameters):
     """Reconstruct the Majority Text
@@ -1598,6 +1651,20 @@ def create_labez_matrix (dba, parameters, val):
         val.n_passages = len (res)
         val.passages   = ["%s-%s" % (x[0], x[1]) for x in res]
 
+        # get matrix of invariant passages
+        # Initialize all passages to 'variant'
+        variant_matrix = np.ones ((1, val.n_passages), np.bool_)
+
+        res = execute (conn, """
+        SELECT pass_id - 1
+        FROM passages
+        WHERE NOT (variant)
+        """, parameters)
+
+        for row in res:
+            variant_matrix [0, row[0]] = False
+        val.variant_matrix = variant_matrix
+
         # get manuscript names and numbers
         res = execute (conn, """
         SELECT hs, hsnr
@@ -1649,6 +1716,7 @@ def create_labez_matrix (dba, parameters, val):
 
         # Boolean matrix ms x pass set where passage is defined
         val.def_matrix = np.greater (val.labez_matrix, 0)
+        val.def_matrix = np.logical_and (val.def_matrix, val.variant_matrix) # mask invariant passages
 
         log (logging.INFO, 'Size of the labez matrix: ' + str (val.labez_matrix.shape))
 
@@ -2073,10 +2141,12 @@ if __name__ == '__main__':
 
     dbsrc1 = db_tools.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_ECM_DB'])
     dbsrc2 = db_tools.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_VG_DB'])
+    dbsrc3 = db_tools.MySQLEngine      (config['MYSQL_GROUP'], config['MYSQL_NESTLE_DB'])
     dbdest = db_tools.PostgreSQLEngine (**config)
 
-    db.fdw ('app_fdw', db.Base.metadata,  dbdest, dbsrc1)
-    db.fdw ('var_fdw', db.Base2.metadata, dbdest, dbsrc2)
+    db.fdw ('app_fdw',    db.Base.metadata,  dbdest, dbsrc1)
+    db.fdw ('var_fdw',    db.Base2.metadata, dbdest, dbsrc2)
+    db.fdw ('nestle_fdw', db.Base4.metadata, dbdest, dbsrc3)
 
     v = CBGM_Params ()
     try:
@@ -2121,11 +2191,19 @@ if __name__ == '__main__':
                     print_stats (dbdest, parameters)
                 continue
 
+            if step == 21:
+                log (logging.INFO, "Step 21 : Importing Nestle Leitzeile ...")
+                db.Base4.metadata.drop_all   (dbdest.engine)
+                db.Base4.metadata.create_all (dbdest.engine)
+                copy_nestle (dbsrc3, dbdest, parameters)
+                continue
+
             if step == 31:
                 log (logging.INFO, "Step 31 : Creating CBGM tables ...")
                 db.Base2.metadata.drop_all   (dbdest.engine)
                 db.Base2.metadata.create_all (dbdest.engine)
                 copy_genealogical_data (dbsrc2, dbdest, parameters)
+                continue
 
             if step == 32:
                 log (logging.INFO, "Step 32 : Filling the Passages table ...")
@@ -2139,6 +2217,7 @@ if __name__ == '__main__':
 
                 log (logging.INFO, "          Filling the Cliques table ...")
                 fill_cliques_table (dbdest, parameters)
+                continue
 
             if step == 33:
                 log (logging.INFO, "Step 33 : Filling the Apparatus table with a positive apparatus ...")
@@ -2149,6 +2228,7 @@ if __name__ == '__main__':
 
                 log (logging.INFO, "          Filling the LocStem table ...")
                 fill_locstem_table (dbdest, parameters)
+                continue
 
             if step == 37:
                 log (logging.INFO, "Step 37 : Creating the labez matrix ...")
@@ -2159,7 +2239,6 @@ if __name__ == '__main__':
 
                 log (logging.INFO, "          Calculating mss similarity post-co ...")
                 calculate_mss_similarity_postco (dbdest, parameters, v)
-
                 continue
 
             if step == 99:

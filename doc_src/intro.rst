@@ -26,11 +26,15 @@ application server for interactive graphic interrogation of the CBGM database.
 Database preparation
 ====================
 
-The input is 2 MySQL databases.  The ECM database contains an apparatus and the
-VarGen database records editorial decisions about the priority of readings.
+The preparation step copies and normalizes the input data and computes the
+affinity matrix.
 
-The preparation step copies and normalizes the input data into a new database
-and computes an affinity matrix.
+The input are 3 MySQL databases.  The ECM database contains an apparatus and the
+VarGen database records editorial decisions about the priority of readings.  The
+Nestle database contains the "Leitzeile".
+
+The output is one Postgres database.  It contains all necessary data for the
+CBGM.
 
 .. uml::
    :align: center
@@ -38,16 +42,16 @@ and computes an affinity matrix.
 
    skinparam handwritten true
 
-   database db [
-    ECM
-   ....
-   VarGen
-   ]
+   database "ECM"    as dbsrc1
+   database "VarGen" as dbsrc2
+   database "Nestle" as dbsrc3
    component "prepare4cbgm" as p4c
-   database "Phase4" as db2
+   database "CBGM"   as db
 
-   db -r-> p4c
-   p4c -> db2
+   dbsrc1 --> p4c
+   dbsrc2 --> p4c
+   dbsrc3 --> p4c
+   p4c --> db
 
 
 Online Application

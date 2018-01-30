@@ -2,12 +2,6 @@
   position: relative;
   height: 0;
 }
-form.passage-selector {
-  margin-bottom: 20px;
-}
-form.passage-selector input[type=text] {
-  width: 12em;
-}
 ul.apparatus-wrapper {
   font-size: smaller;
 }

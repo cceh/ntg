@@ -20,6 +20,7 @@ There are two main entry points: the :mod:`coherence` page and the
    :align: center
 
 .. autofunction:: module:coherence~init()
+.. autofunction:: module:coherence~create_relatives_popup(ms_id, passage, target)
 
 
 :mod:`navigator` --- The Navigator Gadget
@@ -86,9 +87,7 @@ The javascript module that displays the textflow diagrams.
 
 .. module:: relatives
 
-.. autofunction:: module:relatives~get_ms_ids_from_popups(what)
 .. autofunction:: module:relatives~load_passage(passage)
-.. autofunction:: module:relatives~create_popup(ms_id, passage, target)
 .. autofunction:: module:relatives~position_popup(target)
 .. autofunction:: module:relatives~init(instance)
 
@@ -99,12 +98,20 @@ The javascript module that displays the textflow diagrams.
 .. module:: panel
 
 .. autofunction:: module:panel~init($panel)
-.. autofunction:: module:panel~load_labez_dropdown($group, pass_id, name, prefixes, suffixes)
-.. autofunction:: module:panel~load_range_dropdown($group, name, prefixes, suffixes)
-.. autofunction:: module:panel~handle_toolbar_events(event)
-.. autofunction:: module:panel~set_toolbar_buttons($toolbar, new_status)
 .. autofunction:: module:panel~create_panel_controls($panels)
 .. autofunction:: module:panel~setup_button_event_handlers()
+
+
+:mod:`toolbar` --- The Toolbar Module
+=====================================
+
+.. module:: toolbar
+
+.. autofunction:: module:toolbar~init(instance, $toolbar)
+.. autofunction:: module:toolbar~load_labez_dropdown($group, pass_id, name, prefixes, suffixes)
+.. autofunction:: module:toolbar~load_range_dropdown($group, name, prefixes, suffixes)
+.. autofunction:: module:toolbar~handle_toolbar_events(event)
+.. autofunction:: module:toolbar~set_toolbar_buttons($toolbar, new_status)
 
 
 :mod:`d3-chord-layout` --- The Chord Layout Engine

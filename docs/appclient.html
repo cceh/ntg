@@ -166,6 +166,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-textflow"><code class="docutils literal"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-relatives"><code class="docutils literal"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-panel"><code class="docutils literal"><span class="pre">panel</span></code> — The Panel Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-toolbar"><code class="docutils literal"><span class="pre">toolbar</span></code> — The Toolbar Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-d3-chord-layout"><code class="docutils literal"><span class="pre">d3-chord-layout</span></code> — The Chord Layout Engine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-d3-stemma-layout"><code class="docutils literal"><span class="pre">d3-stemma-layout</span></code> — The Stemma Layout Engine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-comparison"><code class="docutils literal"><span class="pre">comparison</span></code> — The Comparison Page</a></li>
@@ -253,7 +254,7 @@
 <div class="section" id="module-coherence">
 <span id="coherence-the-coherence-page"></span><h2><a class="reference internal" href="#coherence" title="coherence"><code class="xref js js-mod docutils literal"><span class="pre">coherence</span></code></a> — The Coherence Page<a class="headerlink" href="#module-coherence" title="Permalink to this headline">¶</a></h2>
 <div class="figure align-center" id="id1">
-<img src="_images/graphviz-cce006736ce92c9bf5c998a2708643901e7eb306.png" alt="digraph G {
+<img src="_images/graphviz-fa7a28f40780396ddf6709bd589979aa8377db7b.png" alt="digraph G {
 graph [rankdir=&quot;LR&quot;]
 
 
@@ -264,7 +265,7 @@ graph [rankdir=&quot;LR&quot;]
 
 
   &quot;apparatus.js&quot;;
-  &quot;panel.js&quot;;
+  &quot;toolbar.js&quot;;
   &quot;tools.js&quot;;
   &quot;coherence.js&quot;;
   &quot;d3-chord-layout.js&quot;;
@@ -273,6 +274,7 @@ graph [rankdir=&quot;LR&quot;]
   &quot;local-stemma.js&quot;;
   &quot;navigator.js&quot;;
   &quot;notes.js&quot;;
+  &quot;panel.js&quot;;
   &quot;relatives.js&quot;;
   &quot;textflow.js&quot;;
   &quot;dot-grammar.pegjs&quot;;
@@ -280,7 +282,7 @@ graph [rankdir=&quot;LR&quot;]
 
 
 
-  &quot;apparatus.js&quot; -&gt; &quot;panel.js&quot;;
+  &quot;apparatus.js&quot; -&gt; &quot;toolbar.js&quot;;
   &quot;apparatus.js&quot; -&gt; &quot;tools.js&quot;;
 
   &quot;coherence.js&quot; -&gt; &quot;apparatus.js&quot;;
@@ -319,15 +321,19 @@ graph [rankdir=&quot;LR&quot;]
 
 
 
+  &quot;panel.js&quot; -&gt; &quot;toolbar.js&quot;;
 
 
-
-  &quot;relatives.js&quot; -&gt; &quot;panel.js&quot;;
+  &quot;relatives.js&quot; -&gt; &quot;toolbar.js&quot;;
   &quot;relatives.js&quot; -&gt; &quot;tools.js&quot;;
 
 
-  &quot;textflow.js&quot; -&gt; &quot;panel.js&quot;;
+  &quot;textflow.js&quot; -&gt; &quot;toolbar.js&quot;;
   &quot;textflow.js&quot; -&gt; &quot;tools.js&quot;;
+
+
+
+
 
 }" />
 <p class="caption"><span class="caption-text">Module dependencies for <a class="reference internal" href="#coherence" title="coherence"><code class="xref js js-mod docutils literal"><span class="pre">coherence</span></code></a>.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
@@ -336,6 +342,29 @@ graph [rankdir=&quot;LR&quot;]
 <dt id="coherence.module:coherence.init">
 <code class="descclassname">module:coherence.</code><code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#coherence.module:coherence.init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the module.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.module:coherence.create_relatives_popup">
+<code class="descclassname">module:coherence.</code><code class="descname">create_relatives_popup</code><span class="sig-paren">(</span><em>ms_id</em>, <em>passage</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#coherence.module:coherence.create_relatives_popup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new popup managed by the relatives module.</p>
+<p>We have to create these dynamically because there may be many open at once.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>ms_id</strong> (<em>integer</em>) – The manuscript id</li>
+<li><strong>passage</strong> (<em>Object</em>) – The passage</li>
+<li><strong>target</strong> (<em>jQuery</em>) – An element. The popup will be positioned relative to this element.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – Resolved when popup is created.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -421,9 +450,12 @@ graph [rankdir=&quot;LR&quot;]
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
 <li><strong>passage</strong> (<em>Object</em>) – Which passage to load.</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – Promise, resolved when the new passage has loaded.</p>
 </td>
 </tr>
 </tbody>
@@ -478,9 +510,12 @@ graph [rankdir=&quot;LR&quot;]
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
 <li><strong>passage</strong> (<em>Object</em>) – Which passage to load.</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – Promise, resolved when the new passage has loaded.</p>
 </td>
 </tr>
 </tbody>
@@ -631,9 +666,12 @@ nodes or to merge a split.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
 <li><strong>passage</strong> (<em>Object</em>) – Which passage to load.</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – Promise, resolved when the new passage has loaded.</p>
 </td>
 </tr>
 </tbody>
@@ -700,9 +738,12 @@ nodes or to merge a split.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
 <li><strong>passage</strong> (<em>Object</em>) – Which passage to load.</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – Promise, resolved when the new passage has loaded.</p>
 </td>
 </tr>
 </tbody>
@@ -731,29 +772,6 @@ nodes or to merge a split.</p>
 <div class="section" id="module-relatives">
 <span id="relatives-the-relatives-popup"></span><h2><a class="reference internal" href="#relatives" title="relatives"><code class="xref js js-mod docutils literal"><span class="pre">relatives</span></code></a> — The Relatives Popup<a class="headerlink" href="#module-relatives" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="relatives.module:relatives.get_ms_ids_from_popups">
-<code class="descclassname">module:relatives.</code><code class="descname">get_ms_ids_from_popups</code><span class="sig-paren">(</span><em>what</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.get_ms_ids_from_popups" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a list of the mss. currently displayed in the panel.</p>
-<p>Get either the ‘source’ ms. – the ms. the panel is all about – or the
-‘target’ mss. – the mss. related to the ‘source’ ms.  Only returns
-target mss. if the panel body is open.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>what</strong> (<em>string</em>) – ‘source’ or ‘target’</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – - Array of ms_ids</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="relatives.module:relatives.load_passage">
 <code class="descclassname">module:relatives.</code><code class="descname">load_passage</code><span class="sig-paren">(</span><em>passage</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.load_passage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load new data.</p>
@@ -763,28 +781,12 @@ passage.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
 <li><strong>passage</strong> (<em>Object</em>) – The new passage</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="relatives.module:relatives.create_popup">
-<code class="descclassname">module:relatives.</code><code class="descname">create_popup</code><span class="sig-paren">(</span><em>ms_id</em>, <em>passage</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.create_popup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a popup panel.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>ms_id</strong> (<em>integer</em>) – The manuscript id.</li>
-<li><strong>passage</strong> (<em>Object</em>) – The passage.</li>
-<li><strong>target</strong> (<em>DOM</em>) – A DOM element relative to which to position the popup.</li>
-</ul>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – Promise, resolved when the new passage has loaded.</p>
 </td>
 </tr>
 </tbody>
@@ -794,7 +796,8 @@ passage.</p>
 <dl class="function">
 <dt id="relatives.module:relatives.position_popup">
 <code class="descclassname">module:relatives.</code><code class="descname">position_popup</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#relatives.module:relatives.position_popup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Position the popup panel relative to the element that created the popup.</p>
+<dd><p>Position the popup panel relative to target.</p>
+<p>Target usually is the element that the user clicked to create the popup.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -849,92 +852,6 @@ passage.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="panel.module:panel.load_labez_dropdown">
-<code class="descclassname">module:panel.</code><code class="descname">load_labez_dropdown</code><span class="sig-paren">(</span><em>$group</em>, <em>pass_id</em>, <em>name</em>, <em>prefixes</em>, <em>suffixes</em><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.load_labez_dropdown" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads the buttons in the labez dropdown.</p>
-<p>Loads the buttons in the labez dropdown with the labez of the readings of
-the passage.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>$group</strong> (<em>jQuery</em>) – The button group</li>
-<li><strong>pass_id</strong> (<em>int|string</em>) – The passage id</li>
-<li><strong>input_name</strong> (<em>string</em>) – &lt;input name=name …&gt;</li>
-<li><strong>prefixes</strong> (<em>Array</em>) – Strings to prepend to the list.</li>
-<li><strong>suffixes</strong> (<em>Array</em>) – Strings to append to the list.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – Promise, resolved when the buttons are loaded.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="panel.module:panel.load_range_dropdown">
-<code class="descclassname">module:panel.</code><code class="descname">load_range_dropdown</code><span class="sig-paren">(</span><em>$group</em>, <em>name</em>, <em>prefixes</em>, <em>suffixes</em><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.load_range_dropdown" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads the buttons in the range dropdown.</p>
-<p>Loads the buttons in the range dropdown with the ranges of the book.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>$group</strong> (<em>jQuery</em>) – The button group</li>
-<li><strong>pass_id</strong> (<em>int|string</em>) – The passage id</li>
-<li><strong>input_name</strong> (<em>string</em>) – The button(s) name</li>
-<li><strong>prefixes</strong> (<em>Array</em>) – Strings to prepend to the list.</li>
-<li><strong>suffixes</strong> (<em>Array</em>) – Strings to append to the list.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – Promise, resolved when the buttons are loaded.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="panel.module:panel.handle_toolbar_events">
-<code class="descclassname">module:panel.</code><code class="descname">handle_toolbar_events</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.handle_toolbar_events" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the status of the toolbar buttons after event</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>event</strong> (<em>Object</em>) – The event.  The status is saved in event.data.data</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="panel.module:panel.set_toolbar_buttons">
-<code class="descclassname">module:panel.</code><code class="descname">set_toolbar_buttons</code><span class="sig-paren">(</span><em>$toolbar</em>, <em>new_status</em><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.set_toolbar_buttons" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the status of the toolbar buttons</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>$toolbar</strong> (<em>jQuery</em>) – The toolbar</li>
-<li><strong>new_status</strong> (<em>Object</em>) – The new status of the toolbar buttons</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="panel.module:panel.create_panel_controls">
 <code class="descclassname">module:panel.</code><code class="descname">create_panel_controls</code><span class="sig-paren">(</span><em>$panels</em><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.create_panel_controls" title="Permalink to this definition">¶</a></dt>
 <dd><p>Put min-max and close buttons onto panels.</p>
@@ -958,6 +875,116 @@ div.panel-closable panes.</p>
 <dt id="panel.module:panel.setup_button_event_handlers">
 <code class="descclassname">module:panel.</code><code class="descname">setup_button_event_handlers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#panel.module:panel.setup_button_event_handlers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Setup the minimize, maximize, and close button event handlers.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-toolbar">
+<span id="toolbar-the-toolbar-module"></span><h2><a class="reference internal" href="#toolbar" title="toolbar"><code class="xref js js-mod docutils literal"><span class="pre">toolbar</span></code></a> — The Toolbar Module<a class="headerlink" href="#module-toolbar" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="toolbar.module:toolbar.init">
+<code class="descclassname">module:toolbar.</code><code class="descname">init</code><span class="sig-paren">(</span><em>instance</em>, <em>$toolbar</em><span class="sig-paren">)</span><a class="headerlink" href="#toolbar.module:toolbar.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>instance</strong> (<em>Object</em>) – The panel instance</li>
+<li><strong>$toolbar</strong> (<em>Object</em>) – The toolbar element</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – The module instance object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="toolbar.module:toolbar.load_labez_dropdown">
+<code class="descclassname">module:toolbar.</code><code class="descname">load_labez_dropdown</code><span class="sig-paren">(</span><em>$group</em>, <em>pass_id</em>, <em>name</em>, <em>prefixes</em>, <em>suffixes</em><span class="sig-paren">)</span><a class="headerlink" href="#toolbar.module:toolbar.load_labez_dropdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the buttons in the labez dropdown.</p>
+<p>Loads the buttons in the labez dropdown with the labez of the readings of
+the passage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>$group</strong> (<em>jQuery</em>) – The button group</li>
+<li><strong>passage</strong> (<em>Object</em>) – The passage</li>
+<li><strong>input_name</strong> (<em>string</em>) – &lt;input name=name …&gt;</li>
+<li><strong>prefixes</strong> (<em>Array</em>) – Strings to prepend to the list.</li>
+<li><strong>suffixes</strong> (<em>Array</em>) – Strings to append to the list.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – Promise, resolved when the buttons are loaded.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="toolbar.module:toolbar.load_range_dropdown">
+<code class="descclassname">module:toolbar.</code><code class="descname">load_range_dropdown</code><span class="sig-paren">(</span><em>$group</em>, <em>name</em>, <em>prefixes</em>, <em>suffixes</em><span class="sig-paren">)</span><a class="headerlink" href="#toolbar.module:toolbar.load_range_dropdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the buttons in the range dropdown.</p>
+<p>Loads the buttons in the range dropdown with the ranges of the book.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>$group</strong> (<em>jQuery</em>) – The button group</li>
+<li><strong>passage</strong> (<em>Object</em>) – The passage</li>
+<li><strong>input_name</strong> (<em>string</em>) – The button(s) name</li>
+<li><strong>prefixes</strong> (<em>Array</em>) – Strings to prepend to the list.</li>
+<li><strong>suffixes</strong> (<em>Array</em>) – Strings to append to the list.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> – Promise, resolved when the buttons are loaded.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="toolbar.module:toolbar.handle_toolbar_events">
+<code class="descclassname">module:toolbar.</code><code class="descname">handle_toolbar_events</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="headerlink" href="#toolbar.module:toolbar.handle_toolbar_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the status of the toolbar buttons after event</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>event</strong> (<em>Object</em>) – The event.  The status is saved in event.data.data</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="toolbar.module:toolbar.set_toolbar_buttons">
+<code class="descclassname">module:toolbar.</code><code class="descname">set_toolbar_buttons</code><span class="sig-paren">(</span><em>$toolbar</em>, <em>new_status</em><span class="sig-paren">)</span><a class="headerlink" href="#toolbar.module:toolbar.set_toolbar_buttons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the status of the toolbar buttons</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>$toolbar</strong> (<em>jQuery</em>) – The toolbar</li>
+<li><strong>new_status</strong> (<em>Object</em>) – The new status of the toolbar buttons</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

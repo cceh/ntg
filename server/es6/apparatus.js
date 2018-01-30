@@ -11,11 +11,11 @@ define ([
     'jquery',
     'lodash',
     'tools',
-    'panel',
+    'toolbar',
     'css!apparatus-css',
 ],
 
-function ($, _, tools, panel) {
+function ($, _, tools, toolbar) {
     function changed () {
         // currently unused
         $ (document).trigger ('ntg.apparatus.changed');
@@ -27,30 +27,32 @@ function ($, _, tools, panel) {
      * @function load_passage
      *
      * @param {Object} passage - Which passage to load.
+     *
+     * @return {Promise} Promise, resolved when the new passage has loaded.
      */
     function load_passage (passage) {
-        this.data.passage = passage;
+        let instance = this;
+        instance.data.passage = passage;
+        let new_list;
 
-        var instance = this;
-        var new_list;
+        let xhr = $.getJSON ('apparatus.json/' + passage.pass_id);
+        xhr.done ((json) => {
+            let labez_grouper  = (g) => g.labez;
+            let clique_grouper = (g) => g.labez_clique;
 
-        var xhr = $.getJSON ('apparatus.json/' + passage.pass_id, function (json) {
-            var labez_grouper  = function (g) { return g.labez; };
-            var clique_grouper = function (g) { return g.labez_clique; };
+            let grouper = _.includes (instance.data.cliques, 'cliques') ? clique_grouper : labez_grouper;
 
-            var grouper = _.includes (instance.data.cliques, 'cliques') ? clique_grouper : labez_grouper;
-
-            var readings = [];
-            var html = [];
+            let readings = [];
+            let html = [];
 
             // load readings into dictionary for faster lookup
-            _.forEach (json.data.readings, function (reading) {
+            _.forEach (json.data.readings, (reading) => {
                 readings[reading.labez] = reading.lesart;
             });
 
             // group manuscripts and loop over groups
-            _.forEach (_.groupBy (_.sortBy (json.data.manuscripts, grouper), grouper), function (group) {
-                var data = {
+            _.forEach (_.groupBy (_.sortBy (json.data.manuscripts, grouper), grouper), (group) => {
+                let data = {
                     'pass_id'      : passage.pass_id,
                     'labez'        : group[0].labez,
                     'labez_clique' : group[0].labez_clique,
@@ -66,8 +68,8 @@ function ($, _, tools, panel) {
                 ));
 
                 html.push ('<ul class="list-group-item-text attesting-mss list-inline">');
-                _.forEach (_.sortBy (group, ['hsnr']), function (item) {
-                    var data2 = {
+                _.forEach (_.sortBy (group, ['hsnr']), (item) => {
+                    let data2 = {
                         'ms_id'     : item.ms_id,
                         'hs'        : item.hs,
                         'certainty' : (item.certainty === 1.0) ? '' : '?',
@@ -81,19 +83,19 @@ function ($, _, tools, panel) {
             new_list = $ (html.join (''));
         });
 
-        var faded_promise = this.$wrapper.animate ({ 'opacity' : 0.0 }, 300);
+        let faded_promise = instance.$wrapper.animate ({ 'opacity' : 0.0 }, 300);
 
-        $.when (xhr, faded_promise).done (function () {
-            var $wrapper = instance.$wrapper;
-            var old_height = $wrapper.prop ('scrollHeight');
+        return $.when (xhr, faded_promise).done (() => {
+            let $wrapper = instance.$wrapper;
+            let old_height = $wrapper.prop ('scrollHeight');
             $wrapper.html (new_list);
-            var new_height = $wrapper.prop ('scrollHeight');
+            let new_height = $wrapper.prop ('scrollHeight');
             $wrapper.height (old_height);
-            $wrapper.animate ({ 'height' : new_height }, 300, function () {
+            $wrapper.animate ({ 'height' : new_height }, 300, () => {
                 $wrapper.height ('auto');
                 $wrapper.animate ({ 'opacity' : 1.0 }, 300);
             });
-            panel.set_toolbar_buttons (instance.$toolbar, instance.data);
+            toolbar.set_toolbar_buttons (instance.$toolbar, instance.data);
             changed ();
         });
     }
@@ -109,8 +111,8 @@ function ($, _, tools, panel) {
     function goto_attestation (event) {
         event.stopPropagation ();
 
-        var instance = window.coherence.ltextflow;
-        var labez = $ (event.currentTarget).attr ('data-labez');
+        let instance = window.coherence.ltextflow;
+        let labez = $ (event.currentTarget).attr ('data-labez');
         instance.data.labez = labez;
         instance.load_passage (instance.data.passage);
 

@@ -61,3 +61,40 @@ form.passage-selector {
         }
     }
 }
+
+form.passage-selector {
+    margin-bottom: 20px;
+    input[type=text] {
+        width: 12em;
+    }
+}
+
+div.leitzeile {
+    margin-bottom: 20px;
+    font-size: larger;
+    .leitzeile-current {
+        color: #d62728;
+        pointer-events: none;
+    }
+    .leitzeile-spanned {
+        border-bottom: 1px dotted grey;
+    }
+    .leitzeile-one {
+        &::before {
+            content: '⸀'; /* 2e00 */
+        }
+    }
+    .leitzeile-insert {
+        &::before {
+            content: '⸆'; /* 2e06 */
+        }
+    }
+    .leitzeile-many {
+        &::before {
+            content: '⸂';
+        }
+        &::after {
+            content: '⸃';
+        }
+    }
+}

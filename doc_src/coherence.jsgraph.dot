@@ -9,7 +9,7 @@ graph [rankdir="LR"]
   "seiyria-bootstrap-slider/dist/bootstrap-slider.js";
   "urijs/src/URI.fragmentQuery.js";
   "apparatus.js";
-  "panel.js";
+  "toolbar.js";
   "tools.js";
   "coherence.js";
   "d3-chord-layout.js";
@@ -18,6 +18,7 @@ graph [rankdir="LR"]
   "local-stemma.js";
   "navigator.js";
   "notes.js";
+  "panel.js";
   "relatives.js";
   "textflow.js";
   "dot-grammar.pegjs";
@@ -25,7 +26,7 @@ graph [rankdir="LR"]
   "seiyria-bootstrap-slider/dist/bootstrap-slider.js" -> "jquery/dist/jquery.js";
   "apparatus.js" -> "jquery/dist/jquery.js";
   "apparatus.js" -> "lodash/lodash.js";
-  "apparatus.js" -> "panel.js";
+  "apparatus.js" -> "toolbar.js";
   "apparatus.js" -> "tools.js";
   "coherence.js" -> "jquery/dist/jquery.js";
   "coherence.js" -> "apparatus.js";
@@ -64,14 +65,18 @@ graph [rankdir="LR"]
   "panel.js" -> "bootstrap/dist/js/bootstrap.js";
   "panel.js" -> "jquery/dist/jquery.js";
   "panel.js" -> "lodash/lodash.js";
-  "panel.js" -> "seiyria-bootstrap-slider/dist/bootstrap-slider.js";
+  "panel.js" -> "toolbar.js";
   "relatives.js" -> "jquery/dist/jquery.js";
   "relatives.js" -> "lodash/lodash.js";
-  "relatives.js" -> "panel.js";
+  "relatives.js" -> "toolbar.js";
   "relatives.js" -> "tools.js";
   "textflow.js" -> "jquery/dist/jquery.js";
   "textflow.js" -> "lodash/lodash.js";
-  "textflow.js" -> "panel.js";
+  "textflow.js" -> "toolbar.js";
   "textflow.js" -> "tools.js";
+  "toolbar.js" -> "bootstrap/dist/js/bootstrap.js";
+  "toolbar.js" -> "jquery/dist/jquery.js";
+  "toolbar.js" -> "lodash/lodash.js";
+  "toolbar.js" -> "seiyria-bootstrap-slider/dist/bootstrap-slider.js";
   "tools.js" -> "lodash/lodash.js";
 }

@@ -19,9 +19,9 @@ function ($, _, d3, tools) {
     }
 
     /** @var {D3selector} dragged_node - The node being dragged or null */
-    var dragged_node = null;
+    let dragged_node = null;
     /** @var {D3selector} target_node  - The node under the node being dragged or null */
-    var target_node  = null;
+    let target_node  = null;
 
     /**
      * Moves the node back to the original position.
@@ -38,15 +38,15 @@ function ($, _, d3, tools) {
 
     function return_to_base (node) {
         if (node !== null) {
-            var t = d3.transition ().duration (500).ease (d3.easeLinear);
+            let t = d3.transition ().duration (500).ease (d3.easeLinear);
             node.transition (t).attrTween ('transform', function (d, dummy_i, dummy_a)  {
-                var delta_x = d.pos.x - d.pos.orig_x;
-                var delta_y = d.pos.y - d.pos.orig_y;
+                let delta_x = d.pos.x - d.pos.orig_x;
+                let delta_y = d.pos.y - d.pos.orig_y;
                 d.pos.x = d.pos.orig_x;
                 d.pos.y = d.pos.orig_y;
                 return function (tt) {
-                    var x = d.pos.x + ((1.0 - tt) * delta_x);
-                    var y = d.pos.y + ((1.0 - tt) * delta_y);
+                    let x = d.pos.x + ((1.0 - tt) * delta_x);
+                    let y = d.pos.y + ((1.0 - tt) * delta_y);
                     return 'translate(' + x + ',' + y + ')';
                 };
             });
@@ -80,8 +80,8 @@ function ($, _, d3, tools) {
      */
 
     function dragListener (instance) {
-        var $panel  = instance.$wrapper;
-        var passage = instance.passage;
+        let $panel  = instance.$wrapper;
+        let passage = instance.passage;
 
         return d3.drag ()
             .on ('start', function (dummy_d) {
@@ -106,28 +106,28 @@ function ($, _, d3, tools) {
                 // console.log (d3.event.shiftKey ? 'shift' : 'unshift');
             })
             .on ('end', function (dummy_d) {
-                var dragged_node_ref = dragged_node;
+                let dragged_node_ref = dragged_node;
                 if (target_node) {
                     // if dropped on another node, the default action is to
                     // move, but if the shift key was held down, the action will
                     // be to merge or to split
-                    var action = 'move';
+                    let action = 'move';
                     if (d3.event.sourceEvent.shiftKey) {
                         action = (dragged_node.datum ().labez === target_node.datum ().labez)
                             ? 'merge' : 'split';
                     }
-                    var xhr = $.getJSON ('stemma-edit/' + passage.pass_id, {
+                    let xhr = $.getJSON ('stemma-edit/' + passage.pass_id, {
                         'action'     : action,
                         'labez_old'  : dragged_node.datum ().labez,
                         'clique_old' : dragged_node.datum ().clique,
                         'labez_new'  : target_node.datum ().labez,
                         'clique_new' : target_node.datum ().clique,
                     });
-                    xhr.done (function (json) {
+                    xhr.done ((json) => {
                         // stemma-edit returns the changed passage
                         $ (document).trigger ('ntg.panel.reload', json.data);
                     });
-                    xhr.fail (function (xhrobj) {
+                    xhr.fail ((xhrobj) => {
                         tools.xhr_alert (xhrobj, $panel);
                         return_to_base (dragged_node_ref);
                     });
@@ -179,17 +179,17 @@ function ($, _, d3, tools) {
     function open_contextmenu (event) {
         event.preventDefault ();
 
-        var passage = event.data.passage;
-        var xhr = $.getJSON ('cliques.json/' + passage.pass_id);
-        xhr.done (function (json) {
-            var dataset = event.target.dataset;
-            var data = {
+        let passage = event.data.passage;
+        let xhr = $.getJSON ('cliques.json/' + passage.pass_id);
+        xhr.done ((json) => {
+            let dataset = event.target.dataset;
+            let data = {
                 'labez_old'  : dataset.labez,
                 'clique_old' : dataset.clique,
             };
 
             // build the context menu
-            var menu = $ ('<table class="contextmenu"></table>');
+            let menu = $ ('<table class="contextmenu"></table>');
             menu.append ($ (
                 tools.format (
                     '<tr class="ui-state-disabled">' +
@@ -213,7 +213,7 @@ function ($, _, d3, tools) {
 
             // Merge two cliques
 
-            var cliques = _.filter (json.data, function (o) { return o[0][0] !== 'z'; });
+            let cliques = _.filter (json.data, function (o) { return o[0][0] !== 'z'; });
             cliques = cliques.concat ([['*', '0', '*'], ['?', '0', '?']]);
             _.forEach (cliques, function (value) {
                 data.labez_new  = value[0];
@@ -246,11 +246,11 @@ function ($, _, d3, tools) {
 
             menu.menu ({
                 'select' : function (event2, ui) {
-                    var tr = ui.item[0];
+                    let tr = ui.item[0];
 
                     // console.log ('Selected: ' + $ (tr).text ());
 
-                    var xhr2 = $.getJSON ('stemma-edit/' + passage.pass_id, tr.dataset);
+                    let xhr2 = $.getJSON ('stemma-edit/' + passage.pass_id, tr.dataset);
                     xhr2.done (function (json2) {
                         // stemma-edit returns the changed passage
                         $ (document).trigger ('ntg.panel.reload', json2.data);
@@ -271,25 +271,28 @@ function ($, _, d3, tools) {
      * @function load_passage
      *
      * @param {Object} passage - Which passage to load.
+     *
+     * @return {Promise} Promise, resolved when the new passage has loaded.
      */
     function load_passage (passage) {
-        var instance = this;
+        let instance = this;
         instance.passage = passage;
 
-        var params = ['width', 'fontsize'];
+        const params = ['width', 'fontsize'];
 
         // provide a width and fontsize for GraphViz to format the graph
         instance.data.width = instance.$wrapper.width ();                            // in px
         instance.data.fontsize = parseFloat (instance.$wrapper.css ('font-size'));   // in px
 
-        var url = 'stemma.dot/' + passage.pass_id + '?' + $.param (_.pick (instance.data, params));
-        var png_url = 'stemma.png/' + passage.pass_id + '?' + $.param (_.pick (instance.data, params));
+        let url = 'stemma.dot/' + passage.pass_id + '?' + $.param (_.pick (instance.data, params));
+        let png_url = 'stemma.png/' + passage.pass_id + '?' + $.param (_.pick (instance.data, params));
 
-        var name = $.trim (instance.$panel.find ('.panel-caption').text ());
+        let name = $.trim (instance.$panel.find ('.panel-caption').text ());
         instance.$toolbar.find ('a[name="dot"]').attr ('href', url).attr ('download', name + '.dot');
         instance.$toolbar.find ('a[name="png"]').attr ('href', png_url);
 
-        instance.graph.load_dot (url).done (function () {
+        let xhr = instance.graph.load_dot (url);
+        xhr.done (() => {
             instance.$panel.animate ({ 'width' : (instance.graph.bbox.width + 20) + 'px' });
 
             if (is_editor) {
@@ -312,6 +315,7 @@ function ($, _, d3, tools) {
             }
         });
         changed ();
+        return xhr;
     }
 
     /**
@@ -329,7 +333,6 @@ function ($, _, d3, tools) {
         instance.load_passage = load_passage;
         $.extend (instance.data, {});
         instance.$wrapper = instance.$panel.find ('.panel-content');
-
         instance.graph = graph_module.init (instance.$wrapper, id_prefix);
 
         if (is_editor) {

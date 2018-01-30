@@ -19,6 +19,26 @@
 {% endblock %}
 
 {% block content %}
+
+  <script type="text/template" id="relatives-template">
+    <div class="panel panel-closable panel-default panel-relatives">
+
+      <div class="panel-heading panel-caption panel-relatives-caption">
+        <div>
+        </div>
+      </div>
+
+      {{ tt.toolbar ('relatives', 'relatives') }}
+
+      <div class="panel-heading panel-slidable panel-relatives-metrics">
+      </div>
+
+      <div class="panel-slidable panel-relatives-content">
+      </div>
+
+    </div>
+  </script>
+
   {% include 'navigator.html' %}
 
   <div class="panel panel-default panel-apparatus">

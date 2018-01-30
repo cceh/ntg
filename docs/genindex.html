@@ -165,6 +165,7 @@
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-textflow"><code class="docutils literal"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-relatives"><code class="docutils literal"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-panel"><code class="docutils literal"><span class="pre">panel</span></code> — The Panel Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-toolbar"><code class="docutils literal"><span class="pre">toolbar</span></code> — The Toolbar Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-chord-layout"><code class="docutils literal"><span class="pre">d3-chord-layout</span></code> — The Chord Layout Engine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-stemma-layout"><code class="docutils literal"><span class="pre">d3-stemma-layout</span></code> — The Stemma Layout Engine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-comparison"><code class="docutils literal"><span class="pre">comparison</span></code> — The Comparison Page</a></li>
@@ -519,10 +520,16 @@
       </ul></li>
       <li><a href="database.html#ntg_common.db.Lac">Lac (class in ntg_common.db)</a>
 </li>
+      <li><a href="appserver.html#server.server.leitzeile">leitzeile() (in module server.server)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Att.lekt">lekt (Att attribute)</a>
 </li>
-      <li><a href="database.html#ntg_common.db.Passages.lemma">lemma (Passages attribute)</a>
+      <li><a href="database.html#ntg_common.db.Nestle.lemma">lemma (Nestle attribute)</a>
+
+      <ul>
+        <li><a href="database.html#ntg_common.db.Passages.lemma">(Passages attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Ms_Ranges.length">length (Ms_Ranges attribute)</a>
@@ -558,6 +565,8 @@
       <li><a href="appclient.html#apparatus.module:apparatus.init">module:apparatus.init() (module:apparatus method)</a>
 </li>
       <li><a href="appclient.html#apparatus.module:apparatus.load_passage">module:apparatus.load_passage() (module:apparatus method)</a>
+</li>
+      <li><a href="appclient.html#coherence.module:coherence.create_relatives_popup">module:coherence.create_relatives_popup() (module:coherence method)</a>
 </li>
       <li><a href="appclient.html#coherence.module:coherence.init">module:coherence.init() (module:coherence method)</a>
 </li>
@@ -619,10 +628,10 @@
 </li>
       <li><a href="appclient.html#local-stemma.module:local-stemma.highlight">module:local-stemma.highlight() (module:local-stemma method)</a>
 </li>
-      <li><a href="appclient.html#local-stemma.module:local-stemma.init">module:local-stemma.init() (module:local-stemma method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="appclient.html#local-stemma.module:local-stemma.init">module:local-stemma.init() (module:local-stemma method)</a>
+</li>
       <li><a href="appclient.html#local-stemma.module:local-stemma.load_passage">module:local-stemma.load_passage() (module:local-stemma method)</a>
 </li>
       <li><a href="appclient.html#local-stemma.module:local-stemma.open_contextmenu">module:local-stemma.open_contextmenu() (module:local-stemma method)</a>
@@ -647,21 +656,9 @@
 </li>
       <li><a href="appclient.html#panel.module:panel.create_panel_controls">module:panel.create_panel_controls() (module:panel method)</a>
 </li>
-      <li><a href="appclient.html#panel.module:panel.handle_toolbar_events">module:panel.handle_toolbar_events() (module:panel method)</a>
-</li>
       <li><a href="appclient.html#panel.module:panel.init">module:panel.init() (module:panel method)</a>
 </li>
-      <li><a href="appclient.html#panel.module:panel.load_labez_dropdown">module:panel.load_labez_dropdown() (module:panel method)</a>
-</li>
-      <li><a href="appclient.html#panel.module:panel.load_range_dropdown">module:panel.load_range_dropdown() (module:panel method)</a>
-</li>
-      <li><a href="appclient.html#panel.module:panel.set_toolbar_buttons">module:panel.set_toolbar_buttons() (module:panel method)</a>
-</li>
       <li><a href="appclient.html#panel.module:panel.setup_button_event_handlers">module:panel.setup_button_event_handlers() (module:panel method)</a>
-</li>
-      <li><a href="appclient.html#relatives.module:relatives.create_popup">module:relatives.create_popup() (module:relatives method)</a>
-</li>
-      <li><a href="appclient.html#relatives.module:relatives.get_ms_ids_from_popups">module:relatives.get_ms_ids_from_popups() (module:relatives method)</a>
 </li>
       <li><a href="appclient.html#relatives.module:relatives.init">module:relatives.init() (module:relatives method)</a>
 </li>
@@ -674,6 +671,16 @@
       <li><a href="appclient.html#textflow.module:textflow.load_passage">module:textflow.load_passage() (module:textflow method)</a>
 </li>
       <li><a href="appclient.html#textflow.module:textflow.open_contextmenu">module:textflow.open_contextmenu() (module:textflow method)</a>
+</li>
+      <li><a href="appclient.html#toolbar.module:toolbar.handle_toolbar_events">module:toolbar.handle_toolbar_events() (module:toolbar method)</a>
+</li>
+      <li><a href="appclient.html#toolbar.module:toolbar.init">module:toolbar.init() (module:toolbar method)</a>
+</li>
+      <li><a href="appclient.html#toolbar.module:toolbar.load_labez_dropdown">module:toolbar.load_labez_dropdown() (module:toolbar method)</a>
+</li>
+      <li><a href="appclient.html#toolbar.module:toolbar.load_range_dropdown">module:toolbar.load_range_dropdown() (module:toolbar method)</a>
+</li>
+      <li><a href="appclient.html#toolbar.module:toolbar.set_toolbar_buttons">module:toolbar.set_toolbar_buttons() (module:toolbar method)</a>
 </li>
       <li><a href="appclient.html#tools.module:tools.bfs">module:tools.bfs() (module:tools method)</a>
 </li>
@@ -705,16 +712,18 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appclient.html#module-navigator">navigator (module)</a>
 </li>
+      <li><a href="database.html#ntg_common.db.Nestle">Nestle (class in ntg_common.db)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Affinity.newer">newer (Affinity attribute)</a>
 </li>
       <li><a href="appclient.html#module-notes">notes (module)</a>
 </li>
       <li><a href="appserver.html#server.editor.notes">notes() (in module server.editor)</a>
 </li>
-      <li><a href="ntg_common.html#module-ntg_common">ntg_common (module)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ntg_common.html#module-ntg_common">ntg_common (module)</a>
+</li>
       <li><a href="database.html#module-ntg_common.db">ntg_common.db (module)</a>
 </li>
       <li><a href="ntg_common.html#module-ntg_common.db_tools">ntg_common.db_tools (module)</a>
@@ -791,9 +800,9 @@
 </li>
       <li><a href="appclient.html#module-relatives">relatives (module)</a>
 </li>
-      <li><a href="appserver.html#server.server.relatives_html">relatives_html() (in module server.server)</a>
+      <li><a href="appserver.html#server.server.relatives">relatives() (in module server.server)</a>
 </li>
-      <li><a href="appserver.html#server.server.relatives_skeleton">relatives_skeleton() (in module server.server)</a>
+      <li><a href="database.html#ntg_common.db.Passages.remarks">remarks (Passages attribute)</a>
 </li>
       <li><a href="appserver.html#server.server.remove_z_leaves">remove_z_leaves() (in module server.server)</a>
 </li>
@@ -866,6 +875,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appserver.html#server.server.textflow">textflow() (in module server.server)</a>
+</li>
+      <li><a href="appclient.html#module-toolbar">toolbar (module)</a>
 </li>
       <li><a href="appclient.html#module-tools">tools (module)</a>
 </li>

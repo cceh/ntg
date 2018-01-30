@@ -17,18 +17,6 @@ from sqlalchemy.schema import DDLElement
 from sqlalchemy_utils import IntRangeType
 
 
-# class CoerceInteger (sqlalchemy.types.TypeDecorator):
-#     """ Coerce numpy integers to python integers
-#     before passing off to the database."""
-
-#     impl = sqlalchemy.types.Integer
-
-#     def process_bind_param (self, value, dialect):
-#         return int (value)
-
-#     def process_result_value (self, value, dialect):
-#         return value
-
 # let sqlalchemy manage our views
 
 class CreateView (DDLElement):
@@ -568,6 +556,10 @@ class Passages (Base2):
 
         True if this passage is a later addition, eg. the pericope adulterae.
 
+    .. attribute:: remarks
+
+        Editor notes.
+
     """
 
     __tablename__ = 'passages'
@@ -1009,7 +1001,7 @@ view ('passages_view', Base2.metadata, '''
            adr2chapter (p.anfadr) AS chapter,
            adr2verse   (p.anfadr) AS verse,
            adr2word    (p.anfadr) AS word,
-           p.anfadr, p.endadr, p.irange, p.lemma
+           p.pass_id, p.anfadr, p.endadr, p.irange, p.lemma, p.variant, p.spanned
     FROM passages p
     JOIN books b USING (bk_id)
     ''')
@@ -1116,6 +1108,43 @@ SELECT EXISTS (SELECT * FROM locstem
                      labez = labez1 AND clique = clique1 AND
                      source_labez IS NULL AND original = false);
 ''', volatility = 'STABLE')
+
+
+Base4 = declarative_base ()
+
+class Nestle (Base4):
+    """The Leitzeile from the Nestle-Aland
+
+    Dient der Darstellung der Leitzeile im Navigator.
+
+    .. sauml::
+       :include: nestle29
+
+    .. _nestle_table:
+
+    .. attribute:: anfadr, endadr
+
+       Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
+       Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade einen
+       Zwischenraum.  In dieser Tabelle sind nur Wörter enthalten, keine
+       Zwischenräume.  Jedes Wort hat einen eigenen Eintrag, d.h. für alle
+       Einträge gilt: anfadr = endadr.
+
+    .. attribute:: lemma
+
+       Das Lemma-Wort in der Leitzeile.
+
+    """
+
+    __tablename__ = 'nestle'
+
+    id        = Column (Integer,       primary_key = True, autoincrement = True)
+
+    anfadr    = Column (Integer,       nullable = False)
+    endadr    = Column (Integer,       nullable = False)
+    irange    = Column (IntRangeType,  nullable = False)
+
+    lemma     = Column (String(1024),  server_default = '')
 
 
 # Tables for flask_login / flask_user / flask_security / whatever

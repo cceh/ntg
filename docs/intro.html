@@ -166,6 +166,7 @@
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-textflow"><code class="docutils literal"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-relatives"><code class="docutils literal"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-panel"><code class="docutils literal"><span class="pre">panel</span></code> — The Panel Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-toolbar"><code class="docutils literal"><span class="pre">toolbar</span></code> — The Toolbar Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-chord-layout"><code class="docutils literal"><span class="pre">d3-chord-layout</span></code> — The Chord Layout Engine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-stemma-layout"><code class="docutils literal"><span class="pre">d3-stemma-layout</span></code> — The Stemma Layout Engine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-comparison"><code class="docutils literal"><span class="pre">comparison</span></code> — The Comparison Page</a></li>
@@ -410,24 +411,27 @@ manuscripts as the parent manuscript.</p>
 application server for interactive graphic interrogation of the CBGM database.</p>
 <div class="section" id="database-preparation">
 <h2>Database preparation<a class="headerlink" href="#database-preparation" title="Permalink to this headline">¶</a></h2>
-<p>The input is 2 MySQL databases.  The ECM database contains an apparatus and the
-VarGen database records editorial decisions about the priority of readings.</p>
-<p>The preparation step copies and normalizes the input data into a new database
-and computes an affinity matrix.</p>
+<p>The preparation step copies and normalizes the input data and computes the
+affinity matrix.</p>
+<p>The input are 3 MySQL databases.  The ECM database contains an apparatus and the
+VarGen database records editorial decisions about the priority of readings.  The
+Nestle database contains the “Leitzeile”.</p>
+<p>The output is one Postgres database.  It contains all necessary data for the
+CBGM.</p>
 <div class="figure align-center" id="id2">
 <p class="plantuml">
-<img src="_images/plantuml-92027a3a7105c0cb90f490a8e7ff5c1a2f78c92a.png" alt="skinparam handwritten true
+<img src="_images/plantuml-c76f405274aa5cf00acb518fbc43c237451518ae.png" alt="skinparam handwritten true
 
-database db [
- ECM
-....
-VarGen
-]
+database &quot;ECM&quot;    as dbsrc1
+database &quot;VarGen&quot; as dbsrc2
+database &quot;Nestle&quot; as dbsrc3
 component &quot;prepare4cbgm&quot; as p4c
-database &quot;Phase4&quot; as db2
+database &quot;CBGM&quot;   as db
 
-db -r-&gt; p4c
-p4c -&gt; db2" />
+dbsrc1 --&gt; p4c
+dbsrc2 --&gt; p4c
+dbsrc3 --&gt; p4c
+p4c --&gt; db" />
 </p>
 <p class="caption"><span class="caption-text">Database Preparation</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>

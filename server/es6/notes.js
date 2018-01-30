@@ -33,6 +33,8 @@ function ($, tools) {
      * @function load_passage
      *
      * @param {Object} passage - Which passage to load.
+     *
+     * @return {Promise} Promise, resolved when the new passage has loaded.
      */
     function load_passage (passage) {
         let instance = this;
@@ -43,7 +45,7 @@ function ($, tools) {
         let faded = $ta.animate ({ 'opacity' : 0.0 }, 300);
         let req = $.get (url);
 
-        $.when (req, faded).done (function () {
+        return $.when (req, faded).done (function () {
             $ta.val (req.responseText);
             $ta.animate ({ 'opacity' : 1.0 }, 300);
             instance.original_text = $ta.val ();

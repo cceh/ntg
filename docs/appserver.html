@@ -166,6 +166,7 @@
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-textflow"><code class="docutils literal"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-relatives"><code class="docutils literal"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-panel"><code class="docutils literal"><span class="pre">panel</span></code> — The Panel Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-toolbar"><code class="docutils literal"><span class="pre">toolbar</span></code> — The Toolbar Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-chord-layout"><code class="docutils literal"><span class="pre">d3-chord-layout</span></code> — The Chord Layout Engine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-stemma-layout"><code class="docutils literal"><span class="pre">d3-stemma-layout</span></code> — The Stemma Layout Engine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-comparison"><code class="docutils literal"><span class="pre">comparison</span></code> — The Comparison Page</a></li>
@@ -328,6 +329,12 @@ per chapters.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="server.server.leitzeile">
+<code class="descname">leitzeile</code><span class="sig-paren">(</span><em>passage_or_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.leitzeile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Endpoint.  Serve the leitzeile for the verse containing passage_or_id.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="server.server.manuscript_json">
 <code class="descname">manuscript_json</code><span class="sig-paren">(</span><em>hs_hsnr_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.manuscript_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  Serve information about a manuscript.</p>
@@ -391,18 +398,11 @@ the NT.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="server.server.relatives_html">
-<code class="descname">relatives_html</code><span class="sig-paren">(</span><em>hs_hsnr_id</em>, <em>passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.relatives_html" title="Permalink to this definition">¶</a></dt>
+<dt id="server.server.relatives">
+<code class="descname">relatives</code><span class="sig-paren">(</span><em>hs_hsnr_id</em>, <em>passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.relatives" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output a table of the nearest relatives of a manuscript.</p>
 <p>Output a table of the nearest relatives/ancestors/descendants of a
 manuscript and what they attest.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="server.server.relatives_skeleton">
-<code class="descname">relatives_skeleton</code><span class="sig-paren">(</span><em>hs_hsnr_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.relatives_skeleton" title="Permalink to this definition">¶</a></dt>
-<dd><p>Endpoint. Serve a skeleton for the relatives popup.</p>
-<p>An endpoint that serves an empty skeleton for the relatives popup.</p>
 </dd></dl>
 
 <dl class="function">

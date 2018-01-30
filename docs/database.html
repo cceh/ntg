@@ -166,6 +166,7 @@
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-textflow"><code class="docutils literal"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-relatives"><code class="docutils literal"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-panel"><code class="docutils literal"><span class="pre">panel</span></code> — The Panel Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-toolbar"><code class="docutils literal"><span class="pre">toolbar</span></code> — The Toolbar Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-chord-layout"><code class="docutils literal"><span class="pre">d3-chord-layout</span></code> — The Chord Layout Engine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-stemma-layout"><code class="docutils literal"><span class="pre">d3-stemma-layout</span></code> — The Stemma Layout Engine</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appclient.html#module-comparison"><code class="docutils literal"><span class="pre">comparison</span></code> — The Comparison Page</a></li>
@@ -696,6 +697,30 @@ purged from the database.</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="ntg_common.db.Nestle">
+<em class="property">class </em><code class="descname">Nestle</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Nestle" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Leitzeile from the Nestle-Aland</p>
+<p>Dient der Darstellung der Leitzeile im Navigator.</p>
+<img src="_images/graphviz-9af18eb9ad458d62d6769fc85e5c8227e2bb4264.png" alt="UML Database Graph" class="sauml"/>
+<span class="target" id="nestle-table"></span><dl class="attribute">
+<dt>
+<code class="descname">anfadr, endadr</code></dt>
+<dd><p>Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
+Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade einen
+Zwischenraum.  In dieser Tabelle sind nur Wörter enthalten, keine
+Zwischenräume.  Jedes Wort hat einen eigenen Eintrag, d.h. für alle
+Einträge gilt: anfadr = endadr.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Nestle.lemma">
+<code class="descname">lemma</code><a class="headerlink" href="#ntg_common.db.Nestle.lemma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Das Lemma-Wort in der Leitzeile.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="ntg_common.db.Passages">
 <em class="property">class </em><code class="descname">Passages</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Passages" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that lists the variant passages.</p>
@@ -754,6 +779,12 @@ different certain readings.)</p>
 <dt id="ntg_common.db.Passages.fehlvers">
 <code class="descname">fehlvers</code><a class="headerlink" href="#ntg_common.db.Passages.fehlvers" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if this passage is a later addition, eg. the pericope adulterae.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Passages.remarks">
+<code class="descname">remarks</code><a class="headerlink" href="#ntg_common.db.Passages.remarks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Editor notes.</p>
 </dd></dl>
 
 </dd></dl>

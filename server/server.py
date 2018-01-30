@@ -30,7 +30,7 @@ import flask_mail
 import networkx as nx
 
 from . import helpers
-from .helpers import parameters, Bag, Passage, Manuscript, make_json_response
+from .helpers import parameters, Bag, Passage, Word, Manuscript, make_json_response
 from . import security
 from . import editor
 
@@ -149,6 +149,35 @@ def _f_map_word (t):
     return [t2, t2, t.lemma]
 
 
+@app.endpoint ('leitzeile')
+def leitzeile (passage_or_id = None):
+    """Endpoint.  Serve the leitzeile for the verse containing passage_or_id. """
+
+    with current_app.config.dba.engine.begin () as conn:
+        passage = Passage (conn, passage_or_id)
+        s = Word (passage.start)
+
+        res = execute (conn, """
+        SELECT l.anfadr, l.endadr, l.lemma, p.pass_id, p.spanned
+        FROM nestle l
+          LEFT JOIN passages p ON (p.irange @> l.irange)
+        WHERE adr2book (l.anfadr) = :book AND adr2chapter (l.anfadr) = :chapter AND adr2verse (l.anfadr) = :verse
+        UNION -- get the omissions
+        SELECT p.anfadr, p.endadr, p.lemma, p.pass_id, p.spanned
+        FROM passages_view p
+        WHERE bk_id = :book AND chapter = :chapter AND verse = :verse AND (word % 2) = 1
+
+        ORDER BY anfadr, endadr DESC
+        """, dict (parameters, book = s.book, chapter = s.chapter, verse = s.verse))
+
+        Leitzeile = collections.namedtuple ('Leitzeile', 'anfadr, endadr, lemma, pass_id, spanned')
+        leitzeile = [ Leitzeile._make (r)._asdict () for r in res ]
+
+        return make_json_response ({
+            'leitzeile' : leitzeile,
+        })
+
+
 @app.endpoint ('suggest.json')
 def suggest_json ():
     """Endpoint.  The suggestion drop-downs in the navigator.
@@ -198,7 +227,7 @@ def suggest_json ():
             res = execute (conn, """
             SELECT DISTINCT verse, verse
             FROM passages_view
-            WHERE siglum = :siglum AND chapter = :chapter AND verse::varchar ~ :term
+            WHERE variant AND siglum = :siglum AND chapter = :chapter AND verse::varchar ~ :term
             ORDER BY verse
             """, dict (parameters, siglum = siglum, chapter = chapter, term = term))
             return flask.json.jsonify ([ { 'value' : r[0], 'label' : r[1] } for r in res ])
@@ -209,7 +238,7 @@ def suggest_json ():
                             adr2chapter (endadr), adr2verse (endadr), adr2word (endadr),
                             lemma
             FROM passages_view
-            WHERE siglum = :siglum AND chapter = :chapter AND verse = :verse AND word::varchar ~ :term
+            WHERE variant AND siglum = :siglum AND chapter = :chapter AND verse = :verse AND word::varchar ~ :term
             ORDER BY word, adr2verse (endadr), adr2word (endadr)
             """, dict (parameters, siglum = siglum, chapter = chapter, verse = verse, term = term))
             res = map (Words._make, res)
@@ -290,25 +319,8 @@ def ms_attesting (passage_or_id, labez):
                                       passage = passage, labez = labez, rows = attesting)
 
 
-@app.endpoint ('relatives-skeleton')
-def relatives_skeleton (hs_hsnr_id):
-    """Endpoint. Serve a skeleton for the relatives popup.
-
-    An endpoint that serves an empty skeleton for the relatives popup.
-
-    """
-
-    chapter = request.args.get ('range') or 'All'
-
-    with current_app.config.dba.engine.begin () as conn:
-        ms = Manuscript (conn, hs_hsnr_id)
-
-    # convert tuples to lists
-    return flask.render_template ('relatives-skeleton.html', ms = ms)
-
-
-@app.endpoint ('relatives.html')
-def relatives_html (hs_hsnr_id, passage_or_id):
+@app.endpoint ('relatives')
+def relatives (hs_hsnr_id, passage_or_id):
     """Output a table of the nearest relatives of a manuscript.
 
     Output a table of the nearest relatives/ancestors/descendants of a
@@ -1119,14 +1131,14 @@ if __name__ == "__main__":
             Rule ('/comparison-summary.csv',                      endpoint = 'comparison-summary.csv'),
             Rule ('/comparison-detail.csv',                       endpoint = 'comparison-detail.csv'),
             Rule ('/suggest.json',                                endpoint = 'suggest.json'),
+            Rule ('/leitzeile/<passage_or_id>',                   endpoint = 'leitzeile'),
             Rule ('/manuscript.json/<hs_hsnr_id>',                endpoint = 'manuscript.json'),
             Rule ('/passage.json/',                               endpoint = 'passage.json'),
             Rule ('/passage.json/<passage_or_id>',                endpoint = 'passage.json'),
             Rule ('/cliques.json/<passage_or_id>',                endpoint = 'cliques.json'),
             Rule ('/ranges.json/<passage_or_id>',                 endpoint = 'ranges.json'),
             Rule ('/ms_attesting/<passage_or_id>/<labez>',        endpoint = 'ms_attesting'),
-            Rule ('/relatives/<hs_hsnr_id>',                      endpoint = 'relatives-skeleton'),
-            Rule ('/relatives.html/<passage_or_id>/<hs_hsnr_id>', endpoint = 'relatives.html'),
+            Rule ('/relatives/<passage_or_id>/<hs_hsnr_id>',      endpoint = 'relatives'),
             Rule ('/apparatus.json/<passage_or_id>',              endpoint = 'apparatus.json'),
             Rule ('/attestation.json/<passage_or_id>',            endpoint = 'attestation.json'),
             Rule ('/stemma.dot/<passage_or_id>',                  endpoint = 'stemma.dot'),

@@ -21,10 +21,8 @@ LESS        := $(wildcard $(SERVER)/less/*.less)
 CSS         := $(patsubst $(SERVER)/less/%.less, $(STATIC)/css/%.css, $(LESS))
 CSS_GZ      := $(patsubst %, %.gzip, $(CSS))
 
-ES6         := $(wildcard $(SERVER)/es6/*.es6)
 JS_SRC      := $(wildcard $(SERVER)/es6/*.js)
-JS          := $(patsubst $(SERVER)/es6/%.es6, $(STATIC)/js/%.js, $(ES6)) \
-               $(patsubst $(SERVER)/es6/%.js,  $(STATIC)/js/%.js, $(JS_SRC))
+JS          := $(patsubst $(SERVER)/es6/%.js, $(STATIC)/js/%.js, $(JS_SRC))
 JS_GZ       := $(patsubst %, %.gzip, $(JS))
 
 PY_SOURCES  := scripts/cceh/*.py ntg_common/*.py server/*.py
@@ -66,7 +64,7 @@ pylint:
 	-pylint $(PY_SOURCES)
 
 jslint:
-	./node_modules/.bin/eslint -f unix $(ES6) $(JS_SRC)
+	./node_modules/.bin/eslint -f unix $(JS_SRC)
 
 csslint: css
 	csslint --ignore="adjoining-classes,box-sizing,ids,order-alphabetical,overqualified-elements,qualified-headings" $(CSS)
@@ -95,7 +93,7 @@ sphinx: jsgraphs
 	cd doc_src; make html; cd ..
 
 jsdoc: js
-	jsdoc -c jsdoc.json -d jsdoc -a all $(ES6) $(JS_SRC) && $(BROWSER) jsdoc/index.html
+	jsdoc -c jsdoc.json -d jsdoc -a all $(JS_SRC) && $(BROWSER) jsdoc/index.html
 
 bower_update:
 	bower update
@@ -108,10 +106,10 @@ sqlacodegen:
 	sqlacodegen mysql:///ECM_ActsPh4?read_default_group=ntg
 	sqlacodegen mysql:///VarGenAtt_ActPh4?read_default_group=ntg
 
-$(STATIC)/js/%.js : $(SERVER)/es6/%.es6
+$(STATIC)/js/%.js : $(SERVER)/es6/%.js
 	./node_modules/.bin/babel $? --out-file $@ --source-maps
 
-$(STATIC)/js/%.js : $(SERVER)/es6/%.js
+$(STATIC)/js/%.js : $(SERVER)/es6/config-require.js
 	cp $? $@
 
 $(STATIC)/css/%.css : $(SERVER)/less/%.less
