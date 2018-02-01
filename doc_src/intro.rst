@@ -69,12 +69,12 @@ graphically.
    skinparam RankSep 50
 
    cloud "Application Server\n" as server {
-      database "Phase4"
+      database "CBGM"
       [Python/Flask] as Flask
       file "JS\nCSS" AS JS
       [Apache]
 
-      [Flask]  <--> Phase4
+      [Flask]  <--> CBGM
       [Flask]  <-> [Apache]
       [Apache]  <--> JS
    }
