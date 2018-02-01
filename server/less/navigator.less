@@ -79,22 +79,35 @@ div.leitzeile {
     .leitzeile-spanned {
         border-bottom: 1px dotted grey;
     }
-    .leitzeile-one {
+    .leitzeile-replaced.leitzeile-one {
         &::before {
             content: '⸀'; /* 2e00 */
         }
     }
-    .leitzeile-insert {
-        &::before {
-            content: '⸆'; /* 2e06 */
-        }
-    }
-    .leitzeile-many {
+    .leitzeile-replaced.leitzeile-many {
         &::before {
             content: '⸂';
         }
         &::after {
             content: '⸃';
+        }
+    }
+    .leitzeile-inserted {
+        &::before {
+            content: '⸆'; /* 2e06 */
+        }
+    }
+    .leitzeile-deleted.leitzeile-one  {
+        &::before {
+            content: '⸋'; /* 2e0b */
+        }
+    }
+    .leitzeile-deleted.leitzeile-many {
+        &::before {
+            content: '⸍'; /* 2e0d */
+        }
+        &::after {
+            content: '⸌'; /* 2e0c */
         }
     }
 }

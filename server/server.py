@@ -30,7 +30,7 @@ import flask_mail
 import networkx as nx
 
 from . import helpers
-from .helpers import parameters, Bag, Passage, Word, Manuscript, make_json_response
+from .helpers import parameters, Bag, Passage, Manuscript, make_json_response
 from . import security
 from . import editor
 
@@ -155,22 +155,29 @@ def leitzeile (passage_or_id = None):
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
-        s = Word (passage.start)
+        verse_start = (passage.start // 1000) * 1000
+        verse_end = verse_start + 999
 
         res = execute (conn, """
-        SELECT l.anfadr, l.endadr, l.lemma, p.pass_id, p.spanned
+        SELECT l.anfadr, l.endadr, l.lemma, p.pass_id, p.spanned,
+          EXISTS (SELECT labez from readings r
+          WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != 'om') AS replaced
         FROM nestle l
           LEFT JOIN passages p ON (p.irange @> l.irange)
-        WHERE adr2book (l.anfadr) = :book AND adr2chapter (l.anfadr) = :chapter AND adr2verse (l.anfadr) = :verse
+        WHERE int4range (:start, :end + 1) @> l.irange
+
         UNION -- get the omissions
-        SELECT p.anfadr, p.endadr, p.lemma, p.pass_id, p.spanned
-        FROM passages_view p
-        WHERE bk_id = :book AND chapter = :chapter AND verse = :verse AND (word % 2) = 1
+
+        SELECT p.anfadr, p.endadr, p.lemma, p.pass_id, p.spanned,
+          EXISTS (SELECT labez from readings r
+          WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != 'om') AS replaced
+        FROM passages p
+        WHERE int4range (:start, :end + 1) @> p.irange AND (anfadr % 2) = 1
 
         ORDER BY anfadr, endadr DESC
-        """, dict (parameters, book = s.book, chapter = s.chapter, verse = s.verse))
+        """, dict (parameters, start = verse_start, end = verse_end))
 
-        Leitzeile = collections.namedtuple ('Leitzeile', 'anfadr, endadr, lemma, pass_id, spanned')
+        Leitzeile = collections.namedtuple ('Leitzeile', 'anfadr, endadr, lemma, pass_id, spanned, replaced')
         leitzeile = [ Leitzeile._make (r)._asdict () for r in res ]
 
         return make_json_response ({

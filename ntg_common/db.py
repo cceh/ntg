@@ -1146,6 +1146,11 @@ class Nestle (Base4):
 
     lemma     = Column (String(1024),  server_default = '')
 
+    __table_args__ = (
+        UniqueConstraint (irange, name = 'unique_nestle_irange'), # needs name
+        Index ('ix_nestle_irange_gist', irange, postgresql_using = 'gist'),
+    )
+
 
 # Tables for flask_login / flask_user / flask_security / whatever
 

@@ -124,11 +124,14 @@ define(['jquery', 'lodash', 'urijs/URI', 'jquery-ui', 'css!navigator-css'], func
                     var tmp = _.map(items, 'lemma').join(' ');
                     var classes = [];
                     if (items[0].anfadr % 2 === 1) {
-                        classes.push('leitzeile-insert');
+                        classes.push('leitzeile-inserted');
                         tmp = '';
+                    } else if (items[0].replaced) {
+                        classes.push('leitzeile-replaced');
                     } else {
-                        classes.push(items.length > 1 ? 'leitzeile-many' : 'leitzeile-one');
+                        classes.push('leitzeile-deleted');
                     }
+                    classes.push(items.length > 1 ? 'leitzeile-many' : 'leitzeile-one');
                     if (items[0].spanned) classes.push('leitzeile-spanned');
                     if (pass_id === current_pass_id) classes.push('leitzeile-current');
                     var class_ = classes.length ? ' class="' + classes.join(' ') + '"' : '';
