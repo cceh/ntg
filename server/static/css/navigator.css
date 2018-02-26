@@ -68,31 +68,32 @@ div.leitzeile .leitzeile-current {
   pointer-events: none;
 }
 div.leitzeile .leitzeile-spanned {
+  display: none;
   border-bottom: 1px dotted grey;
 }
-div.leitzeile .leitzeile-replaced.leitzeile-one::before {
+div.leitzeile .xxx .leitzeile-replaced.leitzeile-one::before {
   content: '⸀';
   /* 2e00 */
 }
-div.leitzeile .leitzeile-replaced.leitzeile-many::before {
+div.leitzeile .xxx .leitzeile-replaced.leitzeile-many::before {
   content: '⸂';
 }
-div.leitzeile .leitzeile-replaced.leitzeile-many::after {
+div.leitzeile .xxx .leitzeile-replaced.leitzeile-many::after {
   content: '⸃';
 }
-div.leitzeile .leitzeile-inserted::before {
+div.leitzeile .xxx .leitzeile-inserted::before {
   content: '⸆';
   /* 2e06 */
 }
-div.leitzeile .leitzeile-deleted.leitzeile-one::before {
+div.leitzeile .xxx .leitzeile-deleted.leitzeile-one::before {
   content: '⸋';
   /* 2e0b */
 }
-div.leitzeile .leitzeile-deleted.leitzeile-many::before {
+div.leitzeile .xxx .leitzeile-deleted.leitzeile-many::before {
   content: '⸍';
   /* 2e0d */
 }
-div.leitzeile .leitzeile-deleted.leitzeile-many::after {
+div.leitzeile .xxx .leitzeile-deleted.leitzeile-many::after {
   content: '⸌';
   /* 2e0c */
 }
