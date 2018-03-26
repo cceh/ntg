@@ -170,13 +170,13 @@ class Passage (object):
 
         if int (start) > 10000000:
             res = execute (conn, """
-            SELECT pass_id, anfadr, endadr, adr2book (anfadr), adr2chapter (anfadr)
+            SELECT pass_id, anfadr, endadr, adr2bk_id (anfadr), adr2chapter (anfadr)
             FROM passages
             WHERE anfadr = :anfadr AND endadr = :endadr
             """, dict (parameters, anfadr = start, endadr = end))
         else:
             res = execute (conn, """
-            SELECT pass_id, anfadr, endadr, adr2book (anfadr), adr2chapter (anfadr)
+            SELECT pass_id, anfadr, endadr, adr2bk_id (anfadr), adr2chapter (anfadr)
             FROM passages
             WHERE pass_id = :pass_id
             """, dict (parameters, pass_id = start))

@@ -65,6 +65,44 @@ SHAPES = {
     'm' : 'invhouse',
 }
 
+def _f_map_word (t):
+    """Helper function for the :func:`suggest_json` function.
+
+    Formats the entry of the last field of the navigation gadget.
+    """
+
+    if t.kapanf != t.kapend:
+        t2 = "%s-%s:%s/%s" % (t.wortanf, t.kapend, t.versend, t.wortend)
+    elif t.versanf != t.versend:
+        t2 = "%s-%s/%s" % (t.wortanf, t.versend, t.wortend)
+    elif t.wortanf != t.wortend:
+        t2 = "%s-%s" % (t.wortanf, t.wortend)
+    else:
+        t2 = "%s" % t.wortanf
+    return [t2, t2, t.lemma]
+
+EXCLUDE_REGEX_MAP = {
+    'A'  : 'A',
+    'MT' : 'MT',
+    'F'  : 'F[1-9Π][0-9]*'
+}
+
+def get_excluded_ms_ids (conn, include):
+    exclude = set (EXCLUDE_REGEX_MAP.keys ()) - set (include)
+    if not exclude:
+        return tuple (-1) # a non-existing id to avoid an SQL syntax error
+    exclude = [ EXCLUDE_REGEX_MAP[x] for x in exclude]
+
+    # get ids of nodes to exclude
+    res = execute (conn, """
+    SELECT ms_id
+    FROM manuscripts
+    WHERE hs ~ '^({exclude})$'
+    ORDER BY ms_id
+    """, dict (parameters, exclude = '|'.join (exclude)))
+
+    return tuple ([ row[0] for row in res ] or [ -1 ])
+
 
 @static_app.endpoint ('index')
 def index ():
@@ -132,23 +170,6 @@ def cliques_json (passage_or_id):
         return make_json_response (passage.cliques ());
 
 
-def _f_map_word (t):
-    """Helper function for the :func:`suggest_json` function.
-
-    Formats the entry of the last field of the navigation gadget.
-    """
-
-    if t.kapanf != t.kapend:
-        t2 = "%s-%s:%s/%s" % (t.wortanf, t.kapend, t.versend, t.wortend)
-    elif t.versanf != t.versend:
-        t2 = "%s-%s/%s" % (t.wortanf, t.versend, t.wortend)
-    elif t.wortanf != t.wortend:
-        t2 = "%s-%s" % (t.wortanf, t.wortend)
-    else:
-        t2 = "%s" % t.wortanf
-    return [t2, t2, t.lemma]
-
-
 @app.endpoint ('leitzeile')
 def leitzeile (passage_or_id = None):
     """Endpoint.  Serve the leitzeile for the verse containing passage_or_id. """
@@ -171,7 +192,7 @@ def leitzeile (passage_or_id = None):
         SELECT p.anfadr, p.endadr, p.lemma, p.pass_id, p.spanned,
           EXISTS (SELECT labez from readings r
           WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != 'om') AS replaced
-        FROM passages p
+        FROM passages_view_lemma p
         WHERE int4range (:start, :end + 1) @> p.irange AND (anfadr % 2) = 1
 
         ORDER BY anfadr, endadr DESC
@@ -213,9 +234,10 @@ def suggest_json ():
     with current_app.config.dba.engine.begin () as conn:
 
         if field == 'siglum':
+            # only show those books that actually are in the database
             res = execute (conn, """
-            SELECT siglum, siglum, book
-            FROM books b
+            SELECT DISTINCT siglum, siglum, book, bk_id
+            FROM passages_view b
             WHERE siglum ~ :term OR book ~ :term
             ORDER BY bk_id
             """, dict (parameters, term = term))
@@ -244,7 +266,7 @@ def suggest_json ():
             SELECT DISTINCT chapter, verse, word,
                             adr2chapter (endadr), adr2verse (endadr), adr2word (endadr),
                             lemma
-            FROM passages_view
+            FROM passages_view_lemma
             WHERE variant AND siglum = :siglum AND chapter = :chapter AND verse = :verse AND word::varchar ~ :term
             ORDER BY word, adr2verse (endadr), adr2word (endadr)
             """, dict (parameters, siglum = siglum, chapter = chapter, verse = verse, term = term))
@@ -421,19 +443,7 @@ def relatives (hs_hsnr_id, passage_or_id):
 
         Nodes = collections.namedtuple ('Nodes', 'ms_id')
 
-        if include:
-            # get ids of nodes to include
-            res = execute (conn, """
-            SELECT ms_id
-            FROM manuscripts
-            WHERE (hs IN :include)
-            ORDER BY ms_id
-            """, dict (parameters, include = tuple (include)))
-
-            include = [str (n.ms_id) for n in map (Nodes._make, res)]
-
-        exclude = set (include) ^ set (['1', '2'])
-        exclude.add (-1) # a non-existing id to avoid SQL error
+        exclude = get_excluded_ms_ids (conn, include)
 
         # Get the X most similar manuscripts and their attestations
         res = execute (conn, """
@@ -480,7 +490,7 @@ def relatives (hs_hsnr_id, passage_or_id):
         {limit}
         """, dict (parameters, where = where, frag_where = frag_where, ms_id1 = ms.ms_id, hsnr = ms.hsnr,
                    pass_id = passage.pass_id, rg_id = rg_id, limit = limit,
-                   view = view, exclude = tuple (exclude)))
+                   view = view, exclude = exclude))
 
         Relatives = collections.namedtuple (
             'Relatives',
@@ -512,7 +522,7 @@ def textflow (passage_or_id):
     fontsize     = float (request.args.get ('fontsize') or 10.0)
     mode         = request.args.get ('mode') or 'sim'
 
-    include      = set (request.args.getlist ('include[]') or ['NONE'])
+    include      = request.args.getlist ('include[]')   or []
     fragments    = request.args.getlist ('fragments[]') or []
     var_only     = request.args.getlist ('var_only[]')  or []
     cliques      = request.args.getlist ('cliques[]')   or []
@@ -564,16 +574,7 @@ def textflow (passage_or_id):
         """, dict (parameters, bk_id = passage.bk_id, range_ = chapter))
         rg_id, = res.fetchone ()
 
-        # get ids of nodes to exclude
-        res = execute (conn, """
-        SELECT ms_id
-        FROM manuscripts
-        WHERE (hs IN ('A', 'MT')) AND (hs NOT IN :include)
-        ORDER BY ms_id
-        """, dict (parameters, include = tuple (include)))
-
-        exclude = tuple ( row[0] for row in res )
-        exclude = exclude + (-1, ) # a non-existing id to avoid SQL syntax error if empty
+        exclude = get_excluded_ms_ids (conn, include)
 
         # nodes query
         #
@@ -583,7 +584,7 @@ def textflow (passage_or_id):
         SELECT ms_id
         FROM apparatus app
         WHERE pass_id = :pass_id AND ms_id NOT IN :exclude {labez_where} {z_where}
-        """, dict (parameters, exclude = tuple (exclude),
+        """, dict (parameters, exclude = exclude,
                    pass_id = passage.pass_id, labez = labez,
                    hyp_a = hyp_a, labez_where = labez_where, z_where = z_where))
 
@@ -607,7 +608,7 @@ def textflow (passage_or_id):
         """
 
         res = execute (conn, query,
-                       dict (parameters, nodes = tuple (nodes), exclude = tuple (exclude),
+                       dict (parameters, nodes = tuple (nodes), exclude = exclude,
                              rg_id = rg_id, pass_id = passage.pass_id, view = view,
                              labez = labez, connectivity = connectivity,
                              frag_where = frag_where, hyp_a = hyp_a))

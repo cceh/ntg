@@ -122,5 +122,6 @@ function ($, _, tools, toolbar) {
 
     return {
         'init'         : init,
+        'changed'      : changed,
     };
 });

@@ -34,7 +34,7 @@ from ntg_common.config import args
 from . import helpers
 from .helpers import parameters, Bag, Passage, Manuscript, make_json_response, make_text_response
 
-RE_VALID_LABEZ  = re.compile ('^[*]|[?]|[a-y]|z[u-z]$')
+RE_VALID_LABEZ  = re.compile ('^([*]|[?]|[a-y]|z[u-z])$')
 RE_VALID_CLIQUE = re.compile ('^[0-9]$')
 
 app = flask.Blueprint ('the_editor', __name__)
@@ -90,19 +90,19 @@ def stemma_edit (passage_or_id):
     if (action not in ('split', 'merge', 'move', 'move-manuscripts')):
         raise EditError ('Bad request')
 
-    params = { 'original' : False }
+    params = { 'original_new' : request.args.get ('labez_new') == '*' }
     for n in 'labez_old labez_new'.split ():
         params[n] = request.args.get (n)
         if not RE_VALID_LABEZ.match (params[n]):
             raise EditError ('Bad request')
-        if params[n] == '*':
-            params['original'] = True
         if params[n] in ('*', '?'):
             params[n] = None
     for n in 'clique_old clique_new'.split ():
         params[n] = request.args.get (n)
         if not RE_VALID_CLIQUE.match (params[n]):
             raise EditError ('Bad request')
+        if params[n] == '0':
+            params[n] = None
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -112,12 +112,12 @@ def stemma_edit (passage_or_id):
             try:
                 res = execute (conn, """
                 UPDATE locstem
-                SET source_labez = :labez_new, source_clique = :clique_new, original = :original
+                SET source_labez = :labez_new, source_clique = :clique_new, original = :original_new
                 WHERE pass_id = :pass_id AND labez = :labez_old AND clique = :clique_old
                 """, dict (parameters, **params))
             except sqlalchemy.exc.IntegrityError as e:
                 if 'unique constraint' in str (e):
-                    raise EditError ('Only one original reading allowed. If you want to change the original reading, first remove the old original reading.')
+                    raise EditError ('Only one original reading allowed. If you want to change the original reading, first remove the old original reading.\n\n' + str (e))
                 raise EditError (str (e))
             except sqlalchemy.exc.DatabaseError as e:
                 raise EditError (str (e))

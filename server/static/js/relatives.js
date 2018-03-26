@@ -109,7 +109,8 @@ define(['jquery', 'lodash', 'tools', 'toolbar', 'css!relatives-css'], function (
     }
 
     return {
-        'init': init
+        'init': init,
+        'changed': changed
     };
 });
 

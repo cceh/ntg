@@ -4,6 +4,8 @@
 //
 // $ wget https://raw.githubusercontent.com/cpettitt/graphlib-dot/master/src/dot-grammar.pegjs
 //
+// Added Greek characters to ID production: \u0370-\u03FF
+//
 // See also: http://www.graphviz.org/content/dot-language
 //
 // Not supported (yet):
@@ -122,7 +124,7 @@ compassPt
   = "ne" / "se" / "sw" / "nw" / "n" / "e" / "s" / "w" / "c" / "_"
 
 id "identifier"
-  = fst:[a-zA-Z\u0200-\u0377_] rest:[a-zA-Z\u0200-\u0377_0-9]* { return fst + rest.join(""); }
+  = fst:[a-zA-Z\u0080-\u00FF_] rest:[a-zA-Z\u0080-\u00FF_0-9\u0370-\u03FF]* { return fst + rest.join(""); }
   / sign:'-'? dot:'.' after:[0-9]+ {
       return (sign || "") + dot + after.join("");
     }

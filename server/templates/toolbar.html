@@ -77,14 +77,17 @@
     </div>
 
     <div class="toolbar-include btn-group btn-group-xs" data-toggle="buttons">
-      <label class="btn btn-primary">
+      <label class="btn btn-primary" title="Include A">
         <input type="checkbox" name="include" data-opt="A">A</input>
       </label>
-      <label class="btn btn-primary">
+      <label class="btn btn-primary" title="Include Byzantine Text">
         <input type="checkbox" name="include" data-opt="MT">MT</input>
       </label>
+      <label class="btn btn-primary" title="Include text families">
+        <input type="checkbox" name="include" data-opt="F">Fam</input>
+      </label>
       {% if mode in ('global', ) %}
-      <label class="btn btn-primary">
+      <label class="btn btn-primary" title="Include mss. lacking this passage">
         <input type="checkbox" name="include" data-opt="Z">Z</input>
       </label>
       {% endif %}

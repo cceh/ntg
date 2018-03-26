@@ -26,6 +26,20 @@ The database system is PostgreSQL.
    { rank=same; locstem, apparatus, affinity }
 
 
+.. _tt:
+
+Transaction-Time State Tables
+-----------------------------
+
+A transaction-time state table keeps track of the table's contents as it changes
+over time.  [Snodgrass2000]_ This is the basis for our undo-functionality in the
+graphical stemma editors.
+
+To hide the details of the TTS table, we use a view that returns the current
+state of the table, and a trigger that updates the underlying table when the
+view gets updated.
+
+
 Tables
 ------
 
@@ -69,3 +83,11 @@ Tables
 
 .. autoclass:: ntg_common.src_db.VarGenAttAct01
    :members:
+
+
+Literature
+==========
+
+.. _Snodgrass2000: Snodgrass, R.T.  *Developing Time-Oriented Database
+                   Applications in SQL*. 2000. Morgan Kaufmann Publishers, San
+                   Francisco.

@@ -11,11 +11,12 @@ import sqlalchemy.types
 from sqlalchemy import String, Integer, Float, Boolean, DateTime, Column, Index, ForeignKey
 from sqlalchemy import UniqueConstraint, CheckConstraint, ForeignKeyConstraint, PrimaryKeyConstraint
 from sqlalchemy.dialects import postgresql
+from sqlalchemy.dialects.postgresql import TSTZRANGE
 from sqlalchemy.ext import compiler
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.schema import DDLElement
+from sqlalchemy.sql import text
 from sqlalchemy_utils import IntRangeType
-
 
 # let sqlalchemy manage our views
 
@@ -93,7 +94,7 @@ def compile (element, compiler, **kw):
     return '''
     CREATE SCHEMA {name};
     CREATE SERVER {name}_server FOREIGN DATA WRAPPER mysql_fdw OPTIONS (host '{host}', port '{port}');
-    CREATE USER MAPPING FOR {pg_user} SERVER {name}_server OPTIONS (username '{user}', password '{password}');
+    CREATE USER MAPPING FOR {pg_user} SERVER {name}_server OPTIONS (username '{username}', password '{password}');
     IMPORT FOREIGN SCHEMA "{database}" FROM SERVER {name}_server INTO {name};
     '''.format (name = element.name, pg_database = pp['database'], pg_user = pp['user'], **mp)
 
@@ -112,7 +113,7 @@ def fdw (name, metadata, pg_database, mysql_db):
     DropFDW (name, pg_database, mysql_db).execute_at ('before-drop', metadata)
 
 
-# let sqlalchemy manage generic stuff
+# let sqlalchemy manage generic stuff like triggers, aggregates, unique partial indices
 
 class CreateGeneric (DDLElement):
     def __init__ (self, create_cmd):
@@ -388,7 +389,6 @@ class SaveReadings (Base):
     anfadr    = Column (Integer,       nullable = False)
     endadr    = Column (Integer,       nullable = False)
     labez     = Column (String(32),    nullable = False, server_default = '')
-    lemma     = Column (String(1024),  server_default = '')
     lesart    = Column (String(1024),  server_default = '')
 
 
@@ -401,7 +401,7 @@ function ('ord_labez', Base.metadata, 'l CHAR (2)', 'INTEGER', '''
     ''', volatility = 'IMMUTABLE')
 
 function ('adr2bk_id', Base.metadata, 'adr INTEGER', 'INTEGER', '''
-    SELECT (adr / 10000000) %% 10
+    SELECT (adr / 10000000)
     ''', volatility = 'IMMUTABLE')
 
 function ('adr2chapter', Base.metadata, 'adr INTEGER', 'INTEGER', '''
@@ -535,10 +535,6 @@ class Passages (Base2):
 
         Words are always even and the space between to words is always odd.
 
-    .. attribute:: lemma
-
-        The lemma of the passage.  Usually the reconstructed original text.
-
     .. attribute:: variant
 
         True if this passage is a variant passage.  (It has at least two
@@ -572,7 +568,6 @@ class Passages (Base2):
     endadr    = Column (Integer,       nullable = False)
     irange    = Column (IntRangeType,  nullable = False)
 
-    lemma     = Column (String (1024), nullable = False, server_default = '')
     variant   = Column (Boolean,       nullable = False, server_default = 'False')
     spanning  = Column (Boolean,       nullable = False, server_default = 'False')
     spanned   = Column (Boolean,       nullable = False, server_default = 'False')
@@ -790,6 +785,11 @@ class LocStem (Base2):
         This reading was established as the original.  Must also have a
         source_labez of NULL.
 
+    .. attribute:: valid_period
+
+       The time period in which this row was valid.  See :ref:`transaction-time
+       state tables<tt>`.
+
     """
     __tablename__ = 'locstem'
 
@@ -802,12 +802,42 @@ class LocStem (Base2):
 
     original      = Column (Boolean,    nullable = False, server_default = 'false')
 
+    valid_period  = Column (TSTZRANGE,  nullable = False, server_default = text ('tstzrange (now (), NULL)'))
+
     __table_args__ = (
         PrimaryKeyConstraint (pass_id, labez, clique),
         Index ('ix_locstem_pass_id', pass_id, unique = True, postgresql_where = original == True),
         ForeignKeyConstraint ([pass_id, labez, clique], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
         ForeignKeyConstraint ([pass_id, source_labez, source_clique], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
         CheckConstraint ('original <= (source_labez is null)'), # original implies source is null
+    )
+
+
+class LocStem_TTS (Base2):
+    """The transaction-time state table for locstem.
+
+    See :ref:`transaction-time state tables<tt>`.
+
+    .. sauml::
+       :include: locstem
+
+    """
+
+    __tablename__ = 'locstem_tts'
+
+    pass_id       = Column (Integer,    nullable = False)
+    labez         = Column (String (2), nullable = False)
+    clique        = Column (String (2), nullable = False)
+
+    source_labez  = Column (String (2), nullable = True)
+    source_clique = Column (String (2), nullable = True)
+
+    original      = Column (Boolean,    nullable = False)
+
+    valid_period  = Column (TSTZRANGE,  nullable = False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint (pass_id, labez, clique, valid_period),
     )
 
 
@@ -1001,9 +1031,20 @@ view ('passages_view', Base2.metadata, '''
            adr2chapter (p.anfadr) AS chapter,
            adr2verse   (p.anfadr) AS verse,
            adr2word    (p.anfadr) AS word,
-           p.pass_id, p.anfadr, p.endadr, p.irange, p.lemma, p.variant, p.spanned
+           p.pass_id, p.anfadr, p.endadr, p.irange, p.variant, p.spanned
     FROM passages p
     JOIN books b USING (bk_id)
+    ''')
+
+view ('passages_view_lemma', Base2.metadata, '''
+    SELECT p.*, COALESCE (rl.lesart, 'undef') AS lemma
+    FROM passages_view p
+    LEFT JOIN (
+      SELECT r.pass_id, r.lesart
+      FROM readings r
+      JOIN locstem l ON (l.pass_id, l.labez, l.original) = (r.pass_id, r.labez, true)
+    ) rl ON (p.pass_id = rl.pass_id)
+    ORDER by p.pass_id;
     ''')
 
 view ('locstem_view', Base2.metadata, '''
@@ -1013,13 +1054,13 @@ view ('locstem_view', Base2.metadata, '''
     ''')
 
 view ('readings_view', Base2.metadata, '''
-    SELECT p.anfadr, p.endadr, p.irange, p.lemma, r.*
+    SELECT p.anfadr, p.endadr, p.irange, r.*
     FROM readings r
     JOIN passages p USING (pass_id)
     ''')
 
 view ('cliques_view', Base2.metadata, '''
-    SELECT r.anfadr, r.endadr, r.irange, r.lemma, r.lesart, q.*
+    SELECT r.anfadr, r.endadr, r.irange, r.lesart, q.*
     FROM cliques q
     JOIN readings_view r USING (pass_id, labez)
     ''')
@@ -1108,6 +1149,28 @@ SELECT EXISTS (SELECT * FROM locstem
                      labez = labez1 AND clique = clique1 AND
                      source_labez IS NULL AND original = false);
 ''', volatility = 'STABLE')
+
+function ('tts_locstem', Base2.metadata, '', 'TRIGGER', '''
+BEGIN
+    INSERT INTO locstem_tts (pass_id, labez, clique, source_labez, source_clique, original, valid_period)
+           VALUES (OLD.pass_id, OLD.labez, OLD.clique, OLD.source_labez, OLD.source_clique, OLD.original,
+                  tstzrange (lower (OLD.valid_period), now (), '[)'));
+
+    IF TG_OP = 'UPDATE' THEN
+        NEW.valid_period = tstzrange (now (), NULL);
+        RETURN NEW;
+    END IF;
+    RETURN OLD;
+END;
+''', language = 'plpgsql')
+
+generic (Base2.metadata, '''
+CREATE TRIGGER tts_locstem BEFORE UPDATE OR DELETE ON locstem FOR EACH ROW
+EXECUTE PROCEDURE tts_locstem ()
+''', '''
+DROP TRIGGER IF EXISTS tts_locstem ON locstem CASCADE
+'''
+)
 
 
 Base4 = declarative_base ()

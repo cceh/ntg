@@ -1,6 +1,7 @@
 RSYNC       := /usr/bin/rsync -azv --exclude '*~'
 SHELL       := /bin/bash
 PYTHON      := /usr/bin/python3
+MYSQL       := mysql --defaults-file=~/.my.cnf.ntg
 BROWSER     := firefox
 
 NTG_VM      := ntg.cceh.uni-koeln.de
@@ -11,6 +12,9 @@ NTG_ROOT    := $(NTG):/home/$(NTG_USER)/prj/ntg/ntg
 PSQL_PORT   := 5432
 SERVER      := server
 STATIC      := $(SERVER)/static
+
+PSQL        := psql -p $(PSQL_PORT)
+PGDUMP      := pg_dump -p $(PSQL_PORT)
 
 TRANSLATIONS    := de            # space-separated list of translations we have eg. de fr
 
@@ -46,7 +50,7 @@ users:
 	scripts/cceh/mk_users.py -vvv server/instance/_global.conf
 
 db_upload:
-	pg_dump -p $(PSQL_PORT) --clean --if-exists ntg_ph4 | bzip2 > /tmp/ntg_ph4.pg_dump.sql.bz2
+	$(PGDUMP) --clean --if-exists ntg_ph4 | bzip2 > /tmp/ntg_ph4.pg_dump.sql.bz2
 	scp /tmp/ntg_ph4.pg_dump.sql.bz2 $(NTG_USER)@$(NTG_VM):~/
 
 clean:
@@ -57,6 +61,14 @@ psql:
 	sleep 1
 	psql -h localhost -p 1$(PSQL_PORT) -d $(NTG_DB) -U $(NTG_USER)
 
+import_john:
+	$(MYSQL) -e "DROP DATABASE DCPJohnWithFam"
+	$(MYSQL) -e "CREATE DATABASE DCPJohnWithFam"
+	cat ../dumps/DCPJohnWithFam-6.sql | mysql --defaults-file=~/.my.cnf.ntg -D DCPJohnWithFam
+	$(MYSQL) -D DCPJohnWithFam -e "CREATE TABLE DCPJohnWithFamLac SELECT * FROM DCPJohnWithFamAtt LIMIT 0;"
+
+diff_affinity:
+	diff -U 0 <($(PSQL) -h $(NTG_VM) -U ntg -c "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 1 order by ms_id1, ms_id2" ntg_ph4) <($(PSQL) -c "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 23 order by ms_id1, ms_id2" ntg_ph4) | less
 
 lint: pylint jslint csslint
 

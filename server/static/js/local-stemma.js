@@ -124,7 +124,7 @@ define(['jquery', 'lodash', 'd3', 'tools'], function ($, _, d3, tools) {
                 });
                 highlight(target_node, false);
             } else {
-                // if dropped in no man's land
+                // if dropped on no man's land
                 return_to_base(dragged_node_ref);
             }
             if (dragged_node !== null) {

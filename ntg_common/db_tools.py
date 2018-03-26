@@ -18,7 +18,9 @@ from .tools import log
 from .config import args
 
 
-MYSQL_DEFAULT_GROUP = 'ntg'
+# mimics mysql Ver 15.1 Distrib 10.1.29-MariaDB
+MYSQL_DEFAULT_FILES  = ( '/etc/my.cnf', '/etc/mysql/my.cnf', '~/.my.cnf' )
+MYSQL_DEFAULT_GROUPS = ( 'mysql', 'client', 'client-server', 'client-mariadb' )
 
 
 def execute (conn, sql, parameters, debug_level = logging.DEBUG):
@@ -157,27 +159,59 @@ def tabulate (res):
 class MySQLEngine (object):
     """ Database Interface """
 
-    def __init__ (self, group = MYSQL_DEFAULT_GROUP, db = ''):
+    def __init__ (self, fn = MYSQL_DEFAULT_FILES, group = MYSQL_DEFAULT_GROUPS, db = ''):
+        # self.params is only needed to configure the MySQL FDW in Postgres
+        self.params = self.get_connection_params (fn, group)
+        self.params['database'] = db
 
-        log (logging.INFO, 'MySQLEngine: Reading init group: {group}'.format (group = group))
-        log (logging.INFO, 'MySQLEngine: Connecting to db: {db}'.format (db = db))
-
-        config = configparser.ConfigParser ()
-        config.read (('/etc/my.cnf', os.path.expanduser ('~/.my.cnf')))
-
-        section = config[group]
-        self.params = {
-            'host' :     section.get ('host', 'localhost').strip ('"'),
-            'port' :     section.get ('port', '3306').strip ('"'),
-            'user' :     section.get ('user', '').strip ('"'),
-            'password' : section.get ('password', '').strip ('"'),
-            'database' : db,
-        }
-
-        self.engine = sqlalchemy.create_engine (
-            'mysql:///{db}?read_default_group={group}'.format (db = db, group = group))
+        url = sqlalchemy.engine.url.URL (**(dict (self.params, password = 'secret')))
+        log (logging.INFO, 'MySQLEngine: Connecting to URL: {url}'.format (url = url))
+        url = sqlalchemy.engine.url.URL (**self.params)
+        self.engine = sqlalchemy.create_engine (url)
 
         self.connection = self.connect ()
+
+
+    @staticmethod
+    def get_connection_params (filenames, groups):
+        if isinstance (filenames, str):
+            filenames = [ filenames ]
+        if isinstance (groups, str):
+            groups = [ groups ]
+
+        filenames = map (os.path.expanduser, filenames)
+        config = configparser.ConfigParser ()
+        config.read (filenames)
+        parameters = {
+            'drivername' : 'drivername',
+            'host' : 'host',
+            'port' : 'port',
+            'database' : 'database',
+            'user' : 'username',
+            'password' : 'password',
+        }
+        options = {
+            'default-character-set' : 'charset',
+        }
+        params = {
+            'drivername' : 'mysql',
+            'host' : 'localhost',
+            'port' : '3306',
+            'query' : {
+                'charset' : 'utf8mb4',
+            }
+        }
+
+        for group in groups:
+            section = config[group]
+            for key, alias in parameters.items ():
+                if key in section:
+                    params[alias] = section[key].strip ('"');
+            for key, alias in options.items ():
+                if key in section:
+                    params['query'][alias] = section[key].strip ('"')
+        return params
+
 
     def connect (self):
         connection = self.engine.connect ()
