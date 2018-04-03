@@ -55,10 +55,10 @@ to our rules.
 
 FEHLVERSE = """
     (
-      anfadr >= 50837002 and endadr <= 50837046 or
-      anfadr >= 51534002 and endadr <= 51534012 or
-      anfadr >= 52406020 and endadr <= 52408014 or
-      anfadr >= 52829002 and endadr <= 52829024
+      begadr >= 50837002 and endadr <= 50837047 or
+      begadr >= 51534002 and endadr <= 51534013 or
+      begadr >= 52406020 and endadr <= 52408015 or
+      begadr >= 52829002 and endadr <= 52829025
     )
     """
 """Verses added in later times.

@@ -170,7 +170,7 @@ class Att (Base):
        Handschrift übrigbleibt.  Parallel dazu werden die Suffixe von den Siglen
        entfernt.
 
-    .. attribute:: anfadr, endadr
+    .. attribute:: begadr, endadr
 
        Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
        Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade einen
@@ -258,15 +258,21 @@ class Att (Base):
 
        Basistext. Nur relevant bei :ref:`Fehlversen <fehlvers>`.
 
+       "'base = b' steht für eine alternative Subvariante (dem Textus receptus)."
+       -- prepare4cbgm_10.py
+
        .. data:: a
 
           Urtext
 
        .. data:: b
 
-          Fehlverse: :ref:`Textus Receptus <rt>`.
+          :ref:`Textus Receptus <rt>`.
 
     .. attribute:: comp
+
+       "Eine variierte Stelle ist eine umfasste Stelle, wenn comp = 'x' ist."
+       -- prepare4cbgm_10.py
 
        .. data:: x
 
@@ -283,7 +289,7 @@ class Att (Base):
     id           = Column (Integer,       primary_key = True, autoincrement = True)
     hsnr         = Column (Integer,       nullable = False, index = True)
     hs           = Column (String(32),    nullable = False, index = True)
-    anfadr       = Column (Integer,       nullable = False, index = True)
+    begadr       = Column (Integer,       nullable = False, index = True)
     endadr       = Column (Integer,       nullable = False, index = True)
     labez        = Column (String(32),    nullable = False, server_default = '')
     labezsuf     = Column (String(32),    server_default = '')
@@ -344,7 +350,7 @@ class Lac (Base):
     id        = Column (Integer,       primary_key = True, autoincrement = True)
     hsnr      = Column (Integer,       nullable = False)
     hs        = Column (String(32),    nullable = False)
-    anfadr    = Column (Integer,       nullable = False)
+    begadr    = Column (Integer,       nullable = False)
     endadr    = Column (Integer,       nullable = False)
     labez     = Column (String(32),    nullable = False, server_default = '')
     labezsuf  = Column (String(32),    server_default = '')
@@ -377,19 +383,6 @@ class Lac (Base):
         Index ('ix_lac_irange_gist', irange, postgresql_using = 'gist'),
         UniqueConstraint (hs, irange)
     )
-
-
-class SaveReadings (Base):
-    """ A temporary table for readings. """
-
-    __tablename__ = 'save_readings'
-
-    id        = Column (Integer,       primary_key = True, autoincrement = True)
-
-    anfadr    = Column (Integer,       nullable = False)
-    endadr    = Column (Integer,       nullable = False)
-    labez     = Column (String(32),    nullable = False, server_default = '')
-    lesart    = Column (String(1024),  server_default = '')
 
 
 function ('char_labez', Base.metadata, 'l INTEGER', 'CHAR (3)', '''
@@ -552,6 +545,8 @@ class Passages (Base2):
 
         True if this passage is a later addition, eg. the pericope adulterae.
 
+        Only set if the passages is spanned.
+
     .. attribute:: remarks
 
         Editor notes.
@@ -564,7 +559,7 @@ class Passages (Base2):
 
     bk_id     = Column (Integer,       ForeignKey ('books.bk_id'), nullable = False)
 
-    anfadr    = Column (Integer,       nullable = False)
+    begadr    = Column (Integer,       nullable = False)
     endadr    = Column (Integer,       nullable = False)
     irange    = Column (IntRangeType,  nullable = False)
 
@@ -634,7 +629,7 @@ class Readings (Base2):
             der stellenbezogenen Lückenliste.
 
         Caveat: die Lesart der Handschrift 'A' kann trotz negativem Apparat in
-        der Tabelle Att in dieselben Passage mehrmals vorkommen, weil an einigen
+        der Tabelle Att in derselben Passage mehrmals vorkommen, weil an einigen
         Stellen im Nestle-Aland ein positiver Apparat benutzt wurde.
 
     .. attribute:: lesart
@@ -646,14 +641,9 @@ class Readings (Base2):
 
           Missing text (omissio).  The scribe did not write any text.
 
-        .. data:: lac
+        .. data:: NULL
 
           Missing substrate (lacuna).  The manuscript is damaged or missing.
-
-        .. data:: vac
-
-          Missing substrate (vacat).  The manuscript is damaged or missing.
-
     """
 
     __tablename__ = 'readings'
@@ -661,7 +651,7 @@ class Readings (Base2):
     pass_id   = Column (Integer,       ForeignKey ('passages.pass_id'), nullable = False)
     labez     = Column (String (2),    nullable = False)
 
-    lesart    = Column (String (1024), nullable = False)
+    lesart    = Column (String (1024))
 
     __table_args__ = (
         PrimaryKeyConstraint (pass_id, labez),
@@ -768,6 +758,9 @@ class LocStem (Base2):
     This table contains the main output of the editors.  The editors decide
     which reading is derived from which other reading(s) at each passage.
 
+    This table contains only the currently valid rows.  A log of previously
+    valid rows is kept in the locstemed_tts table.
+
     .. sauml::
        :include: locstem
 
@@ -787,8 +780,14 @@ class LocStem (Base2):
 
     .. attribute:: valid_period
 
-       The time period in which this row was valid.  See :ref:`transaction-time
-       state tables<tt>`.
+       The time period in which this row is valid.  In this table all rows are
+       still valid, so the end of the period is not set.
+
+       See :ref:`transaction-time state tables<tt>`.
+
+    .. attribute:: user_id
+
+       The id of the user making the change.  See: :class:`.User`.
 
     """
     __tablename__ = 'locstem'
@@ -803,6 +802,7 @@ class LocStem (Base2):
     original      = Column (Boolean,    nullable = False, server_default = 'false')
 
     valid_period  = Column (TSTZRANGE,  nullable = False, server_default = text ('tstzrange (now (), NULL)'))
+    user_id       = Column (Integer,    nullable = False, server_default = '0')
 
     __table_args__ = (
         PrimaryKeyConstraint (pass_id, labez, clique),
@@ -814,12 +814,19 @@ class LocStem (Base2):
 
 
 class LocStem_TTS (Base2):
-    """The transaction-time state table for locstem.
+    """The transaction-time state table for table :class:`.LocStem`.
 
     See :ref:`transaction-time state tables<tt>`.
 
     .. sauml::
-       :include: locstem
+       :include: locstem_tts
+
+    .. attribute:: valid_period
+
+       The time period in which this row was valid.  This table only contains
+       rows that were valid in the past.
+
+       See :ref:`transaction-time state tables<tt>`.
 
     """
 
@@ -835,6 +842,7 @@ class LocStem_TTS (Base2):
     original      = Column (Boolean,    nullable = False)
 
     valid_period  = Column (TSTZRANGE,  nullable = False)
+    user_id       = Column (Integer,    nullable = False)
 
     __table_args__ = (
         PrimaryKeyConstraint (pass_id, labez, clique, valid_period),
@@ -1002,6 +1010,7 @@ function ('labez_clique', Base2.metadata, 'labez CHAR, clique CHAR', 'CHAR', '''
 SELECT labez || COALESCE (NULLIF (clique, '1'), '')
 ''', volatility = 'IMMUTABLE')
 
+
 generic (Base2.metadata, '''
 CREATE AGGREGATE labez_agg (CHAR) (
   sfunc = array_append,
@@ -1028,10 +1037,10 @@ view ('ms_ranges_view', Base2.metadata, '''
 
 view ('passages_view', Base2.metadata, '''
     SELECT b.bk_id, b.siglum, b.book,
-           adr2chapter (p.anfadr) AS chapter,
-           adr2verse   (p.anfadr) AS verse,
-           adr2word    (p.anfadr) AS word,
-           p.pass_id, p.anfadr, p.endadr, p.irange, p.variant, p.spanned
+           adr2chapter (p.begadr) AS chapter,
+           adr2verse   (p.begadr) AS verse,
+           adr2word    (p.begadr) AS word,
+           p.pass_id, p.begadr, p.endadr, p.irange, p.variant, p.spanning, p.spanned, p.fehlvers
     FROM passages p
     JOIN books b USING (bk_id)
     ''')
@@ -1048,25 +1057,25 @@ view ('passages_view_lemma', Base2.metadata, '''
     ''')
 
 view ('locstem_view', Base2.metadata, '''
-    SELECT p.anfadr, p.endadr, locstem.*
+    SELECT p.begadr, p.endadr, p.fehlvers, locstem.*
     FROM locstem
     JOIN passages p USING (pass_id)
     ''')
 
 view ('readings_view', Base2.metadata, '''
-    SELECT p.anfadr, p.endadr, p.irange, r.*
+    SELECT p.begadr, p.endadr, p.irange, r.*
     FROM readings r
     JOIN passages p USING (pass_id)
     ''')
 
 view ('cliques_view', Base2.metadata, '''
-    SELECT r.anfadr, r.endadr, r.irange, r.lesart, q.*
+    SELECT r.begadr, r.endadr, r.irange, r.lesart, q.*
     FROM cliques q
     JOIN readings_view r USING (pass_id, labez)
     ''')
 
 view ('apparatus_view', Base2.metadata, '''
-    SELECT p.pass_id, p.anfadr, p.endadr, p.irange, p.spanning, p.spanned, p.fehlvers,
+    SELECT p.pass_id, p.begadr, p.endadr, p.irange, p.spanning, p.spanned, p.fehlvers,
            ms.ms_id, ms.hs, ms.hsnr,
            a.labez, a.clique, labez_clique (a.labez, a.clique) AS labez_clique,
            a.cbgm, a.labezsuf, a.certainty, a.origin,
@@ -1185,13 +1194,13 @@ class Nestle (Base4):
 
     .. _nestle_table:
 
-    .. attribute:: anfadr, endadr
+    .. attribute:: begadr, endadr
 
        Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
        Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade einen
        Zwischenraum.  In dieser Tabelle sind nur Wörter enthalten, keine
        Zwischenräume.  Jedes Wort hat einen eigenen Eintrag, d.h. für alle
-       Einträge gilt: anfadr = endadr.
+       Einträge gilt: begadr = endadr.
 
     .. attribute:: lemma
 
@@ -1203,7 +1212,7 @@ class Nestle (Base4):
 
     id        = Column (Integer,       primary_key = True, autoincrement = True)
 
-    anfadr    = Column (Integer,       nullable = False)
+    begadr    = Column (Integer,       nullable = False)
     endadr    = Column (Integer,       nullable = False)
     irange    = Column (IntRangeType,  nullable = False)
 

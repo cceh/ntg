@@ -141,13 +141,15 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-db-work-database"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Work Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#transaction-time-state-tables">Transaction-Time State Tables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="database.html#module-ntg_common.db">Tables</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="database.html#id1">Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="database.html#id2">Tables</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#literature">Literature</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
@@ -330,11 +332,13 @@
 </li>
       <li><a href="database.html#ntg_common.db.Books.book">book (Books attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Books">Books (class in ntg_common.db)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ntg_common.html#ntg_common.tools.BOOKS">BOOKS (in module ntg_common.tools)</a>
+</li>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.build_A_text">build_A_text() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.build_byzantine_text">build_byzantine_text() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
@@ -412,6 +416,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appclient.html#module-d3-stemma-layout">d3-stemma-layout (module)</a>
 </li>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.delete_corrector_hands">delete_corrector_hands() (in module scripts.cceh.prepare4cbgm)</a>
+</li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.delete_passages_without_variants">delete_passages_without_variants() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
   </ul></td>
@@ -425,6 +431,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Affinity.equal">equal (Affinity attribute)</a>
+</li>
+      <li><a href="appserver.html#server.server.EXCLUDE_REGEX_MAP">EXCLUDE_REGEX_MAP (in module server.server)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -525,11 +533,7 @@
       <li><a href="database.html#ntg_common.db.Att.lekt">lekt (Att attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Nestle.lemma">lemma (Nestle attribute)</a>
-
-      <ul>
-        <li><a href="database.html#ntg_common.db.Passages.lemma">(Passages attribute)</a>
 </li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Ms_Ranges.length">length (Ms_Ranges attribute)</a>
@@ -545,6 +549,8 @@
       <li><a href="ntg_common.html#ntg_common.db_tools.local_stemma_to_nx">local_stemma_to_nx() (in module ntg_common.db_tools)</a>
 </li>
       <li><a href="database.html#ntg_common.db.LocStem">LocStem (class in ntg_common.db)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.LocStem_TTS">LocStem_TTS (class in ntg_common.db)</a>
 </li>
       <li><a href="database.html#ntg_common.src_db.LocStemEdAct01">LocStemEdAct01 (class in ntg_common.src_db)</a>
 </li>
@@ -732,8 +738,6 @@
 </li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.NULL_FIELDS">NULL_FIELDS (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.NULL_N_FIELDS">NULL_N_FIELDS (in module scripts.cceh.prepare4cbgm)</a>
-</li>
   </ul></td>
 </tr></table>
 
@@ -758,13 +762,17 @@
 </li>
       <li><a href="database.html#ntg_common.db.Passages.pass_id">pass_id (Passages attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appserver.html#server.server.passage_json">passage_json() (in module server.server)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Passages">Passages (class in ntg_common.db)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db_tools.PostgreSQLEngine">PostgreSQLEngine (class in ntg_common.db_tools)</a>
+</li>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.process_commentaries">process_commentaries() (in module scripts.cceh.prepare4cbgm)</a>
+</li>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.process_sigla">process_sigla() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -782,11 +790,9 @@
 </li>
       <li><a href="database.html#ntg_common.db.Readings">Readings (class in ntg_common.db)</a>
 </li>
-      <li><a href="database.html#ntg_common.db.Readings.lac">Readings.lac (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Readings.NULL">Readings.NULL (in module ntg_common.db)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Readings.om">Readings.om (in module ntg_common.db)</a>
-</li>
-      <li><a href="database.html#ntg_common.db.Readings.vac">Readings.vac (in module ntg_common.db)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -816,8 +822,6 @@
 </li>
       <li><a href="database.html#ntg_common.db.LocStemEdAct01.s2">s2 (LocStemEdAct01 attribute)</a>
 </li>
-      <li><a href="database.html#ntg_common.db.SaveReadings">SaveReadings (class in ntg_common.db)</a>
-</li>
       <li><a href="scripts.html#module-scripts">scripts (module)</a>
 </li>
       <li><a href="scripts.html#module-scripts.cceh.prepare4cbgm">scripts.cceh.prepare4cbgm (module)</a>
@@ -830,33 +834,19 @@
 </li>
       <li><a href="appserver.html#module-server.server">server.server (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Books.siglum">siglum (Books attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Passages.spanned">spanned (Passages attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Passages.spanning">spanning (Passages attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appserver.html#server.server.stemma">stemma() (in module server.server)</a>
 </li>
       <li><a href="appserver.html#server.editor.stemma_edit">stemma_edit() (in module server.editor)</a>
 </li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step01">step01() (in module scripts.cceh.prepare4cbgm)</a>
-</li>
-      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step01b">step01b() (in module scripts.cceh.prepare4cbgm)</a>
-</li>
-      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step01c">step01c() (in module scripts.cceh.prepare4cbgm)</a>
-</li>
-      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step02">step02() (in module scripts.cceh.prepare4cbgm)</a>
-</li>
-      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step05">step05() (in module scripts.cceh.prepare4cbgm)</a>
-</li>
-      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step06">step06() (in module scripts.cceh.prepare4cbgm)</a>
-</li>
-      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step06b">step06b() (in module scripts.cceh.prepare4cbgm)</a>
-</li>
-      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step07">step07() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Att.suffix">suffix (Att attribute)</a>
 </li>
@@ -889,6 +879,12 @@
       <li><a href="database.html#ntg_common.db.Affinity.unclear">unclear (Affinity attribute)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.unroll_zw">unroll_zw() (in module scripts.cceh.prepare4cbgm)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.LocStem.user_id">user_id (LocStem attribute)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="V">V</h2>
@@ -896,10 +892,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.vacuum">vacuum() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="database.html#ntg_common.src_db.VarGenAttAct01">VarGenAttAct01 (class in ntg_common.src_db)</a>
+      <li><a href="database.html#ntg_common.db.LocStem.valid_period">valid_period (LocStem attribute)</a>
+
+      <ul>
+        <li><a href="database.html#ntg_common.db.LocStem_TTS.valid_period">(LocStem_TTS attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="database.html#ntg_common.src_db.VarGenAttAct01">VarGenAttAct01 (class in ntg_common.src_db)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Passages.variant">variant (Passages attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.LocStemEdAct01.varid">varid (LocStemEdAct01 attribute)</a>

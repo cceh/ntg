@@ -32,7 +32,7 @@ Transaction-Time State Tables
 -----------------------------
 
 A transaction-time state table keeps track of the table's contents as it changes
-over time.  [Snodgrass2000]_ This is the basis for our undo-functionality in the
+over time.  [SNODGRASS2000]_ This is the basis for our undo-functionality in the
 graphical stemma editors.
 
 To hide the details of the TTS table, we use a view that returns the current
@@ -88,6 +88,6 @@ Tables
 Literature
 ==========
 
-.. _Snodgrass2000: Snodgrass, R.T.  *Developing Time-Oriented Database
+.. [SNODGRASS2000] Snodgrass, R.T.  *Developing Time-Oriented Database
                    Applications in SQL*. 2000. Morgan Kaufmann Publishers, San
                    Francisco.

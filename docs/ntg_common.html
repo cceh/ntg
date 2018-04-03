@@ -141,13 +141,15 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-db-work-database"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Work Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#transaction-time-state-tables">Transaction-Time State Tables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="database.html#module-ntg_common.db">Tables</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="database.html#id1">Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="database.html#id2">Tables</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#literature">Literature</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
@@ -254,7 +256,7 @@ and the database conversion routines.</p>
 <p>This module contains functions for database access.</p>
 <dl class="class">
 <dt id="ntg_common.db_tools.MySQLEngine">
-<em class="property">class </em><code class="descname">MySQLEngine</code><span class="sig-paren">(</span><em>group='ntg'</em>, <em>db=''</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.MySQLEngine" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">MySQLEngine</code><span class="sig-paren">(</span><em>fn=('/etc/my.cnf'</em>, <em>'/etc/mysql/my.cnf'</em>, <em>'~/.my.cnf')</em>, <em>group=('mysql'</em>, <em>'client'</em>, <em>'client-server'</em>, <em>'client-mariadb')</em>, <em>db=''</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.MySQLEngine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Database Interface</p>
 </dd></dl>
 
@@ -314,7 +316,7 @@ utility.</p>
 <p>This module contains some useful functions.</p>
 <dl class="data">
 <dt id="ntg_common.tools.BOOKS">
-<code class="descname">BOOKS</code><em class="property"> = [(1, 'Mt', 'Matthew', 0), (2, 'Mc', 'Mark', 0), (3, 'L', 'Luke', 0), (4, 'J', 'John', 0), (5, 'Act', 'Acts', 28), (6, 'R', 'Romans', 0), (7, '1K', '1Corinthians', 0), (8, '2K', '2Corinthians', 0), (9, 'G', 'Galatians', 0), (10, 'E', 'Ephesians', 0), (11, 'Ph', 'Philippians', 0), (12, 'Kol', 'Colossians', 0), (13, '1Th', '1Thessalonians', 0), (14, '2Th', '2Thessalonians', 0), (15, '1T', '1Timothy', 0), (16, '2T', '2Timothy', 0), (17, 'Tt', 'Titus', 0), (18, 'Phm', 'Philemon', 0), (19, 'H', 'Hebrews', 0), (20, 'Jc', 'James', 0), (21, '1P', '1Peter', 0), (22, '2P', '2Peter', 0), (23, '1J', '1John', 0), (24, '2J', '2John', 0), (25, '3J', '3John', 0), (26, 'Jd', 'Jude', 0), (27, 'Ap', 'Revelation', 0)]</em><a class="headerlink" href="#ntg_common.tools.BOOKS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">BOOKS</code><em class="property"> = [(1, 'Mt', 'Matthew', 28), (2, 'Mc', 'Mark', 16), (3, 'L', 'Luke', 24), (4, 'J', 'John', 21), (5, 'Act', 'Acts', 28), (6, 'R', 'Romans', 16), (7, '1K', '1Corinthians', 16), (8, '2K', '2Corinthians', 13), (9, 'G', 'Galatians', 6), (10, 'E', 'Ephesians', 6), (11, 'Ph', 'Philippians', 4), (12, 'Kol', 'Colossians', 4), (13, '1Th', '1Thessalonians', 5), (14, '2Th', '2Thessalonians', 3), (15, '1T', '1Timothy', 6), (16, '2T', '2Timothy', 4), (17, 'Tt', 'Titus', 3), (18, 'Phm', 'Philemon', 1), (19, 'H', 'Hebrews', 13), (20, 'Jc', 'James', 5), (21, '1P', '1Peter', 5), (22, '2P', '2Peter', 3), (23, '1J', '1John', 5), (24, '2J', '2John', 1), (25, '3J', '3John', 1), (26, 'Jd', 'Jude', 1), (27, 'Ap', 'Revelation', 22)]</em><a class="headerlink" href="#ntg_common.tools.BOOKS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Titles of the NT books</p>
 </dd></dl>
 
@@ -328,7 +330,7 @@ to our rules.</p>
 
 <dl class="data">
 <dt id="ntg_common.tools.FEHLVERSE">
-<code class="descname">FEHLVERSE</code><em class="property"> = '\n    (\n      anfadr &gt;= 50837002 and endadr &lt;= 50837046 or\n      anfadr &gt;= 51534002 and endadr &lt;= 51534012 or\n      anfadr &gt;= 52406020 and endadr &lt;= 52408014 or\n      anfadr &gt;= 52829002 and endadr &lt;= 52829024\n    )\n    '</em><a class="headerlink" href="#ntg_common.tools.FEHLVERSE" title="Permalink to this definition">¶</a></dt>
+<code class="descname">FEHLVERSE</code><em class="property"> = '\n    (\n      begadr &gt;= 50837002 and endadr &lt;= 50837047 or\n      begadr &gt;= 51534002 and endadr &lt;= 51534013 or\n      begadr &gt;= 52406020 and endadr &lt;= 52408015 or\n      begadr &gt;= 52829002 and endadr &lt;= 52829025\n    )\n    '</em><a class="headerlink" href="#ntg_common.tools.FEHLVERSE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verses added in later times.</p>
 <p>These verses were added to the NT in later times. Because they are not original
 they are not included in the text of manuscript ‘A’.</p>

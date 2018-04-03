@@ -86,11 +86,12 @@ EXCLUDE_REGEX_MAP = {
     'MT' : 'MT',
     'F'  : 'F[1-9Π][0-9]*'
 }
+""" Regexes for the include/exclude toolbar buttons. """
 
 def get_excluded_ms_ids (conn, include):
     exclude = set (EXCLUDE_REGEX_MAP.keys ()) - set (include)
     if not exclude:
-        return tuple (-1) # a non-existing id to avoid an SQL syntax error
+        return tuple ([-1]) # a non-existing id to avoid an SQL syntax error
     exclude = [ EXCLUDE_REGEX_MAP[x] for x in exclude]
 
     # get ids of nodes to exclude
@@ -180,7 +181,7 @@ def leitzeile (passage_or_id = None):
         verse_end = verse_start + 999
 
         res = execute (conn, """
-        SELECT l.anfadr, l.endadr, l.lemma, p.pass_id, p.spanned,
+        SELECT l.begadr, l.endadr, l.lemma, p.pass_id, p.spanned,
           EXISTS (SELECT labez from readings r
           WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != 'om') AS replaced
         FROM nestle l
@@ -189,16 +190,16 @@ def leitzeile (passage_or_id = None):
 
         UNION -- get the omissions
 
-        SELECT p.anfadr, p.endadr, p.lemma, p.pass_id, p.spanned,
+        SELECT p.begadr, p.endadr, p.lemma, p.pass_id, p.spanned,
           EXISTS (SELECT labez from readings r
           WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != 'om') AS replaced
         FROM passages_view_lemma p
-        WHERE int4range (:start, :end + 1) @> p.irange AND (anfadr % 2) = 1
+        WHERE int4range (:start, :end + 1) @> p.irange AND (begadr % 2) = 1
 
-        ORDER BY anfadr, endadr DESC
+        ORDER BY begadr, endadr DESC
         """, dict (parameters, start = verse_start, end = verse_end))
 
-        Leitzeile = collections.namedtuple ('Leitzeile', 'anfadr, endadr, lemma, pass_id, spanned, replaced')
+        Leitzeile = collections.namedtuple ('Leitzeile', 'begadr, endadr, lemma, pass_id, spanned, replaced')
         leitzeile = [ Leitzeile._make (r)._asdict () for r in res ]
 
         return make_json_response ({
@@ -296,13 +297,13 @@ def ranges_json (passage_or_id):
         bk_id   = request.args.get ('bk_id') or passage.bk_id
 
         res = execute (conn, """
-        SELECT DISTINCT range, range, lower (ch.irange) as anfadr, upper (ch.irange) as endadr
+        SELECT DISTINCT range, range, lower (ch.irange) as begadr, upper (ch.irange) as endadr
         FROM ranges ch
         WHERE bk_id = :bk_id
-        ORDER BY anfadr, endadr DESC
+        ORDER BY begadr, endadr DESC
         """, dict (parameters, bk_id = bk_id))
 
-        Ranges = collections.namedtuple ('Ranges', 'range, value, anfadr, endadr')
+        Ranges = collections.namedtuple ('Ranges', 'range, value, begadr, endadr')
         # ranges = list (map (Ranges._make, res))
         ranges = [ Ranges._make (r)._asdict () for r in res ]
 
@@ -900,7 +901,7 @@ def comparison_summary ():
 
 _ComparisonDetailRow = collections.namedtuple (
     'ComparisonDetailRow',
-    'pass_id anfadr endadr labez_clique1 lesart1 labez_clique2 lesart2 older newer unclear'
+    'pass_id begadr endadr labez_clique1 lesart1 labez_clique2 lesart2 older newer unclear'
 )
 
 class _ComparisonDetailRowCalcFields (_ComparisonDetailRow):
@@ -910,7 +911,7 @@ class _ComparisonDetailRowCalcFields (_ComparisonDetailRow):
 
     @property
     def pass_hr (self):
-        return Passage._to_hr (self.anfadr, self.endadr)
+        return Passage._to_hr (self.begadr, self.endadr)
 
     @property
     def norel (self):
@@ -932,7 +933,7 @@ def comparison_detail ():
         range_ = request.args.get ('range') or 'All'
 
         res = execute (conn, """
-        SELECT p.pass_id, p.anfadr, p.endadr, v1.labez_clique, v1.lesart,
+        SELECT p.pass_id, p.begadr, p.endadr, v1.labez_clique, v1.lesart,
                                               v2.labez_clique, v2.lesart,
           is_p_older (p.pass_id, v1.labez, v1.clique, v2.labez, v2.clique) AS older,
           is_p_older (p.pass_id, v2.labez, v2.clique, v1.labez, v1.clique) AS newer,
@@ -974,7 +975,7 @@ def apparatus_json (passage_or_id):
 
         # list of labez => lesart
         res = execute (conn, """
-        SELECT labez, lesart
+        SELECT labez, COALESCE (lesart, '')
         FROM readings
         WHERE pass_id = :pass_id
         ORDER BY labez

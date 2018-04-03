@@ -6,7 +6,6 @@ BROWSER     := firefox
 
 NTG_VM      := ntg.cceh.uni-koeln.de
 NTG_USER    := ntg
-NTG_DB      := ntg
 NTG         := $(NTG_USER)@$(NTG_VM)
 NTG_ROOT    := $(NTG):/home/$(NTG_USER)/prj/ntg/ntg
 PSQL_PORT   := 5432
@@ -31,7 +30,7 @@ JS_GZ       := $(patsubst %, %.gzip, $(JS))
 
 PY_SOURCES  := scripts/cceh/*.py ntg_common/*.py server/*.py
 
-.PHONY: upload upload_po update_pot update_po update_mo update_libs vpn server restart psql
+.PHONY: upload vpn server restart psql
 .PHONY: js css doc jsdoc sphinx lint pylint jslint csslint
 
 css: $(CSS)
@@ -49,26 +48,21 @@ prepare:
 users:
 	scripts/cceh/mk_users.py -vvv server/instance/_global.conf
 
-db_upload:
-	$(PGDUMP) --clean --if-exists ntg_ph4 | bzip2 > /tmp/ntg_ph4.pg_dump.sql.bz2
-	scp /tmp/ntg_ph4.pg_dump.sql.bz2 $(NTG_USER)@$(NTG_VM):~/
-
 clean:
 	find . -depth -name "*~" -delete
 
 psql:
 	ssh -f -L 1$(PSQL_PORT):localhost:$(PSQL_PORT) $(NTG_USER)@$(NTG_VM) sleep 120
 	sleep 1
-	psql -h localhost -p 1$(PSQL_PORT) -d $(NTG_DB) -U $(NTG_USER)
+	psql -h localhost -p 1$(PSQL_PORT) -U $(NTG_USER) ntg_ph4
 
 import_john:
 	$(MYSQL) -e "DROP DATABASE DCPJohnWithFam"
 	$(MYSQL) -e "CREATE DATABASE DCPJohnWithFam"
 	cat ../dumps/DCPJohnWithFam-6.sql | mysql --defaults-file=~/.my.cnf.ntg -D DCPJohnWithFam
-	$(MYSQL) -D DCPJohnWithFam -e "CREATE TABLE DCPJohnWithFamLac SELECT * FROM DCPJohnWithFamAtt LIMIT 0;"
 
 diff_affinity:
-	diff -U 0 <($(PSQL) -h $(NTG_VM) -U ntg -c "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 1 order by ms_id1, ms_id2" ntg_ph4) <($(PSQL) -c "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 23 order by ms_id1, ms_id2" ntg_ph4) | less
+	scripts/cceh/sqldiff.sh "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 94 order by ms_id1, ms_id2" | less
 
 lint: pylint jslint csslint
 
@@ -110,9 +104,21 @@ jsdoc: js
 bower_update:
 	bower update
 
-upload:
+upload_scripts:
 	$(RSYNC) --exclude "**/__pycache__"  --exclude "*.pyc"  ntg_common $(NTG_ROOT)/
 	$(RSYNC) --exclude "**/instance/**"                     server     $(NTG_ROOT)/
+
+# from home
+upload_db:
+	-rm /tmp/*.pg_dump.sql.bz2
+	$(PGDUMP) --clean --if-exists ntg_ph4  | bzip2 > /tmp/ntg_ph4.pg_dump.sql.bz2
+	$(PGDUMP) --clean --if-exists john_ph1 | bzip2 > /tmp/john_ph1.pg_dump.sql.bz2
+	scp /tmp/*.pg_dump.sql.bz2 $(NTG_USER)@$(NTG_VM):~/
+
+# from work
+copy_local_db_to_server:
+	# $(PGDUMP) --clean --if-exists ntg_ph4   | psql -h $(NTG_VM) -U $(NTG_USER) ntg_ph4
+	$(PGDUMP) --clean --if-exists john_ph1  | psql -h $(NTG_VM) -U $(NTG_USER) john_ph1
 
 sqlacodegen:
 	sqlacodegen mysql:///ECM_ActsPh4?read_default_group=ntg
@@ -140,35 +146,3 @@ install-prerequisites:
 		psycopg2 mysqlclient sqlalchemy sqlalchemy-utils intervals \
 		flask babel flask-babel flask-sqlalchemy jinja2 flask-user \
 		sphinx sphinx_rtd_theme sphinx_js sphinxcontrib-plantuml
-
-### Localization ###
-
-define LOCALE_TEMPLATE
-
-.PRECIOUS: po/$(1).po
-
-update_mo: server/translations/$(1)/LC_MESSAGES/messages.mo
-
-update_po: po/$(1).po
-
-po/$(1).po: po/server.pot
-	if test -e $$@; \
-	then msgmerge -U --backup=numbered $$@ $$?; \
-	else msginit --locale=$(1) -i $$? -o $$@; \
-	fi
-
-server/translations/$(1)/LC_MESSAGES/messages.mo: po/$(1).po
-	-mkdir -p $$(dir $$@)
-	msgfmt -o $$@ $$?
-
-endef
-
-$(foreach lang,$(TRANSLATIONS),$(eval $(call LOCALE_TEMPLATE,$(lang))))
-
-po/server.pot: $(PY_SOURCES) $(TEMPLATES) pybabel.cfg Makefile
-	PYTHONPATH=.; pybabel extract -F pybabel.cfg --no-wrap --add-comments=NOTE \
-	--copyright-holder="CCeH Cologne" --project=NTG --version=2.0 \
-	--msgid-bugs-address=marcello@perathoner.de \
-	-k 'l_' -k 'n_:1,2' -o $@ .
-
-update_pot: po/server.pot

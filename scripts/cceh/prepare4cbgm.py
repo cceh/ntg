@@ -48,13 +48,18 @@ NULL_FIELDS = 'lemma lesart labezsuf'.split ()
 
 book = None
 
-def copy_table (conn, source_table, dest_table):
+def copy_table (conn, source_table, dest_table, where = ''):
     """ Make a copy of a table. """
+
+    if where:
+        where = 'WHERE ' + where
 
     execute (conn, """
     DROP TABLE IF EXISTS {dest_table};
-    SELECT * INTO {dest_table} FROM {source_table}
-    """, dict (parameters, dest_table = dest_table, source_table = source_table))
+    SELECT * INTO {dest_table}
+    FROM {source_table}
+    {where};
+    """, dict (parameters, dest_table = dest_table, source_table = source_table, where = where))
 
 
 def copy_table_fdw (conn, fdw, source_table, dest_table):
@@ -127,7 +132,18 @@ def step01 (dba, dbs, parameters):
 
     with dba.engine.begin () as dest:
         concat_tables (dest, dbs_meta, 'original_att', 'app_fdw', config['MYSQL_ATT_TABLES'])
-        concat_tables (dest, dbs_meta, 'original_lac', 'app_fdw', config['MYSQL_LAC_TABLES'])
+        if (book == 'Acts'):
+            concat_tables (dest, dbs_meta, 'original_lac', 'app_fdw', config['MYSQL_LAC_TABLES'])
+        if (book == 'John'):
+            execute (dest, """
+	        DROP TABLE IF EXISTS original_lac;
+	        CREATE TABLE original_lac (LIKE original_att);
+            """, parameters)
+
+        execute (dest, """
+        ALTER TABLE original_att RENAME COLUMN anfadr TO begadr;
+        ALTER TABLE original_lac RENAME COLUMN anfadr TO begadr;
+        """, parameters)
 
     att_model = sqlalchemy.Table ('att', db.Base.metadata)
     lac_model = sqlalchemy.Table ('lac', db.Base.metadata)
@@ -158,35 +174,33 @@ def step01 (dba, dbs, parameters):
 
             rows = execute (dest, """
             INSERT INTO {dest_table} ({dest_columns}, irange, created)
-            SELECT {source_columns}, int4range (anfadr, endadr + 1), '{created}'
+            SELECT {source_columns}, int4range (begadr, endadr + 1), '{created}'
             FROM {source_table} s
-            WHERE endadr >= anfadr
+            WHERE endadr >= begadr
             ON CONFLICT DO NOTHING
             """, dict (parameters, source_table = source_table, dest_table = dest_table,
                        source_columns = ', '.join (source_columns),
                        dest_columns = ', '.join (dest_columns),
                        created = datetime.date.today().strftime ("%Y-%m-%d")))
 
-
-    # some source-dependent fixes
-    # tables from Münster are different than tables from Birmingham
     with dba.engine.begin () as conn:
-        log (logging.INFO, '          Applying source-dependent fixes')
+        # delete 'MT'
+        execute (conn, """
+        DELETE FROM att WHERE hs IN ('MT');
+        DELETE FROM lac WHERE hs IN ('MT');
+        """, parameters)
+
+        if book == 'John':
+            execute (conn, """
+            UPDATE att SET hsnr = 1 WHERE hs = 'A'
+            """, parameters)
+
         if book == 'Acts':
             # delete Patristic texts
             execute (conn, """
             DELETE FROM att WHERE hsnr >= 500000;
             DELETE FROM lac WHERE hsnr >= 500000;
             """, parameters)
-
-        if book == 'John':
-            # harmonize hsnr with Acts
-            execute (conn, """
-            UPDATE att SET hsnr = 0 WHERE hs = 'A';
-            UPDATE att SET hsnr = 1 WHERE hs = 'MT';
-            UPDATE att SET labez = 'zw', labezsuf = labez WHERE labez ~ '/';
-            """, parameters)
-
 
     # Fix data entry errors.
     # These errors should be fixed in the original database.
@@ -200,40 +214,34 @@ def step01 (dba, dbs, parameters):
         SET labezorig = labez, labezsuforig = labezsuf
         """, parameters)
 
-        execute (conn, """
-        UPDATE att
-        SET lesart = NULL
-        WHERE lesart = ''
-        """, parameters)
-
         if book == 'Acts':
-            fix (conn, "Wrong hs Acts", """
-            SELECT hs, hsnr, anfadr, endadr
-            FROM att
-            WHERE hs = 'L156s1'
-            """, """
+            execute (conn, """
             UPDATE att
-            SET hs = 'L156s'
-            WHERE hs = 'L156s1' AND anfadr = 50311014 AND endadr = 50311014
+            SET lesart = NULL
+            WHERE lesart = ''
             """, parameters)
 
-            fix (conn, "Wrong hsnr Acts", """
-            SELECT DISTINCT hs, hsnr, adr2chapter (anfadr)
-            FROM att
-            WHERE hsnr = 411881 AND hs !~ '{re_supp}'
-               OR hsnr = 411880 AND hs ~ '{re_supp}'
-            """, """
-            UPDATE att SET hsnr = 411881 WHERE hsnr = 411880 AND hs ~ '[Ss]';
-            DELETE FROM lac WHERE hsnr = 411882;
-            UPDATE lac SET hs = REGEXP_REPLACE (hs, '[Ss][1-2]*', 's') WHERE hsnr = 411881;
+            execute (conn, """
+            UPDATE att
+            SET labez = labezsuf, labezsuf = ''
+            WHERE labez = 'zw'
             """, parameters)
+
+            for t in ('att', 'lac'):
+                # Normalize NULL to ''
+                for col in NULL_FIELDS:
+                    execute (conn, """
+                    UPDATE {t}
+                    SET {col} = ''
+                    WHERE {col} IS NULL
+                    """, dict (parameters, t = t, col = col))
 
             fix (conn, "Wrong labez Acts", """
-            SELECT labez, labezsuf, adr2chapter (anfadr), count (*) AS anzahl
+            SELECT labez, labezsuf, adr2chapter (begadr), count (*) AS anzahl
             FROM att
             WHERE labez !~ '{re_labez}'
-            GROUP BY labez, labezsuf, adr2chapter (anfadr)
-            ORDER BY labez, labezsuf, adr2chapter (anfadr)
+            GROUP BY labez, labezsuf, adr2chapter (begadr)
+            ORDER BY labez, labezsuf, adr2chapter (begadr)
             """, """
             UPDATE att
             SET labez = 'a', labezsuf = 'f'
@@ -249,87 +257,65 @@ def step01 (dba, dbs, parameters):
             WHERE labez = 'k ';
             UPDATE att
             SET labez = 'a', labezsuf = ''
-            WHERE labezsuf = 'a/ao1-ao4';
+            WHERE labez = 'a/ao1-ao4';
             UPDATE att
             SET labez = 'a', labezsuf = ''
-            WHERE labezsuf = 'ao1-3';
+            WHERE labez = 'ao1-3';
             UPDATE att
             SET labez = 'b', labezsuf = ''
-            WHERE labezsuf = 'b/bo1-3'
+            WHERE labez = 'b/bo1-3'
+            """, parameters)
+
+            fix (conn, "Wrong hs Acts", """
+            SELECT hs, hsnr, begadr, endadr
+            FROM att
+            WHERE hs = 'L156s1'
+            """, """
+            UPDATE att
+            SET hs = 'L156s'
+            WHERE hs = 'L156s1' AND begadr = 50311014 AND endadr = 50311014
+            """, parameters)
+
+            fix (conn, "Wrong hsnr Acts", """
+            SELECT DISTINCT hs, hsnr, adr2chapter (begadr)
+            FROM att
+            WHERE hsnr = 411881 AND hs !~ '{re_supp}'
+               OR hsnr = 411880 AND hs ~ '{re_supp}'
+            """, """
+            UPDATE att SET hsnr = 411881 WHERE hsnr = 411880 AND hs ~ '[Ss]';
+            DELETE FROM lac WHERE hsnr = 411882;
+            UPDATE lac SET hs = REGEXP_REPLACE (hs, '[Ss][1-2]*', 's') WHERE hsnr = 411881;
             """, parameters)
 
         if book == 'John':
-            fix (conn, "Wrong labez John", """
-            SELECT anfadr, endadr, lesart, array_agg (labez)
-            FROM passages p
-            JOIN save_readings USING (anfadr, endadr)
-            GROUP BY (anfadr, endadr, lesart)
-            HAVING COUNT (labez) > 1;
+            fix (conn, "More than one labez for lesart John", """
+            SELECT begadr, endadr, lesart, array_agg (DISTINCT labez)
+            FROM att
+            GROUP BY (begadr, endadr, lesart)
+            HAVING COUNT (distinct labez) > 1;
             """, """
             UPDATE att
-            SET labez = 'v'
-            WHERE (labez, anfadr, endadr) = ('ba', 41916016, 41916022);
-            UPDATE att
-            SET labez = 'w'
-            WHERE (labez, anfadr, endadr) = ('bb', 41916016, 41916022);
-            UPDATE att
-            SET labez = 'x'
-            WHERE (labez, anfadr, endadr) = ('bd', 41916016, 41916022);
+            SET labez = 'i'
+            WHERE (begadr, endadr) = (40206008, 40206024) AND labez ~ '^i[12]$';
             """, parameters)
 
             fix (conn, "Wrong labez John", """
-            SELECT labez, labezsuf, adr2chapter (anfadr), count (*) AS anzahl
+            SELECT labez, count (*) AS anzahl
             FROM att
             WHERE labez !~ '{re_labez}'
-            GROUP BY labez, labezsuf, adr2chapter (anfadr)
-            ORDER BY labez, labezsuf, adr2chapter (anfadr)
-            """, """
+            GROUP BY labez
+            ORDER BY labez
+            """, r"""
             UPDATE att
-            SET labez = 'zx'
-            WHERE labez !~ '{re_labez}'
+            SET labez = CASE WHEN labez = 'ba' THEN 'v' WHEN labez = 'bb' THEN 'w' ELSE 'x' END
+            WHERE (begadr, endadr) = (41916016, 41916022) AND labez IN ('ba', 'bb', 'bd');
+            UPDATE att
+            SET labez = REGEXP_REPLACE (labez, '\(f\??\)', 'f')
+            WHERE labez ~ '\(f\??\)';
+            UPDATE att
+            SET labez = 'zz'
+            WHERE labez ~ '\?';
             """, parameters)
-
-        fix (conn, "Attestation of A != 'a'", """
-        SELECT hs, labez, labezsuf, anfadr, endadr
-        FROM att
-        WHERE hs = 'A' AND labez ~ '^[b-y]'
-        """, """
-        UPDATE att
-        SET labez = 'a', labezsuf = ''
-        WHERE (hs, anfadr, endadr) = ('A', 50240012, 50240018)
-        """, parameters)
-
-        if book == 'Acts':
-            # Passages not in A
-            fix (conn, "Passages not in A Acts", """
-            SELECT DISTINCT anfadr, endadr
-            FROM att
-            WHERE (anfadr, endadr) NOT IN (
-              SELECT anfadr, endadr
-              FROM att
-              WHERE hs = 'A'
-            )
-            """, """
-            INSERT INTO att (hsnr, hs, anfadr, endadr, labez, irange)
-            VALUES (0, 'A', 51528017, 51528017, 'a', int4range (51528017, 51528017 + 1))
-            """, parameters)
-
-        # Alle Fehlverse in A mit labez 'zu'?
-        fix (conn, "Fehlverse in A with labez <> 'zu'", """
-        SELECT anfadr, endadr, labez
-        FROM att
-        WHERE {fehlverse} AND hs = 'A' AND labez <> 'zu'
-        """, "", dict (parameters, fehlverse = tools.FEHLVERSE))
-
-        if book == 'Acts':
-            for t in ('att', 'lac'):
-                # Normalize NULL to ''
-                for col in NULL_FIELDS:
-                    execute (conn, """
-                    UPDATE {t}
-                    SET {col} = ''
-                    WHERE {col} IS NULL
-                    """, dict (parameters, t = t, col = col))
 
 
     with dba.engine.begin () as conn:
@@ -338,27 +324,27 @@ def step01 (dba, dbs, parameters):
             # Any errors in the lacunae table will wreak havoc with lacunae unrolling.
 
             debug (conn, "nested lacunae", """
-            SELECT l.id, l.hs, l.anfadr, l.endadr
+            SELECT l.id, l.hs, l.begadr, l.endadr
             FROM lac l
             JOIN lac l2
-              ON l.hs = l2.hs AND l.anfadr != l2.anfadr AND l.endadr != l2.endadr
-                AND int4range (l.anfadr, l.endadr + 1) <@ int4range (l2.anfadr, l2.endadr + 1)
+              ON l.hs = l2.hs AND l.begadr != l2.begadr AND l.endadr != l2.endadr
+                AND int4range (l.begadr, l.endadr + 1) <@ int4range (l2.begadr, l2.endadr + 1)
             """, parameters)
 
-            # Lac with anfadr > endadr
-            fix (conn, "Lac with anfadr > endadr", """
+            # Lac with begadr > endadr
+            fix (conn, "Lac with begadr > endadr", """
             SELECT *
             FROM lac
-            WHERE anfadr > endadr
+            WHERE begadr > endadr
             """, """
             UPDATE lac
-            SET anfadr = endadr, endadr = anfadr
-            WHERE anfadr > endadr
+            SET begadr = endadr, endadr = begadr
+            WHERE begadr > endadr
             """, parameters)
 
             # Check consistency between Att and Lac tables
             fix (conn, "Manuscript found in lac table but not in att table", """
-            SELECT DISTINCT hsnr, adr2chapter (anfadr)
+            SELECT DISTINCT hsnr, adr2chapter (begadr)
             FROM lac
             WHERE hsnr NOT IN (
               SELECT DISTINCT hsnr FROM att
@@ -374,8 +360,8 @@ def step01 (dba, dbs, parameters):
             # Fix inconsistencies in endadr between Att and Lac
             fix (conn, "Chapters shorter in Lac than in Att", """
             SELECT a.chapter, attend, lacend
-            FROM (SELECT adr2chapter (anfadr) AS chapter, MAX (endadr) AS attend FROM att GROUP BY 1) AS a
-            JOIN (SELECT adr2chapter (anfadr) AS chapter, MAX (endadr) AS lacend FROM lac GROUP BY 1) AS l
+            FROM (SELECT adr2chapter (begadr) AS chapter, MAX (endadr) AS attend FROM att GROUP BY 1) AS a
+            JOIN (SELECT adr2chapter (begadr) AS chapter, MAX (endadr) AS lacend FROM lac GROUP BY 1) AS l
               USING (chapter)
             WHERE attend > lacend
             ORDER BY a.chapter
@@ -387,44 +373,17 @@ def step01 (dba, dbs, parameters):
             SET endadr = 50760037
             WHERE endadr = 50760036;
             UPDATE lac
-            SET anfadr = 51201001
-            WHERE anfadr = 51201002;
+            SET begadr = 51201001
+            WHERE begadr = 51201002;
             UPDATE lac
             SET endadr = 52831035
             WHERE endadr = 52831034;
             UPDATE lac
-            SET irange = int4range (anfadr, endadr + 1);
+            SET irange = int4range (begadr, endadr + 1);
             """, parameters)
 
 
-def save_readings (dba, parameters):
-
-    with dba.engine.begin () as conn:
-
-        execute (conn, """
-        TRUNCATE save_readings RESTART IDENTITY CASCADE
-        """, parameters)
-
-        execute (conn, """
-        INSERT INTO save_readings (anfadr, endadr, labez, lesart)
-        SELECT anfadr, endadr, labez,
-               MODE () WITHIN GROUP (ORDER BY lesart) AS lesart
-        FROM att a
-        GROUP BY anfadr, endadr, labez
-        """, parameters)
-
-        if book == 'John':
-            execute (conn, """
-            DELETE FROM save_readings
-            WHERE labez = 'zz';
-            UPDATE save_readings
-            SET lesart = 'om'
-            WHERE lesart IS NULL;
-            """, parameters)
-
-
-
-def step02 (dba, parameters):
+def process_commentaries (dba, parameters):
     """Process differing readings in commentaries (T1, T2)
 
     Aus: prepare4cbgm_5b.py
@@ -444,8 +403,8 @@ def step02 (dba, parameters):
         deleted.
 
     DIVINATIO: If there is only one T1 or T2 reading for that passage and
-    manuscript, unset the 'T' suffix.  If there are both T1 and T2 readings, merge
-    them into one 'zw' reading.
+    manuscript, unset the 'T' suffix.  If there are both T1 and T2 readings,
+    merge them into one uncertain reading.
 
     """
 
@@ -457,24 +416,24 @@ def step02 (dba, parameters):
         UPDATE att u
         SET hs = REGEXP_REPLACE (hs, '{re_comm}', '')
         FROM (
-          SELECT hsnr, anfadr, endadr
+          SELECT hsnr, begadr, endadr
           FROM att
           WHERE hs ~ '{re_comm}'
-          GROUP BY hsnr, anfadr, endadr
+          GROUP BY hsnr, begadr, endadr
           HAVING count (*) = 1
         ) AS t
-        WHERE (u.hsnr, u.anfadr, u.endadr) = (t.hsnr, t.anfadr, t.endadr)
+        WHERE (u.hsnr, u.begadr, u.endadr) = (t.hsnr, t.begadr, t.endadr)
 
         """, parameters)
 
         # T1 and T2
         # Original hand wrote both readings.
-        # Group both T readings into one and set labez = 'zw'.
+        # Group both T readings into one uncertain reading.
         res = execute (conn, """
-        SELECT id, labez, labezsuf, CONCAT (hsnr, anfadr, endadr) AS k
+        SELECT id, labez, labezsuf, CONCAT (hsnr, begadr, endadr) AS k
         FROM att
-        WHERE (hsnr, anfadr, endadr) IN (
-          SELECT DISTINCT hsnr, anfadr, endadr
+        WHERE (hsnr, begadr, endadr) IN (
+          SELECT DISTINCT hsnr, begadr, endadr
           FROM att
           WHERE hs ~ '{re_comm}'
         )
@@ -499,14 +458,14 @@ def step02 (dba, parameters):
 
                 execute (conn, """
                 UPDATE att
-                SET labez = 'zw',
-                    labezsuf = '{labezsuf}',
+                SET labez = '{labez}',
+                    labezsuf = '',
                     hs = REGEXP_REPLACE (hs, '{re_comm}', '')
                 WHERE id = {id}
-                """, dict (parameters, id = ids[0], labezsuf = '/'.join (sorted (labez))))
+                """, dict (parameters, id = ids[0], labez = '/'.join (sorted (labez))))
 
 
-def step04 (dba, parameters):
+def delete_corrector_hands (dba, parameters):
     """Delete later hands
 
     Aus: prepare4cbgm_6.py
@@ -529,9 +488,9 @@ def step04 (dba, parameters):
             # Delete all other readings if there is a C* reading.
             execute (conn, """
             DELETE FROM {t}
-            WHERE (hsnr, anfadr, endadr) IN (
-              SELECT hsnr, anfadr, endadr FROM (
-                SELECT hsnr, anfadr, endadr
+            WHERE (hsnr, begadr, endadr) IN (
+              SELECT hsnr, begadr, endadr FROM (
+                SELECT hsnr, begadr, endadr
                 FROM {t}
                 WHERE hs ~ '{regexp}'
               ) AS tmp
@@ -551,7 +510,7 @@ def step04 (dba, parameters):
             """, dict (parameters, t = t))
 
 
-def step06 (dba, parameters):
+def process_sigla (dba, parameters):
     """Process Sigla
 
     Aus: prepare4cbgm_6b.py
@@ -573,17 +532,17 @@ def step06 (dba, parameters):
     with dba.engine.begin () as conn:
 
         fix (conn, "Duplicate readings", """
-        SELECT hs, hsnr, anfadr, endadr, labez, labezsuf, lesart FROM att
-        WHERE (hsnr, anfadr, endadr) IN (
-           SELECT hsnr, anfadr, endadr
+        SELECT hs, hsnr, begadr, endadr, labez, labezsuf, lesart FROM att
+        WHERE (hsnr, begadr, endadr) IN (
+           SELECT hsnr, begadr, endadr
            FROM att
-           GROUP BY hsnr, anfadr, endadr
+           GROUP BY hsnr, begadr, endadr
            HAVING count (*) > 1
         )
-        ORDER BY anfadr, endadr, hsnr, hs
+        ORDER BY begadr, endadr, hsnr, hs
         """, """
         DELETE FROM att
-        WHERE (hs, anfadr, endadr) = ('P74', 50124030, 50125002)
+        WHERE (hs, begadr, endadr) = ('P74', 50124030, 50125002)
         """, parameters)
 
         for t in ('att', 'lac'):
@@ -617,7 +576,7 @@ def step06 (dba, parameters):
         """, parameters)
 
 
-def step07 (dba, parameters):
+def unroll_zw (dba, parameters):
     """zw Lesarten
 
     Aus: prepare4cbgm_7.py
@@ -632,23 +591,23 @@ def step07 (dba, parameters):
 
     """
 
-    def unroll_labezsuf (m):
+    def unroll_labez (m):
         return '/'.join ([chr (n) for n in range (ord (m.group (1)), ord (m.group (2)) + 1)])
 
     with dba.engine.begin () as conn:
 
-        fields = 'hsnr hs anfadr endadr labez labezsuf labezorig labezsuforig certainty lemma lesart irange created'.split ()
+        fields = 'hsnr hs begadr endadr labez labezsuf labezorig labezsuforig certainty lemma lesart irange created'.split ()
         Zw = collections.namedtuple ('Zw', fields)
         res = execute (conn, """
         SELECT %s
         FROM att
-        WHERE labez = 'zw'""" % ', '.join (fields),
+        WHERE labez ~ '[-/]'""" % ', '.join (fields),
         parameters)
         zws = list (map (Zw._make, res))
 
         execute (conn, """
         DELETE FROM att
-        WHERE labez = 'zw'
+        WHERE labez ~ '[-/]'
         """, dict (parameters))
 
         updated = 0
@@ -659,9 +618,9 @@ def step07 (dba, parameters):
         for zw in zws:
             unique_labez = collections.defaultdict (list)
 
-            labezsuf = re.sub (r'(\w)-(\w)', unroll_labezsuf, zw.labezsuf)
+            labez = re.sub (r'([a-y])-([a-y])', unroll_labez, zw.labez)
 
-            for suf in labezsuf.split ('/'):
+            for suf in labez.split ('/'):
                 unique_labez[suf[0]].append (suf[1:].replace ('_', ''))
             options = len (unique_labez)
             if options > 0:
@@ -705,14 +664,14 @@ def delete_passages_without_variants (dba, parameters):
 
         execute (conn, """
         DELETE FROM att
-        WHERE (anfadr, endadr) IN (
-          SELECT anfadr, endadr
+        WHERE (begadr, endadr) IN (
+          SELECT begadr, endadr
           FROM (
-            SELECT DISTINCT anfadr, endadr, labez
+            SELECT DISTINCT begadr, endadr, labez
             FROM att
             WHERE labez !~ '^z' AND certainty = 1.0
           ) AS i
-          GROUP BY anfadr, endadr
+          GROUP BY begadr, endadr
           HAVING count (*) <= 1
         )
         """, parameters)
@@ -727,7 +686,7 @@ def copy_nestle_fdw (dbsrc3, dbdest, parameters):
         """, parameters)
 
         execute (dest, """
-        INSERT INTO nestle (anfadr, endadr, irange, lemma)
+        INSERT INTO nestle (begadr, endadr, irange, lemma)
         SELECT adr, adr, int4range (adr, adr + 1), content
         FROM original_nestle
         """, parameters)
@@ -791,54 +750,48 @@ def copy_genealogical_data (dbsrcvg, dbdest, parameters):
     with dbdest.engine.begin () as dest:
 
         if 'MYSQL_LOCSTEM_TABLES' in config:
-            concat_tables (dest, dbsrcvg_meta, 'tmp_locstemed', 'var_fdw', config['MYSQL_LOCSTEM_TABLES'])
+            concat_tables (dest, dbsrcvg_meta, 'original_locstemed', 'var_fdw', config['MYSQL_LOCSTEM_TABLES'])
+            copy_table (dest, 'original_locstemed', 'tmp_locstemed', "varid !~ '^z'");
+
             if (book == 'John'):
                 execute (dest, """
-                UPDATE tmp_locstemed SET varid = 'zw' WHERE varid ~ '[?(/)]';
+                DELETE FROM tmp_locstemed WHERE varid ~ '/';
                 ALTER TABLE tmp_locstemed ADD COLUMN varnew CHARACTER VARYING (10);
                 UPDATE tmp_locstemed SET varnew = varid;
                 """, parameters)
-            copy_table (dest, 'tmp_locstemed', 'original_locstemed');
 
         if 'MYSQL_RDG_TABLES' in config:
-            concat_tables (dest, dbsrcvg_meta, 'tmp_rdg',       'var_fdw', config['MYSQL_RDG_TABLES'])
-            copy_table (dest, 'tmp_rdg',       'original_rdg');
+            concat_tables (dest, dbsrcvg_meta, 'original_rdg',       'var_fdw', config['MYSQL_RDG_TABLES'])
+            copy_table (dest, 'original_rdg',       'tmp_rdg');
 
         if 'MYSQL_VAR_TABLES' in config:
-            concat_tables (dest, dbsrcvg_meta, 'tmp_var',       'var_fdw', config['MYSQL_VAR_TABLES'])
-            copy_table (dest, 'tmp_var',       'original_var');
+            concat_tables (dest, dbsrcvg_meta, 'original_var',       'var_fdw', config['MYSQL_VAR_TABLES'])
+            copy_table (dest, 'original_var',       'tmp_var', "varid !~ '^z'");
 
         if (book == 'Acts') and ('MYSQL_LOCSTEM_TABLES' in config) and ('MYSQL_VAR_TABLES' in config):
-            execute (dest, """
-            DELETE FROM tmp_var
-            WHERE begadr = 50516020 AND witn = 'L1188s' AND varnew = 'c'
-            """, parameters)
+            for table in ('tmp_locstemed', 'tmp_var'):
+                # fix 'cf' and 'df' in locstem and var
+                execute (dest, """
+                UPDATE {table}
+                SET varid = 'c', varnew = 'c'
+                WHERE varnew = 'cf';
+                UPDATE {table}
+                SET varid = 'd', varnew = 'd'
+                WHERE varnew = 'df';
+                """, dict (parameters, table = table))
 
-            execute (dest, """
-            DELETE FROM tmp_var
-            WHERE (begadr, endadr) = (52212026, 52212028) AND witn = '1838'
-            """, parameters)
+                # fix 'm' 'n' 'o' in locstem and var
+                execute (dest, """
+                DELETE FROM {table}
+                WHERE (begadr, endadr, varid) = (52621006, 52621010, 'n');
+                """, dict (parameters, table = table))
 
-            execute (dest, """
-            UPDATE tmp_locstemed
-            SET varid = 'zw', varnew = 'zw'
-            WHERE (begadr, endadr, varnew) = (50323002, 50323006, 'e')
-            """, parameters)
-
-            execute (dest, """
-            UPDATE tmp_var
-            SET varid = 'zw', varnew = 'zw'
-            WHERE (begadr, endadr, varnew) = (50323002, 50323006, 'e')
-            """, parameters)
-
-            execute (dest, """
-            UPDATE tmp_locstemed
-            SET varid = 'zw', varnew = 'zw'
-            WHERE (begadr, endadr, varid) = (50424028, 50424030, 'e');
-            UPDATE tmp_var
-            SET varid = 'zw', varnew = 'zw'
-            WHERE (begadr, endadr, varid) = (50424028, 50424030, 'e')
-            """, parameters)
+                for old, new in zip ('o p'.split (), 'n o'.split ()):
+                    execute (dest, """
+                    UPDATE {table}
+                    SET varid = :new, varnew = :new
+                    WHERE (begadr, endadr, varid) = (52621006, 52621010, :old);
+                    """, dict (parameters, old = old, new = new, table = table))
 
             execute (dest, """
             UPDATE tmp_locstemed
@@ -846,48 +799,45 @@ def copy_genealogical_data (dbsrcvg, dbdest, parameters):
             WHERE (begadr, endadr, varnew) = (51413002, 51413044, 'e')
             """, parameters)
 
+            # add missing 'd' in locstem
             execute (dest, """
             INSERT INTO tmp_locstemed (id, begadr, endadr, varid, varnew, s1, s2, prs1, prs2, "check")
             VALUES (0, 51313038, 51313038, 'd', 'd', '?', '', '', '', '');
             UPDATE tmp_var
             SET s1 = '?'
-            WHERE (begadr, endadr, varnew) = (51313038, 51313038, 'd')
+            WHERE (begadr, endadr, varnew) = (51313038, 51313038, 'd');
             """, parameters)
 
-            for old, new in zip ('n o p'.split (), 'm n o'.split ()):
-                execute (dest, """
-                UPDATE tmp_locstemed
-                SET varid = :new, varnew = :new
-                WHERE (begadr, endadr, varid) = (52621006, 52621010, :old);
-                UPDATE tmp_var
-                SET varid = :new, varnew = :new
-                WHERE (begadr, endadr, varid) = (52621006, 52621010, :old)
-                """, dict (parameters, old = old, new = new))
+            # duplicate rows
+            fix (dest, "Duplicates in LocStem", """
+            SELECT begadr, endadr, varnew
+            FROM tmp_locstemed
+            GROUP BY begadr, endadr, varnew
+            HAVING count (*) > 1
+            """, """
+            DELETE FROM tmp_locstemed
+            WHERE (begadr, endadr, varnew, s1) = (51702028, 51702030, 'c2', '?');
+            DELETE FROM tmp_locstemed
+            WHERE (begadr, endadr, varnew, s1) = (52830006, 52830014, 'd', '?')
+            """, parameters)
+
+            # duplicate rows
+            fix (dest, "Duplicates in VarGenAtt", """
+            SELECT begadr, endadr, witn
+            FROM tmp_var
+            GROUP BY witn, begadr, endadr
+            HAVING count (*) > 1
+            """, """
+            DELETE FROM tmp_var
+            WHERE (begadr, endadr) = (52212026, 52212028) AND witn = '1838'
+            """, parameters)
 
             execute (dest, """
-            DELETE FROM tmp_locstemed
-            WHERE (begadr, endadr, varnew, s1) = (52621006, 52621010, 'm', '?');
-            DELETE FROM tmp_var
-            WHERE (begadr, endadr, varnew, s1) = (52621006, 52621010, 'm', '?');
-            DELETE FROM tmp_locstemed
-            WHERE (begadr, endadr, varnew) = (50116013, 50116013, 'zv');
             DELETE FROM tmp_locstemed
             WHERE (begadr, endadr) = (52209026, 52209034);
             """, parameters)
 
             execute (dest, """
-            UPDATE tmp_var
-            SET varid = 'c', varnew = 'c'
-            WHERE varnew = 'cf';
-            UPDATE tmp_var
-            SET varid = 'd', varnew = 'd'
-            WHERE varnew = 'df';
-            UPDATE tmp_locstemed
-            SET varid = 'c', varnew = 'c'
-            WHERE varnew = 'cf';
-            UPDATE tmp_locstemed
-            SET varid = 'd', varnew = 'd'
-            WHERE varnew = 'df';
             UPDATE tmp_locstemed
             SET s1 = 'h1'
             WHERE begadr = 50247038 AND endadr = 50301004 AND s1 = 'h';
@@ -915,18 +865,16 @@ def copy_genealogical_data (dbsrcvg, dbdest, parameters):
             UPDATE tmp_var
             SET s1 = 'a1'
             WHERE begadr = 51314016 AND endadr = 51314022 AND witn = '2147';
+
             UPDATE tmp_var
-            SET varid = 'zw', varnew = 'zw', s1 = ''
-            WHERE begadr = 50926004 AND endadr = 50926008 AND witn = '424';
+            SET varid = 'a', varnew = 'a1', s1 = '*'
+            WHERE begadr = 51342020 AND endadr = 51342026 AND witn = '383';
             UPDATE tmp_var
             SET varid = 'b', varnew = 'b', s1 = 'a1'
             WHERE begadr = 51314016 AND endadr = 51314022 AND witn = '2718';
             UPDATE tmp_var
             SET varid = 'a', varnew = 'a2', s1 = '?'
-            WHERE begadr = 50405022 AND endadr = 50405034 AND witn = 'L156s'
-            """, parameters)
-
-            execute (dest, """
+            WHERE begadr = 50405022 AND endadr = 50405034 AND witn = 'L156s';
             UPDATE tmp_var
             SET varid = 'f', varnew = 'f', s1 = 'a'
             WHERE begadr = 51201014 and endadr = 51201022 AND witn = 'L1188';
@@ -938,25 +886,17 @@ def copy_genealogical_data (dbsrcvg, dbdest, parameters):
             WHERE begadr = 51324020 and endadr = 51324026 AND witn = 'L1188';
             UPDATE tmp_var
             SET varid = 'd', varnew = 'd', s1 = 'a'
-            WHERE begadr = 52207002 and endadr = 52207004 AND witn = 'L1188'
-            """, parameters)
-
-            execute (dest, """
-            UPDATE tmp_var
-            SET varid = 'a', varnew = 'a1', s1 = '*'
-            WHERE begadr = 51342020 AND endadr = 51342026 AND witn = '383'
-            """, parameters)
-
-            execute (dest, """
-            UPDATE tmp_var
-            SET varid = 'zz', varnew = 'zz', s1 = ''
-            WHERE begadr = 50111044 AND endadr = 50111044 AND witn = '321'
+            WHERE begadr = 52207002 and endadr = 52207004 AND witn = 'L1188';
             """, parameters)
 
         # memo
 
         if (book == 'Acts') and ('MYSQL_MEMO_TABLE' in config):
             copy_table_fdw (dest, 'var_fdw', 'Memo', config['MYSQL_MEMO_TABLE'])
+
+            execute (dest, """
+            ALTER TABLE memo RENAME COLUMN anfadr TO begadr;
+            """, parameters)
 
             execute (dest, """
             UPDATE memo
@@ -1022,13 +962,13 @@ def fill_passages_table (dba, parameters):
         # The Passages Table
 
         execute (conn, """
-        INSERT INTO passages (anfadr, endadr, irange, variant, bk_id)
-        SELECT anfadr, endadr, int4range (anfadr, endadr + 1),
+        INSERT INTO passages (begadr, endadr, irange, variant, bk_id)
+        SELECT begadr, endadr, int4range (begadr, endadr + 1),
                True, bk_id
         FROM att a
-        JOIN books b ON b.irange @> anfadr
-        GROUP BY anfadr, endadr, int4range (anfadr, endadr + 1), bk_id
-        ORDER BY anfadr, endadr DESC
+        JOIN books b ON b.irange @> begadr
+        GROUP BY begadr, endadr, int4range (begadr, endadr + 1), bk_id
+        ORDER BY begadr, endadr DESC
         """, parameters)
 
         # Mark Nested Passages
@@ -1037,11 +977,11 @@ def fill_passages_table (dba, parameters):
         UPDATE passages p
         SET spanned = EXISTS (
           SELECT irange FROM passages o
-          WHERE o.irange @> p.irange AND p.pass_id <> o.pass_id
+          WHERE o.irange @> p.irange AND p.pass_id != o.pass_id
         ),
         spanning = EXISTS (
           SELECT irange FROM passages i
-          WHERE i.irange <@ p.irange AND p.pass_id <> i.pass_id
+          WHERE i.irange <@ p.irange AND p.pass_id != i.pass_id
         )
         """, parameters)
 
@@ -1050,8 +990,14 @@ def fill_passages_table (dba, parameters):
         execute (conn, """
         UPDATE passages p
         SET fehlvers = True
-        WHERE {fehlverse}
+        WHERE p.spanned AND {fehlverse}
         """, dict (parameters, fehlverse = tools.FEHLVERSE))
+
+        execute (conn, """
+        UPDATE passages p
+        SET fehlvers = True
+        WHERE irange = '[51534013,51534014)';
+        """, parameters) # not spanned because inserted after the end
 
         # Insert remarks
 
@@ -1060,7 +1006,7 @@ def fill_passages_table (dba, parameters):
             UPDATE passages p
             SET remarks = m.remarks
             FROM memo m
-            WHERE (p.anfadr, p.endadr) = (m.anfadr, m.endadr)
+            WHERE (p.begadr, p.endadr) = (m.begadr, m.endadr)
             """, parameters)
 
 
@@ -1115,18 +1061,29 @@ def fill_readings_table (dba, parameters):
 
         execute (conn, """
         INSERT INTO readings (pass_id, labez, lesart)
-        SELECT p.pass_id, a.labez, a.lesart
-        FROM save_readings a
+        SELECT p.pass_id, a.labez, MODE () WITHIN GROUP (ORDER BY a.lesart) AS lesart
+        FROM att a
         JOIN passages p
-        ON (a.anfadr, a.endadr) = (p.anfadr, p.endadr)
+        USING (begadr, endadr)
+        WHERE certainty = 1.0
+        GROUP BY p.pass_id, a.labez
         """, parameters)
 
-        # Insert a 'zz' reading for every passage
+        if book == 'John':
+            execute (conn, """
+            UPDATE readings
+            SET lesart = 'om'
+            WHERE lesart = '' AND labez != 'zz';
+            """, parameters)
+
+        # We need to keep 'zz' readings for referential integrity, but we must
+        # set them to NULL.  'zz' readings in `att` may still contain a few
+        # readable characters, but those characters cannot be recorded here
+        # because what is recorded here is shared by all mss.
         execute (conn, """
-        INSERT INTO readings (pass_id, labez, lesart)
-        SELECT p.pass_id, 'zz', ''
-        FROM passages p
-        ON CONFLICT DO NOTHING
+        UPDATE readings
+        SET lesart = NULL
+        WHERE labez = 'zz';
         """, parameters)
 
         # Update lesart of 'zu' readings
@@ -1136,19 +1093,21 @@ def fill_readings_table (dba, parameters):
         WHERE labez = 'zu'
         """, parameters)
 
-        # Update lesart of 'zz' readings
+        # Insert a 'zz' reading for every passage
         execute (conn, """
-        UPDATE readings
-        SET lesart = ''
-        WHERE labez = 'zz'
+        INSERT INTO readings (pass_id, labez, lesart)
+        SELECT p.pass_id, 'zz', NULL
+        FROM passages p
+        ON CONFLICT DO NOTHING
         """, parameters)
 
-        # Delete 'zw' readings.  'zw' readings in the att table get unrolled
-        # into many uncertain non-'zw' readings, so they will never relate to
-        # 'zw' readings back here anyway.
+        # Insert a 'zu' reading for Fehlverse
         execute (conn, """
-        DELETE FROM readings
-        WHERE labez = 'zw'
+        INSERT INTO readings (pass_id, labez, lesart)
+        SELECT p.pass_id, 'zu', 'overlap'
+        FROM passages p
+        WHERE p.fehlvers
+        ON CONFLICT DO NOTHING
         """, parameters)
 
 
@@ -1160,26 +1119,33 @@ def fill_cliques_table (db, parameters):
         TRUNCATE cliques RESTART IDENTITY CASCADE
         """, parameters)
 
+        if book == 'John':
+            execute (conn, """
+            DELETE FROM tmp_locstemed l
+            WHERE NOT EXISTS (
+              SELECT * FROM readings_view r
+              WHERE (l.begadr, l.endadr, l.varid) = (r.begadr, r.endadr, r.labez)
+            )
+            """, parameters)
+
         fix (conn, "Readings in locstemed but not in readings", """
         SELECT l.begadr, l.endadr, l.varid
         FROM tmp_locstemed l
         LEFT JOIN readings_view r
-          ON (l.begadr, l.endadr, l.varid) = (r.anfadr, r.endadr, r.labez)
-        WHERE r.labez IS NULL AND l.varid != 'zw' AND NOT (l.varnew = 'a' AND l.s1 = '?')
+          ON (l.begadr, l.endadr, l.varid) = (r.begadr, r.endadr, r.labez)
+        WHERE r.labez IS NULL
         ORDER BY l.begadr, l.endadr, l.varid
         """, """
-        DELETE FROM tmp_locstemed l
-        WHERE NOT EXISTS (
-           SELECT * FROM readings_view r
-           WHERE (l.begadr, l.endadr, l.varid) = (r.anfadr, r.endadr, r.labez)
-        )
+        DELETE FROM tmp_locstemed
+        WHERE (begadr, endadr, varid) = (50323002, 50323006, 'e')
+           OR (begadr, endadr, varid) = (50424028, 50424030, 'e');
         """, parameters)
 
-        warn (conn, "Readings in apparatus but not in locstemed", """
-        SELECT r.anfadr, r.endadr, r.labez
-        FROM apparatus_view r
+        warn (conn, "Readings in readings but not in locstemed", """
+        SELECT r.begadr, r.endadr, r.labez
+        FROM readings_view r
         LEFT JOIN tmp_locstemed l
-          ON (r.anfadr, r.endadr, r.labez) = (l.begadr, l.endadr, l.varid)
+          ON (r.begadr, r.endadr, r.labez) = (l.begadr, l.endadr, l.varid)
         WHERE r.labez !~ '^z' AND l.varid IS NULL
         ORDER BY r.pass_id, r.labez
         """, parameters)
@@ -1197,20 +1163,13 @@ def fill_cliques_table (db, parameters):
         execute (conn, """
         INSERT INTO cliques (pass_id, labez, clique)
         SELECT p.pass_id, varnew2labez (varnew), varnew2clique (varnew)
-        FROM tmp_locstemed l, passages p
-        WHERE p.irange = int4range (l.begadr, l.endadr + 1)
-          AND varnew !~ '^z'
+        FROM tmp_locstemed l
+          JOIN passages p
+          USING (begadr, endadr)
+        WHERE varnew !~ '^z'
         GROUP BY p.pass_id, varnew2labez (varnew), varnew2clique (varnew)
         ON CONFLICT DO NOTHING
         """, parameters)
-
-        if 'MYSQL_VAR_TABLES' in config:
-            warn (conn, "Duplicates in VarGenAtt", """
-            SELECT begadr, endadr, witn
-            FROM tmp_var
-            GROUP BY witn, begadr, endadr
-            HAVING count (*) > 1
-            """, parameters)
 
 
 def fill_apparatus_table (dba, parameters):
@@ -1232,15 +1191,35 @@ def fill_apparatus_table (dba, parameters):
 
         log (logging.INFO, "          Filling default readings of 'A' ...")
 
+        # fix (conn, "Attestation of A != 'a'", """
+        # SELECT hs, labez, labezsuf, begadr, endadr
+        # FROM att
+        # WHERE hs = 'A' AND labez ~ '^[b-y]'
+        # """, """
+        # UPDATE att
+        # SET labez = 'a', labezsuf = ''
+        # WHERE (hs, begadr, endadr, labez) = ('A', 50240012, 50240018, 'f')
+        # """, parameters)
+        #
+        # execute (conn, """
+        # INSERT INTO apparatus (ms_id, pass_id, labez, labezsuf, cbgm, certainty, lesart, origin)
+        # SELECT ms.ms_id, p.pass_id, a.labez, COALESCE (a.labezsuf, ''), true, 1.0, NULLIF (a.lesart, r.lesart), 'DEF'
+        # FROM passages p
+        #   CROSS JOIN manuscripts ms
+        #   JOIN att a ON p.irange = a.irange AND a.hsnr = 0
+        #   JOIN readings r ON r.pass_id = p.pass_id AND r.labez = a.labez
+        # """, parameters)
+
+        # Instead of using the manuscript 'A' contained in the input database
+        # (which only reads 'a' and 'zu' anyway) we set 'a' everywhere except in
+        # the 'Fehlverse' where we set 'zu'.
+
         execute (conn, """
-        INSERT INTO apparatus (ms_id, pass_id, labez, cbgm, labezsuf, certainty, lesart, origin)
-        SELECT ms.ms_id, p.pass_id, a.labez, true, COALESCE (a.labezsuf, ''), 1.0, NULLIF (a.lesart, r.lesart), 'DEF'
+        INSERT INTO apparatus (ms_id, pass_id, labez, labezsuf, cbgm, certainty, lesart, origin)
+        SELECT ms.ms_id, p.pass_id, CASE WHEN p.fehlvers THEN 'zu' ELSE 'a' END, '', true, 1.0, NULL, 'DEF'
         FROM passages p
           CROSS JOIN manuscripts ms
-          JOIN att a ON p.irange = a.irange AND a.hsnr = 0
-          JOIN readings r ON r.pass_id = p.pass_id AND r.labez = a.labez
         """, parameters)
-
 
     with dba.engine.begin () as conn:
 
@@ -1315,39 +1294,27 @@ def fill_apparatus_table (dba, parameters):
             log (logging.INFO, "          Doing sanity checks ...")
 
             fix (conn, "Readings in tmp_var != Apparatus", """
-            SELECT a.pass_id, a.anfadr, a.endadr, a.ms_id, a.hs, a.hsnr, a.labez, v.varid, v.varnew
+            SELECT a.pass_id, a.begadr, a.endadr, a.ms_id, a.hs, a.hsnr, a.labez, v.varid, v.varnew
             FROM tmp_var v
             JOIN apparatus_view a
-              ON int4range (v.begadr, v.endadr + 1) = a.irange AND v.ms = a.hsnr
+              ON (v.begadr, v.endadr, v.ms) = (a.begadr, a.endadr, a.hsnr)
             WHERE v.varid != a.labez AND v.varid !~ '^z' AND a.cbgm
-            ORDER BY a.anfadr, a.endadr, a.hsnr, a.labez;
+            ORDER BY a.begadr, a.endadr, a.hsnr, a.labez;
             """, """
             UPDATE tmp_var v
             SET varid = 'zu', varnew = 'zu'
             FROM apparatus_view a
-            WHERE (v.begadr, v.endadr, v.ms, 'zu') = (a.anfadr, a.endadr, a.hsnr, a.labez);
+            WHERE (v.begadr, v.endadr, v.ms, 'zu') = (a.begadr, a.endadr, a.hsnr, a.labez);
             UPDATE tmp_var v
             SET varid = 'a', varnew = 'a1'
             FROM apparatus_view a
-            WHERE (v.begadr, v.endadr, v.ms) = (a.anfadr, a.endadr, a.hsnr)
-              AND (a.anfadr, a.endadr, a.labez, v.varid) = (51122038, 51122040, 'a', 'b');
-            """, parameters)
-
-            log (logging.INFO, "          Doing sanity checks ...")
-
-            fix (conn, "Original reading uncertain but A doesn't read zz", """
-            SELECT a.pass_id, a.anfadr, a.endadr, a.ms_id, a.hs, a.hsnr, a.labez, l.varid, l.varnew, l.s1
-            FROM apparatus_view a, tmp_locstemed l
-            WHERE (a.anfadr, a.endadr) = (l.begadr, l.endadr)
-              AND l.varnew = 'a' AND l.s1 = '?'
-              AND a.ms_id = 1 and a.labez != 'zz'
-            """, """
-            UPDATE apparatus a
-            SET labez = 'zz', cbgm = true, certainty = 1.0, origin = 'LOC'
-            FROM passages p, tmp_locstemed l
-            WHERE a.pass_id = p.pass_id AND (p.anfadr, p.endadr) = (l.begadr, l.endadr)
-              AND l.varnew = 'a' AND l.s1 = '?'
-              AND a.ms_id = 1 and a.labez != 'zz'
+            WHERE (v.begadr, v.endadr, v.ms) = (a.begadr, a.endadr, a.hsnr)
+              AND (a.begadr, a.endadr, a.labez, v.varid) = (51122038, 51122040, 'a', 'b');
+            UPDATE tmp_var v
+            SET varid = 'd', varnew = 'd1'
+            FROM apparatus_view a
+            WHERE (v.begadr, v.endadr, v.ms) = (a.begadr, a.endadr, a.hsnr)
+              AND (a.begadr, a.endadr, a.labez, v.varid) = (50405022, 50405034, 'd', 'a');
             """, parameters)
 
         with dba.engine.begin () as conn:
@@ -1413,11 +1380,115 @@ def fill_apparatus_table (dba, parameters):
             """, parameters)
 
 
+def fill_locstem_table (db, parameters):
+
+    with db.engine.begin () as conn:
+
+        execute (conn, """
+        TRUNCATE locstem RESTART IDENTITY CASCADE;
+        TRUNCATE locstem_tts RESTART IDENTITY CASCADE;
+        """, parameters)
+
+        fix (conn, "Sources in LocStemEd but not in Cliques", """
+        SELECT begadr, endadr, varnew, s1
+        FROM tmp_locstemed l
+        WHERE s1 NOT IN ('*', '?')
+          AND l.varnew !~ '^z'
+          AND NOT EXISTS (
+            SELECT 1 FROM cliques_view q
+            WHERE (q.begadr, q.endadr, q.labez, q.clique) = (l.begadr, l.endadr, source2labez (l.s1), source2clique (l.s1))
+          )
+        """, """
+        DELETE FROM tmp_locstemed l
+        WHERE l.s1 NOT IN ('*', '?')
+          AND NOT EXISTS (
+            SELECT 1 FROM cliques_view q
+            WHERE (q.begadr, q.endadr, q.labez, q.clique) = (l.begadr, l.endadr, source2labez (l.s1), source2clique (l.s1))
+        )
+        """, parameters)
+
+        # check generated locstem
+        fix (conn, "Source loops in locstem", """
+        SELECT begadr, endadr, varid, varnew, s1
+        FROM tmp_locstemed
+        WHERE varnew = s1
+        """, """
+        DELETE FROM tmp_locstemed
+        WHERE varnew = s1
+        """, parameters)
+
+        # copy cliques into locstem and get source readings from tmp_locstemed
+        # s1 = '*'   =>   s1 = NULL AND original = True
+        # s1 = '?'   =>   s1 = NULL AND original = False
+
+        execute (conn, """
+        INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original)
+        SELECT c.pass_id, c.labez, c.clique, source2labez (l.s1), source2clique (l.s1), source2original (l.s1)
+        FROM cliques_view c
+        LEFT JOIN tmp_locstemed l
+          ON (c.begadr, c.endadr) = (l.begadr, l.endadr)
+            AND c.labez  = varnew2labez (l.varnew)
+            AND c.clique = varnew2clique (l.varnew)
+            AND l.varnew !~ '^z'
+        ON CONFLICT DO NOTHING
+        """, parameters)
+
+
+def build_A_text (dba, parameters):
+    """Build the 'A' text
+
+    The editors' reconstruction of the archetype is recorded in the locstem
+    table. This functions generates a virtual manuscript 'A' from those choices.
+
+    The designation as 'Fehlvers' can be seen as (and actually is) an editorial
+    decision that the verse is not original, so we can tranquilly set 'zu'.
+
+    If the editors came to no decision, no 'original' reading will be found in
+    locstem.  In this case we set 'zz' to signify that there is a gap in the
+    reconstructed text.
+
+    The 'A' manuscript has a hard-coded ms_id of 1.
+
+    """
+
+    with dba.engine.begin () as conn:
+
+        execute (conn, """
+        DELETE FROM apparatus WHERE ms_id = 1
+        """, parameters)
+
+        # Fill with the 'original' reading in locstem
+        execute (conn, """
+        INSERT INTO apparatus (ms_id, pass_id, labez, clique, cbgm, origin)
+          SELECT 1, pass_id, labez, clique, true, 'LOC'
+          FROM locstem l
+          JOIN passages p USING (pass_id)
+          WHERE l.original AND NOT p.fehlvers
+        """, parameters)
+
+        # Fill with labez 'zu' if Fehlvers
+        execute (conn, """
+        INSERT INTO apparatus (ms_id, pass_id, labez, cbgm, origin)
+        SELECT 1, p.pass_id, 'zu', true, 'LOC'
+        FROM passages p
+        WHERE p.fehlvers
+        ON CONFLICT DO NOTHING
+        """, parameters)
+
+        # Fill with labez 'zz' where A is still undefined
+        execute (conn, """
+        INSERT INTO apparatus (ms_id, pass_id, labez, lesart, cbgm, origin)
+        SELECT 1, p.pass_id, 'zz', NULL, true, 'LOC'
+        FROM passages p
+        ON CONFLICT DO NOTHING
+        """, parameters)
+
+
 def build_byzantine_text (dba, parameters):
     """Reconstruct the Majority Text
 
     Build a virtual manuscript that reconstructs the :ref:`Majority Text <mt>`.
-    The MT manuscripts has a hard-coded ms_id of 2.
+    The 'MT' manuscript has a hard-coded ms_id of 2.
 
     .. _mt_rules:
 
@@ -1465,90 +1536,10 @@ def build_byzantine_text (dba, parameters):
 
         # Fill with labez 'zz' where MT is undefined
         execute (conn, """
-        INSERT INTO apparatus (ms_id, pass_id, labez, cbgm, origin)
-        SELECT 2, p.pass_id, 'zz', true, 'BYZ'
+        INSERT INTO apparatus (ms_id, pass_id, labez, lesart, cbgm, origin)
+        SELECT 2, p.pass_id, 'zz', NULL, true, 'BYZ'
         FROM passages p
         ON CONFLICT DO NOTHING
-        """, parameters)
-
-
-def fill_locstem_table (db, parameters):
-
-    with db.engine.begin () as conn:
-
-        execute (conn, """
-        TRUNCATE locstem RESTART IDENTITY CASCADE;
-        TRUNCATE locstem_tts RESTART IDENTITY CASCADE;
-        """, parameters)
-
-        fix (conn, "Duplicates in LocStem", """
-        SELECT begadr, endadr, varnew
-        FROM tmp_locstemed
-        GROUP BY begadr, endadr, varnew
-        HAVING count (*) > 1
-        """, """
-        DELETE FROM tmp_locstemed
-        WHERE (begadr, endadr, varnew, s1) = (51702028, 51702030, 'c2', '?');
-        DELETE FROM tmp_locstemed
-        WHERE (begadr, endadr, varnew, s1) = (52830006, 52830014, 'd', '?')
-        """, parameters)
-
-        fix (conn, "Sources in LocStemEd but not in Cliques", """
-        SELECT begadr, endadr, varnew, s1
-        FROM tmp_locstemed l
-        WHERE s1 NOT IN ('*', '?')
-          AND l.varnew !~ '^z'
-          AND NOT EXISTS (
-            SELECT 1 FROM cliques_view q
-            WHERE (q.anfadr, q.endadr, q.labez, q.clique) = (l.begadr, l.endadr, source2labez (l.s1), source2clique (l.s1))
-          )
-        """, """
-        DELETE FROM tmp_locstemed l
-        WHERE l.s1 NOT IN ('*', '?')
-          AND NOT EXISTS (
-            SELECT 1 FROM cliques_view q
-            WHERE (q.anfadr, q.endadr, q.labez, q.clique) = (l.begadr, l.endadr, source2labez (l.s1), source2clique (l.s1))
-        )
-        """, parameters)
-
-        # copy cliques into locstem and get source readings from tmp_locstemed
-        # s1 = '*'   =>   s1 = NULL AND original = True
-        # s1 = '?'   =>   s1 = NULL AND original = False
-
-        execute (conn, """
-        INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original)
-        SELECT c.pass_id, c.labez, c.clique, source2labez (l.s1), source2clique (l.s1), source2original (l.s1)
-        FROM cliques c
-        JOIN passages p USING (pass_id)
-        LEFT JOIN tmp_locstemed l
-          ON (p.anfadr, p.endadr) = (l.begadr, l.endadr)
-            AND c.labez  = varnew2labez (l.varnew)
-            AND c.clique = varnew2clique (l.varnew)
-            AND l.varnew !~ '^z'
-        ON CONFLICT DO NOTHING
-        """, parameters)
-
-        # execute (conn, """
-        # UPDATE locstem u
-        # SET source_labez  = source2labez (l.s1),
-        #     source_clique = source2clique (l.s1),
-        #     original      = source2original (l.s1)
-        # FROM tmp_locstemed l, passages p
-        # WHERE u.pass_id = p.pass_id AND
-        #       u.labez   = varnew2labez (l.varnew)  AND
-        #       u.clique  = varnew2clique (l.varnew) AND
-        #       (p.anfadr, p.endadr) = (l.begadr, l.endadr) AND
-        #       l.varnew !~ '^z'
-        # """, parameters)
-
-        # check generated locstem
-        fix (conn, "Self-references in locstem", """
-        SELECT pass_id, anfadr, endadr, labez, clique, source_labez, source_clique
-        FROM locstem_view
-        WHERE labez = source_labez AND clique = source_clique
-        """, """
-        DELETE FROM locstem
-        WHERE labez = source_labez AND clique = source_clique
         """, parameters)
 
 
@@ -1568,9 +1559,9 @@ def create_labez_matrix (dba, parameters, val):
 
         # get passages
         res = execute (conn, """
-        SELECT anfadr, endadr
+        SELECT begadr, endadr
         FROM passages
-        ORDER BY anfadr, endadr DESC
+        ORDER BY begadr, endadr DESC
         """, parameters)
 
         res = list (res)
@@ -1739,12 +1730,12 @@ def calculate_mss_similarity_postco (dba, parameters, val):
         # Load all passages into memory
 
         res = execute (conn, """
-        SELECT pass_id, anfadr, endadr FROM passages
+        SELECT pass_id, begadr, endadr FROM passages
         ORDER BY pass_id
         """, parameters)
 
         stemmas = dict ()
-        for pass_id, anfadr, endadr in res.fetchall ():
+        for pass_id, begadr, endadr in res.fetchall ():
             G = db_tools.local_stemma_to_nx (conn, pass_id)
 
             G.add_node ('root', label = 'root')
@@ -1755,11 +1746,11 @@ def calculate_mss_similarity_postco (dba, parameters, val):
             if not nx.is_weakly_connected (G):
                 # use it anyway
                 log (logging.WARNING, "Local Stemma @ %s-%s is not connected (pass_id=%s)." %
-                     (anfadr, endadr, pass_id))
+                     (begadr, endadr, pass_id))
             if not nx.is_directed_acyclic_graph (G):
                 # don't use these
                 log (logging.ERROR, "Local Stemma @ %s-%s is not a directed acyclic graph (pass_id=%s)." %
-                     (anfadr, endadr, pass_id))
+                     (begadr, endadr, pass_id))
                 continue
 
             G.remove_node ('root')
@@ -1979,7 +1970,7 @@ def print_stats (dba, parameters):
         hs = res.scalar ()
         log (logging.INFO, "hs       = {cnt}".format (cnt = hs))
 
-        res = execute (conn, "SELECT count (*) FROM (SELECT DISTINCT anfadr, endadr FROM att) AS sq", parameters)
+        res = execute (conn, "SELECT count (*) FROM (SELECT DISTINCT begadr, endadr FROM att) AS sq", parameters)
         passages = res.scalar ()
         log (logging.INFO, "passages = {cnt}".format (cnt = passages))
 
@@ -2053,7 +2044,7 @@ if __name__ == '__main__':
         parameters['re_lekt']  = 'L[1-9]'   # lectionaries
         parameters['re_comm']  = 'T[1-9]'   # commentaries
         parameters['re_vid']   = 'V'        # videtur (visual guesswork)
-        parameters['re_labez'] = '^([a-y]|z[u-z])$'
+        parameters['re_labez'] = '^([-a-y1-9/_]+|z[u-z])$'
     if book == 'John':
         parameters['re_hs']    = '^(A|MT|([P0F]?[1-9][0-9]*|FΠ)(S[*]?)?)'
         parameters['re_supp']  = 'S[*]?'
@@ -2061,7 +2052,7 @@ if __name__ == '__main__':
         parameters['re_lekt']  = 'L[1-9]' # not used
         parameters['re_comm']  = 'T[1-9]' # not used
         parameters['re_vid']   = 'V'      # not used
-        parameters['re_labez'] = '^([a-y]|z[wz])$'
+        parameters['re_labez'] = '^([a-y]f?(/[a-y]f?)*|z[wz])$'
 
     logging.getLogger ().setLevel (args.log_level)
     formatter = logging.Formatter (fmt = '%(relativeCreated)d - %(levelname)s - %(message)s')
@@ -2094,27 +2085,29 @@ if __name__ == '__main__':
             if step == 1:
                 log (logging.INFO, "Step  1 : Creating tables ...")
 
-                db.Base.metadata.drop_all (dbdest.engine)
+                db.Base.metadata.drop_all  (dbdest.engine)
+                db.Base2.metadata.drop_all (dbdest.engine)
+                db.Base4.metadata.drop_all (dbdest.engine)
+
                 db.Base.metadata.create_all (dbdest.engine)
 
                 step01  (dbdest, dbsrc1, parameters)
                 continue
             if step == 2:
                 log (logging.INFO, "Step  2: Processing Commentaries ...")
-                save_readings (dbdest, parameters)
-                step02 (dbdest, parameters)
+                process_commentaries (dbdest, parameters)
                 continue
             if step == 4:
                 log (logging.INFO, "Step  4 : Delete corrector hands ...")
-                step04 (dbdest, parameters)
+                delete_corrector_hands (dbdest, parameters)
                 continue
             if step == 6:
                 log (logging.INFO, "Step  6 : Remove suffixes from sigla ...")
-                step06 (dbdest, parameters)
+                process_sigla (dbdest, parameters)
                 continue
             if step == 7:
                 log (logging.INFO, "Step  7 : Unroll 'zw' ...")
-                step07 (dbdest, parameters)
+                unroll_zw (dbdest, parameters)
                 continue
             if step == 8:
                 log (logging.INFO, "Step  8 : Deleting passages without variants ...")
@@ -2155,18 +2148,27 @@ if __name__ == '__main__':
                 continue
 
             if step == 33:
-                log (logging.INFO, "Step 33 : Filling the Apparatus table with a positive apparatus ...")
-                fill_apparatus_table (dbdest, parameters)
-
-                log (logging.INFO, "          Building Byzantine text ...")
-                build_byzantine_text (dbdest, parameters)
-
-                log (logging.INFO, "          Filling the LocStem table ...")
+                log (logging.INFO, "Step 33 : Filling the LocStem table ...")
                 fill_locstem_table (dbdest, parameters)
                 continue
 
-            if step == 37:
-                log (logging.INFO, "Step 37 : Creating the labez matrix ...")
+            if step == 34:
+                log (logging.INFO, "Step 34 : Filling the Apparatus table with a positive apparatus ...")
+                fill_apparatus_table (dbdest, parameters)
+                continue
+
+            if step == 41:
+                log (logging.INFO, "Step 41 : Building the Byzantine text ...")
+                build_byzantine_text (dbdest, parameters)
+                continue
+
+            if step == 42:
+                log (logging.INFO, "Step 42 : Building the 'A' text ...")
+                build_A_text (dbdest, parameters)
+                continue;
+
+            if step == 43:
+                log (logging.INFO, "Step 43 : Creating the labez matrix ...")
                 create_labez_matrix (dbdest, parameters, v)
 
                 log (logging.INFO, "          Calculating mss similarity pre-co ...")

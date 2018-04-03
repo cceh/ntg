@@ -142,13 +142,15 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-db-work-database"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Work Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#transaction-time-state-tables">Transaction-Time State Tables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="database.html#module-ntg_common.db">Tables</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="database.html#id1">Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="database.html#id2">Tables</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#literature">Literature</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
@@ -310,10 +312,18 @@ into tables suitable for doing CBGM:</p>
 <dd><p>Fields to look for data entry error NULL, and change it into ‘’</p>
 </dd></dl>
 
-<dl class="data">
-<dt id="scripts.cceh.prepare4cbgm.NULL_N_FIELDS">
-<code class="descname">NULL_N_FIELDS</code><em class="property"> = ['base', 'comp', 'comp1', 'komm', 'kontrolle', 'korr', 'lekt', 'over', 'over1', 'suff', 'suffix2', 'vid', 'vl']</em><a class="headerlink" href="#scripts.cceh.prepare4cbgm.NULL_N_FIELDS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fields to look for data entry error ‘N’ and NULL, and change them into ‘’</p>
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.build_A_text">
+<code class="descname">build_A_text</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.build_A_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the ‘A’ text</p>
+<p>The editors’ reconstruction of the archetype is recorded in the locstem
+table. This functions generates a virtual manuscript ‘A’ from those choices.</p>
+<p>The designation as ‘Fehlvers’ can be seen as (and actually is) an editorial
+decision that the verse is not original, so we can tranquilly set ‘zu’.</p>
+<p>If the editors came to no decision, no ‘original’ reading will be found in
+locstem.  In this case we set ‘zz’ to signify that there is a gap in the
+reconstructed text.</p>
+<p>The ‘A’ manuscript has a hard-coded ms_id of 1.</p>
 </dd></dl>
 
 <dl class="function">
@@ -321,7 +331,7 @@ into tables suitable for doing CBGM:</p>
 <code class="descname">build_byzantine_text</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.build_byzantine_text" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reconstruct the Majority Text</p>
 <p>Build a virtual manuscript that reconstructs the <a class="reference internal" href="developer.html#mt"><span class="std std-ref">Majority Text</span></a>.
-The MT manuscripts has a hard-coded ms_id of 2.</p>
+The ‘MT’ manuscript has a hard-coded ms_id of 2.</p>
 <p id="mt-rules">Im Laufe der Textgeschichte hat sich eine Textform durchgesetzt, der
 sogenannte Mehrheitstext, der auch Byzantinischer Text genannt wird.
 Diese Textform wird exemplarisch durch die sieben Handschriften 1, 18,
@@ -398,7 +408,7 @@ no passages in att that are not in locstemed also.</p>
 
 <dl class="function">
 <dt id="scripts.cceh.prepare4cbgm.copy_table">
-<code class="descname">copy_table</code><span class="sig-paren">(</span><em>conn</em>, <em>source_table</em>, <em>dest_table</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.copy_table" title="Permalink to this definition">¶</a></dt>
+<code class="descname">copy_table</code><span class="sig-paren">(</span><em>conn</em>, <em>source_table</em>, <em>dest_table</em>, <em>where=''</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.copy_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a copy of a table.</p>
 </dd></dl>
 
@@ -434,6 +444,23 @@ no passages in att that are not in locstemed also.</p>
 <dd><p>Create the labez matrix.</p>
 <p>Create a matrix of manuscripts x passages.  Each entry represents one
 reading: 0 = lacuna, 1 = ‘a’, 2 = ‘b’, …</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.delete_corrector_hands">
+<code class="descname">delete_corrector_hands</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.delete_corrector_hands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete later hands</p>
+<p>Aus: prepare4cbgm_6.py</p>
+<blockquote>
+<div><p>Lesarten löschen, die nicht von der ersten Hand stammen.  Bei mehreren
+Lektionslesarten gilt die L1-Lesart.  Ausnahme: Bei Selbstkorrekturen
+wird die <em>-Lesart gelöscht und die C</em>-Lesart beibehalten.</p>
+<p>Erweiterung vom 15.02.2013: Wenn die einzige Variante an einer Stelle
+nur von einem oder mehreren Korrektoren bezeugt ist (z.B. 26:8/17),
+gehört die Stelle nicht in die Tabelle.  Es muss also noch eine Prüfung
+stattfinden, ob nach diesem Vorgang eine Stelle noch immer eine
+variierte Stelle ist. Wenn nicht, kann der Datensatz gelöscht werden.</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="function">
@@ -483,48 +510,8 @@ ausschließlich ‘z[u-z]’ Lesearten ebenso.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.cceh.prepare4cbgm.step01">
-<code class="descname">step01</code><span class="sig-paren">(</span><em>dba</em>, <em>dbb</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step01" title="Permalink to this definition">¶</a></dt>
-<dd><p>Copy tables to new database</p>
-<p>Copy the (28 * 2) mysql tables to 2 tables in a new postgres database.  Do
-<em>not</em> copy versions and patristic manuscripts.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="scripts.cceh.prepare4cbgm.step01b">
-<code class="descname">step01b</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step01b" title="Permalink to this definition">¶</a></dt>
-<dd><p>Delete Versions</p>
-<p>No need to delete translations because we didn’t copy them in the first
-place.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="scripts.cceh.prepare4cbgm.step01c">
-<code class="descname">step01c</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step01c" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fix data entry errors.</p>
-<p>Fix a bogus hsnr.</p>
-<p>These errors should be fixed in the original database.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="scripts.cceh.prepare4cbgm.step02">
-<code class="descname">step02</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step02" title="Permalink to this definition">¶</a></dt>
-<dd><p>Data cleanup</p>
-<p>Delete spurious carriage return characters in suffix2 field.  Replace NULL
-entries with empty strings.</p>
-<blockquote>
-<div><p>Korrekturen in den Acts-Tabellen: L-Notierungen nur im Feld LEKT, *-
-u. C-Notierungen nur im Feld KORR.</p>
-<p>Gelegentlich steht an Stellen, an denen mehrere Lektionen desselben
-Lektionars zu verzeichnen sind, in KORR ein überflüssiges ‘L’ ohne
-Nummer.  Es kommt auch vor, dass L1 und L2 in KORR stehen oder
-C-Notierungen in LEKT.</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="function">
-<dt id="scripts.cceh.prepare4cbgm.step05">
-<code class="descname">step05</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step05" title="Permalink to this definition">¶</a></dt>
+<dt id="scripts.cceh.prepare4cbgm.process_commentaries">
+<code class="descname">process_commentaries</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.process_commentaries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process differing readings in commentaries (T1, T2)</p>
 <p>Aus: prepare4cbgm_5b.py</p>
 <blockquote>
@@ -540,30 +527,13 @@ witness will be treated as normal witness. The T notation can be
 deleted.</p>
 </div></blockquote>
 <p>DIVINATIO: If there is only one T1 or T2 reading for that passage and
-manuscript, unset the ‘T’ suffix.  If there are both T1 and T2 readings, merge
-them into one ‘zw’ reading.</p>
+manuscript, unset the ‘T’ suffix.  If there are both T1 and T2 readings,
+merge them into one uncertain reading.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.cceh.prepare4cbgm.step06">
-<code class="descname">step06</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step06" title="Permalink to this definition">¶</a></dt>
-<dd><p>Delete later hands</p>
-<p>Aus: prepare4cbgm_6.py</p>
-<blockquote>
-<div><p>Lesarten löschen, die nicht von der ersten Hand stammen.  Bei mehreren
-Lektionslesarten gilt die L1-Lesart.  Ausnahme: Bei Selbstkorrekturen
-wird die <em>-Lesart gelöscht und die C</em>-Lesart beibehalten.</p>
-<p>Erweiterung vom 15.02.2013: Wenn die einzige Variante an einer Stelle
-nur von einem oder mehreren Korrektoren bezeugt ist (z.B. 26:8/17),
-gehört die Stelle nicht in die Tabelle.  Es muss also noch eine Prüfung
-stattfinden, ob nach diesem Vorgang eine Stelle noch immer eine
-variierte Stelle ist. Wenn nicht, kann der Datensatz gelöscht werden.</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="function">
-<dt id="scripts.cceh.prepare4cbgm.step06b">
-<code class="descname">step06b</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step06b" title="Permalink to this definition">¶</a></dt>
+<dt id="scripts.cceh.prepare4cbgm.process_sigla">
+<code class="descname">process_sigla</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.process_sigla" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process Sigla</p>
 <p>Aus: prepare4cbgm_6b.py</p>
 <blockquote>
@@ -581,8 +551,16 @@ und ‘C*’.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.cceh.prepare4cbgm.step07">
-<code class="descname">step07</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step07" title="Permalink to this definition">¶</a></dt>
+<dt id="scripts.cceh.prepare4cbgm.step01">
+<code class="descname">step01</code><span class="sig-paren">(</span><em>dba</em>, <em>dbs</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step01" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy tables to new database</p>
+<p>Copy the (28 * 2) mysql tables to 2 tables in a new postgres database.  Do
+<em>not</em> copy versions and patristic manuscripts.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.unroll_zw">
+<code class="descname">unroll_zw</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.unroll_zw" title="Permalink to this definition">¶</a></dt>
 <dd><p>zw Lesarten</p>
 <p>Aus: prepare4cbgm_7.py</p>
 <blockquote>
