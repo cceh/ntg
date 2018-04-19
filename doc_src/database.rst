@@ -26,6 +26,20 @@ The database system is PostgreSQL.
    { rank=same; locstem, apparatus, affinity }
 
 
+Transform the negative apparatus into a positive apparatus
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Set all passages in all manuscripts to the reading 'a'.
+
+2. Overwrite all Fehlverse in all manuscripts with the reading 'zu'.
+
+3. Unroll the lacuna table. Overwrite with 'zz' every passage that is inside a
+   lacuna.
+
+4. Overwrite everything with the reading from the negative apparatus, if there
+   is one.
+
+
 .. _tt:
 
 Transaction-Time State Tables

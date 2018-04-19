@@ -141,14 +141,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-db-work-database"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Work Database</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="database.html#transaction-time-state-tables">Transaction-Time State Tables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="database.html#module-ntg_common.db">Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="database.html#transform-the-negative-apparatus-into-a-positive-apparatus">Transform the negative apparatus into a positive apparatus</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="database.html#id2">Tables</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="database.html#literature">Literature</a></li>
 </ul>
 </li>
@@ -340,7 +336,7 @@
 </li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.build_A_text">build_A_text() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.build_byzantine_text">build_byzantine_text() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.build_MT_text">build_MT_text() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.BYZ_HSNR">BYZ_HSNR (in module ntg_common.tools)</a>
 </li>
@@ -374,10 +370,10 @@
 </li>
       <li><a href="database.html#ntg_common.db.Att.comp">comp (Att attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appclient.html#module-comparison">comparison (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appserver.html#server.server.comparison_detail">comparison_detail() (in module server.server)</a>
 </li>
       <li><a href="appserver.html#server.server.comparison_detail_csv">comparison_detail_csv() (in module server.server)</a>
@@ -392,7 +388,9 @@
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.config_from_pyfile">config_from_pyfile() (in module ntg_common.tools)</a>
 </li>
-      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.copy_genealogical_data">copy_genealogical_data() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.copy_att_fdw">copy_att_fdw() (in module scripts.cceh.prepare4cbgm)</a>
+</li>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.copy_genealogical_fdw">copy_genealogical_fdw() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.copy_table">copy_table() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
@@ -832,10 +830,10 @@
 </li>
       <li><a href="appserver.html#module-server.security">server.security (module)</a>
 </li>
-      <li><a href="appserver.html#module-server.server">server.server (module)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="appserver.html#module-server.server">server.server (module)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Books.siglum">siglum (Books attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Passages.spanned">spanned (Passages attribute)</a>
@@ -845,8 +843,6 @@
       <li><a href="appserver.html#server.server.stemma">stemma() (in module server.server)</a>
 </li>
       <li><a href="appserver.html#server.editor.stemma_edit">stemma_edit() (in module server.editor)</a>
-</li>
-      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.step01">step01() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Att.suffix">suffix (Att attribute)</a>
 </li>

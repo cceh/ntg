@@ -142,14 +142,10 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Database Structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#ntg-common-db-work-database"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Work Database</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#transaction-time-state-tables">Transaction-Time State Tables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ntg_common.db">Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transform-the-negative-apparatus-into-a-positive-apparatus">Transform the negative apparatus into a positive apparatus</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id2">Tables</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#literature">Literature</a></li>
 </ul>
 </li>
@@ -252,7 +248,7 @@
 <h1>Database Structure<a class="headerlink" href="#database-structure" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="ntg-common-db-work-database">
 <h2><a class="reference internal" href="#module-ntg_common.db" title="ntg_common.db: Database Structure"><code class="xref py py-mod docutils literal"><span class="pre">ntg_common.db</span></code></a> — Work Database<a class="headerlink" href="#ntg-common-db-work-database" title="Permalink to this headline">¶</a></h2>
-<div class="figure" id="id3">
+<div class="figure" id="id2">
 <img alt="_images/uml.svg" src="_images/uml.svg" /><p class="caption"><span class="caption-text">Overview of the CBGM database (some columns omitted)</span></p>
 </div>
 <p>The work database is build
@@ -260,12 +256,22 @@ from the <code class="xref py py-mod docutils literal"><span class="pre">source<
 by the <a class="reference internal" href="scripts.html#module-scripts.cceh.prepare4cbgm" title="scripts.cceh.prepare4cbgm: Initialize the CBGM Database"><code class="xref py py-mod docutils literal"><span class="pre">prepare4cbgm</span></code></a> script.
 The <a class="reference internal" href="appserver.html#module-server" title="server: Application Server"><code class="xref py py-mod docutils literal"><span class="pre">online</span> <span class="pre">application</span></code></a> reads this database.
 The database system is PostgreSQL.</p>
-<div class="figure align-center" id="id4">
+<div class="figure align-center" id="id3">
 <img src="_images/graphviz-614c3c514a5efca39916302b05a49b5d52c46c75.png" alt="UML Database Graph" class="sauml"/>
-<p class="caption"><span class="caption-text">Work database structure</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">Work database structure</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </div>
+<div class="section" id="transform-the-negative-apparatus-into-a-positive-apparatus">
+<h3>Transform the negative apparatus into a positive apparatus<a class="headerlink" href="#transform-the-negative-apparatus-into-a-positive-apparatus" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Set all passages in all manuscripts to the reading ‘a’.</li>
+<li>Overwrite all Fehlverse in all manuscripts with the reading ‘zu’.</li>
+<li>Unroll the lacuna table. Overwrite with ‘zz’ every passage that is inside a
+lacuna.</li>
+<li>Overwrite everything with the reading from the negative apparatus, if there
+is one.</li>
+</ol>
 <div class="section" id="transaction-time-state-tables">
-<span id="tt"></span><h3>Transaction-Time State Tables<a class="headerlink" href="#transaction-time-state-tables" title="Permalink to this headline">¶</a></h3>
+<span id="tt"></span><h4>Transaction-Time State Tables<a class="headerlink" href="#transaction-time-state-tables" title="Permalink to this headline">¶</a></h4>
 <p>A transaction-time state table keeps track of the table’s contents as it changes
 over time.  <a class="reference internal" href="#snodgrass2000" id="id1">[SNODGRASS2000]</a> This is the basis for our undo-functionality in the
 graphical stemma editors.</p>
@@ -274,7 +280,7 @@ state of the table, and a trigger that updates the underlying table when the
 view gets updated.</p>
 </div>
 <div class="section" id="module-ntg_common.db">
-<span id="tables"></span><h3>Tables<a class="headerlink" href="#module-ntg_common.db" title="Permalink to this headline">¶</a></h3>
+<span id="tables"></span><h4>Tables<a class="headerlink" href="#module-ntg_common.db" title="Permalink to this headline">¶</a></h4>
 <p>This module contains the sqlalchemy classes that create the database structure
 we need for doing the CBGM and running the application server.</p>
 <dl class="class">
@@ -938,6 +944,7 @@ orthographic variants are normalized.  Following abbreviations are used:</p>
 
 </div>
 </div>
+</div>
 <div class="section" id="ntg-common-src-db-source-database">
 <h2><code class="xref py py-mod docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database<a class="headerlink" href="#ntg-common-src-db-source-database" title="Permalink to this headline">¶</a></h2>
 <p>This is the legacy database used in Münster.
@@ -946,12 +953,10 @@ These tables are only used once for building the <a class="reference internal" h
 The database system is MySQL.</p>
 <div align="center" class="align-center"><img src="_images/graphviz-143778a7b0ed5d546ede2756f0059cbdf884606e.png" alt="UML Database Graph" class="sauml"/>
 </div>
-<div class="figure align-center" id="id5">
+<div class="figure align-center" id="id4">
 <img src="_images/graphviz-342d852185a07bae9f8cfaa89a58efdb205dd290.png" alt="UML Database Graph" class="sauml"/>
-<p class="caption"><span class="caption-text">Source database structure</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">Source database structure</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
 </div>
-<div class="section" id="id2">
-<h3>Tables<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="ntg_common.src_db.Acts01GVZ">
 <em class="property">class </em><code class="descname">Acts01GVZ</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.Acts01GVZ" title="Permalink to this definition">¶</a></dt>
@@ -1031,7 +1036,6 @@ which reading is derived from which other reading(s) at each passage.</p>
 <img src="_images/graphviz-caeede30db3ab701a78d4e505195e783943fdd4a.png" alt="UML Database Graph" class="sauml"/>
 </dd></dl>
 
-</div>
 </div>
 <div class="section" id="literature">
 <h2>Literature<a class="headerlink" href="#literature" title="Permalink to this headline">¶</a></h2>

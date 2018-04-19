@@ -142,14 +142,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-db-work-database"><code class="docutils literal"><span class="pre">ntg_common.db</span></code> — Work Database</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="database.html#transaction-time-state-tables">Transaction-Time State Tables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="database.html#module-ntg_common.db">Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="database.html#transform-the-negative-apparatus-into-a-positive-apparatus">Transform the negative apparatus into a positive apparatus</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="database.html#id2">Tables</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a></li>
 <li class="toctree-l2"><a class="reference internal" href="database.html#literature">Literature</a></li>
 </ul>
 </li>
@@ -327,8 +323,8 @@ reconstructed text.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.cceh.prepare4cbgm.build_byzantine_text">
-<code class="descname">build_byzantine_text</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.build_byzantine_text" title="Permalink to this definition">¶</a></dt>
+<dt id="scripts.cceh.prepare4cbgm.build_MT_text">
+<code class="descname">build_MT_text</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.build_MT_text" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reconstruct the Majority Text</p>
 <p>Build a virtual manuscript that reconstructs the <a class="reference internal" href="developer.html#mt"><span class="std std-ref">Majority Text</span></a>.
 The ‘MT’ manuscript has a hard-coded ms_id of 2.</p>
@@ -377,9 +373,17 @@ festgehalten.</div></blockquote>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.cceh.prepare4cbgm.copy_genealogical_data">
-<code class="descname">copy_genealogical_data</code><span class="sig-paren">(</span><em>dbsrcvg</em>, <em>dbdest</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.copy_genealogical_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Copy / update genealogical data</p>
+<dt id="scripts.cceh.prepare4cbgm.copy_att_fdw">
+<code class="descname">copy_att_fdw</code><span class="sig-paren">(</span><em>dba</em>, <em>dbs</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.copy_att_fdw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy / fix Att tables</p>
+<p>Copy the (28 * 2) mysql tables to 2 tables in a new postgres database.  Do
+<em>not</em> copy versions and patristic manuscripts.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.copy_genealogical_fdw">
+<code class="descname">copy_genealogical_fdw</code><span class="sig-paren">(</span><em>dbsrcvg</em>, <em>dbdest</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.copy_genealogical_fdw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy / fix genealogical data</p>
 <p>Aus: VGA/Att2CBGMPh3.pl</p>
 <p>“kopiert die Daten aus ECM_Acts_CBGM nach VarGenAtt_Act,
 zur weiteren Bearbeitung im Stemma-Editor”</p>
@@ -548,14 +552,6 @@ Handschriftennummer, spielt für die CBGM keine Rolle.  Ein eventuell
 vorhandenes ‘V’ muss getilgt werden.  Gleiches gilt für die Einträge ‘*’
 und ‘C*’.</p>
 </div></blockquote>
-</dd></dl>
-
-<dl class="function">
-<dt id="scripts.cceh.prepare4cbgm.step01">
-<code class="descname">step01</code><span class="sig-paren">(</span><em>dba</em>, <em>dbs</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.step01" title="Permalink to this definition">¶</a></dt>
-<dd><p>Copy tables to new database</p>
-<p>Copy the (28 * 2) mysql tables to 2 tables in a new postgres database.  Do
-<em>not</em> copy versions and patristic manuscripts.</p>
 </dd></dl>
 
 <dl class="function">
