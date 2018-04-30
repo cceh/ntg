@@ -36,6 +36,5 @@
     "engines": {
         "node": ">=0.10.1"
     },
-    "dependencies": {
-    }
+    "dependencies": {}
 }

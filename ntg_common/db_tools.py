@@ -164,7 +164,7 @@ class MySQLEngine (object):
         self.params = self.get_connection_params (fn, group)
         self.params['database'] = db
 
-        url = sqlalchemy.engine.url.URL (**(dict (self.params, password = 'secret')))
+        url = sqlalchemy.engine.url.URL (**(dict (self.params, password = 'password')))
         log (logging.INFO, 'MySQLEngine: Connecting to URL: {url}'.format (url = url))
         url = sqlalchemy.engine.url.URL (**self.params)
         self.engine = sqlalchemy.create_engine (url)
@@ -223,6 +223,13 @@ class MySQLEngine (object):
 class PostgreSQLEngine (object):
     """ PostgreSQL Database Interface """
 
+    @staticmethod
+    def receive_checkout (dbapi_connection, connection_record, connection_proxy):
+        # just give a default value so postgres won't choke.  the actual user is
+        # set in editor.py
+        dbapi_connection.cursor ().execute ("SET ntg.user_id = 0")
+
+
     def __init__ (self, **kwargs):
 
         args = self.get_connection_params (kwargs)
@@ -238,6 +245,10 @@ class PostgreSQLEngine (object):
         self.engine = sqlalchemy.create_engine (self.url + '?sslmode=disable&server_side_cursors')
 
         self.params = args
+
+        # N.B. Do not do anything on checkin because that would begin a transaction,
+        # which in turn does not work well with now ().
+        sqlalchemy.event.listen (self.engine, 'checkout', self.receive_checkout)
 
 
     def connect (self):

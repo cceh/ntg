@@ -107,6 +107,11 @@ def stemma_edit (passage_or_id):
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
         params['pass_id'] = passage.pass_id
+        params['user_id'] = flask_login.current_user.id
+
+        res = execute (conn, """
+        SET LOCAL ntg.user_id = :user_id;
+        """, dict (parameters, **params))
 
         if action == 'move':
             try:
@@ -117,19 +122,10 @@ def stemma_edit (passage_or_id):
                 """, dict (parameters, **params))
             except sqlalchemy.exc.IntegrityError as e:
                 if 'unique constraint' in str (e):
-                    raise EditError ('Only one original reading allowed. If you want to change the original reading, first remove the old original reading.\n\n' + str (e))
+                    raise EditError ('Only one original reading allowed. If you want to change the original reading, first remove the old original reading.<br/><br/>' + str (e))
                 raise EditError (str (e))
             except sqlalchemy.exc.DatabaseError as e:
                 raise EditError (str (e))
-
-            if res.rowcount > 1:
-                raise EditError (
-                    'Too many rows ({count}) affected while moving {labez_old}{clique_old} to {labez_new}{clique_new}'
-                .format (count = res.rowcount, **params))
-            if res.rowcount == 0:
-                raise EditError (
-                    'Could not move {labez_old}{clique_old} to {labez_new}{clique_new}'
-                .format (**params))
 
             # test the still uncommited changes
 
@@ -148,38 +144,48 @@ def stemma_edit (passage_or_id):
                     raise EditError ('A reading cannot be derived from the same reading.  If you want to <b>merge</b> instead, use shift + drag.')
 
         elif action == 'split':
+            # get the next free clique
             res = execute (conn, """
             SELECT max (clique)
             FROM  cliques
             WHERE pass_id = :pass_id AND labez = :labez_old
             """, dict (parameters, **params))
+            params['clique_next'] = str (int (res.fetchone ()[0]) + 1)
 
-            # the old clique doesn't matter when splitting, replace it with the
-            # next free one
-            params['clique_old'] = str (int (res.fetchone ()[0]) + 1)
-
+            # insert into cliques table
             res = execute (conn, """
             INSERT INTO cliques (pass_id, labez, clique)
-            VALUES (:pass_id, :labez_old, :clique_old)
+            VALUES (:pass_id, :labez_old, :clique_next)
             """, dict (parameters, **params))
 
+            # insert into locstem table with source = '?'
             res = execute (conn, """
             INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original)
-            VALUES (:pass_id, :labez_old, :clique_old, :labez_new, :clique_new, false)
+            VALUES (:pass_id, :labez_old, :clique_next, NULL, NULL, false)
             """, dict (parameters, **params))
 
         elif action == 'merge':
+            # reassign manuscripts to merged clique
             res = execute (conn, """
-            UPDATE apparatus
+            UPDATE ms_cliques
             SET clique = :clique_new
             WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old)
             """, dict (parameters, **params))
 
+            # reassign sources to merged clique
+            res = execute (conn, """
+            UPDATE locstem
+            SET source_clique = :clique_new
+            WHERE (pass_id, source_labez, source_clique) = (:pass_id, :labez_old, :clique_old)
+            """, dict (parameters, **params))
+
+            # remove clique from locstem
             res = execute (conn, """
             DELETE FROM locstem
             WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old)
             """, dict (parameters, **params))
 
+            # remove clique from cliques
             res = execute (conn, """
             DELETE FROM cliques
             WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old)
@@ -187,8 +193,10 @@ def stemma_edit (passage_or_id):
 
         elif action == 'move-manuscripts':
             ms_ids = set (request.args.getlist ('ms_ids[]') or [])
+
+            # reassign manuscripts to new clique
             res = execute (conn, """
-            UPDATE apparatus
+            UPDATE apparatus_cliques_view
             SET clique = :clique_new
             WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old)
               AND ms_id IN :ms_ids

@@ -40,7 +40,7 @@ LANGUAGES = {
 LABEZ_I18N = {
     'zu':      'Overlap',
     'zv':      'Lac',
-    'zw':      'Dub',
+    'zw':      'Dubious',
     'zz':      'Lac',
     'lac':     'Lac',
     'all':     'All',

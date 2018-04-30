@@ -144,7 +144,10 @@
 <li class="toctree-l3"><a class="reference internal" href="database.html#transform-the-negative-apparatus-into-a-positive-apparatus">Transform the negative apparatus into a positive apparatus</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#id2">Tables</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="database.html#literature">Literature</a></li>
 </ul>
 </li>
@@ -314,6 +317,8 @@
 </li>
       <li><a href="database.html#ntg_common.db.Att.o">Att.o (in module ntg_common.db)</a>
 </li>
+      <li><a href="database.html#ntg_common.db.Att.V">Att.V (in module ntg_common.db)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Att.x">Att.x (in module ntg_common.db)</a>
 </li>
   </ul></td>
@@ -362,6 +367,8 @@
 </li>
       <li><a href="appserver.html#server.server.cliques_json">cliques_json() (in module server.server)</a>
 </li>
+      <li><a href="database.html#ntg_common.db.Cliques_TTS">Cliques_TTS (class in ntg_common.db)</a>
+</li>
       <li><a href="appclient.html#module-coherence">coherence (module)</a>
 </li>
       <li><a href="appserver.html#server.server.coherence_skeleton">coherence_skeleton() (in module server.server)</a>
@@ -370,10 +377,10 @@
 </li>
       <li><a href="database.html#ntg_common.db.Att.comp">comp (Att attribute)</a>
 </li>
-      <li><a href="appclient.html#module-comparison">comparison (module)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="appclient.html#module-comparison">comparison (module)</a>
+</li>
       <li><a href="appserver.html#server.server.comparison_detail">comparison_detail() (in module server.server)</a>
 </li>
       <li><a href="appserver.html#server.server.comparison_detail_csv">comparison_detail_csv() (in module server.server)</a>
@@ -444,9 +451,11 @@
 </li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.fill_apparatus_table">fill_apparatus_table() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.fill_manuscripts_table">fill_manuscripts_table() (in module scripts.cceh.prepare4cbgm)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.fill_manuscripts_table">fill_manuscripts_table() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts.html#scripts.cceh.prepare4cbgm.fill_ms_cliques_table">fill_ms_cliques_table() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.fill_passages_table">fill_passages_table() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
@@ -632,10 +641,10 @@
 </li>
       <li><a href="appclient.html#local-stemma.module:local-stemma.highlight">module:local-stemma.highlight() (module:local-stemma method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appclient.html#local-stemma.module:local-stemma.init">module:local-stemma.init() (module:local-stemma method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appclient.html#local-stemma.module:local-stemma.load_passage">module:local-stemma.load_passage() (module:local-stemma method)</a>
 </li>
       <li><a href="appclient.html#local-stemma.module:local-stemma.open_contextmenu">module:local-stemma.open_contextmenu() (module:local-stemma method)</a>
@@ -705,6 +714,10 @@
       <li><a href="database.html#ntg_common.db.Manuscripts.ms_id">ms_id (Manuscripts attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Ms_Ranges">Ms_Ranges (class in ntg_common.db)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.MsCliques">MsCliques (class in ntg_common.db)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.MsCliques_TTS">MsCliques_TTS (class in ntg_common.db)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db_tools.MySQLEngine">MySQLEngine (class in ntg_common.db_tools)</a>
 </li>
@@ -830,12 +843,12 @@
 </li>
       <li><a href="appserver.html#module-server.security">server.security (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="appserver.html#module-server.server">server.server (module)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Books.siglum">siglum (Books attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Passages.spanned">spanned (Passages attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Passages.spanning">spanning (Passages attribute)</a>
@@ -848,6 +861,14 @@
 </li>
       <li><a href="appserver.html#server.server.suggest_json">suggest_json() (in module server.server)</a>
 </li>
+      <li><a href="database.html#ntg_common.db.Cliques.sys_period">sys_period (Cliques attribute)</a>
+
+      <ul>
+        <li><a href="database.html#ntg_common.db.LocStem.sys_period">(LocStem attribute)</a>
+</li>
+        <li><a href="database.html#ntg_common.db.MsCliques.sys_period">(MsCliques attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -874,12 +895,26 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Affinity.unclear">unclear (Affinity attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.unroll_zw">unroll_zw() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="database.html#ntg_common.db.LocStem.user_id">user_id (LocStem attribute)</a>
+      <li><a href="database.html#ntg_common.db.Cliques.user_id_start">user_id_start (Cliques attribute)</a>
+
+      <ul>
+        <li><a href="database.html#ntg_common.db.LocStem.user_id_start">(LocStem attribute)</a>
 </li>
+        <li><a href="database.html#ntg_common.db.MsCliques.user_id_start">(MsCliques attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="database.html#ntg_common.db.Cliques.user_id_stop">user_id_stop (Cliques attribute)</a>
+
+      <ul>
+        <li><a href="database.html#ntg_common.db.LocStem.user_id_stop">(LocStem attribute)</a>
+</li>
+        <li><a href="database.html#ntg_common.db.MsCliques.user_id_stop">(MsCliques attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -888,16 +923,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="scripts.html#scripts.cceh.prepare4cbgm.vacuum">vacuum() (in module scripts.cceh.prepare4cbgm)</a>
 </li>
-      <li><a href="database.html#ntg_common.db.LocStem.valid_period">valid_period (LocStem attribute)</a>
-
-      <ul>
-        <li><a href="database.html#ntg_common.db.LocStem_TTS.valid_period">(LocStem_TTS attribute)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.src_db.VarGenAttAct01">VarGenAttAct01 (class in ntg_common.src_db)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Passages.variant">variant (Passages attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.LocStemEdAct01.varid">varid (LocStemEdAct01 attribute)</a>

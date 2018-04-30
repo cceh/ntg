@@ -183,16 +183,16 @@ def leitzeile (passage_or_id = None):
         res = execute (conn, """
         SELECT l.begadr, l.endadr, l.lemma, p.pass_id, p.spanned,
           EXISTS (SELECT labez from readings r
-          WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != 'om') AS replaced
+          WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != '') AS replaced
         FROM nestle l
           LEFT JOIN passages p ON (p.irange @> l.irange)
         WHERE int4range (:start, :end + 1) @> l.irange
 
-        UNION -- get the omissions
+        UNION -- get the insertions
 
         SELECT p.begadr, p.endadr, p.lemma, p.pass_id, p.spanned,
           EXISTS (SELECT labez from readings r
-          WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != 'om') AS replaced
+          WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != '') AS replaced
         FROM passages_view_lemma p
         WHERE int4range (:start, :end + 1) @> p.irange AND (begadr % 2) = 1
 
@@ -398,13 +398,13 @@ def relatives (hs_hsnr_id, passage_or_id):
         ms.length = ms.get_length (passage, chapter)
         rg_id     = passage.range_id (chapter)
 
-        # Get the attestation(s) of the manuscript
+        # Get the attestation(s) of the manuscript (may be uncertain eg. a/b/c)
         res = execute (conn, """
-        SELECT labez
+        SELECT labez, clique, labez_clique
         FROM apparatus_view_agg
         WHERE ms_id = :ms_id AND pass_id = :pass_id
         """, dict (parameters, ms_id = ms.ms_id, pass_id = passage.pass_id))
-        ms.labez,  = res.fetchone ()
+        ms.labez, ms.clique, ms.labez_clique = res.fetchone ()
 
         # Get the affinity of the manuscript to all manuscripts
         res = execute (conn, """
@@ -420,7 +420,7 @@ def relatives (hs_hsnr_id, passage_or_id):
         # Get the reading of MT
         res = execute (conn, """
         SELECT labez, clique, labez_clique
-        FROM apparatus_view
+        FROM apparatus_view_agg
         WHERE ms_id = 2 AND pass_id = :pass_id
         """, dict (parameters, pass_id = passage.pass_id))
         mt.labez, mt.clique, mt.labez_clique = res.fetchone ()
@@ -627,15 +627,10 @@ def textflow (passage_or_id):
         src_nodes  = set ([r.ms_id2 for r in ranks])
 
         res = execute (conn, """
-        SELECT ms_id,
-               MAX (hs) AS hs,
-               MAX (hsnr) AS hsnr,
-               labez_agg (labez ORDER BY labez) AS labez,
-               labez_agg (clique ORDER BY clique) AS clique,
-               labez_agg (labez_clique ORDER BY labez_clique) AS labez_clique
-        FROM apparatus_view
+        SELECT ms.ms_id, ms.hs, ms.hsnr, a.labez, a.clique, a.labez_clique
+        FROM apparatus_view_agg a
+        JOIN manuscripts ms USING (ms_id)
         WHERE pass_id = :pass_id AND ms_id IN :ms_ids
-        GROUP BY ms_id
         """, dict (parameters, ms_ids = tuple (src_nodes | dest_nodes), pass_id = passage.pass_id))
 
         Mss = collections.namedtuple ('Mss', 'ms_id hs hsnr labez clique labez_clique')
@@ -941,8 +936,8 @@ def comparison_detail ():
           is_p_unclear (p.pass_id, v2.labez, v2.clique) AS unclear
         FROM (SELECT * FROM ranges WHERE range = :range_) r
           JOIN passages p ON (r.irange @> p.irange )
-          JOIN apparatus_view v1 USING (pass_id)
-          JOIN apparatus_view v2 USING (pass_id)
+          JOIN apparatus_cliques_view v1 USING (pass_id)
+          JOIN apparatus_cliques_view v2 USING (pass_id)
         WHERE v1.ms_id = :ms1 AND v2.ms_id = :ms2
           AND v1.labez != v2.labez AND v1.labez !~ '^z' AND v2.labez !~ '^z'
           AND v1.cbgm AND v2.cbgm
@@ -975,7 +970,7 @@ def apparatus_json (passage_or_id):
 
         # list of labez => lesart
         res = execute (conn, """
-        SELECT labez, COALESCE (lesart, '')
+        SELECT labez, reading (labez, lesart)
         FROM readings
         WHERE pass_id = :pass_id
         ORDER BY labez
@@ -987,7 +982,7 @@ def apparatus_json (passage_or_id):
         # list of labez_clique => manuscripts
         res = execute (conn, """
         SELECT labez, clique, labez_clique, ms_id, hs, hsnr, certainty
-        FROM apparatus_view
+        FROM apparatus_cliques_view
         WHERE pass_id = :pass_id
         ORDER BY labez, clique, hsnr
         """, dict (parameters, pass_id = passage.pass_id))

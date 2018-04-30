@@ -141,9 +141,7 @@ def generic (metadata, create_cmd, drop_cmd):
 Base = declarative_base ()
 
 class Att (Base):
-    """
-
-    Input buffer table for the Nestle-Aland ECM_Acts*GVZ tables.
+    """Input buffer table for the Nestle-Aland ECM_Acts*GVZ tables.
 
     The Nestle-Aland database contains one table for each chapter (for
     historical reasons). As first step we copy those many tables into one big
@@ -249,10 +247,11 @@ class Att (Base):
           's1', 's2', etc. für jeweils einen Abschnitt verwendet.  Ergänzungen
           können nicht die Authorität der jeweiligen Hs beanspruchen.
 
-       .. data:: V, vid
+       .. data:: V
 
-          (ut videtur) augenscheinlich.  Unsichere aber höchst wahrscheinliche
-          Lesung.  Ist für die CBGM als sichere Lesart zu akzeptieren.
+          (vid, ut videtur) augenscheinlich.  Unsichere aber höchst
+          wahrscheinliche Lesung.  Ist für die CBGM als sichere Lesart zu
+          akzeptieren.
 
     .. attribute:: base
 
@@ -557,7 +556,7 @@ class Passages (Base2):
 
     pass_id   = Column (Integer,       primary_key = True, autoincrement = True)
 
-    bk_id     = Column (Integer,       ForeignKey ('books.bk_id'), nullable = False)
+    bk_id     = Column (Integer,       nullable = False)
 
     begadr    = Column (Integer,       nullable = False)
     endadr    = Column (Integer,       nullable = False)
@@ -570,6 +569,7 @@ class Passages (Base2):
     remarks   = Column (String,        nullable = True)
 
     __table_args__ = (
+        ForeignKeyConstraint ([bk_id], ['books.bk_id']),
         UniqueConstraint (irange, name = 'unique_passages_irange'), # needs name
         Index ('ix_passages_irange_gist', irange, postgresql_using = 'gist'),
     )
@@ -648,41 +648,14 @@ class Readings (Base2):
 
     __tablename__ = 'readings'
 
-    pass_id   = Column (Integer,       ForeignKey ('passages.pass_id'), nullable = False)
+    pass_id   = Column (Integer,       nullable = False)
     labez     = Column (String (2),    nullable = False)
 
     lesart    = Column (String (1024))
 
     __table_args__ = (
         PrimaryKeyConstraint (pass_id, labez),
-    )
-
-
-class Cliques (Base2):
-    """A table that contains the cliques at every passage
-
-    A clique is a set of strongly related manuscripts that offer the same
-    reading.  A reading may have been originated more than once, while a clique
-    has been originated only once.
-
-    .. sauml::
-       :include: cliques
-
-    .. attribute:: clique
-
-        Name of the Clique. '0', '1', '2' ...
-
-    """
-
-    __tablename__ = 'cliques'
-
-    pass_id   = Column (Integer,    nullable = False)
-    labez     = Column (String (2), nullable = False)
-    clique    = Column (String (2), nullable = False, server_default = '1')
-
-    __table_args__ = (
-        PrimaryKeyConstraint (pass_id, labez, clique),
-        ForeignKeyConstraint ([pass_id, labez], ['readings.pass_id', 'readings.labez']),
+        ForeignKeyConstraint ([pass_id], ['passages.pass_id']),
     )
 
 
@@ -732,10 +705,9 @@ class Apparatus (Base2):
 
     __tablename__ = 'apparatus'
 
-    ms_id     = Column (Integer,       ForeignKey ('manuscripts.ms_id'), nullable = False, index = True)
+    ms_id     = Column (Integer,       nullable = False, index = True)
     pass_id   = Column (Integer,       nullable = False)
     labez     = Column (String (2),    nullable = False)
-    clique    = Column (String (2),    nullable = False, server_default = '1')
 
     cbgm      = Column (Boolean,       nullable = False)
     labezsuf  = Column (String (32),   nullable = False, server_default = '')
@@ -745,21 +717,184 @@ class Apparatus (Base2):
 
     __table_args__ = (
         PrimaryKeyConstraint (pass_id, ms_id, labez),
+        ForeignKeyConstraint ([ms_id], ['manuscripts.ms_id']),
+        ForeignKeyConstraint ([pass_id, labez], ['readings.pass_id', 'readings.labez']),
         Index ('ix_apparatus_pass_id_ms_id', pass_id, ms_id, unique = True, postgresql_where = cbgm == True),
-        ForeignKeyConstraint ([pass_id, labez, clique], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
         CheckConstraint ('certainty > 0.0 AND certainty <= 1.0'),
         CheckConstraint ('(certainty = 1.0) >= cbgm'),  # cbgm implies 100% certainty
     )
 
 
-class LocStem (Base2):
+class TTS_Mixin (object):
+    # use of declared_attr to create these columns last in table
+    @declared_attr
+    def sys_period (cls):
+        return Column (TSTZRANGE,  nullable = False, server_default = text ('tstzrange (now (), NULL)'))
+
+    @declared_attr
+    def user_id_start (cls):
+        return Column (Integer,    nullable = False)
+
+    @declared_attr
+    def user_id_stop (cls):
+        return Column (Integer,    nullable = True)
+
+
+class Cliques_Mixin (TTS_Mixin):
+    pass_id   = Column (Integer,    nullable = False)
+    labez     = Column (String (2), nullable = False)
+    clique    = Column (String (2), nullable = False, server_default = '1')
+
+
+class Cliques (Cliques_Mixin, Base2):
+    """A table that contains the cliques at every passage
+
+    A clique is a set of strongly related manuscripts that offer the same
+    reading.  A reading may have been originated independently more than once,
+    but in a clique a reading has been originated only once.
+
+    This is the current table of a transaction state table pair.  `cliques_tts`
+    is the table that contains the past rows.  See :ref:`transaction-time state
+    tables<tts>`.
+
+    .. sauml::
+       :include: cliques
+
+    .. attribute:: clique
+
+        Name of the Clique. '0', '1', '2' ...
+
+    .. attribute:: sys_period
+
+       The time period in which this row is valid.  In this table all rows are
+       still valid, so the end of the period is not set.
+
+    .. attribute:: user_id_start
+
+       The id of the user making the change at the start of the validity period.
+       See: :class:`.User`.
+
+    .. attribute:: user_id_stop
+
+       The id of the user making the change at the end of the validity period.
+       See: :class:`.User`.
+
+    """
+
+    __tablename__ = 'cliques'
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('pass_id', 'labez', 'clique'),
+        ForeignKeyConstraint (['pass_id', 'labez'], ['readings.pass_id', 'readings.labez']),
+    )
+
+
+class Cliques_TTS (Cliques_Mixin, Base2):
+    """A table that contains the cliques at every passage
+
+    This is the past table of a transaction state table pair.  `cliques` is the
+    table that contains the current rows.  The structure of the two tables is
+    the same.  See :ref:`transaction-time state tables<tts>`.
+
+    """
+
+    __tablename__ = 'cliques_tts'
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('pass_id', 'labez', 'clique', 'sys_period'),
+    )
+
+
+class MsCliques_Mixin (TTS_Mixin):
+    ms_id         = Column (Integer,    nullable = False, index = True)
+    pass_id       = Column (Integer,    nullable = False)
+    labez         = Column (String (2), nullable = False)
+    clique        = Column (String (2), nullable = False, server_default = '1')
+
+
+class MsCliques (MsCliques_Mixin, Base2):
+    """A table that relates manuscripts and cliques.
+
+    This table records the editorial decisions regarding which manuscripts
+    represent each clique.  The editors decide which reading is derived from
+    which other reading(s) at each passage.
+
+    This is the current table of a transaction state table pair.
+    `ms_cliques_tts` is the table that contains the past rows.  See
+    :ref:`transaction-time state tables<tts>`.
+
+    .. sauml::
+       :include: ms_cliques
+
+    .. attribute:: labez, clique
+
+       The clique this manuscript represents.
+
+    .. attribute:: sys_period
+
+       The time period in which this row is valid.  In this table all rows are
+       still valid, so the end of the period is not set.
+
+    .. attribute:: user_id_start
+
+       The id of the user making the change at the start of the validity period.
+       See: :class:`.User`.
+
+    .. attribute:: user_id_stop
+
+       The id of the user making the change at the end of the validity period.
+       See: :class:`.User`.
+
+    """
+
+    __tablename__ = 'ms_cliques'
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('ms_id', 'pass_id'),
+        ForeignKeyConstraint (['ms_id', 'pass_id', 'labez'], ['apparatus.ms_id', 'apparatus.pass_id', 'apparatus.labez'],
+                              deferrable = True),
+        ForeignKeyConstraint (['pass_id', 'labez', 'clique'], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
+    )
+
+
+class MsCliques_TTS (MsCliques_Mixin, Base2):
+    """A table that relates manuscripts and cliques.
+
+    This is the past table of a transaction state table pair.  `ms_cliques` is
+    the table that contains the current rows.  The structure of the two tables
+    is the same.  See :ref:`transaction-time state tables<tts>`.
+
+    """
+
+    __tablename__ = 'ms_cliques_tts'
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('ms_id', 'pass_id', 'sys_period'),
+    )
+
+
+class LocStem_Mixin (TTS_Mixin):
+    pass_id       = Column (Integer,    nullable = False)
+    labez         = Column (String (2), nullable = False)
+    clique        = Column (String (2), nullable = False, server_default = '1')
+
+    source_labez  = Column (String (2), nullable = True)
+    source_clique = Column (String (2), nullable = True)
+
+    original      = Column (Boolean,    nullable = False, server_default = 'false')
+
+
+class LocStem (LocStem_Mixin, Base2):
     """A table that contains the priority of the cliques at each passage
 
-    This table contains the main output of the editors.  The editors decide
-    which reading is derived from which other reading(s) at each passage.
+    This table records the editorial decisions regarding which manuscripts
+    represent each clique.  The editors decide which reading is derived from
+    which other reading(s) at each passage.
 
-    This table contains only the currently valid rows.  A log of previously
-    valid rows is kept in the locstemed_tts table.
+    This is the current table of a transaction state table pair.  `locstem_tts`
+    is the table that contains the past rows.  See :ref:`transaction-time state
+    tables<tts>`.
+
 
     .. sauml::
        :include: locstem
@@ -778,74 +913,47 @@ class LocStem (Base2):
         This reading was established as the original.  Must also have a
         source_labez of NULL.
 
-    .. attribute:: valid_period
+    .. attribute:: sys_period
 
        The time period in which this row is valid.  In this table all rows are
        still valid, so the end of the period is not set.
 
-       See :ref:`transaction-time state tables<tt>`.
+    .. attribute:: user_id_start
 
-    .. attribute:: user_id
+       The id of the user making the change at the start of the validity period.
+       See: :class:`.User`.
 
-       The id of the user making the change.  See: :class:`.User`.
+    .. attribute:: user_id_stop
+
+       The id of the user making the change at the end of the validity period.
+       See: :class:`.User`.
 
     """
+
     __tablename__ = 'locstem'
 
-    pass_id       = Column (Integer,    nullable = False)
-    labez         = Column (String (2), nullable = False)
-    clique        = Column (String (2), nullable = False, server_default = '1')
-
-    source_labez  = Column (String (2), nullable = True)
-    source_clique = Column (String (2), nullable = True)
-
-    original      = Column (Boolean,    nullable = False, server_default = 'false')
-
-    valid_period  = Column (TSTZRANGE,  nullable = False, server_default = text ('tstzrange (now (), NULL)'))
-    user_id       = Column (Integer,    nullable = False, server_default = '0')
-
     __table_args__ = (
-        PrimaryKeyConstraint (pass_id, labez, clique),
-        Index ('ix_locstem_pass_id', pass_id, unique = True, postgresql_where = original == True),
-        ForeignKeyConstraint ([pass_id, labez, clique], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
-        ForeignKeyConstraint ([pass_id, source_labez, source_clique], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
+        PrimaryKeyConstraint ('pass_id', 'labez', 'clique'),
+        Index ('ix_locstem_pass_id', 'pass_id', unique = True, postgresql_where = text ('original')),
+        ForeignKeyConstraint (['pass_id', 'labez', 'clique'], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
+        ForeignKeyConstraint (['pass_id', 'source_labez', 'source_clique'], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
         CheckConstraint ('original <= (source_labez is null)'), # original implies source is null
     )
 
 
-class LocStem_TTS (Base2):
-    """The transaction-time state table for table :class:`.LocStem`.
+class LocStem_TTS (LocStem_Mixin, Base2):
+    """A table that contains the priority of the cliques at each passage
 
-    See :ref:`transaction-time state tables<tt>`.
-
-    .. sauml::
-       :include: locstem_tts
-
-    .. attribute:: valid_period
-
-       The time period in which this row was valid.  This table only contains
-       rows that were valid in the past.
-
-       See :ref:`transaction-time state tables<tt>`.
+    This is the past table of a transaction state table pair.  `locstem` is the
+    table that contains the current rows.  The structure of the two tables is
+    the same.  See :ref:`transaction-time state tables<tts>`.
 
     """
 
     __tablename__ = 'locstem_tts'
 
-    pass_id       = Column (Integer,    nullable = False)
-    labez         = Column (String (2), nullable = False)
-    clique        = Column (String (2), nullable = False)
-
-    source_labez  = Column (String (2), nullable = True)
-    source_clique = Column (String (2), nullable = True)
-
-    original      = Column (Boolean,    nullable = False)
-
-    valid_period  = Column (TSTZRANGE,  nullable = False)
-    user_id       = Column (Integer,    nullable = False)
-
     __table_args__ = (
-        PrimaryKeyConstraint (pass_id, labez, clique, valid_period),
+        PrimaryKeyConstraint ('pass_id', 'labez', 'clique', 'sys_period'),
     )
 
 
@@ -878,13 +986,14 @@ class Ranges (Base2):
 
     rg_id     = Column (Integer,          primary_key = True, autoincrement = True)
 
-    bk_id     = Column (Integer,          ForeignKey ('books.bk_id'), nullable = False)
+    bk_id     = Column (Integer,          nullable = False)
 
     range_    = Column ('range', String,  nullable = False)
 
     irange    = Column (IntRangeType,     nullable = False)
 
     __table_args__ = (
+        ForeignKeyConstraint ([bk_id], ['books.bk_id']),
         Index ('ix_ranges_irange_gist', irange, postgresql_using = 'gist'),
     )
 
@@ -905,13 +1014,15 @@ class Ms_Ranges (Base2):
 
     __tablename__ = 'ms_ranges'
 
-    rg_id      = Column (Integer,       ForeignKey ('ranges.rg_id'),      nullable = False)
-    ms_id      = Column (Integer,       ForeignKey ('manuscripts.ms_id'), nullable = False)
+    rg_id      = Column (Integer, nullable = False)
+    ms_id      = Column (Integer, nullable = False)
 
     length     = Column (Integer)
 
     __table_args__ = (
         PrimaryKeyConstraint (rg_id, ms_id),
+        ForeignKeyConstraint ([ms_id], ['manuscripts.ms_id']),
+        ForeignKeyConstraint ([rg_id], ['ranges.rg_id']),
     )
 
 
@@ -1010,6 +1121,13 @@ function ('labez_clique', Base2.metadata, 'labez CHAR, clique CHAR', 'CHAR', '''
 SELECT labez || COALESCE (NULLIF (clique, '1'), '')
 ''', volatility = 'IMMUTABLE')
 
+function ('reading', Base2.metadata, 'labez CHAR, lesart VARCHAR', 'VARCHAR', '''
+SELECT CASE WHEN labez = 'zz' THEN '' WHEN labez = 'zu' THEN 'overlap' ELSE COALESCE (NULLIF (lesart, ''), 'om') END
+''', volatility = 'IMMUTABLE')
+
+function ('close_period', Base2.metadata, 'period TSTZRANGE', 'TSTZRANGE', '''
+SELECT TSTZRANGE (LOWER (period), NOW ())
+''', volatility = 'IMMUTABLE')
 
 generic (Base2.metadata, '''
 CREATE AGGREGATE labez_agg (CHAR) (
@@ -1077,8 +1195,7 @@ view ('cliques_view', Base2.metadata, '''
 view ('apparatus_view', Base2.metadata, '''
     SELECT p.pass_id, p.begadr, p.endadr, p.irange, p.spanning, p.spanned, p.fehlvers,
            ms.ms_id, ms.hs, ms.hsnr,
-           a.labez, a.clique, labez_clique (a.labez, a.clique) AS labez_clique,
-           a.cbgm, a.labezsuf, a.certainty, a.origin,
+           a.labez, a.cbgm, a.labezsuf, a.certainty, a.origin,
            COALESCE (a.lesart, r.lesart) AS lesart
     FROM apparatus a
     JOIN readings r     USING (pass_id, labez)
@@ -1086,9 +1203,17 @@ view ('apparatus_view', Base2.metadata, '''
     JOIN manuscripts ms USING (ms_id)
     ''')
 
+view ('apparatus_cliques_view', Base2.metadata, '''
+    SELECT a.*, q.clique, labez_clique (q.labez, q.clique) as labez_clique FROM apparatus_view a
+    LEFT JOIN ms_cliques q USING (ms_id, pass_id, labez)
+    ''')
+
 view ('apparatus_view_agg', Base2.metadata, '''
-   SELECT pass_id, ms_id, labez_agg (labez ORDER BY labez) as labez
-   FROM apparatus
+   SELECT pass_id, ms_id,
+          labez_agg (labez ORDER BY labez) as labez,
+          labez_agg (clique ORDER BY clique) as clique,
+          labez_agg (labez_clique ORDER BY labez_clique) as labez_clique
+   FROM apparatus_cliques_view
    GROUP BY pass_id, ms_id
    ''')
 
@@ -1159,25 +1284,126 @@ SELECT EXISTS (SELECT * FROM locstem
                      source_labez IS NULL AND original = false);
 ''', volatility = 'STABLE')
 
-function ('tts_locstem', Base2.metadata, '', 'TRIGGER', '''
-BEGIN
-    INSERT INTO locstem_tts (pass_id, labez, clique, source_labez, source_clique, original, valid_period)
-           VALUES (OLD.pass_id, OLD.labez, OLD.clique, OLD.source_labez, OLD.source_clique, OLD.original,
-                  tstzrange (lower (OLD.valid_period), now (), '[)'));
+function ('user_id', Base2.metadata, '', 'INTEGER', '''
+SELECT current_setting ('ntg.user_id')::int;
+''', volatility = 'STABLE')
 
-    IF TG_OP = 'UPDATE' THEN
-        NEW.valid_period = tstzrange (now (), NULL);
+# implement automagic TTS on cliques, locstem and ms_cliques
+
+function ('cliques_trigger_f', Base2.metadata, '', 'TRIGGER', '''
+   BEGIN
+      IF TG_OP IN ('UPDATE', 'DELETE') THEN
+        -- transfer data to tts table
+        INSERT INTO cliques_tts (pass_id, labez, clique,
+                                 sys_period, user_id_start, user_id_stop)
+        VALUES (OLD.pass_id, OLD.labez, OLD.clique,
+                close_period (OLD.sys_period), OLD.user_id_start, user_id ());
+      END IF;
+      IF TG_OP IN ('UPDATE', 'INSERT') THEN
+        NEW.sys_period = tstzrange (now (), NULL);
+        NEW.user_id_start = user_id ();
         RETURN NEW;
-    END IF;
-    RETURN OLD;
-END;
-''', language = 'plpgsql')
+      END IF;
+      RETURN OLD;
+   END;
+''', language = 'plpgsql', volatility = 'VOLATILE')
+
+function ('locstem_trigger_f', Base2.metadata, '', 'TRIGGER', '''
+   BEGIN
+      IF TG_OP IN ('UPDATE', 'DELETE') THEN
+        -- transfer data to tts table
+        INSERT INTO locstem_tts (pass_id, labez, clique, source_labez, source_clique, original,
+                                 sys_period, user_id_start, user_id_stop)
+        VALUES (OLD.pass_id, OLD.labez, OLD.clique, OLD.source_labez, OLD.source_clique, OLD.original,
+                close_period (OLD.sys_period), OLD.user_id_start, user_id ());
+      END IF;
+      IF TG_OP IN ('UPDATE', 'INSERT') THEN
+        NEW.sys_period = tstzrange (now (), NULL);
+        NEW.user_id_start = user_id ();
+        RETURN NEW;
+      END IF;
+      RETURN OLD;
+   END;
+''', language = 'plpgsql', volatility = 'VOLATILE')
+
+function ('ms_cliques_trigger_f', Base2.metadata, '', 'TRIGGER', '''
+   BEGIN
+      IF TG_OP IN ('UPDATE', 'DELETE') THEN
+        -- transfer data to tts table
+        INSERT INTO ms_cliques_tts (pass_id, ms_id, labez, clique,
+                                    sys_period, user_id_start, user_id_stop)
+        VALUES (OLD.pass_id, OLD.ms_id, OLD.labez, OLD.clique,
+                close_period (OLD.sys_period), OLD.user_id_start, user_id ());
+      END IF;
+      IF TG_OP IN ('UPDATE', 'INSERT') THEN
+        NEW.sys_period = tstzrange (now (), NULL);
+        NEW.user_id_start = user_id ();
+        RETURN NEW;
+      END IF;
+      RETURN OLD;
+   END;
+''', language = 'plpgsql', volatility = 'VOLATILE')
 
 generic (Base2.metadata, '''
-CREATE TRIGGER tts_locstem BEFORE UPDATE OR DELETE ON locstem FOR EACH ROW
-EXECUTE PROCEDURE tts_locstem ()
+    CREATE TRIGGER cliques_trigger
+    BEFORE INSERT OR UPDATE OR DELETE ON cliques
+    FOR EACH ROW EXECUTE PROCEDURE cliques_trigger_f ()
 ''', '''
-DROP TRIGGER IF EXISTS tts_locstem ON locstem CASCADE
+    DROP TRIGGER IF EXISTS cliques_trigger ON locstem
+'''
+)
+
+generic (Base2.metadata, '''
+    CREATE TRIGGER locstem_trigger
+    BEFORE INSERT OR UPDATE OR DELETE ON locstem
+    FOR EACH ROW EXECUTE PROCEDURE locstem_trigger_f ()
+''', '''
+    DROP TRIGGER IF EXISTS locstem_trigger ON locstem
+'''
+)
+
+generic (Base2.metadata, '''
+    CREATE TRIGGER ms_cliques_trigger
+    BEFORE INSERT OR UPDATE OR DELETE ON ms_cliques
+    FOR EACH ROW EXECUTE PROCEDURE ms_cliques_trigger_f ()
+''', '''
+    DROP TRIGGER IF EXISTS ms_cliques_trigger ON ms_cliques
+'''
+)
+
+# implement inserts on view apparatus_cliques_view
+
+function ('apparatus_cliques_view_trigger_f', Base2.metadata, '', 'TRIGGER', '''
+   BEGIN
+      IF TG_OP = 'INSERT' THEN
+        INSERT INTO apparatus  (pass_id, ms_id, labez, lesart, cbgm, origin)
+               VALUES (NEW.pass_id, NEW.ms_id, NEW.labez, NEW.lesart, NEW.cbgm, NEW.origin);
+        INSERT INTO ms_cliques (pass_id, ms_id, labez, clique)
+               VALUES (NEW.pass_id, NEW.ms_id, NEW.labez, NEW.clique);
+      ELSIF TG_OP = 'UPDATE' THEN
+        SET CONSTRAINTS ALL DEFERRED;
+        UPDATE apparatus
+        SET pass_id = NEW.pass_id, ms_id = NEW.ms_id, labez = NEW.labez, lesart = NEW.lesart, cbgm = NEW.cbgm, origin = NEW.origin
+        WHERE (pass_id, ms_id) = (OLD.pass_id, OLD.ms_id);
+        UPDATE ms_cliques
+        SET pass_id = NEW.pass_id, ms_id = NEW.ms_id, labez = NEW.labez, clique = NEW.clique
+        WHERE (pass_id, ms_id) = (OLD.pass_id, OLD.ms_id);
+      ELSIF TG_OP = 'DELETE' THEN
+        DELETE FROM ms_cliques
+        WHERE (pass_id, ms_id) = (OLD.pass_id, OLD.ms_id);
+        DELETE FROM apparatus
+        WHERE (pass_id, ms_id) = (OLD.pass_id, OLD.ms_id);
+      END IF;
+      RETURN NEW;
+    END;
+''', language = 'plpgsql', volatility = 'VOLATILE')
+
+generic (Base2.metadata, '''
+    CREATE TRIGGER apparatus_cliques_view_trigger
+    INSTEAD OF INSERT OR UPDATE OR DELETE ON apparatus_cliques_view
+    FOR EACH ROW EXECUTE PROCEDURE apparatus_cliques_view_trigger_f ();
+''', '''
+    DROP TRIGGER IF EXISTS apparatus_cliques_view_trigger ON apparatus_cliques_view
 '''
 )
 
@@ -1190,7 +1416,7 @@ class Nestle (Base4):
     Dient der Darstellung der Leitzeile im Navigator.
 
     .. sauml::
-       :include: nestle29
+       :include: nestle
 
     .. _nestle_table:
 

@@ -46,6 +46,9 @@ if PLOT:
 NULL_FIELDS = 'lemma lesart labezsuf'.split ()
 """ Fields to look for data entry error NULL, and change it into '' """
 
+MS_ID_A  = 1
+MS_ID_MT = 2
+
 book = None
 
 def copy_table (conn, source_table, dest_table, where = ''):
@@ -117,8 +120,8 @@ def concat_tables (conn, meta, dest_table, fdw, source_tables):
                    dest_columns = ', '.join (dest_columns)))
 
 
-def step01 (dba, dbs, parameters):
-    """Copy tables to new database
+def copy_att_fdw (dba, dbs, parameters):
+    """Copy / fix Att tables
 
     Copy the (28 * 2) mysql tables to 2 tables in a new postgres database.  Do
     *not* copy versions and patristic manuscripts.
@@ -184,18 +187,17 @@ def step01 (dba, dbs, parameters):
                        created = datetime.date.today().strftime ("%Y-%m-%d")))
 
     with dba.engine.begin () as conn:
-        # delete 'MT'
-        execute (conn, """
-        DELETE FROM att WHERE hs IN ('MT');
-        DELETE FROM lac WHERE hs IN ('MT');
-        """, parameters)
-
         if book == 'John':
+            # we cannot delete 'A' even if he have a positive apparatus because
+            # 'A' holds one reading not found in any collated ms.
+
+            # fix MT
             execute (conn, """
-            UPDATE att SET hsnr = 1 WHERE hs = 'A'
+            UPDATE att SET hsnr = 1 WHERE hs = 'MT';
             """, parameters)
 
         if book == 'Acts':
+            # we cannot delete 'A' because in a negative apparatus it holds unique readings.
             # delete Patristic texts
             execute (conn, """
             DELETE FROM att WHERE hsnr >= 500000;
@@ -214,13 +216,13 @@ def step01 (dba, dbs, parameters):
         SET labezorig = labez, labezsuforig = labezsuf
         """, parameters)
 
-        if book == 'Acts':
-            execute (conn, """
-            UPDATE att
-            SET lesart = NULL
-            WHERE lesart = ''
-            """, parameters)
+        execute (conn, """
+        UPDATE att
+        SET lesart = NULL
+        WHERE lesart = '' AND labez ~ '^z';
+        """, parameters)
 
+        if book == 'Acts':
             execute (conn, """
             UPDATE att
             SET labez = labezsuf, labezsuf = ''
@@ -705,8 +707,8 @@ class CBGM_Params (object):
     affinity_matrix = None  # mss x mss matrix of similarity measure
 
 
-def copy_genealogical_data (dbsrcvg, dbdest, parameters):
-    """Copy / update genealogical data
+def copy_genealogical_fdw (dbsrcvg, dbdest, parameters):
+    """Copy / fix genealogical data
 
     Aus: VGA/Att2CBGMPh3.pl
 
@@ -752,13 +754,6 @@ def copy_genealogical_data (dbsrcvg, dbdest, parameters):
         if 'MYSQL_LOCSTEM_TABLES' in config:
             concat_tables (dest, dbsrcvg_meta, 'original_locstemed', 'var_fdw', config['MYSQL_LOCSTEM_TABLES'])
             copy_table (dest, 'original_locstemed', 'tmp_locstemed', "varid !~ '^z'");
-
-            if (book == 'John'):
-                execute (dest, """
-                DELETE FROM tmp_locstemed WHERE varid ~ '/';
-                ALTER TABLE tmp_locstemed ADD COLUMN varnew CHARACTER VARYING (10);
-                UPDATE tmp_locstemed SET varnew = varid;
-                """, parameters)
 
         if 'MYSQL_RDG_TABLES' in config:
             concat_tables (dest, dbsrcvg_meta, 'original_rdg',       'var_fdw', config['MYSQL_RDG_TABLES'])
@@ -1069,13 +1064,6 @@ def fill_readings_table (dba, parameters):
         GROUP BY p.pass_id, a.labez
         """, parameters)
 
-        if book == 'John':
-            execute (conn, """
-            UPDATE readings
-            SET lesart = 'om'
-            WHERE lesart = '' AND labez != 'zz';
-            """, parameters)
-
         # We need to keep 'zz' readings for referential integrity, but we must
         # set them to NULL.  'zz' readings in `att` may still contain a few
         # readable characters, but those characters cannot be recorded here
@@ -1083,31 +1071,20 @@ def fill_readings_table (dba, parameters):
         execute (conn, """
         UPDATE readings
         SET lesart = NULL
-        WHERE labez = 'zz';
+        WHERE labez IN ('zu', 'zz');
         """, parameters)
 
-        # Update lesart of 'zu' readings
-        execute (conn, """
-        UPDATE readings
-        SET lesart = 'overlap'
-        WHERE labez = 'zu'
-        """, parameters)
-
-        # Insert a 'zz' reading for every passage
+        # Insert a 'zz' reading for every passage, and a 'zu' for Fehlverse.
         execute (conn, """
         INSERT INTO readings (pass_id, labez, lesart)
         SELECT p.pass_id, 'zz', NULL
         FROM passages p
-        ON CONFLICT DO NOTHING
-        """, parameters)
-
-        # Insert a 'zu' reading for Fehlverse
-        execute (conn, """
+        ON CONFLICT DO NOTHING;
         INSERT INTO readings (pass_id, labez, lesart)
-        SELECT p.pass_id, 'zu', 'overlap'
+        SELECT p.pass_id, 'zu', NULL
         FROM passages p
         WHERE p.fehlvers
-        ON CONFLICT DO NOTHING
+        ON CONFLICT DO NOTHING;
         """, parameters)
 
 
@@ -1123,7 +1100,7 @@ def fill_cliques_table (db, parameters):
             execute (conn, """
             DELETE FROM tmp_locstemed l
             WHERE NOT EXISTS (
-              SELECT * FROM readings_view r
+              SELECT 1 FROM readings_view r
               WHERE (l.begadr, l.endadr, l.varid) = (r.begadr, r.endadr, r.labez)
             )
             """, parameters)
@@ -1172,6 +1149,65 @@ def fill_cliques_table (db, parameters):
         """, parameters)
 
 
+def fill_locstem_table (db, parameters):
+
+    with db.engine.begin () as conn:
+
+        execute (conn, """
+        TRUNCATE locstem_tts RESTART IDENTITY CASCADE;
+        TRUNCATE locstem     RESTART IDENTITY CASCADE;
+        ALTER TABLE locstem DISABLE TRIGGER locstem_trigger;
+        """, parameters)
+
+        fix (conn, "Sources in LocStemEd but not in Cliques", """
+        SELECT begadr, endadr, varnew, s1
+        FROM tmp_locstemed l
+        WHERE s1 NOT IN ('*', '?')
+          AND l.varnew !~ '^z'
+          AND NOT EXISTS (
+            SELECT 1 FROM cliques_view q
+            WHERE (q.begadr, q.endadr, q.labez, q.clique) = (l.begadr, l.endadr, source2labez (l.s1), source2clique (l.s1))
+          )
+        """, """
+        DELETE FROM tmp_locstemed l
+        WHERE l.s1 NOT IN ('*', '?')
+          AND NOT EXISTS (
+            SELECT 1 FROM cliques_view q
+            WHERE (q.begadr, q.endadr, q.labez, q.clique) = (l.begadr, l.endadr, source2labez (l.s1), source2clique (l.s1))
+        )
+        """, parameters)
+
+        # check generated locstem
+        fix (conn, "Source loops in locstem", """
+        SELECT begadr, endadr, varid, varnew, s1
+        FROM tmp_locstemed
+        WHERE varnew = s1
+        """, """
+        DELETE FROM tmp_locstemed
+        WHERE varnew = s1
+        """, parameters)
+
+        # copy cliques into locstem and get source readings from tmp_locstemed
+        # s1 = '*'   =>   s1 = NULL AND original = True
+        # s1 = '?'   =>   s1 = NULL AND original = False
+
+        execute (conn, """
+        INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original, user_id_start)
+        SELECT c.pass_id, c.labez, c.clique, source2labez (l.s1), source2clique (l.s1), source2original (l.s1), 0
+        FROM cliques_view c
+        LEFT JOIN tmp_locstemed l
+          ON (c.begadr, c.endadr) = (l.begadr, l.endadr)
+            AND c.labez  = varnew2labez (l.varnew)
+            AND c.clique = varnew2clique (l.varnew)
+            AND l.varnew !~ '^z'
+        ON CONFLICT DO NOTHING
+        """, parameters)
+
+        execute (conn, """
+        ALTER TABLE locstem ENABLE TRIGGER locstem_trigger;
+        """, parameters)
+
+
 def fill_apparatus_table (dba, parameters):
     """ Create the apparatus table.
 
@@ -1190,25 +1226,6 @@ def fill_apparatus_table (dba, parameters):
         # Datenbasis für CBGM"
 
         log (logging.INFO, "          Filling default readings of 'A' ...")
-
-        # fix (conn, "Attestation of A != 'a'", """
-        # SELECT hs, labez, labezsuf, begadr, endadr
-        # FROM att
-        # WHERE hs = 'A' AND labez ~ '^[b-y]'
-        # """, """
-        # UPDATE att
-        # SET labez = 'a', labezsuf = ''
-        # WHERE (hs, begadr, endadr, labez) = ('A', 50240012, 50240018, 'f')
-        # """, parameters)
-        #
-        # execute (conn, """
-        # INSERT INTO apparatus (ms_id, pass_id, labez, labezsuf, cbgm, certainty, lesart, origin)
-        # SELECT ms.ms_id, p.pass_id, a.labez, COALESCE (a.labezsuf, ''), true, 1.0, NULLIF (a.lesart, r.lesart), 'DEF'
-        # FROM passages p
-        #   CROSS JOIN manuscripts ms
-        #   JOIN att a ON p.irange = a.irange AND a.hsnr = 0
-        #   JOIN readings r ON r.pass_id = p.pass_id AND r.labez = a.labez
-        # """, parameters)
 
         # Instead of using the manuscript 'A' contained in the input database
         # (which only reads 'a' and 'zu' anyway) we set 'a' everywhere except in
@@ -1286,8 +1303,70 @@ def fill_apparatus_table (dba, parameters):
         """, parameters)
 
 
-    if 'MYSQL_VAR_TABLES' in config:
-        with dba.engine.begin () as conn:
+    # Mark passages without variants
+    #
+    # An diese Stelle versetzt damit sie nur einmal aufgerufen werden muß.
+    # Wir wollen die Leitzeile darstellen, deshalb können wir Stellen ohne
+    # Varianten nicht mehr löschen.  Sie werden stattdessen in Passages als
+    # solche markiert.
+    #
+    # Stellen ohne Varianten sind für die CBGM irrelevant.  Stellen mit
+    # ausschließlich 'z[u-z]' Lesearten ebenso.
+    #
+    # Aus: prepare4cbgm_5.py
+    #
+    #     Stellen löschen, an denen nur eine oder mehrere f- oder o-Lesarten
+    #     vom A-Text abweichen. Hier gibt es also keine Variante.
+    #
+    #     Nicht löschen, wenn an dieser variierten Stelle eine Variante 'b'
+    #     - 'y' erscheint.
+    #
+    #     Änderung 2014-12-16: Act 28,29/22 gehört zu einem Fehlvers.  Dort
+    #     gibt es u.U. keine Variante neben b, sondern nur ein
+    #     Orthographicum.  Wir suchen also nicht mehr nach einer Variante
+    #     'b' bis 'y', sondern zählen die Varianten.  Liefert getReadings
+    #     nur 1 zurück, gibt es keine Varianten.
+    #
+
+    with dba.engine.begin () as conn:
+
+        execute (conn, """
+        UPDATE passages p
+        SET variant = False
+        WHERE pass_id IN (
+          SELECT pass_id
+          FROM (
+            SELECT DISTINCT pass_id, labez
+            FROM apparatus
+            WHERE labez !~ '^z' AND certainty = 1.0
+          ) AS i
+          GROUP BY pass_id
+          HAVING count (*) <= 1
+        )
+        """, parameters)
+
+
+def fill_ms_cliques_table (dba, parameters):
+    """ Create the ms_cliques table.
+
+    """
+
+    with dba.engine.begin () as conn:
+
+        execute (conn, """
+        TRUNCATE ms_cliques_tts RESTART IDENTITY CASCADE;
+        TRUNCATE ms_cliques     RESTART IDENTITY CASCADE;
+        ALTER TABLE ms_cliques DISABLE TRIGGER ms_cliques_trigger;
+        """, parameters)
+
+        execute (conn, """
+        INSERT INTO ms_cliques (pass_id, ms_id, labez, clique, user_id_start)
+        SELECT pass_id, ms_id, labez, '1', 0
+        FROM apparatus a
+        WHERE cbgm
+        """, parameters)
+
+        if 'MYSQL_VAR_TABLES' in config:
 
             # Data entry fixes
 
@@ -1317,14 +1396,8 @@ def fill_apparatus_table (dba, parameters):
               AND (a.begadr, a.endadr, a.labez, v.varid) = (50405022, 50405034, 'd', 'a');
             """, parameters)
 
-        with dba.engine.begin () as conn:
-
-            # Update the clique no. in Apparatus
-
-            log (logging.INFO, "          Filling in clique numbers ...")
-
             execute (conn, """
-            UPDATE apparatus u
+            UPDATE ms_cliques u
             SET clique = varnew2clique (v.varnew)
             FROM tmp_var v, manuscripts ms, cliques_view cq
             WHERE (cq.pass_id, cq.labez) = (u.pass_id, u.labez)
@@ -1336,101 +1409,8 @@ def fill_apparatus_table (dba, parameters):
               AND varnew2clique (v.varnew) != '1'
             """, parameters)
 
-
-        # Mark passages without variants
-        #
-        # An diese Stelle versetzt damit sie nur einmal aufgerufen werden muß.
-        # Wir wollen die Leitzeile darstellen, deshalb können wir Stellen ohne
-        # Varianten nicht mehr löschen.  Sie werden stattdessen in Passages als
-        # solche markiert.
-        #
-        # Stellen ohne Varianten sind für die CBGM irrelevant.  Stellen mit
-        # ausschließlich 'z[u-z]' Lesearten ebenso.
-        #
-        # Aus: prepare4cbgm_5.py
-        #
-        #     Stellen löschen, an denen nur eine oder mehrere f- oder o-Lesarten
-        #     vom A-Text abweichen. Hier gibt es also keine Variante.
-        #
-        #     Nicht löschen, wenn an dieser variierten Stelle eine Variante 'b'
-        #     - 'y' erscheint.
-        #
-        #     Änderung 2014-12-16: Act 28,29/22 gehört zu einem Fehlvers.  Dort
-        #     gibt es u.U. keine Variante neben b, sondern nur ein
-        #     Orthographicum.  Wir suchen also nicht mehr nach einer Variante
-        #     'b' bis 'y', sondern zählen die Varianten.  Liefert getReadings
-        #     nur 1 zurück, gibt es keine Varianten.
-        #
-
-        with dba.engine.begin () as conn:
-
-            execute (conn, """
-            UPDATE passages p
-            SET variant = False
-            WHERE pass_id IN (
-              SELECT pass_id
-              FROM (
-                SELECT DISTINCT pass_id, labez
-                FROM apparatus
-                WHERE labez !~ '^z' AND certainty = 1.0
-              ) AS i
-              GROUP BY pass_id
-              HAVING count (*) <= 1
-            )
-            """, parameters)
-
-
-def fill_locstem_table (db, parameters):
-
-    with db.engine.begin () as conn:
-
         execute (conn, """
-        TRUNCATE locstem RESTART IDENTITY CASCADE;
-        TRUNCATE locstem_tts RESTART IDENTITY CASCADE;
-        """, parameters)
-
-        fix (conn, "Sources in LocStemEd but not in Cliques", """
-        SELECT begadr, endadr, varnew, s1
-        FROM tmp_locstemed l
-        WHERE s1 NOT IN ('*', '?')
-          AND l.varnew !~ '^z'
-          AND NOT EXISTS (
-            SELECT 1 FROM cliques_view q
-            WHERE (q.begadr, q.endadr, q.labez, q.clique) = (l.begadr, l.endadr, source2labez (l.s1), source2clique (l.s1))
-          )
-        """, """
-        DELETE FROM tmp_locstemed l
-        WHERE l.s1 NOT IN ('*', '?')
-          AND NOT EXISTS (
-            SELECT 1 FROM cliques_view q
-            WHERE (q.begadr, q.endadr, q.labez, q.clique) = (l.begadr, l.endadr, source2labez (l.s1), source2clique (l.s1))
-        )
-        """, parameters)
-
-        # check generated locstem
-        fix (conn, "Source loops in locstem", """
-        SELECT begadr, endadr, varid, varnew, s1
-        FROM tmp_locstemed
-        WHERE varnew = s1
-        """, """
-        DELETE FROM tmp_locstemed
-        WHERE varnew = s1
-        """, parameters)
-
-        # copy cliques into locstem and get source readings from tmp_locstemed
-        # s1 = '*'   =>   s1 = NULL AND original = True
-        # s1 = '?'   =>   s1 = NULL AND original = False
-
-        execute (conn, """
-        INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original)
-        SELECT c.pass_id, c.labez, c.clique, source2labez (l.s1), source2clique (l.s1), source2original (l.s1)
-        FROM cliques_view c
-        LEFT JOIN tmp_locstemed l
-          ON (c.begadr, c.endadr) = (l.begadr, l.endadr)
-            AND c.labez  = varnew2labez (l.varnew)
-            AND c.clique = varnew2clique (l.varnew)
-            AND l.varnew !~ '^z'
-        ON CONFLICT DO NOTHING
+        ALTER TABLE ms_cliques ENABLE TRIGGER ms_cliques_trigger;
         """, parameters)
 
 
@@ -1447,48 +1427,50 @@ def build_A_text (dba, parameters):
     locstem.  In this case we set 'zz' to signify that there is a gap in the
     reconstructed text.
 
-    The 'A' manuscript has a hard-coded ms_id of 1.
-
     """
 
     with dba.engine.begin () as conn:
 
         execute (conn, """
-        DELETE FROM apparatus WHERE ms_id = 1
-        """, parameters)
+        DELETE FROM ms_cliques     WHERE ms_id = :ms_id;
+        DELETE FROM ms_cliques_tts WHERE ms_id = :ms_id;
+        DELETE FROM apparatus      WHERE ms_id = :ms_id;
+        """, dict (parameters, ms_id = MS_ID_A))
 
-        # Fill with the 'original' reading in locstem
+        # Fill with the original reading in locstem
         execute (conn, """
-        INSERT INTO apparatus (ms_id, pass_id, labez, clique, cbgm, origin)
-          SELECT 1, pass_id, labez, clique, true, 'LOC'
+        INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, cbgm, origin)
+          SELECT :ms_id, pass_id, labez, clique, true, 'LOC'
           FROM locstem l
           JOIN passages p USING (pass_id)
-          WHERE l.original AND NOT p.fehlvers
-        """, parameters)
+          WHERE NOT p.fehlvers AND l.original
+        """, dict (parameters, ms_id = MS_ID_A))
 
-        # Fill with labez 'zu' if Fehlvers
+        # Fill Fehlverse with labez 'zu'
         execute (conn, """
-        INSERT INTO apparatus (ms_id, pass_id, labez, cbgm, origin)
-        SELECT 1, p.pass_id, 'zu', true, 'LOC'
-        FROM passages p
-        WHERE p.fehlvers
-        ON CONFLICT DO NOTHING
-        """, parameters)
+        INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, cbgm, origin)
+          SELECT :ms_id, p.pass_id, 'zu', '1', true, 'LOC'
+          FROM passages p
+          WHERE p.fehlvers
+        """, dict (parameters, ms_id = MS_ID_A))
 
-        # Fill with labez 'zz' where A is still undefined
+        # Fill with labez 'zz' where locstem offers no original reading
         execute (conn, """
-        INSERT INTO apparatus (ms_id, pass_id, labez, lesart, cbgm, origin)
-        SELECT 1, p.pass_id, 'zz', NULL, true, 'LOC'
-        FROM passages p
-        ON CONFLICT DO NOTHING
-        """, parameters)
+        INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, cbgm, origin, lesart)
+          SELECT :ms_id, p.pass_id, 'zz', '1', true, 'LOC', NULL
+          FROM passages p
+          WHERE NOT p.fehlvers AND NOT EXISTS (
+            SELECT 1
+            FROM locstem l
+            WHERE l.pass_id = p.pass_id AND l.original
+          )
+        """, dict (parameters, ms_id = MS_ID_A))
 
 
-def build_byzantine_text (dba, parameters):
+def build_MT_text (dba, parameters):
     """Reconstruct the Majority Text
 
     Build a virtual manuscript that reconstructs the :ref:`Majority Text <mt>`.
-    The 'MT' manuscript has a hard-coded ms_id of 2.
 
     .. _mt_rules:
 
@@ -1512,35 +1494,43 @@ def build_byzantine_text (dba, parameters):
     with dba.engine.begin () as conn:
 
         execute (conn, """
-        DELETE FROM apparatus WHERE ms_id = 2
-        """, parameters)
+        DELETE FROM ms_cliques     WHERE ms_id = :ms_id;
+        DELETE FROM ms_cliques_tts WHERE ms_id = :ms_id;
+        DELETE FROM apparatus      WHERE ms_id = :ms_id;
+        """, dict (parameters, ms_id = MS_ID_MT))
 
-        execute (conn, """
-        INSERT INTO apparatus (ms_id, pass_id, labez, clique, cbgm, origin)
-          SELECT 2, pass_id, labez[1], clique[1], true, 'BYZ'
-          FROM (
-            SELECT pass_id,
-                   ARRAY_AGG (labez  ORDER BY cnt DESC) AS labez,
-                   ARRAY_AGG (clique ORDER BY cnt DESC) AS clique,
-                   ARRAY_AGG (cnt    ORDER BY cnt DESC) AS mask
+        # Insert MT where defined according to our rules
+        if book == 'Acts':
+            execute (conn, """
+            INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, lesart, cbgm, origin)
+            SELECT :ms_id, pass_id, labez, clique, NULL, true, 'BYZ'
             FROM (
-              SELECT pass_id, labez, clique, count (*) AS cnt
-              FROM apparatus_view a
-              WHERE hsnr IN {byzlist}
-              GROUP BY pass_id, labez, clique
-            ) AS q1
-            GROUP BY pass_id
-          ) AS q2
-          WHERE mask IN ('{{7}}', '{{6,1}}', '{{5,1,1}}')
-        """, dict (parameters, byzlist = tools.BYZ_HSNR))
+                SELECT pass_id,
+                       (ARRAY_AGG (labez  ORDER BY cnt DESC))[1] AS labez,
+                       (ARRAY_AGG (clique ORDER BY cnt DESC))[1] AS clique,
+                       ARRAY_AGG (cnt    ORDER BY cnt DESC) AS mask
+                FROM (
+                  SELECT pass_id, labez, clique, count (*) AS cnt
+                  FROM apparatus_cliques_view a
+                  WHERE hsnr IN {byzlist}
+                  GROUP BY pass_id, labez, clique
+                ) AS q1
+                GROUP BY pass_id
+            ) AS q2
+            WHERE mask IN ('{{7}}', '{{6,1}}', '{{5,1,1}}')
+            """, dict (parameters, ms_id = MS_ID_MT, byzlist = tools.BYZ_HSNR))
 
-        # Fill with labez 'zz' where MT is undefined
+        # Insert MT as 'zz' where undefined
         execute (conn, """
-        INSERT INTO apparatus (ms_id, pass_id, labez, lesart, cbgm, origin)
-        SELECT 2, p.pass_id, 'zz', NULL, true, 'BYZ'
+        INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, lesart, cbgm, origin)
+        SELECT :ms_id, p.pass_id, 'zz', '1', NULL, true, 'BYZ'
         FROM passages p
-        ON CONFLICT DO NOTHING
-        """, parameters)
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM ms_cliques q
+            WHERE p.pass_id = q.pass_id AND q.ms_id = :ms_id
+        )
+        """, dict (parameters, ms_id = MS_ID_MT))
 
 
 def create_labez_matrix (dba, parameters, val):
@@ -1791,7 +1781,7 @@ def calculate_mss_similarity_postco (dba, parameters, val):
         SELECT pass_id - 1 AS pass_id,
                ms_id   - 1 AS ms_id,
                labez_clique (labez, clique) AS labez_clique
-        FROM apparatus a
+        FROM apparatus_cliques_view a
         WHERE labez !~ '^z' AND cbgm
         ORDER BY pass_id
         """, parameters)
@@ -2091,7 +2081,7 @@ if __name__ == '__main__':
 
                 db.Base.metadata.create_all (dbdest.engine)
 
-                step01  (dbdest, dbsrc1, parameters)
+                copy_att_fdw (dbdest, dbsrc1, parameters)
                 continue
             if step == 2:
                 log (logging.INFO, "Step  2: Processing Commentaries ...")
@@ -2130,7 +2120,7 @@ if __name__ == '__main__':
                 log (logging.INFO, "Step 31 : Creating CBGM tables ...")
                 db.Base2.metadata.drop_all   (dbdest.engine)
                 db.Base2.metadata.create_all (dbdest.engine)
-                copy_genealogical_data (dbsrc2, dbdest, parameters)
+                copy_genealogical_fdw (dbsrc2, dbdest, parameters)
                 continue
 
             if step == 32:
@@ -2157,9 +2147,14 @@ if __name__ == '__main__':
                 fill_apparatus_table (dbdest, parameters)
                 continue
 
+            if step == 35:
+                log (logging.INFO, "Step 35 : Filling the MsCliques table ...")
+                fill_ms_cliques_table (dbdest, parameters)
+                continue
+
             if step == 41:
-                log (logging.INFO, "Step 41 : Building the Byzantine text ...")
-                build_byzantine_text (dbdest, parameters)
+                log (logging.INFO, "Step 41 : Building the 'MT' text ...")
+                build_MT_text (dbdest, parameters)
                 continue
 
             if step == 42:

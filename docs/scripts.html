@@ -145,7 +145,10 @@
 <li class="toctree-l3"><a class="reference internal" href="database.html#transform-the-negative-apparatus-into-a-positive-apparatus">Transform the negative apparatus into a positive apparatus</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal"><span class="pre">ntg_common.src_db</span></code> — Source Database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#id2">Tables</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="database.html#literature">Literature</a></li>
 </ul>
 </li>
@@ -319,15 +322,13 @@ decision that the verse is not original, so we can tranquilly set ‘zu’.</p>
 <p>If the editors came to no decision, no ‘original’ reading will be found in
 locstem.  In this case we set ‘zz’ to signify that there is a gap in the
 reconstructed text.</p>
-<p>The ‘A’ manuscript has a hard-coded ms_id of 1.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="scripts.cceh.prepare4cbgm.build_MT_text">
 <code class="descname">build_MT_text</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.build_MT_text" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reconstruct the Majority Text</p>
-<p>Build a virtual manuscript that reconstructs the <a class="reference internal" href="developer.html#mt"><span class="std std-ref">Majority Text</span></a>.
-The ‘MT’ manuscript has a hard-coded ms_id of 2.</p>
+<p>Build a virtual manuscript that reconstructs the <a class="reference internal" href="developer.html#mt"><span class="std std-ref">Majority Text</span></a>.</p>
 <p id="mt-rules">Im Laufe der Textgeschichte hat sich eine Textform durchgesetzt, der
 sogenannte Mehrheitstext, der auch Byzantinischer Text genannt wird.
 Diese Textform wird exemplarisch durch die sieben Handschriften 1, 18,
@@ -499,6 +500,12 @@ ausschließlich ‘z[u-z]’ Lesearten ebenso.</p>
 <dt id="scripts.cceh.prepare4cbgm.fill_manuscripts_table">
 <code class="descname">fill_manuscripts_table</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.fill_manuscripts_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the Manuscripts and Ms_Ranges tables.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare4cbgm.fill_ms_cliques_table">
+<code class="descname">fill_ms_cliques_table</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare4cbgm.fill_ms_cliques_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the ms_cliques table.</p>
 </dd></dl>
 
 <dl class="function">

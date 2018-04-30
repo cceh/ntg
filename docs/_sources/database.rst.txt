@@ -7,23 +7,29 @@
 ======================================
 
 .. figure:: uml.*
+   :align: center
 
    Overview of the CBGM database (some columns omitted)
 
-The work database is build
+This work database is built
 from the :mod:`source database <ntg_common.src_db>`
 by the :mod:`prepare4cbgm <scripts.cceh.prepare4cbgm>` script.
 The :mod:`online application <server>` reads this database.
-The database system is PostgreSQL.
+
+The editors update the green tables through a graphical editor.  These tables
+are journalled to provide undo functionality.
+
+The CBGM process populates the red tables.
+
+.. Palette https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Paired.js
 
 .. sauml::
-   :include: books passages ranges readings cliques locstem manuscripts apparatus ms_ranges affinity
+   :include: books passages ranges readings cliques manuscripts ms_cliques locstem apparatus ms_ranges affinity
    :caption: Work database structure
    :align: center
+   :dot-table: bgcolor.ms_cliques=#b2df8a&color.ms_cliques=#33a02c&bgcolor.locstem=#b2df8a&color.locstem=#33a02c&bgcolor.cliques=#b2df8a&color.cliques=#33a02c&bgcolor.affinity=#fb9a99&color.affinity=#e31a1c&bgcolor.ms_ranges=#fb9a99&color.ms_ranges=#e31a1c
 
-   { rank=same; passages, ranges, manuscripts }
-   { rank=same; cliques, ms_ranges }
-   { rank=same; locstem, apparatus, affinity }
+   { rank=same; passages, ranges }
 
 
 Transform the negative apparatus into a positive apparatus
@@ -40,18 +46,21 @@ Transform the negative apparatus into a positive apparatus
    is one.
 
 
-.. _tt:
+.. _tts:
 
 Transaction-Time State Tables
 -----------------------------
 
 A transaction-time state table keeps track of the table's contents as it changes
-over time.  [SNODGRASS2000]_ This is the basis for our undo-functionality in the
-graphical stemma editors.
+over time.  This is the basis for our undo-functionality in the graphical stemma
+editors.
 
-To hide the details of the TTS table, we use a view that returns the current
-state of the table, and a trigger that updates the underlying table when the
-view gets updated.
+Our TTS tables are temporally partitioned (See [SNODGRASS2000]_ Section 9.4).
+We have one table that holds the current rows and another table that holds the
+rows that were valid at some time in the past.
+
+We have triggers in place that hide the details of TTS table maintenance:
+operations on the current table automagically update the past table also.
 
 
 Tables
@@ -81,7 +90,7 @@ The database system is MySQL.
 
 
 Tables
-------
+~~~~~~
 
 .. autoclass:: ntg_common.src_db.Acts01GVZ
    :members:
