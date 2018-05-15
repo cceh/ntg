@@ -1500,25 +1500,25 @@ def build_MT_text (dba, parameters):
         """, dict (parameters, ms_id = MS_ID_MT))
 
         # Insert MT where defined according to our rules
-        if book == 'Acts':
-            execute (conn, """
-            INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, lesart, cbgm, origin)
-            SELECT :ms_id, pass_id, labez, clique, NULL, true, 'BYZ'
+        execute (conn, """
+        INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, lesart, cbgm, origin)
+        SELECT :ms_id, pass_id, labez, clique, NULL, true, 'BYZ'
+        FROM (
+            SELECT pass_id,
+                   (ARRAY_AGG (labez  ORDER BY cnt DESC))[1] AS labez,
+                   (ARRAY_AGG (clique ORDER BY cnt DESC))[1] AS clique,
+                   ARRAY_AGG (cnt    ORDER BY cnt DESC) AS mask
             FROM (
-                SELECT pass_id,
-                       (ARRAY_AGG (labez  ORDER BY cnt DESC))[1] AS labez,
-                       (ARRAY_AGG (clique ORDER BY cnt DESC))[1] AS clique,
-                       ARRAY_AGG (cnt    ORDER BY cnt DESC) AS mask
-                FROM (
-                  SELECT pass_id, labez, clique, count (*) AS cnt
-                  FROM apparatus_cliques_view a
-                  WHERE hsnr IN {byzlist}
-                  GROUP BY pass_id, labez, clique
-                ) AS q1
-                GROUP BY pass_id
-            ) AS q2
-            WHERE mask IN ('{{7}}', '{{6,1}}', '{{5,1,1}}')
-            """, dict (parameters, ms_id = MS_ID_MT, byzlist = tools.BYZ_HSNR))
+              SELECT pass_id, labez, clique, count (*) AS cnt
+              FROM apparatus_cliques_view a
+              WHERE hsnr IN {byzlist}
+              GROUP BY pass_id, labez, clique
+            ) AS q1
+            GROUP BY pass_id
+        ) AS q2
+        WHERE mask IN ('{{7}}', '{{6,1}}', '{{5,1,1}}')
+        """, dict (parameters, ms_id = MS_ID_MT,
+                   byzlist = tools.BYZ_HSNR_ACTS if book == 'Acts' else tools.BYZ_HSNR_JOHN))
 
         # Insert MT as 'zz' where undefined
         execute (conn, """

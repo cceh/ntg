@@ -45,13 +45,15 @@ BOOKS = [
 ]
 """ Titles of the NT books """
 
-BYZ_HSNR = "(300010, 300180, 300350, 303300, 303980, 304240, 312410)"
+BYZ_HSNR_ACTS = "(300010, 300180, 300350, 303300, 303980, 304240, 312410)"
 """Manuscripts attesting the Byzantine Text.
 
 We use these manuscripts as templates to establish the Byzantine Text according
 to our rules.
 
 """
+
+BYZ_HSNR_JOHN = "(200070, 200280, 200450, 300180, 300350, 302260, 313200)"
 
 FEHLVERSE = """
     (
