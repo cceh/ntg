@@ -60,7 +60,7 @@ clean:
 psql:
 	ssh -f -L 1$(PSQL_PORT):localhost:$(PSQL_PORT) $(NTG_USER)@$(NTG_VM) sleep 120
 	sleep 1
-	psql -h localhost -p 1$(PSQL_PORT) -U $(NTG_USER) ntg_ph4
+	psql -h localhost -p 1$(PSQL_PORT) -U $(NTG_USER) acts_ph4
 
 import_acts:
 	$(MYSQL) -e "DROP DATABASE ECM_ActsPh4"
@@ -121,7 +121,7 @@ upload_scripts:
 	$(RSYNC) --exclude "**/instance/**"                     server     $(NTG_ROOT)/
 
 diff_affinity_acts:
-	scripts/cceh/sqldiff.sh ntg_ph4 "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 94 order by ms_id1, ms_id2" | less
+	scripts/cceh/sqldiff.sh acts_ph4 "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 94 order by ms_id1, ms_id2" | less
 
 diff_affinity_john:
 	scripts/cceh/sqldiff.sh john_ph1 "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 72 order by ms_id1, ms_id2" | less
