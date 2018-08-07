@@ -44,9 +44,9 @@ function load_passage (vm, passage) {
     }
 
     const xhr = vm.get ('apparatus.json/' + passage.pass_id);
-    const p2 = vm.$wrapper.animate ({ 'opacity' : 0.0 }, 300).promise ();
+    const p1 = vm.$wrapper.animate ({ 'opacity' : 0.0 }, 300).promise ();
 
-    return Promise.all ([xhr, p2]).then ((p) => {
+    return Promise.all ([xhr, p1]).then ((p) => {
         // select a grouping function
         const labez_grouper  = (g) => g.labez;
         const clique_grouper = (g) => g.labez_clique;

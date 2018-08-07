@@ -27,9 +27,8 @@ var dot_parser = require ('./dot-grammar.pegjs');
 var dot2css = 96.0 / 72.0;
 
 /* A color palette for labez. */
-var Labez =
-    '8888881f77b42ca02cd62728e7ba52ff7f0e9467bd8c564be377c217becf' +
-    'aec7e8ffbb7898df8aff9896c5b0d5c49c94f7b6d2dbdb8d9edae57f7f7f';
+var Labez = '8888881f77b42ca02cd62728e7ba52ff7f0e9467bd8c564be377c217becf'
+    +       'aec7e8ffbb7898df8aff9896c5b0d5c49c94f7b6d2dbdb8d9edae57f7f7f';
 
 /* A color palette for cliques.  Pilfered from d3-scale-chromatic.js */
 var Greys = 'fffffff0f0f0d9d9d9bdbdbd969696737373525252252525000000';
@@ -85,14 +84,14 @@ function generate_css_palette (labez_scale, clique_scale) {
     style = _.map (_.zip (labez_scale.domain (), labez_scale.range ()), function (pair) {
         var code = labezFromCharCode (pair[0]);
         return (
-            '.fg_labez[data-labez="' + code + '"] {\n' +
-            '    color: ' + pair[1] + ' !important;\n' +
-            '    stroke: ' + pair[1] + ';\n' +
-            '}\n' +
-            '.bg_labez[data-labez="' + code + '"] {\n' +
-            '    background-color: ' + pair[1] + ' !important;\n' +
-            '    fill: ' + pair[1] + ';\n' +
-            '}'
+            '.fg_labez[data-labez="' + code + '"] {\n'
+                + '    color: ' + pair[1] + ' !important;\n'
+                + '    stroke: ' + pair[1] + ';\n'
+                + '}\n'
+                + '.bg_labez[data-labez="' + code + '"] {\n'
+                + '    background-color: ' + pair[1] + ' !important;\n'
+                + '    fill: ' + pair[1] + ';\n'
+                + '}'
         );
     });
     style.unshift ('.fg_labez[data-labez] { color: grey !important; stroke: grey; }');
@@ -105,14 +104,14 @@ function generate_css_palette (labez_scale, clique_scale) {
     style = style.concat (_.map (_.zip (clique_scale.domain (), clique_scale.range ()), function (pair) {
         var code = pair[0];
         return (
-            '.fg_clique[data-clique="' + code + '"] {\n' +
-            '    color: ' + pair[1] + ' !important;\n' +
-            '    stroke: ' + pair[1] + ';\n' +
-            '}\n' +
-            '.bg_clique[data-clique="' + code + '"] {\n' +
-            '    background-color: ' + pair[1] + ' !important;\n' +
-            '    fill: ' + pair[1] + ';\n' +
-            '}'
+            '.fg_clique[data-clique="' + code + '"] {\n'
+                + '    color: ' + pair[1] + ' !important;\n'
+                + '    stroke: ' + pair[1] + ';\n'
+                + '}\n'
+                + '.bg_clique[data-clique="' + code + '"] {\n'
+                + '    background-color: ' + pair[1] + ' !important;\n'
+                + '    fill: ' + pair[1] + ';\n'
+                + '}'
         );
     }));
 

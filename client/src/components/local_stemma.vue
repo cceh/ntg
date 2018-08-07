@@ -155,11 +155,11 @@ function dragListener (vm) {
 
 function trow (data) {
     return $ (tools.format (
-        '<tr data-action="{action}" data-labez_old="{labez_old}" data-clique_old="{clique_old}" ' +
-            'data-labez_new="{labez_new}" data-clique_new="{clique_new}">' +
-            '<td class="bg_labez" data-labez="{labez_bg}"></td>' +
-            '<td>{msg}</td>' +
-            '</tr>',
+        '<tr data-action="{action}" data-labez_old="{labez_old}" data-clique_old="{clique_old}" '
+            + 'data-labez_new="{labez_new}" data-clique_new="{clique_new}">'
+            + '<td class="bg_labez" data-labez="{labez_bg}"></td>'
+            + '<td>{msg}</td>'
+            + '</tr>',
         data
     ));
 }
@@ -187,10 +187,10 @@ function open_contextmenu (event, vm) {
     // build the context menu
     let menu = $ ('<table class="contextmenu"></table>');
     menu.append ($ (tools.format (
-        '<tr class="ui-state-disabled">' +
-            '<td class="bg_labez" data-labez="{labez_old}"></td>' +
-            '<td>{labez_old}{clique_old}</td>' +
-            '</tr>',
+        '<tr class="ui-state-disabled">'
+            + '<td class="bg_labez" data-labez="{labez_old}"></td>'
+            + '<td>{labez_old}{clique_old}</td>'
+            + '</tr>',
         data
     )));
     menu.append ($ ('<tr><td>-</td><td>-</td></tr>'));

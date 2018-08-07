@@ -1,72 +1,76 @@
 <template>
   <div>
-    <!-- the parent for all floating panels must be at the top of the page so
-         the panels will not move around on page resizes etc. this element will
-         only contain absolute-positioned stuff and thus has a height of 0 -->
-    <div id="floating-panels">
-      <panel v-for="panel in floating_panels" :key="panel.id"
-             :panel_id="panel.id" :position_target="panel.position_target"
-             class="panel-closable panel-draggable panel-relatives">
-        <toolbar name="relatives" mode="relatives" />
-        <relmetrics :ms_id="panel.ms_id" />
-        <relatives :ms_id="panel.ms_id" />
+    <page-header :caption="caption" />
+
+    <div class="container bs-docs-container">
+
+      <!-- the parent for all floating panels must be at the top of the page so
+           the panels will not move around on page resizes etc. this element will
+           only contain absolute-positioned stuff and thus has a height of 0 -->
+      <div id="floating-panels">
+        <panel v-for="panel in floating_panels" :key="panel.id"
+               :panel_id="panel.id" :position_target="panel.position_target"
+               class="panel-closable panel-draggable panel-relatives">
+          <toolbar name="relatives" mode="relatives" />
+          <relmetrics :ms_id="panel.ms_id" />
+          <relatives :ms_id="panel.ms_id" />
+        </panel>
+      </div>
+
+      <navigator ref="nav" />
+
+      <panel cssclass="panel-apparatus" static_caption="Apparatus">
+        <toolbar name="apparatus" mode="apparatus" />
+        <apparatus />
       </panel>
+
+      <panel cssclass="panel-local-stemma" static_caption="Local Stemma">
+        <toolbar name="stemma" mode="stemma" />
+        <localstemma cssclass="stemma-wrapper local-stemma-wrapper">
+          <d3stemma prefix="ls_" />
+        </localstemma>
+      </panel>
+
+      <panel v-if="this.$store.state.current_user.is_editor"
+             cssclass="panel-notes" static_caption="Notes" default_closed="true">
+        <toolbar name="notes" mode="notes" />
+        <notes />
+      </panel>
+
+      <panel cssclass="panel-textflow panel-variant-textflow"
+             static_caption="Coherence at Variant Passages (GraphViz)">
+        <toolbar name="variant" mode="variant" />
+        <textflow cssclass="textflow-wrapper variant-textflow-wrapper"
+                  global="true" var_only="true">
+          <d3stemma prefix="vtf_" />
+        </textflow>
+      </panel>
+
+      <panel class="panel-textflow panel-variant-textflow-2"
+             static_caption="Coherence at Variant Passages (Chord)" default_closed="true">
+        <toolbar name="variant-2" mode="variant" />
+        <textflow global="true" var_only="true" cssclass="textflow-wrapper variant-textflow-wrapper">
+          <d3chord prefix="vtf2_" />
+        </textflow>
+      </panel>
+
+      <panel ref="ltpanel" class="panel-textflow panel-local-textflow"
+             static_caption="Coherence in Attestations">
+        <toolbar name="local" mode="local" />
+        <textflow cssclass="textflow-wrapper local-textflow-wrapper">
+          <d3stemma prefix="tf_" />
+        </textflow>
+      </panel>
+
+      <panel class="panel-textflow panel-global-textflow" static_caption="General Textual Flow">
+        <toolbar name="global" mode="global" />
+        <textflow global="true" cssclass="textflow-wrapper global-textflow-wrapper">
+          <d3stemma prefix="gtf_" />
+        </textflow>
+      </panel>
+
+      <navigator />
     </div>
-
-    <navigator ref="nav" />
-
-    <panel cssclass="panel-apparatus" static_caption="Apparatus">
-      <toolbar name="apparatus" mode="apparatus" />
-      <apparatus />
-    </panel>
-
-    <panel cssclass="panel-local-stemma" static_caption="Local Stemma">
-      <toolbar name="stemma" mode="stemma" />
-      <localstemma cssclass="stemma-wrapper local-stemma-wrapper">
-        <d3stemma prefix="ls_" />
-      </localstemma>
-    </panel>
-
-    <panel v-if="this.$store.state.current_user.is_editor"
-           cssclass="panel-notes" static_caption="Notes" default_closed="true">
-      <toolbar name="notes" mode="notes" />
-      <notes />
-    </panel>
-
-    <panel cssclass="panel-textflow panel-variant-textflow"
-           static_caption="Coherence at Variant Passages (GraphViz)">
-      <toolbar name="variant" mode="variant" />
-      <textflow cssclass="textflow-wrapper variant-textflow-wrapper"
-                global="true" var_only="true">
-        <d3stemma prefix="vtf_" />
-      </textflow>
-    </panel>
-
-    <panel class="panel-textflow panel-variant-textflow-2"
-           static_caption="Coherence at Variant Passages (Chord)" default_closed="true">
-      <toolbar name="variant-2" mode="variant" />
-      <textflow global="true" var_only="true" cssclass="textflow-wrapper variant-textflow-wrapper">
-        <d3chord prefix="vtf2_" />
-      </textflow>
-    </panel>
-
-    <panel ref="ltpanel" class="panel-textflow panel-local-textflow"
-           static_caption="Coherence in Attestations">
-      <toolbar name="local" mode="local" />
-      <textflow cssclass="textflow-wrapper local-textflow-wrapper">
-        <d3stemma prefix="tf_" />
-      </textflow>
-    </panel>
-
-    <panel class="panel-textflow panel-global-textflow" static_caption="General Textual Flow">
-      <toolbar name="global" mode="global" />
-      <textflow global="true" cssclass="textflow-wrapper global-textflow-wrapper">
-        <d3stemma prefix="gtf_" />
-      </textflow>
-    </panel>
-
-    <navigator />
-
   </div>
 </template>
 
@@ -87,6 +91,7 @@ import d3common  from 'd3-common';
 import 'bootstrap.css';
 import 'jquery-ui-css/all.css';
 
+import page_header      from 'page_header.vue';
 import navigator        from 'navigator.vue';
 import panel            from 'panel.vue';
 import toolbar          from 'toolbar.vue';
@@ -99,6 +104,7 @@ import textflow         from 'textflow.vue';
 import relatives        from 'relatives.vue';
 import relmetrics       from 'relatives_metrics.vue';
 
+Vue.component ('page-header', page_header);
 Vue.component ('navigator',   navigator);
 Vue.component ('panel',       panel);
 Vue.component ('toolbar',     toolbar);
@@ -122,11 +128,6 @@ export default {
     'computed' : {
         'caption' : function () {
             return `Attestation for ${this.$store.state.passage.hr}`;
-        },
-    },
-    'watch' : {
-        'caption' : function () {
-            this.$store.commit ('caption', this.caption);
         },
     },
     'methods' : {
@@ -202,6 +203,7 @@ export default {
 
         // React to hash changes.  All navigation is done by manipulating the
         // hash.
+        $ (window).off ('hashchange');
         $ (window).on ('hashchange', () => {
             nav.set_passage (window.location.hash.substring (1));
         });

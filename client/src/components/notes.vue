@@ -37,13 +37,16 @@ export default {
          */
         load_passage () {
             const vm = this;
+            if (vm.passage.pass_id === 0) {
+                return Promise.resolve ();
+            }
             const $ta = vm.$textarea;
             const old_height = tools.save_height ($ta);
 
             const xhr = vm.get ('notes.txt/' + vm.passage.pass_id);
-            const p2 = $ta.animate ({ 'opacity' : 0.0 }, 300).promise ();
+            const p1 = $ta.animate ({ 'opacity' : 0.0 }, 300).promise ();
 
-            return Promise.all ([xhr, p2]).then (function (p) {
+            return Promise.all ([xhr, p1]).then (function (p) {
                 $ta.val (p[0].data);
                 vm.original_text = $ta.val ();
                 tools.slide_from ($ta, old_height);

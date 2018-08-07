@@ -302,12 +302,12 @@ export default {
         readings () {
             // reset toolbar if reading is not in new passage
             const mapped_readings = this.readings.map (item => item[0]);
-            if (this.toolbar.labez &&
-                !mapped_readings.includes (this.toolbar.labez)) {
+            if (this.toolbar.labez
+                && !mapped_readings.includes (this.toolbar.labez)) {
                 this.toolbar.labez = mapped_readings[0];
             }
-            if (this.toolbar.hyp_a &&
-                !mapped_readings.includes (this.toolbar.hyp_a)) {
+            if (this.toolbar.hyp_a
+                && !mapped_readings.includes (this.toolbar.hyp_a)) {
                 this.toolbar.hyp_a = 'A';
             }
             set_toolbar_buttons (this);

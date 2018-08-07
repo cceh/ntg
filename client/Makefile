@@ -27,6 +27,7 @@ csslint:
 
 
 build/index.html: src/index.html
+	-mkdir -p build
 	cp $< $@
 
 build/api.conf.js: src/api.conf.js

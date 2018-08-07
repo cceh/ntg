@@ -25,7 +25,7 @@ const routes = [
         'component' : app,
         'props'     : true,
         'children'  : [
-            { 'path' : '',           'component' : index      },
+            { 'path' : '',           'component' : index,     'name' : 'index' },
             { 'path' : 'coherence',  'component' : coherence  },
             { 'path' : 'comparison', 'component' : comparison },
         ],

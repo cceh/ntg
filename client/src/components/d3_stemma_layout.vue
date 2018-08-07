@@ -30,13 +30,13 @@ function load_dot (vm, url) {
     const css_dpi = 96;
     const svg = d3.select (vm.$el);
 
-    const p0 = vm.get (url);
+    const xhr = vm.get (url);
     const p1 = new Promise ((resolve, dummy_reject) => {
         svg.transition ('svg').duration (300).style ('opacity', 0.0).on ('end', resolve);
     });
 
     const promise = new Promise ((resolve, dummy_reject) => {
-        Promise.all ([p0, p1]).then (function (p) {
+        Promise.all ([xhr, p1]).then (function (p) {
             svg.selectAll ('g').remove ();
             d3_common.dot (p[0].data, (graph) => {
                 // if we have subgraphs, retrieve their nodes too
@@ -118,10 +118,10 @@ function load_dot (vm, url) {
                     .attr ('id', d => d.id)
                     .attr ('data-labez', d => graph.nodes[d.elems[0].id].attrs.labez)
                     .attr ('class', d => {
-                        return 'link fg_labez ' +
-                            vm.prefix + 'sid-' + d.elems[0].id + ' ' +
-                            vm.prefix + 'tid-' + d.elems[1].id +
-                            (/dashed/.test (d.attrs.style) ? ' dashed' : '');
+                        return 'link fg_labez '
+                            + vm.prefix + 'sid-' + d.elems[0].id + ' '
+                            + vm.prefix + 'tid-' + d.elems[1].id
+                            + (/dashed/.test (d.attrs.style) ? ' dashed' : '');
                     })
                     .attr ('marker-end', 'url(#' + vm.prefix + 'triangle)')
                     .attr ('d', d => d3_common.parse_path_svg (d.attrs.pos));
@@ -130,9 +130,9 @@ function load_dot (vm, url) {
                     .append ('text')
                     .attr ('data-labez', d => graph.nodes[d.elems[0].id].attrs.labez)
                     .attr ('class', (d) => {
-                        return 'link bg_labez ' +
-                            vm.prefix + 'sid-' + d.elems[0].id + ' ' +
-                            vm.prefix + 'tid-' + d.elems[1].id;
+                        return 'link bg_labez '
+                            + vm.prefix + 'sid-' + d.elems[0].id + ' '
+                            + vm.prefix + 'tid-' + d.elems[1].id;
                     })
                     .attr ('x', d => d.attrs.head_lp.x)
                     .attr ('y', d => d.attrs.head_lp.y)

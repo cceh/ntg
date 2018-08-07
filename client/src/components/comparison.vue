@@ -1,23 +1,28 @@
 <template>
   <div>
-    <div class="navigator">
-      <form class="manuscripts-selector form-inline" @submit.prevent="submit">
-        <div class="form-group">
-          <label>Witness 1:</label>
-          <input v-model="input1" type="text" class="form-control" name="ms1"
-                 title="Enter the Gregory-Aland no. of the first witness ('A' for the initial text)." />
-          <label>Witness 2:</label>
-          <input v-model="input2" type="text" class="form-control" name="ms2"
-                 title="Enter the Gregory-Aland no. of the second witness ('A' for the initial text)." />
-        </div>
-        <button type="submit" data="Go" class="btn btn-primary"
-                title="Start the comparison.">Go</button>
-      </form>
+    <page-header :caption="caption" />
+
+    <div class="container bs-docs-container">
+      <div class="navigator">
+        <form class="manuscripts-selector form-inline" @submit.prevent="submit">
+          <div class="form-group">
+            <label>Witness 1:</label>
+            <input v-model="input1" type="text" class="form-control" name="ms1"
+                   title="Enter the Gregory-Aland no. of the first witness ('A' for the initial text)." />
+            <label>Witness 2:</label>
+            <input v-model="input2" type="text" class="form-control" name="ms2"
+                   title="Enter the Gregory-Aland no. of the second witness ('A' for the initial text)." />
+          </div>
+          <button type="submit" data="Go" class="btn btn-primary"
+                  title="Start the comparison.">Go</button>
+        </form>
+      </div>
+
+      <div class="panel panel-default panel-comparison">
+        <comparison-table :ms1="ms1" :ms2="ms2" />
+      </div>
     </div>
 
-    <div class="panel panel-default panel-comparison">
-      <comparison-table :ms1="ms1" :ms2="ms2" />
-    </div>
   </div>
 </template>
 
@@ -57,11 +62,6 @@ export default {
             return `Comparison of ${this.ms1.hs} and ${this.ms2.hs}`;
         },
     },
-    'watch' : {
-        'caption' : function () {
-            this.$store.commit ('caption', this.caption);
-        },
-    },
     'methods' : {
         submit (dummy_event) {
             window.location.hash = '#' + $.param ({
@@ -74,12 +74,14 @@ export default {
             if (hash) {
                 const vm = this;
                 const params = tools.deparam (hash);
-                const p1 = vm.get ('manuscript.json/' + params.ms1);
-                const p2 = vm.get ('manuscript.json/' + params.ms2);
+                const requests = [
+                    vm.get ('manuscript.json/' + params.ms1),
+                    vm.get ('manuscript.json/' + params.ms2),
+                ];
 
-                Promise.all ([p1, p2]).then ((p) => {
-                    vm.ms1 = p[0].data.data;
-                    vm.ms2 = p[1].data.data;
+                Promise.all (requests).then ((responses) => {
+                    vm.ms1 = responses[0].data.data;
+                    vm.ms2 = responses[1].data.data;
                     vm.input1 = vm.ms1.hs;
                     vm.input2 = vm.ms2.hs;
                 });
@@ -89,18 +91,17 @@ export default {
             }
         },
     },
-    created () {
+    mounted () {
         const vm = this;
+
+        $ (window).off ('hashchange');
         $ (window).on ('hashchange', function () {
             vm.on_hashchange ();
         });
-    },
-    mounted () {
+
         // On first page load simulate user navigation to hash.
         if (window.location.hash) {
-            this.on_hashchange ();
-        } else {
-            this.$store.commit ('caption', this.caption);
+            vm.on_hashchange ();
         }
     },
 };

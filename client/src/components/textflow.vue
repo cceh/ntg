@@ -45,10 +45,10 @@ function open_contextmenu (event, vm) {
     // build the context menu
     const menu  = $ ('<table class="contextmenu"></table>');
     menu.append ($ (tools.format (
-        '<tr class="ui-state-disabled">' +
-            '<td class="bg_labez" data-labez="{labez_old}"></td>' +
-            '<td>{labez_old}{clique_old}</td>' +
-            '</tr>',
+        '<tr class="ui-state-disabled">'
+            + '<td class="bg_labez" data-labez="{labez_old}"></td>'
+            + '<td>{labez_old}{clique_old}</td>'
+            + '</tr>',
         data
     )));
     menu.append ($ ('<tr><td>-</td><td>-</td></tr>'));
@@ -60,12 +60,12 @@ function open_contextmenu (event, vm) {
 
         if (data.labez_new === data.labez_old && data.clique_new !== data.clique_old) {
             menu.append ($ (tools.format (
-                '<tr data-action="move-manuscripts" ' +
-                    'data-labez_old="{labez_old}" data-clique_old="{clique_old}" ' +
-                    'data-labez_new="{labez_new}" data-clique_new="{clique_new}">' +
-                    '<td class="bg_labez" data-labez="{labez_old}"></td>' +
-                    '<td>Move subtree to {labez_new}{clique_new}</td>' +
-                    '</tr>',
+                '<tr data-action="move-manuscripts" '
+                    + 'data-labez_old="{labez_old}" data-clique_old="{clique_old}" '
+                    + 'data-labez_new="{labez_new}" data-clique_new="{clique_new}">'
+                    + '<td class="bg_labez" data-labez="{labez_old}"></td>'
+                    + '<td>Move subtree to {labez_new}{clique_new}</td>'
+                    + '</tr>',
                 data
             )));
         }
@@ -103,7 +103,7 @@ function open_contextmenu (event, vm) {
  */
 function load_passage (vm, passage) {
     if (passage.pass_id === 0) {
-        return;
+        return Promise.resolve ();
     }
 
     const tb = vm.$parent.toolbar;
@@ -124,9 +124,11 @@ function load_passage (vm, passage) {
     tb.png_url = 'textflow.png/' + passage.pass_id + '?' + $.param (params);
 
     const graph_vm = vm.get_graph_vm ();
-    graph_vm.load_dot (tb.dot_url).then (() => {
+    const p1 = graph_vm.load_dot (tb.dot_url);
+    p1.then (() => {
         vm.$panel.animate ({ 'width' : (graph_vm.bbox.width + 20) + 'px' });
     });
+    return p1;
 }
 
 /**
