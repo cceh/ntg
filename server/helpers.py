@@ -323,11 +323,17 @@ def make_json_response (json = None, status = 200, message = None):
         d['data'] = json
     if message:
         d['message'] = message
-    return flask.make_response (flask.json.jsonify (d), status)
+    return flask.make_response (flask.json.jsonify (d), status, {
+        'content-type' : 'application/json;charset=utf-8',
+        'Access-Control-Allow-Origin' : '*',
+    })
 
 
 def make_text_response (text = None, status = 200):
-    return flask.make_response ((text, status, { 'content-type' : 'text/plain;charset=utf-8' }))
+    return flask.make_response (text, status, {
+        'content-type' : 'text/plain;charset=utf-8',
+        'Access-Control-Allow-Origin' : '*',
+    })
 
 
 DOT_SKELETON = """

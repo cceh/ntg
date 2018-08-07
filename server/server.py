@@ -105,18 +105,38 @@ def get_excluded_ms_ids (conn, include):
     return tuple ([ row[0] for row in res ] or [ -1 ])
 
 
-@static_app.endpoint ('index')
-def index ():
-    """ Endpoint.  The root of the application. """
+@app.endpoint ('application.json')
+def application_json ():
+    """Endpoint.  Serve information about the application."""
 
-    return flask.redirect ('/ph4/', code = 302)
+    conf = current_app.config
+
+    return make_json_response ({
+        'name'  : conf['APPLICATION_NAME'],
+        'root'  : conf['APPLICATION_ROOT'],
+        'start' : conf['server_start_time'],
+    })
 
 
-@app.endpoint ('acts-phase4')
-def acts_phase4 ():
-    """ Endpoint.  The current main page. """
+@app.endpoint ('messages.json')
+def messages_json ():
+    """Endpoint.  Serve the flashed messages."""
 
-    return flask.render_template ('acts-phase4.html')
+    return make_json_response (flask.get_flashed_messages (with_categories = True) or [])
+
+
+@app.endpoint ('user.json')
+def user_json ():
+    """Endpoint.  Serve information about the current user."""
+
+    user = flask_login.current_user
+    logged_in = user.is_authenticated
+
+    return make_json_response ({
+        'is_logged_in' : logged_in,
+        'is_editor' :    logged_in and user.has_role ('editor'),
+        'username' :     user.username if logged_in else 'anonymous',
+    })
 
 
 @app.endpoint ('passage.json')
@@ -171,8 +191,8 @@ def cliques_json (passage_or_id):
         return make_json_response (passage.cliques ());
 
 
-@app.endpoint ('leitzeile')
-def leitzeile (passage_or_id = None):
+@app.endpoint ('leitzeile.json')
+def leitzeile_json (passage_or_id = None):
     """Endpoint.  Serve the leitzeile for the verse containing passage_or_id. """
 
     with current_app.config.dba.engine.begin () as conn:
@@ -202,9 +222,7 @@ def leitzeile (passage_or_id = None):
         Leitzeile = collections.namedtuple ('Leitzeile', 'begadr, endadr, lemma, pass_id, spanned, replaced')
         leitzeile = [ Leitzeile._make (r)._asdict () for r in res ]
 
-        return make_json_response ({
-            'leitzeile' : leitzeile,
-        })
+        return make_json_response (leitzeile)
 
 
 @app.endpoint ('suggest.json')
@@ -307,9 +325,7 @@ def ranges_json (passage_or_id):
         # ranges = list (map (Ranges._make, res))
         ranges = [ Ranges._make (r)._asdict () for r in res ]
 
-        return make_json_response ({
-            'ranges' : ranges,
-        })
+        return make_json_response (ranges)
 
 
 @app.endpoint ('manuscript.json')
@@ -327,30 +343,64 @@ def manuscript_json (hs_hsnr_id):
         return make_json_response (ms.to_json ())
 
 
-@app.endpoint ('ms_attesting')
-def ms_attesting (passage_or_id, labez):
-    """ Serve all relatives of all mss. attesting labez at passage. """
+@app.endpoint ('manuscript-full.json')
+def manuscript_full_json (hs_hsnr_id, passage_or_id):
+    """Endpoint.  Serve information about a manuscript.
+
+    :param string hs_hsnr_id: The hs, hsnr or id of the manuscript.
+
+    """
+
+    hs_hsnr_id = request.args.get ('ms_id') or hs_hsnr_id
+    chapter    = request.args.get ('range') or 'All'
 
     with current_app.config.dba.engine.begin () as conn:
-        passage = Passage (conn, passage_or_id)
+        passage   = Passage (conn, passage_or_id)
+        ms        = Manuscript (conn, hs_hsnr_id)
+        rg_id     = passage.range_id (chapter)
 
+        json = ms.to_json ()
+        json['length'] = ms.get_length (passage, chapter)
+
+        # Get the attestation(s) of the manuscript (may be uncertain eg. a/b/c)
         res = execute (conn, """
-        SELECT hsnr
-        FROM apparatus_view
-        WHERE pass_id = :pass_id AND labez = :labez
-        ORDER BY hsnr
-        """, dict (parameters, pass_id = passage.pass_id, labez = labez))
+        SELECT labez, clique, labez_clique
+        FROM apparatus_view_agg
+        WHERE ms_id = :ms_id AND pass_id = :pass_id
+        """, dict (parameters, ms_id = ms.ms_id, pass_id = passage.pass_id))
+        json['labez'], json['clique'], json['labez_clique'] = res.fetchone ()
 
-        Attesting = collections.namedtuple ('Attesting', 'hsnr')
-        attesting = list (map (Attesting._make, res))
+        # Get the affinity of the manuscript to all manuscripts
+        res = execute (conn, """
+        SELECT avg (a.affinity) as aa,
+        percentile_cont(0.5) WITHIN GROUP (ORDER BY a.affinity) as ma
+        FROM affinity a
+        WHERE a.ms_id1 = :ms_id1 AND a.rg_id = :rg_id
+        """, dict (parameters, ms_id1 = ms.ms_id, rg_id = rg_id))
+        json['aa'], json['ma'] = res.fetchone ()
 
-        # convert tuples to lists
-        return flask.render_template ("ms_attesting.html",
-                                      passage = passage, labez = labez, rows = attesting)
+        # Get the affinity of the manuscript to MT
+        #
+        # For a description of mt and mtp see the comment in
+        # ActsMsListValPh3.pl and
+        # http://intf.uni-muenster.de/cbgm/actsPh3/guide_en.html#Ancestors
+
+        json['mt'], json['mtp'] = 0.0, 0.0
+        res = execute (conn, """
+        SELECT a.affinity as mt, a.equal::float / c.length as mtp
+        FROM affinity a
+        JOIN ms_ranges c
+          ON (a.ms_id1, a.rg_id) = (c.ms_id, c.rg_id)
+        WHERE a.ms_id1 = :ms_id1 AND a.ms_id2 = 2 AND a.rg_id = :rg_id
+        """, dict (parameters, ms_id1 = ms.ms_id, rg_id = rg_id))
+        if res.rowcount > 0:
+            json['mt'], json['mtp'] = res.fetchone ()
+
+        return make_json_response (json)
 
 
-@app.endpoint ('relatives')
-def relatives (hs_hsnr_id, passage_or_id):
+@app.endpoint ('relatives.csv')
+def relatives_csv (hs_hsnr_id, passage_or_id):
     """Output a table of the nearest relatives of a manuscript.
 
     Output a table of the nearest relatives/ancestors/descendants of a
@@ -395,54 +445,7 @@ def relatives (hs_hsnr_id, passage_or_id):
 
         passage   = Passage (conn, passage_or_id)
         ms        = Manuscript (conn, hs_hsnr_id)
-        ms.length = ms.get_length (passage, chapter)
         rg_id     = passage.range_id (chapter)
-
-        # Get the attestation(s) of the manuscript (may be uncertain eg. a/b/c)
-        res = execute (conn, """
-        SELECT labez, clique, labez_clique
-        FROM apparatus_view_agg
-        WHERE ms_id = :ms_id AND pass_id = :pass_id
-        """, dict (parameters, ms_id = ms.ms_id, pass_id = passage.pass_id))
-        ms.labez, ms.clique, ms.labez_clique = res.fetchone ()
-
-        # Get the affinity of the manuscript to all manuscripts
-        res = execute (conn, """
-        SELECT avg (a.affinity) as aa,
-               percentile_cont(0.5) WITHIN GROUP (ORDER BY a.affinity) as ma
-        FROM affinity a
-        WHERE a.ms_id1 = :ms_id1 AND a.rg_id = :rg_id
-        """, dict (parameters, ms_id1 = ms.ms_id, rg_id = rg_id))
-        ms.aa, ms.ma = res.fetchone ()
-
-        mt = Bag ()
-
-        # Get the reading of MT
-        res = execute (conn, """
-        SELECT labez, clique, labez_clique
-        FROM apparatus_view_agg
-        WHERE ms_id = 2 AND pass_id = :pass_id
-        """, dict (parameters, pass_id = passage.pass_id))
-        mt.labez, mt.clique, mt.labez_clique = res.fetchone ()
-
-        # Get the affinity of the manuscript to MT
-        #
-        # For a description of mt and mtp see the comment in
-        # ActsMsListValPh3.pl and
-        # http://intf.uni-muenster.de/cbgm/actsPh3/guide_en.html#Ancestors
-
-        mt.mt, mt.mtp = 0.0, 0.0
-        res = execute (conn, """
-        SELECT a.affinity as mt, a.equal::float / c.length as mtp
-        FROM affinity a
-        JOIN ms_ranges c
-          ON (a.ms_id1, a.rg_id) = (c.ms_id, c.rg_id)
-        WHERE a.ms_id1 = :ms_id1 AND a.ms_id2 = 2 AND a.rg_id = :rg_id
-        """, dict (parameters, ms_id1 = ms.ms_id, rg_id = rg_id))
-        if res.rowcount > 0:
-            mt.mt, mt.mtp = res.fetchone ()
-
-        Nodes = collections.namedtuple ('Nodes', 'ms_id')
 
         exclude = get_excluded_ms_ids (conn, include)
 
@@ -497,9 +500,29 @@ def relatives (hs_hsnr_id, passage_or_id):
             'Relatives',
             'rank ms_id hs hsnr length common equal older newer unclear norel direction affinity labez'
         )
-        relatives = list (map (Relatives._make, res))
+        return csvify (Relatives._fields, list (map (Relatives._make, res)))
 
-        return flask.render_template ('relatives.html', caption = caption, ms = ms, mt = mt, rows = relatives)
+
+@app.endpoint ('ms_attesting')
+def ms_attesting (passage_or_id, labez):
+    """ Serve all relatives of all mss. attesting labez at passage. """
+
+    with current_app.config.dba.engine.begin () as conn:
+        passage = Passage (conn, passage_or_id)
+
+        res = execute (conn, """
+        SELECT hsnr
+        FROM apparatus_view
+        WHERE pass_id = :pass_id AND labez = :labez
+        ORDER BY hsnr
+        """, dict (parameters, pass_id = passage.pass_id, labez = labez))
+
+        Attesting = collections.namedtuple ('Attesting', 'hsnr')
+        attesting = list (map (Attesting._make, res))
+
+        # convert tuples to lists
+        return flask.render_template ("ms_attesting.html",
+                                      passage = passage, labez = labez, rows = attesting)
 
 
 def remove_z_leaves (G):
@@ -559,7 +582,7 @@ def textflow (passage_or_id):
     if not rank_z:
         z_where = "AND app.labez !~ '^z' AND app.certainty = 1.0"
 
-    group_field = 'labez' if cliques else 'labez_clique'
+    group_field = 'labez_clique' if cliques else 'labez'
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -787,36 +810,6 @@ def csvify (fields, rows):
     for r in rows:
         writer.writerow (r._asdict ())
     return flask.Response (fp.getvalue (), mimetype = 'text/csv')
-
-
-@app.endpoint ('coherence-skeleton')
-def coherence_skeleton ():
-    """Endpoint. Serve a skeleton of the Coherence page.
-
-    The Coherence page is the main page of the application.  This endpoint only
-    serves a skeleton.  All relevant content is then loaded by AJAX.
-
-    """
-
-    return flask.render_template ('coherence-skeleton.html',
-                                  is_editor = flask_login.current_user.has_role ('editor'))
-
-
-@app.endpoint ('comparison-skeleton')
-def comparison_skeleton ():
-    """Endpoint. Serve a skeleton of the Comparison page.
-
-    The comparison page contains a table detailing the differences between 2
-    manuscripts.  This endpoint only serves a skeleton.  The table rows will be
-    loaded with AJAX.
-
-    """
-
-    with current_app.config.dba.engine.begin () as conn:
-        ms1 = Manuscript (conn, request.args.get ('ms1') or 'A')
-        ms2 = Manuscript (conn, request.args.get ('ms2') or 'A')
-
-        return flask.render_template ('comparison-skeleton.html', ms1 = ms1, ms2 = ms2)
 
 
 _ComparisonRow = collections.namedtuple (
@@ -1129,20 +1122,21 @@ if __name__ == "__main__":
         sub_app.register_blueprint (editor.app)
 
         sub_app.url_map = Map ([
-            Rule ('/',                                            endpoint = 'acts-phase4'),
-            Rule ('/coherence',                                   endpoint = 'coherence-skeleton'),
-            Rule ('/comparison',                                  endpoint = 'comparison-skeleton'),
             Rule ('/comparison-summary.csv',                      endpoint = 'comparison-summary.csv'),
             Rule ('/comparison-detail.csv',                       endpoint = 'comparison-detail.csv'),
             Rule ('/suggest.json',                                endpoint = 'suggest.json'),
-            Rule ('/leitzeile/<passage_or_id>',                   endpoint = 'leitzeile'),
+            Rule ('/application.json',                            endpoint = 'application.json'),
+            Rule ('/user.json',                                   endpoint = 'user.json'),
+            Rule ('/messages.json',                               endpoint = 'messages.json'),
+            Rule ('/leitzeile.json/<passage_or_id>',              endpoint = 'leitzeile.json'),
             Rule ('/manuscript.json/<hs_hsnr_id>',                endpoint = 'manuscript.json'),
+            Rule ('/manuscript-full.json/<passage_or_id>/<hs_hsnr_id>', endpoint = 'manuscript-full.json'),
+            Rule ('/relatives.csv/<passage_or_id>/<hs_hsnr_id>',  endpoint = 'relatives.csv'),
             Rule ('/passage.json/',                               endpoint = 'passage.json'),
             Rule ('/passage.json/<passage_or_id>',                endpoint = 'passage.json'),
             Rule ('/cliques.json/<passage_or_id>',                endpoint = 'cliques.json'),
             Rule ('/ranges.json/<passage_or_id>',                 endpoint = 'ranges.json'),
             Rule ('/ms_attesting/<passage_or_id>/<labez>',        endpoint = 'ms_attesting'),
-            Rule ('/relatives/<passage_or_id>/<hs_hsnr_id>',      endpoint = 'relatives'),
             Rule ('/apparatus.json/<passage_or_id>',              endpoint = 'apparatus.json'),
             Rule ('/attestation.json/<passage_or_id>',            endpoint = 'attestation.json'),
             Rule ('/stemma.dot/<passage_or_id>',                  endpoint = 'stemma.dot'),
@@ -1150,7 +1144,7 @@ if __name__ == "__main__":
             Rule ('/textflow.dot/<passage_or_id>',                endpoint = 'textflow.dot'),
             Rule ('/textflow.png/<passage_or_id>',                endpoint = 'textflow.png'),
             Rule ('/notes.txt/<passage_or_id>',                   endpoint = 'notes.txt', methods = ['GET', 'PUT']),
-            Rule ('/stemma-edit/<passage_or_id>',                 endpoint = 'stemma-edit'),
+            Rule ('/stemma-edit/<passage_or_id>',                 endpoint = 'stemma-edit', methods = ['POST']),
         ])
 
         tools.log (logging.INFO, "{name} at {path} from conf {conf}".format (

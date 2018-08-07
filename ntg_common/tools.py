@@ -55,8 +55,20 @@ to our rules.
 
 BYZ_HSNR_JOHN = "(200070, 200280, 200450, 300180, 300350, 302260, 313200)"
 
+BYZ_HSNR_MARK = "(300030, 300180, 300350, 301050, 302610, 303510, 326070)"
+
+# Mk  7:16, 9:44, 9:46, 11:26, 15:28, 16:9-20
+
 FEHLVERSE = """
     (
+      begadr >= 20716000 and endadr <= 20716999 or
+      begadr >= 20944000 and endadr <= 20944999 or
+      begadr >= 20946000 and endadr <= 20946999 or
+      begadr >= 21126000 and endadr <= 21126999 or
+      begadr >= 21528000 and endadr <= 21528999 or
+      begadr >= 21609000 and endadr <= 21620999 or
+      begadr >= 21608068 and endadr <= 21620999 or
+
       begadr >= 50837002 and endadr <= 50837047 or
       begadr >= 51534002 and endadr <= 51534013 or
       begadr >= 52406020 and endadr <= 52408015 or

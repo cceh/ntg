@@ -1,9 +1,0 @@
-.panel-notes textarea {
-  display: block;
-  resize: vertical;
-  width: 100%;
-  max-height: 500px;
-  border: none;
-  padding: 15px;
-  border-radius: 4px;
-}

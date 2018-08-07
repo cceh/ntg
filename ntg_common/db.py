@@ -93,6 +93,9 @@ def compile (element, compiler, **kw):
     mp = element.mysql_db.params
     return '''
     CREATE SCHEMA {name};
+    -- Following commands don't work because you have to be superuser:
+    -- CREATE EXTENSION mysql_fdw;
+    -- GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO {username};
     CREATE SERVER {name}_server FOREIGN DATA WRAPPER mysql_fdw OPTIONS (host '{host}', port '{port}');
     CREATE USER MAPPING FOR {pg_user} SERVER {name}_server OPTIONS (username '{username}', password '{password}');
     IMPORT FOREIGN SCHEMA "{database}" FROM SERVER {name}_server INTO {name};
@@ -291,12 +294,12 @@ class Att (Base):
     begadr       = Column (Integer,       nullable = False, index = True)
     endadr       = Column (Integer,       nullable = False, index = True)
     labez        = Column (String(32),    nullable = False, server_default = '')
-    labezsuf     = Column (String(32),    server_default = '')
+    labezsuf     = Column (String(64),    server_default = '')
     certainty    = Column (Float(16),     nullable = False, server_default = '1.0')
     lemma        = Column (String(1024),  server_default = '')
     lesart       = Column (String(1024),  server_default = '')
     labezorig    = Column (String(32),    nullable = False, server_default = '')
-    labezsuforig = Column (String(32),    server_default = '')
+    labezsuforig = Column (String(64),    server_default = '')
     suffix2      = Column (String(32),    server_default = '')
     kontrolle    = Column (String(1),     server_default = '')
     fehler       = Column (Integer,       server_default = '0')
@@ -310,7 +313,7 @@ class Att (Base):
     endalt       = Column (Integer)
     labezalt     = Column (String(32),    server_default = '')
     lasufalt     = Column (String(32),    server_default = '')
-    base         = Column (String(1),     server_default = '')
+    base         = Column (String(8),     server_default = '')
     over         = Column (String(1),     server_default = '')
     comp         = Column (String(1),     server_default = '')
     over1        = Column (String(1),     server_default = '')
@@ -351,8 +354,8 @@ class Lac (Base):
     hs        = Column (String(32),    nullable = False)
     begadr    = Column (Integer,       nullable = False)
     endadr    = Column (Integer,       nullable = False)
-    labez     = Column (String(32),    nullable = False, server_default = '')
-    labezsuf  = Column (String(32),    server_default = '')
+    labez     = Column (String(32),    server_default = '')
+    labezsuf  = Column (String(64),    server_default = '')
     lemma     = Column (String(1024),  server_default = '')
     lesart    = Column (String(1024),  server_default = '')
     suffix2   = Column (String(32),    server_default = '')
@@ -368,7 +371,7 @@ class Lac (Base):
     endalt    = Column (Integer)
     labezalt  = Column (String(32),    server_default = '')
     lasufalt  = Column (String(32),    server_default = '')
-    base      = Column (String(1),     server_default = '')
+    base      = Column (String(8),     server_default = '')
     over      = Column (String(1),     server_default = '')
     comp      = Column (String(1),     server_default = '')
     over1     = Column (String(1),     server_default = '')
@@ -649,7 +652,7 @@ class Readings (Base2):
     __tablename__ = 'readings'
 
     pass_id   = Column (Integer,       nullable = False)
-    labez     = Column (String (2),    nullable = False)
+    labez     = Column (String (3),    nullable = False)
 
     lesart    = Column (String (1024))
 
@@ -707,10 +710,10 @@ class Apparatus (Base2):
 
     ms_id     = Column (Integer,       nullable = False, index = True)
     pass_id   = Column (Integer,       nullable = False)
-    labez     = Column (String (2),    nullable = False)
+    labez     = Column (String (3),    nullable = False)
 
     cbgm      = Column (Boolean,       nullable = False)
-    labezsuf  = Column (String (32),   nullable = False, server_default = '')
+    labezsuf  = Column (String (64),   nullable = False, server_default = '')
     certainty = Column (Float (16),    nullable = False, server_default = '1.0')
     lesart    = Column (String (1024), nullable = True,  server_default = None)
     origin    = Column (String (3),    nullable = False)
@@ -742,7 +745,7 @@ class TTS_Mixin (object):
 
 class Cliques_Mixin (TTS_Mixin):
     pass_id   = Column (Integer,    nullable = False)
-    labez     = Column (String (2), nullable = False)
+    labez     = Column (String (3), nullable = False)
     clique    = Column (String (2), nullable = False, server_default = '1')
 
 
@@ -808,7 +811,7 @@ class Cliques_TTS (Cliques_Mixin, Base2):
 class MsCliques_Mixin (TTS_Mixin):
     ms_id         = Column (Integer,    nullable = False, index = True)
     pass_id       = Column (Integer,    nullable = False)
-    labez         = Column (String (2), nullable = False)
+    labez         = Column (String (3), nullable = False)
     clique        = Column (String (2), nullable = False, server_default = '1')
 
 
@@ -875,10 +878,10 @@ class MsCliques_TTS (MsCliques_Mixin, Base2):
 
 class LocStem_Mixin (TTS_Mixin):
     pass_id       = Column (Integer,    nullable = False)
-    labez         = Column (String (2), nullable = False)
+    labez         = Column (String (3), nullable = False)
     clique        = Column (String (2), nullable = False, server_default = '1')
 
-    source_labez  = Column (String (2), nullable = True)
+    source_labez  = Column (String (3), nullable = True)
     source_clique = Column (String (2), nullable = True)
 
     original      = Column (Boolean,    nullable = False, server_default = 'false')

@@ -308,7 +308,7 @@ def local_stemma_to_nx (conn, pass_id, show_empty_roots = False):
            labez_clique (source_labez, source_clique) AS source_labez_clique,
            original
     FROM locstem l
-    WHERE labez !~ '^z' AND pass_id = :pass_id
+    WHERE labez !~ '^z[u-z]' AND pass_id = :pass_id
     ORDER BY labez, clique
     """, dict (pass_id = pass_id))
 

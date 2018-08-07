@@ -24,14 +24,14 @@ LESS        := $(wildcard $(SERVER)/less/*.less)
 CSS         := $(patsubst $(SERVER)/less/%.less, $(STATIC)/css/%.css, $(LESS))
 CSS_GZ      := $(patsubst %, %.gzip, $(CSS))
 
-JS_SRC      := $(wildcard $(SERVER)/es6/*.js)
-JS          := $(patsubst $(SERVER)/es6/%.js, $(STATIC)/js/%.js, $(JS_SRC))
+JS_SRC      := $(wildcard $(SERVER)/js/*.js)
+JS          := $(patsubst $(SERVER)/js/%.js, $(STATIC)/js/%.js, $(JS_SRC))
 JS_GZ       := $(patsubst %, %.gzip, $(JS))
 
 PY_SOURCES  := scripts/cceh/*.py ntg_common/*.py server/*.py
 
-.PHONY: upload vpn server restart psql
-.PHONY: js css doc jsdoc sphinx lint pylint jslint csslint
+.PHONY: upload vpn server client restart psql
+.PHONY: js css doc jsdoc sphinx lint pylint eslint csslint
 
 css: $(CSS)
 
@@ -39,8 +39,17 @@ js:	$(JS)
 
 restart: js css server
 
-server: css js
+server:
 	python3 -m server.server -vv
+
+client:
+	cd client; make build; cd ..
+
+client-production:
+	cd client; make build-production; cd ..
+
+dev-server:
+	cd client; make dev-server; cd ..
 
 users:
 	scripts/cceh/mk_users.py -vvv server/instance/_global.conf
@@ -64,25 +73,48 @@ import_acts:
 import_john:
 	$(MYSQL) -e "DROP DATABASE DCPJohnWithFam"
 	$(MYSQL) -e "CREATE DATABASE DCPJohnWithFam"
-	mysql --defaults-file=~/.my.cnf.ntg -D DCPJohnWithFam   < ../dumps/DCPJohnWithFam-7.sql
+	cat ../dumps/DCPJohnWithFam-8.sql | mysql --defaults-file=~/.my.cnf.ntg -D DCPJohnWithFam
+
+import_mark:
+	-$(MYSQL) -e "DROP DATABASE ECM_Mark_Ph1"
+	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph1"
+	for dump in ../dumps/Mk1to16dump/*.dump; do \
+		mysql --defaults-file=~/.my.cnf.ntg -D ECM_Mark_Ph1 < $${dump} ; \
+	done
 
 acts:
-	python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/ph4.conf
+	python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/acts_ph4.conf
 
 john:
 	python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/john_ph1.conf
 
-# from home / slow connection
-upload_db_from_home:
-	-rm /tmp/*.pg_dump.sql.bz2
-	$(PGDUMP) --clean --if-exists ntg_ph4  | bzip2 > /tmp/ntg_ph4.pg_dump.sql.bz2
-	$(PGDUMP) --clean --if-exists john_ph1 | bzip2 > /tmp/john_ph1.pg_dump.sql.bz2
-	scp /tmp/*.pg_dump.sql.bz2 $(NTG_USER)@$(NTG_VM):~/
+mark:
+	python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/mark_ph1.conf
 
-# from work / fast connection
-upload_db_from_work:
-	$(PGDUMP) --clean --if-exists ntg_ph4   | psql -h $(NTG_VM) -U $(NTG_USER) ntg_ph4
-	$(PGDUMP) --clean --if-exists john_ph1  | psql -h $(NTG_VM) -U $(NTG_USER) john_ph1
+
+define UPLOAD_TEMPLATE =
+
+BOOK = $(firstword $(subst _, ,$(1)))
+
+upload_dbs_from_work: upload_$$(BOOK)_from_work
+
+upload_dbs_from_home: upload_$$(BOOK)_from_home
+
+# from work (fast connection, pipe to psql on the host)
+upload_$$(BOOK)_from_work:
+	$(PGDUMP) --clean --if-exists $(1) | psql -h $(NTG_VM) -U $(NTG_USER) $(1)
+
+# from home (slow connection, upload bzipped file and then ssh to host)
+upload_$$(BOOK)_from_home:
+	-rm /tmp/$(1).pg_dump.sql.bz2
+	$(PGDUMP) --clean --if-exists $(1) | bzip2 > /tmp/$(1).pg_dump.sql.bz2
+	scp /tmp/$(1).pg_dump.sql.bz2 $(NTG_USER)@$(NTG_VM):~/
+
+endef
+
+DBS := acts_ph4 john_ph1 mark_ph1
+
+$(foreach db,$(DBS),$(eval $(call UPLOAD_TEMPLATE,$(db))))
 
 upload_scripts:
 	$(RSYNC) --exclude "**/__pycache__"  --exclude "*.pyc"  ntg_common $(NTG_ROOT)/
@@ -94,16 +126,22 @@ diff_affinity_acts:
 diff_affinity_john:
 	scripts/cceh/sqldiff.sh john_ph1 "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 72 order by ms_id1, ms_id2" | less
 
-lint: pylint jslint csslint
+lint: pylint eslint csslint
 
 pylint:
 	-pylint $(PY_SOURCES)
 
-jslint:
-	./node_modules/.bin/eslint -f unix $(JS_SRC)
+# eslint:
+# 	./node_modules/.bin/eslint -f unix $(JS_SRC)
+#
+# csslint: css
+# 	csslint --ignore="adjoining-classes,box-sizing,ids,order-alphabetical,overqualified-elements,qualified-headings" $(CSS)
 
-csslint: css
-	csslint --ignore="adjoining-classes,box-sizing,ids,order-alphabetical,overqualified-elements,qualified-headings" $(CSS)
+csslint:
+	cd client ; make csslint ; cd ..
+
+eslint:
+	cd client ; make eslint ; cd ..
 
 doc: sphinx
 
@@ -112,7 +150,7 @@ doc: sphinx
 doc_src/%.jsgraph.dot : $(STATIC)/js/%.js $(JS)
 	madge --dot $< | \
 	sed -e "s/static\/js\///g" \
-		-e "s/static\/bower_components\///g" \
+		-e "s/static\/node_modules\///g" \
 		-e "s/G {/G {\ngraph [rankdir=\"LR\"]/" > $@
 
 doc_src/%.nolibs.jsgraph.dot : doc_src/%.jsgraph.dot
@@ -131,21 +169,15 @@ sphinx: jsgraphs
 jsdoc: js
 	jsdoc -c jsdoc.json -d jsdoc -a all $(JS_SRC) && $(BROWSER) jsdoc/index.html
 
-bower_update:
-	bower update
-
 sqlacodegen:
 	sqlacodegen mysql:///ECM_ActsPh4?read_default_group=ntg
 	sqlacodegen mysql:///VarGenAtt_ActPh4?read_default_group=ntg
 
-$(STATIC)/js/%.js : $(SERVER)/es6/%.js
+$(STATIC)/js/%.js : $(SERVER)/js/%.js
 	./node_modules/.bin/babel $? --out-file $@ --source-maps
 
-$(STATIC)/js/%.js : $(SERVER)/es6/config-require.js
-	cp $? $@
-
 $(STATIC)/css/%.css : $(SERVER)/less/%.less
-	lessc --global-var="BS=\"$(STATIC)/bower_components/bootstrap/less\"" --autoprefix="last 2 versions" $? $@
+	lessc --global-var="BS=\"$(STATIC)/node_modules/bootstrap/less\"" --autoprefix="last 2 versions" $? $@
 
 %.gzip : %
 	gzip < $? > $@
@@ -155,10 +187,10 @@ install-prerequisites:
 		postgresql libpg-dev postgresql-10-mysql-fdw \
 		mysql default-libmysqlclient-dev \
 		python3 python3-pip graphviz git plantuml
-	sudo npm install -g bower
 	sudo pip3 install --upgrade pip
 	sudo pip3 install --upgrade \
 		numpy networkx matplotlib pillow \
 		psycopg2 mysqlclient sqlalchemy sqlalchemy-utils intervals \
 		flask babel flask-babel flask-sqlalchemy jinja2 flask-user \
-		sphinx sphinx_rtd_theme sphinx_js sphinxcontrib-plantuml
+		sphinx sphinx_rtd_theme sphinx_js sphinxcontrib-plantuml \
+	yarn

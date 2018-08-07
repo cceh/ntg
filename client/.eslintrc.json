@@ -1,0 +1,99 @@
+{
+    // See: http://eslint.org/docs/rules/
+
+    "extends" : [
+        "plugin:vue/recommended",
+        // "airbnb"
+        "airbnb-base/legacy"
+        // "eslint:recommended
+    ],
+    "plugins" : [
+        "json"
+    ],
+    "parserOptions": {
+        "parser": "babel-eslint"
+    },
+    "env" : {
+        "commonjs" : true,
+        "browser"  : true,
+        "jquery"   : true
+    },
+    "globals" : {
+        "api_base_url" : false
+    },
+    "rules" : {
+        // restrict vue/recommended
+        "vue/max-attributes-per-line" : "off",
+        "vue/html-self-closing" : "off",
+
+        // restrict airbnb
+
+        // style.js
+        "comma-dangle"      : ["error", "always-multiline"],
+        "func-call-spacing" : ["error", "always"],
+        "indent" : ["error", 4, {
+            "SwitchCase"         : 0,
+            "VariableDeclarator" : 1,
+            "outerIIFEBody"      : 1,
+            "MemberExpression"   : 1
+        }],
+        "key-spacing"       : ["error", {
+            "singleLine" : {
+                "beforeColon" : true,
+                "afterColon"  : true
+            },
+            "multiLine" : {
+                "beforeColon" : true,
+                "afterColon"  : true,
+                "align"       : "colon"
+            }
+        }],
+        "max-len" : ["warn", 120, 4, {
+            "ignoreUrls"     : true,
+            "ignoreComments" : false
+        }],
+        "quote-props"                 : ["error", "always"],
+        "space-before-function-paren" : ["error", "always"],
+
+        // best-practices.js
+        "curly"  : ["error", "all"],
+        "eqeqeq" : ["error", "always"],
+
+        // variables.js
+        "no-unused-vars" : ["error", { "argsIgnorePattern": "^dummy_" }],
+
+        // strict.js
+        "strict" : ["error", "function"],
+
+        // relax airbnb
+
+        // style.js
+        "camelcase"            : "off",
+        "func-names"           : "off",
+        "no-mixed-operators"   : ["error", { "allowSamePrecedence" : true }],
+        "no-spaced-func"       : "off",
+        "no-underscore-dangle" : "off",
+        "no-restricted-syntax" : "off",
+
+        // best practices
+        "no-multi-spaces"   : "off",
+        "no-param-reassign" : "off",
+        "vars-on-top"       : "off",
+        "function-paren-newline" : ["error", "consistent"]
+    },
+    "overrides": [
+        {
+            "files": ["api.conf.js"],
+            "rules": {
+                "no-unused-vars" : "off"
+            }
+        },
+        {
+            "files": ["webpack.*.js"],
+            "rules": {
+                "key-spacing" : "off",
+                "quote-props" : ["error", "consistent-as-needed"]
+            }
+        }
+    ]
+}

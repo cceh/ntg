@@ -85,20 +85,22 @@ def stemma_edit (passage_or_id):
     if not flask_login.current_user.has_role ('editor'):
         raise PrivilegeError ('You don\'t have editor privilege.')
 
-    action = request.args.get ('action')
+    args = request.get_json ()
+
+    action = args.get ('action')
 
     if (action not in ('split', 'merge', 'move', 'move-manuscripts')):
         raise EditError ('Bad request')
 
-    params = { 'original_new' : request.args.get ('labez_new') == '*' }
+    params = { 'original_new' : args.get ('labez_new') == '*' }
     for n in 'labez_old labez_new'.split ():
-        params[n] = request.args.get (n)
+        params[n] = args.get (n)
         if not RE_VALID_LABEZ.match (params[n]):
             raise EditError ('Bad request')
         if params[n] in ('*', '?'):
             params[n] = None
     for n in 'clique_old clique_new'.split ():
-        params[n] = request.args.get (n)
+        params[n] = args.get (n)
         if not RE_VALID_CLIQUE.match (params[n]):
             raise EditError ('Bad request')
         if params[n] == '0':
@@ -192,7 +194,7 @@ def stemma_edit (passage_or_id):
             """, dict (parameters, **params))
 
         elif action == 'move-manuscripts':
-            ms_ids = set (request.args.getlist ('ms_ids[]') or [])
+            ms_ids = set (args.get ('ms_ids') or [])
 
             # reassign manuscripts to new clique
             res = execute (conn, """
@@ -230,7 +232,7 @@ def notes (passage_or_id):
             WHERE pass_id = :pass_id
             """, dict (parameters,
                        pass_id = passage.pass_id,
-                       remarks = request.form['remarks']))
+                       remarks = request.get_json ()['remarks']))
 
             return make_json_response (message = 'Notes saved.')
         else:
@@ -240,4 +242,6 @@ def notes (passage_or_id):
             WHERE pass_id = :pass_id
             """, dict (parameters, pass_id = passage.pass_id))
 
-            return make_text_response (res.fetchone ()[0] or '')
+            if res.rowcount > 0:
+                return make_text_response (res.fetchone ()[0] or '')
+            return make_text_response ('')
