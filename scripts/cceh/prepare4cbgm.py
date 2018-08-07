@@ -225,6 +225,12 @@ def copy_att_fdw (dba, dbs, parameters):
         WHERE lesart = '' AND labez ~ '^z[u-z]';
         """, parameters)
 
+        execute (conn, """
+        UPDATE att
+        SET lesart = ''
+        WHERE lesart ~ ' ?om[ .]?';
+        """, parameters)
+
         if book == 'Acts':
             execute (conn, """
             UPDATE att

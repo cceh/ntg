@@ -141,7 +141,7 @@ function compute_leitzeile_html (leitzeile_json, current_pass_id) {
             const pass_id = items[0].pass_id;
             const classes = [];
             let tmp = _.map (items, 'lemma').join (' ');
-            if ((items[0].anfadr % 2) === 1) {
+            if ((items[0].begadr % 2) === 1) {
                 classes.push ('leitzeile-inserted');
                 tmp = '';
             } else if (items[0].replaced) {
@@ -363,6 +363,12 @@ div.leitzeile {
         border-bottom: 1px dotted grey;
     }
 
+    .leitzeile-inserted {
+        &::before {
+            content: '⸆'; /* 2e06 */
+        }
+    }
+
     .xxx {
         .leitzeile-replaced.leitzeile-one {
             &::before {
@@ -377,12 +383,6 @@ div.leitzeile {
 
             &::after {
                 content: '⸃';
-            }
-        }
-
-        .leitzeile-inserted {
-            &::before {
-                content: '⸆'; /* 2e06 */
             }
         }
 
