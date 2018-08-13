@@ -6,6 +6,7 @@
  * @author Marcello Perathoner
  */
 
+import $ from 'jquery';
 import _ from 'lodash';
 
 /**
@@ -74,7 +75,7 @@ export function deparam (query_string) {
  */
 
 export function svg_contextmenu (menu, target) {
-    $ (target).closest ('div.panel').append (menu);
+    $ (target).closest ('div.card').append (menu);
 
     var rect = target.getBoundingClientRect ();
     var bodyRect = document.body.getBoundingClientRect (); // account for scrolling
@@ -93,33 +94,40 @@ export function svg_contextmenu (menu, target) {
  *
  * @function xhr_alert
  *
- * @param {Object} xhr - The server response containing the
- *                          message.  The JSON response must
- *                          contain an Object with a message
- *                          field.
- * @param {jQuery} $panel - The panel to append the window to.
+ * @param {Object} reason - The parameter that was passed to Promise.then ()
+ *                          or Promise.catch ().
+ * @param {jQuery} $card - The card to append the window to.
  */
 
-export function xhr_alert (reason, $panel) {
-    if (!$panel) {
-        $panel = $ ('body');
+export function xhr_alert (reason, $card) {
+    if (!$card) {
+        $card = $ ('body');
     }
-    var category = 'danger';
 
-    if (reason.response) {
-        var $alert = $ (`
-            <div class="alert alert-${category} alert-dismissible alert-margins" role="alert">
-                <button type="button" class="close" data-dismiss="alert"
-                        aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                ${reason.response.data.message}
-             </div>
-            `);
-        $alert.appendTo ($panel).hide ();
-        $alert.on ('click', 'button[data-dismiss="alert"]', function () {
-            $alert.stop (true, true).slideUp (function () { $alert.remove (); });
-        });
-        $alert.slideDown ().delay (5000).slideUp ();
+    let message = '';
+    let category = '';
+
+    if (reason.data && reason.data.message) {
+        message = reason.data.message;
+        category = 'success';
     }
+    if (reason.response && reason.response.data && reason.response.data.message) {
+        message = reason.response.data.message;
+        category = 'danger';
+    }
+
+    var $alert = $ (`
+        <div class="alert alert-${category} alert-dismissible alert-margins" role="alert">
+            <button type="button" class="close" data-dismiss="alert"
+                    aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            ${message}
+        </div>
+        `);
+    $alert.appendTo ($card).hide ();
+    $alert.on ('click', 'button[data-dismiss="alert"]', function () {
+        $alert.stop (true, true).slideUp (function () { $alert.remove (); });
+    });
+    $alert.slideDown ().delay (5000).slideUp ();
 }
 
 /**

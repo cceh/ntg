@@ -331,9 +331,6 @@ def copy_att_fdw (dba, dbs, parameters):
             GROUP BY labez, labezsuf, adr2chapter (begadr)
             ORDER BY labez, labezsuf, adr2chapter (begadr)
             """, """
-            UPDATE att
-            SET labez = 'a', labezsuf = 'o'
-            WHERE labez = 'ao';
             """, parameters)
 
             fix (conn, "More than one labez for lesart Mark", """
@@ -344,8 +341,11 @@ def copy_att_fdw (dba, dbs, parameters):
             HAVING COUNT (distinct labez) > 1;
             """, """
             UPDATE att
-            SET labez = 'b'
-            WHERE (hsnr, begadr, endadr) = (302090, 21126002, 21126035);
+            SET labez = 'a'
+            WHERE (hsnr, begadr, endadr) = (303490, 21421007, 21421007);
+            UPDATE att
+            SET labez = 'c'
+            WHERE (hsnr, begadr, endadr) = (305790, 21037026, 21037026);
             """, parameters)
 
 
@@ -1464,12 +1464,13 @@ def fill_ms_cliques_table (dba, parameters):
         ALTER TABLE ms_cliques DISABLE TRIGGER ms_cliques_trigger;
         """, parameters)
 
+        # insert cliques from apparatus
         execute (conn, """
         INSERT INTO ms_cliques (pass_id, ms_id, labez, clique, user_id_start)
-        SELECT pass_id, ms_id, labez, '1', 0
+        SELECT DISTINCT pass_id, ms_id, labez, '1', 0
         FROM apparatus a
-        WHERE cbgm
         """, parameters)
+        # FIXME WHERE cbgm
 
         if 'MYSQL_VAR_TABLES' in config:
 
@@ -1501,6 +1502,7 @@ def fill_ms_cliques_table (dba, parameters):
               AND (a.begadr, a.endadr, a.labez, v.varid) = (50405022, 50405034, 'd', 'a');
             """, parameters)
 
+            # update cliques > 1 from varnew
             execute (conn, """
             UPDATE ms_cliques u
             SET clique = varnew2clique (v.varnew)

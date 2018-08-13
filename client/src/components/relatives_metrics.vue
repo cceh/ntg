@@ -1,5 +1,5 @@
 <template>
-  <div class="panel-slidable panel-heading panel-relatives-metrics">
+  <div class="relatives-metrics-vm">
     <template v-if="mt">
       <span :data-labez="mt.labez" class="mt fg_labez"><span class="ms hilite-target" data-ms-id="mt_id">MT</span>
       ({{ mt.labez }})</span> •
@@ -26,7 +26,7 @@
  * This module implements the information bar about the average agreements
  * in the relatives popup.
  *
- * @module relatives_metrics
+ * @component relatives_metrics
  *
  * @author Marcello Perathoner
  */
@@ -34,33 +34,24 @@
 import { mapGetters } from 'vuex';
 
 export default {
-    'props' : ['ms_id'],
+    'props' : ['ms'],
     data () {
         return {
-            'ms'    : null,
             'mt'    : null,
             'mt_id' : 2,
         };
     },
     'computed' : {
-        caption () {
-            return this.ms ? `Relatives for <span class="ms">W1:</span>
-                <span class="fg_labez" data-labez="${this.ms.labez}"><span
-                      class="ms hilite-source" data-ms-id="${this.ms_id}">${this.ms.hs}</span>
-                (<span class="labez">${this.ms.labez}</span>) ${this.ms.length}</span>` : 'Loading ...';
-        },
         ...mapGetters ([
             'passage',
         ]),
     },
     'watch' : {
         passage () {
-            // NOT this.$parent.load_passage () because the caption must change
-            // even if the panel is closed
             this.load_passage ();
         },
-        caption (new_caption) {
-            this.$parent.set_caption (new_caption);
+        ms () {
+            this.load_passage ();
         },
     },
     'methods' : {
@@ -75,10 +66,7 @@ export default {
          */
         load_passage () {
             const vm = this;
-            vm.get (`manuscript-full.json/${this.passage.pass_id}/id${this.ms_id}`).then ((response) => {
-                vm.ms = response.data.data;
-            });
-            if (vm.ms_id !== 2) {
+            if (vm.ms && vm.ms.ms_id !== 2) {
                 vm.get (`manuscript-full.json/${this.passage.pass_id}/id${this.mt_id}`).then ((response) => {
                     vm.mt = response.data.data;
                 });

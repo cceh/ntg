@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div class="index-vm">
     <page-header :caption="caption" home_url="http://intf.uni-muenster.de/cbgm/acts/" />
 
     <div class="container bs-docs-container">
       <router-link class="biglink" to="coherence">Coherence and Textual Flow</router-link>
       <router-link class="biglink" to="comparison">Comparison of Witnesses</router-link>
 
-      <a class="biglink" href="/pdf/GenQ4_Guide.pdf" target="_blank">Short Guide (PDF)</a>
+      <a class="biglink" href="/pdfs/GenQ4_Guide.pdf" target="_blank">Short Guide (PDF)</a>
 
       <p>
         This new interface of the Genealogical Queries suite of tools is the
@@ -16,9 +16,9 @@
       </p>
 
       <div class="logos">
-        <a href="http://egora.uni-muenster.de/intf/index_en.shtml"><img src="/images/intf-logo.png" /></a>
-        <a href="http://www.awk.nrw.de"><img src="/images/awk-logo-00.png" /></a>
-        <a href="http://cceh.uni-koeln.de"><img src="/images/cceh-logo.png" /></a>
+        <a href="http://egora.uni-muenster.de/intf/index_en.shtml"><img :src="intf_logo" /></a>
+        <a href="http://www.awk.nrw.de"><img :src="awk_logo" /></a>
+        <a href="http://cceh.uni-koeln.de"><img :src="cceh_logo" /></a>
       </div>
 
       <div class="gdpr">
@@ -32,36 +32,43 @@
 <script>
 
 /* import these images for the side-effect only: make webpack pack these files. */
-import '../images/intf-logo.png';
-import '../images/awk-logo-00.png';
-import '../images/cceh-logo.png';
+import intf_logo from '../images/intf-logo.png';
+import awk_logo from  '../images/awk-logo-00.png';
+import cceh_logo from '../images/cceh-logo.png';
 
 export default {
     'data' : function () {
         return {
-            'caption' : 'Genealogical Queries',
+            'caption'   : 'Genealogical Queries',
+            'intf_logo' : intf_logo,
+            'awk_logo'  : awk_logo,
+            'cceh_logo' : cceh_logo,
         };
     },
 };
 </script>
 
-<style lang="less" scoped>
-a.biglink {
-    display: block;
-    font-size: 150%;
-    margin: 1em 0;
-}
+<style lang="scss">
+/* index.vue */
 
-div.gdpr {
-    margin-top: 1em;
-}
+div.index-vm {
+    a.biglink {
+        display: block;
+        font-size: 150%;
+        margin: 1em 0;
+    }
 
-div.logos {
-    margin-top: 2em;
+    div.gdpr {
+        margin-top: 1em;
+    }
 
-    img {
-        height: 100px;
-        padding-right: 1em;
+    div.logos {
+        margin-top: 2em;
+
+        img {
+            height: 100px;
+            padding-right: 1em;
+        }
     }
 }
 </style>

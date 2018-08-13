@@ -3,37 +3,32 @@
 
     <!-- the violet header -->
     <div class="bs-docs-header">
-      <div class="container">
-        <h1>
-          <span class="caption">{{ caption }}</span>
-          <span class="appname">{{ $store.state.current_application.name }}</span>
-        </h1>
-      </div>
+      <!-- needs a nested container to expand the violet band to the screen edges -->
+      <h1 class="container d-flex flex-row justify-content-between">
+        <span class="caption">{{ caption }}</span>
+        <span class="appname">{{ $store.state.current_application.name }}</span>
+      </h1>
     </div>
 
-    <div class="container bs-docs-container">
-      <div class="clearfix">
-        <div class="pull-right">
-          <a v-if="home_url" :href="home_url">Home</a>
-          <router-link v-else :to="{ name : 'index' }">Home</router-link>
-          &#xa0; | &#xa0;
-          <a href="/pdf/GenQ4_Guide.pdf" target="_blank">Short Guide (PDF)</a>
-          <template v-if="this.$store.state.current_user.is_logged_in">
-            &#xa0; | &#xa0;
-            <router-link :to="{ name : 'user.profile' }" class="user_profile_link">
-              {{ this.$store.state.current_user.username }}
-            </router-link>
-            &#xa0; | &#xa0;
-            <router-link :to="{ name : 'user.logout' }" class="user_logout_link">Sign out</router-link>
-          </template>
-        </div>
-      </div>
+    <div class="login-nav container d-flex flex-row justify-content-end bs-docs-container">
+      <a v-if="home_url" :href="home_url">Home</a>
+      <router-link v-else :to="{ name : 'index' }">Home</router-link>
+      &#xa0; | &#xa0;
+      <a href="/pdfs/GenQ4_Guide.pdf" target="_blank">Short Guide (PDF)</a>
+      <template v-if="this.$store.state.current_user.is_logged_in">
+        &#xa0; | &#xa0;
+        <a href="/user/profile" class="user_profile_link">
+          <span class="fas fa-user" /> {{ this.$store.state.current_user.username }}
+        </a>
+        &#xa0; | &#xa0;
+        <a href="/user/sign-out" class="user_logout_link">
+          <span class="fas fa-sign-out-alt" /> Sign out
+        </a>
+      </template>
     </div>
 
-    <div class="container bs-docs-container">
-      <div class="flashed_messages">
-        <!-- container for eventual messages -->
-      </div>
+    <div class="container bs-docs-container flashed_messages">
+      <!-- container for eventual messages -->
     </div>
 
   </div>
@@ -82,29 +77,32 @@ export default {
 
 </script>
 
-<style lang="less">
-@import "@{BS}/variables.less";
-@import "@{BS}/mixins.less";
+<style lang="scss">
+/* page_header.vue */
+@import "bootstrap-custom";
 
 div.bs-docs-header {
-    margin-bottom: 1em;
-    color: #cdbfe3;
-    background-color: #6f5499;
+    margin: 0 0 ($spacer * 0.5) 0;
+    padding: ($spacer * 0.5) 0 ($spacer * 0.25) 0;
+    color: var(--light);
+    background-color: var(--brand-color);
+}
 
-    h1 {
-        color: white;
+div.bs-docs-container {
+    margin-bottom: ($spacer * 0.5);
+}
 
-        span.appname {
-            float: right;
-        }
+div.login-nav {
+    @media print {
+        display: none !important;
     }
 }
 
 .alert {
-    margin-top: @line-height-computed;
+    margin-top: $alert-padding-y;
 
     &.alert-margins {
-        margin: @line-height-computed @alert-padding;
+        margin: $alert-padding-y $alert-padding-x;
     }
 }
 </style>

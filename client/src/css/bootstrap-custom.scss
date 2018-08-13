@@ -1,0 +1,39 @@
+/* See: https://getbootstrap.com/docs/4.1/getting-started/theming/ */
+
+@import "../../node_modules/bootstrap/scss/_functions.scss";
+@import "../../node_modules/bootstrap/scss/_variables.scss";
+@import "../../node_modules/bootstrap/scss/_mixins.scss";
+
+$font-size-base: 0.875rem;
+
+$theme-colors: (
+    "primary":     #337ab7,
+    "brand-color": #6f5499
+);
+
+$grid-breakpoints: (
+    // Extra small screen / phone
+    xs: 0,
+    // Small screen / phone
+    sm: 576px,
+    // Medium screen / tablet
+    md: 768px,
+    // Large screen / desktop
+    lg: 992px,
+    // Extra large screen / wide desktop
+    xl: 1200px,
+    // My Screen
+    x2l: 1600px,
+    x3l: 2000px,
+    x4l: 2500px
+);
+
+$container-max-widths: (
+    sm: 540px,
+    md: 720px,
+    lg: 960px,
+    xl: 1140px,
+    x2l: 1540px,
+    x3l: 1940px,
+    x4l: 2440px
+);

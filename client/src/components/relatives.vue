@@ -1,6 +1,14 @@
 <template>
-  <div class="panel-content panel-slidable panel-relatives-content">
-    <table class="relatives table table-condensed">
+  <div class="relatives-vm card-slidable">
+    <div class="card-header">
+      <toolbar @csv="download ('relatives.csv')" />
+    </div>
+
+    <div class="card-header">
+      <relmetrics :ms="ms" />
+    </div>
+
+    <table class="relatives table table-sm">
       <tbody>
         <tr>
           <th class="ms"
@@ -42,6 +50,7 @@
         </tr>
       </tbody>
     </table>
+
   </div>
 </template>
 
@@ -49,7 +58,7 @@
 /**
  * This module implements the table in the relatives popup.
  *
- * @module relatives
+ * @component relatives
  *
  * @author Marcello Perathoner
  */
@@ -59,22 +68,43 @@ import $ from 'jquery';
 import _ from 'lodash';
 import csv_parse from 'csv-parse/lib/sync';
 
-/**
- * Initialize the module.
- *
- * @function init
- *
- * @param {Object} instance - The panel module instance to inherit from.
- */
+const CAPTIONS = {
+    'rel' : 'Relatives for',
+    'anc' : 'Ancestors for',
+    'des' : 'Descendants for',
+};
 
 export default {
     'props' : ['ms_id'],
     data () {
+        const tb = {
+            'type'                  : 'rel',
+            'range'                 : 'All',
+            'limit'                 : '10',
+            'include'               : [],
+            'fragments'             : [],
+            'mode'                  : 'sim',
+            'labez'                 : 'all+lac',
+            'labez_dropdown_prefix' : [['all', 'All']],
+            'labez_dropdown_suffix' : [['all+lac', 'All+Lac']],
+            'csv'                   : true, // show a download csv button
+        };
         return {
-            'rows' : [],
+            'toolbar' : tb,
+            'rows'    : [],
+            'ms'      : null,
         };
     },
     'computed' : {
+        caption () {
+            if (!this.ms) {
+                return '';
+            }
+            return CAPTIONS[this.toolbar.type] + ` <span class="ms">W1:</span>
+                <span class="fg_labez" data-labez="${this.ms.labez}"><span
+                      class="ms hilite-source" data-ms-id="${this.ms.ms_id}">${this.ms.hs}</span>
+                (<span class="labez">${this.ms.labez}</span>) ${this.ms.length}</span>`;
+        },
         ...mapGetters ([
             'passage',
         ]),
@@ -82,6 +112,15 @@ export default {
     'watch' : {
         passage () {
             this.load_passage ();
+        },
+        'toolbar' : {
+            handler () {
+                this.load_passage ();
+            },
+            'deep' : true,
+        },
+        caption () {
+            this.$parent.set_caption (this.caption);
         },
     },
     'methods' : {
@@ -94,14 +133,14 @@ export default {
          * @function load_passage
          */
         load_passage () {
-            const params = ['type', 'range', 'limit', 'labez', 'mode', 'include', 'fragments'];
-
-            const url = `relatives.csv/${this.passage.pass_id}/id${this.ms_id}?`
-                + $.param (_.pick (this.$parent.toolbar, params)); // we must use GET, not POST
-
             const vm = this;
             vm.rows.length = 0;
-            vm.get (url).then ((response) => {
+
+            vm.get (`manuscript-full.json/${this.passage.pass_id}/id${this.ms_id}`).then ((response) => {
+                vm.ms = response.data.data;
+            });
+
+            vm.get (this.build_url ('relatives.csv')).then ((response) => {
                 const records = csv_parse (response.data, { 'columns' : true });
                 vm.rows = records.map ((d) => {
                     return {
@@ -124,18 +163,16 @@ export default {
                 });
             });
         },
-    },
-    created () {
-        this.$parent.toolbar = {
-            'type'                  : 'rel',
-            'range'                 : 'All',
-            'limit'                 : '10',
-            'include'               : [],
-            'fragments'             : [],
-            'mode'                  : 'sim',
-            'labez'                 : 'all+lac',
-            'labez_dropdown_prefix' : [['all', 'All'], ['all+lac', 'All+Lac']],
-        };
+        build_url (page) {
+            const vm = this;
+            const params = _.pick (vm.toolbar, [
+                'type', 'range', 'limit', 'labez', 'mode', 'include', 'fragments',
+            ]);
+            return `${page}/${vm.passage.pass_id}/id${vm.ms_id}?` + $.param (params);
+        },
+        download (page) {
+            window.open (this.build_full_api_url (this.build_url (page), '_blank'));
+        },
     },
     mounted () {
         this.load_passage ();
@@ -143,42 +180,36 @@ export default {
 };
 </script>
 
-<style lang="less">
-div.panel.panel-relatives {
-    position: fixed;
-    z-index: 10;
-    width: 38em;
-    min-width: 0;
+<style lang="scss">
+/* relatives.vue */
 
+div.relatives-vm {
     span.ms {
         font-weight: bold;
     }
 
-    div.panel-relatives-content {
+    table.relatives {
+        margin-bottom: 0;
         max-height: 50em;
         overflow: auto;
-    }
-}
 
-table.relatives {
-    margin-bottom: 0;
+        th,
+        td {
+            padding-left: 0;
+            padding-right: 0;
+            text-align: right;
 
-    th,
-    td {
-        padding-left: 0;
-        padding-right: 0;
-        text-align: right;
+            &:first-child {
+                padding-left: 1em;
+            }
 
-        &:first-child {
-            padding-left: 1em;
-        }
+            &:last-child {
+                padding-right: 1em;
+            }
 
-        &:last-child {
-            padding-right: 1em;
-        }
-
-        &.ms {
-            text-align: left;
+            &.ms {
+                text-align: left;
+            }
         }
     }
 }

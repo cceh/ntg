@@ -1,38 +1,80 @@
 <template>
-  <table class="comparison table table-bordered table-condensed table-hover" cellspacing="0">
-    <caption>
-      <span class="caption">{{ caption }}</span>
-      <div ref="toolbar" class="btn-toolbar toolbar toolbar-comparison" role="toolbar" />
-    </caption>
-    <thead>
-      <tr>
-        <th class="details-control" />
+  <div class="comparison-table-vm">
+    <div class="card-header">
+      <toolbar @csv="download ()" />
+    </div>
 
-        <th class="range exportable">Chapter</th>
-        <th class="direction exportable"
-            title="Genealogical direction, potential ancestors indicated by “>”">Dir</th>
-        <th class="rank exportable"
-            title="Ancestral rank according to the degree of agreement (Perc)">NR</th>
+    <table class="table table-bordered table-sm table-hover table-comparison" cellspacing="0">
+      <thead>
+        <tr @click="on_sort">
+          <th class="details-control" />
 
-        <th class="perc exportable"
-            title="Percentaged agreement of W1 and W2 at the variant passages attested by both (Pass)">Perc</th>
-        <th class="eq exportable"
-            title="Number of agreements of W1 and W2 at the variant passages attested by both (Pass)">Eq</th>
-        <th class="common exportable"
-            title="Total number of passages where W1 and W2 are both extant">Pass</th>
+          <th class="range" data-sort-by="rg_id">Chapter</th>
+          <th class="direction" data-sort-by="direction"
+              title="Genealogical direction, potential ancestors indicated by “>”">Dir</th>
+          <th class="rank" data-sort-by="rank"
+              title="Ancestral rank according to the degree of agreement (Perc)">NR</th>
 
-        <th class="older exportable"
-            title="Number of variants in W2 that are prior to those in W1">W1&lt;W2</th>
-        <th class="newer exportable"
-            title="Number of variants in W1 that are prior to those in W2">W1&gt;W2</th>
-        <th class="uncl exportable"
-            title="Number of variants where no decision has been made about priority">Uncl</th>
-        <th class="norel exportable"
-            title="Number of passages where the respective variants are unrelated">NoRel</th>
-      </tr>
-    </thead>
-    <tbody />
-  </table>
+          <th class="perc" data-sort-by="affinity"
+              title="Percentaged agreement of W1 and W2 at the variant passages attested by both (Pass)">Perc</th>
+          <th class="eq" data-sort-by="equal"
+              title="Number of agreements of W1 and W2 at the variant passages attested by both (Pass)">Eq</th>
+          <th class="common" data-sort-by="common"
+              title="Total number of passages where W1 and W2 are both extant">Pass</th>
+
+          <th class="older" data-sort-by="older"
+              title="Number of variants in W2 that are prior to those in W1">W1&lt;W2</th>
+          <th class="newer" data-sort-by="newer"
+              title="Number of variants in W1 that are prior to those in W2">W1&gt;W2</th>
+          <th class="uncl" data-sort-by="unclear"
+              title="Number of variants where no decision has been made about priority">Uncl</th>
+          <th class="norel" data-sort-by="norel"
+              title="Number of passages where the respective variants are unrelated">NoRel</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template v-for="r in rows">
+          <tr :class="rowclass (r)"
+              :data-range="r.range" :key="r.rg_id ">
+            <td class="details-control" @click="toggle_details_table (r)" />
+
+            <td class="range">{{ r.range }}</td>
+            <td class="direction"
+                title="Genealogical direction, potential ancestors indicated by “>”">{{ r.direction }}</td>
+            <td class="rank"
+                title="Ancestral rank according to the degree of agreement (Perc)">{{ r.rank }}</td>
+
+            <td class="perc"
+                title="Percentaged agreement of W1 and W2 at the variant passages attested by both (Pass)">
+              {{ r.affinity }}
+            </td>
+            <td class="eq"
+                title="Number of agreements of W1 and W2 at the variant passages attested by both (Pass)">
+              {{ r.equal }}
+            </td>
+            <td class="common"
+                title="Total number of passages where W1 and W2 are both extant">{{ r.common }}</td>
+
+            <td class="older"
+                title="Number of variants in W2 that are prior to those in W1">{{ r.older }}</td>
+            <td class="newer"
+                title="Number of variants in W1 that are prior to those in W2">{{ r.newer }}</td>
+            <td class="uncl"
+                title="Number of variants where no decision has been made about priority">{{ r.unclear }}</td>
+            <td class="norel"
+                title="Number of passages where the respective variants are unrelated">{{ r.norel }}</td>
+
+          </tr>
+          <tr v-if="r.child" :data-range="r.range" :key="r.rg_id + '_child'" class="child" >
+            <td />
+            <td colspan="99">
+              <comparison-details-table :ms1="ms1" :ms2="ms2" :range="r.range" />
+            </td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script>
@@ -50,52 +92,10 @@ import $ from 'jquery';
 import Vue from 'vue';
 import csv_parse from 'csv-parse/lib/sync';
 
-import 'datatables.net';
-import 'datatables.net-bs';
-import 'datatables.net-buttons';
-import 'datatables.net-buttons-bs';
-// import 'datatables.net-buttons-html5';
-import 'datatables.net-buttons/js/buttons.print.js';
-
-import 'bootstrap.css';
-import 'datatables.net-bs.css';
-import 'datatables.net-buttons-bs.css';
-
 import comparison_details_table from 'comparison_details_table.vue';
+import { sort_mixin } from 'comparison_details_table.vue';
 
 Vue.component ('comparison-details-table', comparison_details_table);
-
-export const default_table_options = {
-    'autoWidth'    : true,
-    'deferRender'  : true,
-    'info'         : false,
-    'lengthChange' : false,
-    'ordering'     : true,
-    'paging'       : false,
-    'scrollX'      : false,
-    'searching'    : false,
-};
-
-const default_buttons = [
-/*
-    {
-        'extend'        : 'copy',
-        'className'     : 'btn btn-primary btn-comparison-copy',
-        'exportOptions' : { 'columns' : '.exportable' },
-    },
-    {
-        'extend'        : 'csv',
-        'className'     : 'btn btn-primary btn-comparison-csv',
-        'exportOptions' : { 'columns' : '.exportable' },
-    },
-*/
-    {
-        'extend'        : 'print',
-        'className'     : 'btn btn-primary btn-comparison-print',
-        'exportOptions' : { 'columns' : '.exportable' },
-        'autoPrint'     : false,
-    },
-];
 
 /**
  * Return a direction marker, <, =, or >.
@@ -141,37 +141,21 @@ function row_conversion (d) {
         'affinity'  : Math.round (d.affinity * 100000) / 1000,
         'rank'      : +d.rank,
         'direction' : dir (d),
+        'child'     : false,
+        'sorted'    : '',
     };
 }
 
-/**
- * Add buttons to a data_table.
- *
- * Must do this as separate function because otherwise dynamic creation of
- * details table components will not show buttons.
- *
- * @function buttons
- */
-
-function buttons ($table, $toolbar) {
-    let data_table = $table.DataTable (); // eslint-disable-line new-cap
-
-    /* eslint-disable no-new */
-    new $.fn.dataTable.Buttons (data_table, {
-        'buttons' : default_buttons,
-        'dom'     : {
-            'container' : {
-                'className' : 'btn-group btn-group-xs',
-            },
-        },
-    });
-    data_table.buttons ().container ().appendTo ($toolbar);
-}
-
 export default {
-    'props' : ['ms1', 'ms2'],
+    'mixins' : [sort_mixin],
+    'props'  : ['ms1', 'ms2'],
     data () {
         return {
+            'rows'      : [],
+            'sorted_by' : 'rg_id',
+            'toolbar'   : {
+                'csv' : true, // show a download csv button
+            },
         };
     },
     'computed' : {
@@ -185,101 +169,24 @@ export default {
     'watch' : {
         'ms1ms2' : function () {
             this.load_data ();
+            this.sort ();
         },
-    },
-    mounted () {
-        /**
-         * Initialize the table structure.  This has to be done only once.  On
-         * navigation we only replace the table data.
-         */
-
-        const $table = $ (this.$el);
-
-        $table.DataTable ( // eslint-disable-line new-cap
-            $.extend ({}, default_table_options, {
-                'columns' : [
-                    {
-                        'class'          : 'details-control',
-                        'orderable'      : false,
-                        'data'           : null,
-                        'defaultContent' : '',
-                    },
-
-                    {
-                        'data' : function (r, type /* , val, meta */) {
-                            if (type === 'sort') {
-                                return r.rg_id;
-                            }
-                            return r.range;
-                        },
-                        'class' : 'range',
-                        'type'  : 'num',
-                    },
-                    {
-                        'data'  : 'direction',
-                        'class' : 'direction',
-                    },
-                    {
-                        'data'  : 'rank',
-                        'class' : 'equal',
-                    },
-
-                    {
-                        'data'  : 'affinity',
-                        'class' : 'equal',
-                    },
-                    {
-                        'data'  : 'equal',
-                        'class' : 'equal',
-                    },
-                    {
-                        'data'  : 'common',
-                        'class' : 'common',
-                    },
-
-                    {
-                        'data'  : 'newer',
-                        'class' : 'newer',
-                    },
-                    {
-                        'data'  : 'older',
-                        'class' : 'older',
-                    },
-                    {
-                        'data'  : 'unclear',
-                        'class' : 'unclear',
-                    },
-                    {
-                        'data'  : 'norel',
-                        'class' : 'norel',
-                    },
-                ],
-                'order'      : [[1, 'asc']],
-                'createdRow' : function (row, data, dummy_index) {
-                    let $row = $ (row);
-                    $row.attr ('data-range', data.range);
-                    $row.toggleClass ('older', data.older > data.newer);
-                    $row.toggleClass ('newer', data.older < data.newer);
-                },
-            })
-        );
-
-        buttons ($table, this.$refs.toolbar);
-
-        $table.find ('tbody').on ('click', 'td.details-control', this.toggle_details_table);
+        caption () {
+            this.$parent.set_caption (this.caption);
+        },
     },
     'methods' : {
         load_data () {
-            // reload table
-            let url = 'comparison-summary.csv?' + $.param ({
+            const vm = this;
+            vm.get (vm.build_url ()).then ((response) => {
+                const rows = csv_parse (response.data, { 'columns' : true });
+                vm.rows = rows.map (row_conversion);
+            });
+        },
+        build_url (page = 'comparison-summary.csv') {
+            return page + '?' + $.param ({
                 'ms1' : 'id' + this.ms1.ms_id,
                 'ms2' : 'id' + this.ms2.ms_id,
-            });
-            let vm = this;
-            vm.get (url).then ((response) => {
-                const rows = csv_parse (response.data, { 'columns' : true });
-                const data_table = $ (vm.$el).DataTable (); // eslint-disable-line new-cap
-                data_table.clear ().rows.add (rows.map (row_conversion)).draw ();
             });
         },
 
@@ -289,124 +196,91 @@ export default {
          * @function toggle_details_table
          */
 
-        toggle_details_table (event) {
-            let $tr    = $ (event.currentTarget).closest ('tr');
-            let $table = $ (this.$el);
-            let row    = $table.DataTable ().row ($tr); // eslint-disable-line new-cap
-
-            if (row.child.isShown ()) {
-                $ ('div.slider', row.child ()).slideUp (function () {
-                    row.child.hide ();
-                    $tr.removeClass ('shown');
-                });
+        toggle_details_table (row) {
+            if (row.child) {
+                const $slider = $ (`table.table-comparison tr.child[data-range=${row.range}] div.slider`);
+                $slider.slideUp (() => { row.child = false; });
             } else {
-                if ($tr.hasClass ('csv-loaded')) {
-                    $tr.addClass ('shown');
-                    row.child.show ();
-                    $ ('div.slider', row.child ()).slideDown ();
-                    return;
-                }
-
-                // Dynamically create the details table component and mount it
-                // as off-DOM element.  Then attach it using row.child ().
-                let Comp = this.$options.components['comparison-details-table'];
-                let comp = new Comp ({
-                    'propsData' : { 'ms1' : this.ms1, 'ms2' : this.ms2, 'range' : $tr.attr ('data-range') },
-                    'parent'    : this,
-                }).$mount ();
-
-                row.child (comp.$el);
-                row.child.show ();
-                $tr.addClass ('shown');
-
-                buttons ($ (comp.$refs.table), comp.$refs.toolbar);
+                row.child = true;
             }
         },
+        download () {
+            window.open (this.build_full_api_url (this.build_url (), '_blank'));
+        },
+        rowclass (r) {
+            return (r.older > r.newer ? 'older' : '')
+                + (r.newer > r.older ? 'newer' : '')
+                + (r.child ? ' shown' : '');
+        },
+    },
+    mounted () {
+        this.load_data ();
     },
 };
 </script>
 
-<style lang="less">
-@import "@{BS}/variables.less";
-@import "@{BS}/mixins.less";
+<style lang="scss">
+/* comparison_table.vue */
+@import "bootstrap-custom";
 
-table.dataTable {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-
-    caption {
-        font-weight: bold;
-        padding: @table-condensed-cell-padding;
-        border-bottom: 1px solid @table-border-color;
-        color: inherit;
-
-        div.toolbar {
-            float: right;
-        }
-    }
-
-    thead {
-        background-color: @panel-default-heading-bg;
-
-        tr th {
-            &.sorting::after,
-            &.sorting_asc::after,
-            &.sorting_desc::after {
-                position: absolute;
-                bottom: 8px;
-                right: 8px;
-                display: block;
-                padding-left: 8px;
-                /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
-                font-family: 'Glyphicons Halflings';
-                opacity: 1;
-                cursor: pointer;
-            }
-
-            &.sorting::after {
-                content: "\e114";
-                color: green;
-            }
-
-            &.sorting_asc::after {
-                content: "\e114";
-                color: red;
-            }
-
-            &.sorting_desc::after {
-                content: "\e113";
-                color: red;
-            }
-        }
-    }
-
-    tbody {
-        background-color: @panel-bg;
-
-        td.sorting_1 {
-            background: @panel-default-heading-bg;
+div.comparison-table-vm {
+    .card-header {
+        @media print {
+            display: none;
         }
     }
 }
 
-table.comparison {
-    margin-bottom: 0;
-    border-width: 0;
-    text-align: right;
+table.table-comparison,
+table.table-comparison-details {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    background-color: $card-bg;
 
     caption {
-        padding: @panel-heading-padding;
+        caption-side: top;
+        padding: $card-spacer-y $card-spacer-x;
+        border-bottom: $table-border-width solid $table-border-color;
+        font-weight: bold;
+        color: inherit;
+        background-color: $card-cap-bg;
     }
 
-    /* stylelint-disable-next-line no-descending-specificity */
-    th,
-    td {
-        &.ms {
-            text-align: left;
-        }
+    thead {
+        background-color: $card-cap-bg;
 
-        &.direction {
-            text-align: center;
+        tr th {
+            position: relative;
+
+            &[data-sort-by] {
+                cursor: pointer;
+            }
+
+            &[data-sort-by]::after {
+                position: absolute;
+                top: ($spacer * 0.25);
+                display: block;
+                /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
+                font-family: 'Font Awesome 5 Free';
+                font-weight: 900;
+                content: "\f0dc";
+                color: var(--green);
+                opacity: 1;
+
+                @media print {
+                    display: none;
+                }
+            }
+
+            &.asc[data-sort-by]::after {
+                content: "\f0de";
+                color: var(--red);
+            }
+
+            &.desc[data-sort-by]::after {
+                content: "\f0dd";
+                color: var(--red);
+            }
         }
     }
 
@@ -419,39 +293,60 @@ table.comparison {
             background-color: #fcc;
         }
     }
+}
 
-    div.slider {
-        background-color: @panel-default-heading-bg;
-        display: none;
+/* stylelint-disable no-descending-specificity */
+
+table.table-comparison {
+    width: 100%;
+    border-width: 0;
+
+    th,
+    td {
+        text-align: right;
+
+        &.direction {
+            text-align: center;
+        }
     }
 
-    td.no-padding {
+    th[data-sort-by]::after {
+        left: ($spacer * 0.25);
+    }
+
+    tr.child {
         padding: 0;
+
+        &:hover {
+            background-color: $card-bg;
+        }
+
+        > td {
+            padding: 0;
+        }
     }
 
     tr .details-control {
         text-align: center;
+        width: $spacer;
+
+        @media print {
+            display: none;
+        }
     }
 
     tr td.details-control::after {
         /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
-        font-family: 'Glyphicons Halflings';
-        content: "\e081";
-        color: green;
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        content: "\f055";
+        color: var(--green);
         cursor: pointer;
     }
 
     tr.shown td.details-control::after {
-        content: "\e082";
-        color: red;
+        content: "\f056";
+        color: var(--red);
     }
-
-    tr[data-range="0"] td.details-control::after {
-        content: "";
-    }
-}
-
-body.dt-print-view table {
-    font-size: 12px;
 }
 </style>

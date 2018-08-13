@@ -4,70 +4,63 @@
 
     <div class="container bs-docs-container">
 
-      <!-- the parent for all floating panels must be at the top of the page so
-           the panels will not move around on page resizes etc. this element will
+      <!-- the parent for all floating cards must be at the top of the page so
+           the cards will not move around on page resizes etc. this element will
            only contain absolute-positioned stuff and thus has a height of 0 -->
-      <div id="floating-panels">
-        <panel v-for="panel in floating_panels" :key="panel.id"
-               :panel_id="panel.id" :position_target="panel.position_target"
-               class="panel-closable panel-draggable panel-relatives">
-          <toolbar name="relatives" mode="relatives" />
-          <relmetrics :ms_id="panel.ms_id" />
-          <relatives :ms_id="panel.ms_id" />
-        </panel>
+      <div id="floating-cards">
+        <card v-for="card in floating_cards" :key="card.id"
+              :card_id="card.id" :position_target="card.position_target"
+              class="card-closable card-draggable card-floating">
+          <relatives :ms_id="card.ms_id" />
+        </card>
       </div>
 
       <navigator ref="nav" />
 
-      <panel cssclass="panel-apparatus" static_caption="Apparatus">
-        <toolbar name="apparatus" mode="apparatus" />
+      <card cssclass="card-apparatus" caption="Apparatus">
         <apparatus />
-      </panel>
+      </card>
 
-      <panel cssclass="panel-local-stemma" static_caption="Local Stemma">
-        <toolbar name="stemma" mode="stemma" />
+      <card cssclass="card-local-stemma" caption="Local Stemma">
         <localstemma cssclass="stemma-wrapper local-stemma-wrapper">
           <d3stemma prefix="ls_" />
         </localstemma>
-      </panel>
+      </card>
 
-      <panel v-if="this.$store.state.current_user.is_editor"
-             cssclass="panel-notes" static_caption="Notes" default_closed="true">
-        <toolbar name="notes" mode="notes" />
+      <card v-if="this.$store.state.current_user.is_editor"
+            cssclass="card-notes" caption="Notes" default_closed="true">
         <notes />
-      </panel>
+      </card>
 
-      <panel cssclass="panel-textflow panel-variant-textflow"
-             static_caption="Coherence at Variant Passages (GraphViz)">
-        <toolbar name="variant" mode="variant" />
+      <card cssclass="card-textflow card-variant-textflow"
+            caption="Coherence at Variant Passages (GraphViz)">
         <textflow cssclass="textflow-wrapper variant-textflow-wrapper"
                   global="true" var_only="true">
           <d3stemma prefix="vtf_" />
         </textflow>
-      </panel>
+      </card>
 
-      <panel class="panel-textflow panel-variant-textflow-2"
-             static_caption="Coherence at Variant Passages (Chord)" default_closed="true">
-        <toolbar name="variant-2" mode="variant" />
-        <textflow global="true" var_only="true" cssclass="textflow-wrapper variant-textflow-wrapper">
+      <card class="card-textflow card-variant-textflow-2"
+            caption="Coherence at Variant Passages (Chord)" default_closed="true">
+        <textflow cssclass="textflow-wrapper variant-textflow-wrapper"
+                  global="true" var_only="true">
           <d3chord prefix="vtf2_" />
         </textflow>
-      </panel>
+      </card>
 
-      <panel ref="ltpanel" class="panel-textflow panel-local-textflow"
-             static_caption="Coherence in Attestations">
-        <toolbar name="local" mode="local" />
-        <textflow cssclass="textflow-wrapper local-textflow-wrapper">
+      <card class="card-textflow card-local-textflow"
+            caption="Coherence in Attestations">
+        <textflow ref="lt" cssclass="textflow-wrapper local-textflow-wrapper">
           <d3stemma prefix="tf_" />
         </textflow>
-      </panel>
+      </card>
 
-      <panel class="panel-textflow panel-global-textflow" static_caption="General Textual Flow">
-        <toolbar name="global" mode="global" />
+      <card class="card-textflow card-global-textflow"
+            caption="General Textual Flow">
         <textflow global="true" cssclass="textflow-wrapper global-textflow-wrapper">
           <d3stemma prefix="gtf_" />
         </textflow>
-      </panel>
+      </card>
 
       <navigator />
     </div>
@@ -88,12 +81,10 @@ import Vue from 'vue';
 
 import d3common  from 'd3-common';
 
-import 'bootstrap.css';
-import 'jquery-ui-css/all.css';
-
 import page_header      from 'page_header.vue';
 import navigator        from 'navigator.vue';
-import panel            from 'panel.vue';
+import card             from 'card.vue';
+import card_caption     from 'card_caption.vue';
 import toolbar          from 'toolbar.vue';
 import apparatus        from 'apparatus.vue';
 import notes            from 'notes.vue';
@@ -104,25 +95,26 @@ import textflow         from 'textflow.vue';
 import relatives        from 'relatives.vue';
 import relmetrics       from 'relatives_metrics.vue';
 
-Vue.component ('page-header', page_header);
-Vue.component ('navigator',   navigator);
-Vue.component ('panel',       panel);
-Vue.component ('toolbar',     toolbar);
-Vue.component ('apparatus',   apparatus);
-Vue.component ('notes',       notes);
-Vue.component ('localstemma', local_stemma);
-Vue.component ('d3stemma',    d3_stemma_layout);
-Vue.component ('d3chord',     d3_chord_layout);
-Vue.component ('textflow',    textflow);
-Vue.component ('relatives',   relatives);
-Vue.component ('relmetrics',  relmetrics);
+Vue.component ('page-header',  page_header);
+Vue.component ('navigator',    navigator);
+Vue.component ('card',         card);
+Vue.component ('card-caption', card_caption);
+Vue.component ('toolbar',      toolbar);
+Vue.component ('apparatus',    apparatus);
+Vue.component ('notes',        notes);
+Vue.component ('localstemma',  local_stemma);
+Vue.component ('d3stemma',     d3_stemma_layout);
+Vue.component ('d3chord',      d3_chord_layout);
+Vue.component ('textflow',     textflow);
+Vue.component ('relatives',    relatives);
+Vue.component ('relmetrics',   relmetrics);
 
 export default {
     'props' : ['current_user'],
     'data'  : function () {
         return {
-            'floating_panels' : [],
-            'panel_id'        : 0,
+            'floating_cards' : [],
+            'card_id'        : 0,
         };
     },
     'computed' : {
@@ -142,15 +134,15 @@ export default {
          * @param {jQuery} target - An element. The popup will be positioned relative to this element.
          */
         create_relatives_popup (ms_id, target) {
-            this.panel_id += 1;
-            this.floating_panels.push ({
-                'id'              : this.panel_id,
+            this.card_id += 1;
+            this.floating_cards.push ({
+                'id'              : this.card_id,
                 'ms_id'           : ms_id,
                 'position_target' : target,
             });
         },
-        destroy_relatives_popup (panel_id) {
-            this.floating_panels = this.floating_panels.filter (item => item.id !== panel_id);
+        destroy_relatives_popup (card_id) {
+            this.floating_cards = this.floating_cards.filter (item => item.id !== card_id);
         },
     },
     created () {
@@ -187,7 +179,7 @@ export default {
         });
 
         // Click on a node in the textflow diagram.
-        $ (document).on ('click', 'div.panel-textflow g.node', function (event) {
+        $ (document).on ('click', 'div.card-textflow g.node', function (event) {
             let ms_id = $ (event.currentTarget).attr ('data-ms-id'); // the g.node, not the circle
             vm.create_relatives_popup (ms_id, event.currentTarget);
         });
@@ -218,13 +210,20 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import "@{BS}/variables.less";
-@import "@{BS}/mixins.less";
+<style lang="scss">
+/* coherence.vue */
+@import "bootstrap-custom";
 
-#floating-panels {
+#floating-cards {
     position: relative;
     height: 0;
+
+    .card-floating {
+        position: fixed;
+        z-index: 10;
+        width: 38em;
+        min-width: 0;
+    }
 }
 
 .ms[data-ms-id]:hover {
@@ -242,8 +241,8 @@ span.selected {
     outline: 2px solid #f00;
 }
 
-@link-color: #ccc;
-@link-opacity: 0.6;
+$svg-link-color: #ccc;
+$svg-link-opacity: 0.6;
 
 /* links */
 
@@ -251,9 +250,9 @@ path,
 line,
 text {
     &.link {
-        stroke: @link-color;
+        stroke: $svg-link-color;
+        stroke-opacity: $svg-link-opacity;
         stroke-width: 2px;
-        stroke-opacity: @link-opacity;
         fill: none;
 
         &.dashed {
@@ -304,8 +303,8 @@ text {
 }
 
 marker.link {
-    stroke: @link-color;
-    stroke-opacity: @link-opacity;
+    stroke: $svg-link-color;
+    stroke-opacity: $svg-link-opacity;
     fill: #000;
     fill-opacity: 1;
     stroke-dasharray: none;
@@ -355,13 +354,13 @@ g.selected ellipse.node {
 /* subgraphs */
 
 rect.subgraph {
-    stroke: @panel-default-border;
-    stroke-width: 1px;
-    fill: @panel-default-heading-bg;
+    stroke: $card-border-color;
+    stroke-width: $card-border-width;
+    fill: $card-cap-bg;
 
     &.rounded {
-        rx: 5px;
-        ry: 5px;
+        rx: $card-border-radius;
+        ry: $card-border-radius;
     }
 }
 

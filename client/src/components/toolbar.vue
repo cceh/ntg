@@ -1,160 +1,124 @@
 <template>
-  <div :class="'panel-heading panel-slidable panel-toolbar panel-' + name + '-toolbar'">
-    <div :class="'btn-toolbar toolbar ' + name + '-toolbar'" role="toolbar">
+  <b-button-toolbar class="justify-content-between">
+    <b-form-radio-group v-if="'type' in toolbar" v-model="toolbar.type"
+                        :options="type_checkbox_options"
+                        buttons button-variant="primary" size="sm" />
 
-      <div v-if="mode == 'relatives'" class="relatives-type btn-group btn-group-xs" data-toggle="buttons">
-        <label class="btn btn-primary">
-          <input type="radio" name="type" data-opt="rel" />Rel
-        </label>
-        <label class="btn btn-primary">
-          <input type="radio" name="type" data-opt="anc" />Anc
-        </label>
-        <label class="btn btn-primary">
-          <input type="radio" name="type" data-opt="des" />Des
-        </label>
-      </div>
+    <b-form-radio-group v-if="'limit' in toolbar" v-model="toolbar.limit"
+                        :options="limit_checkbox_options"
+                        buttons button-variant="primary" size="sm" />
 
-      <div v-if="mode == 'relatives'" class="relatives-limit btn-group btn-group-xs" data-toggle="buttons">
-        <label class="btn btn-primary">
-          <input type="radio" name="limit" data-opt="10" />10
-        </label>
-        <label class="btn btn-primary">
-          <input type="radio" name="limit" data-opt="20" />20
-        </label>
-        <label class="btn btn-primary">
-          <input type="radio" name="limit" data-opt="0" />All
-        </label>
-      </div>
+    <b-form-checkbox-group v-if="'cliques' in toolbar" v-model="toolbar.cliques"
+                           :options="cliques_checkbox_options"
+                           buttons button-variant="primary" size="sm" />
 
-      <div v-if="['apparatus', 'variant'].includes (mode)"
-           class="apparatus-cliques btn-group btn-group-xs" data-toggle="buttons">
-        <label class="btn btn-primary">
-          <input type="checkbox" name="cliques" data-opt="cliques" />Splits
-        </label>
-      </div>
-
-      <div v-if="['local', 'relatives'].includes (mode)" class="toolbar-labez btn-group btn-group-xs">
-        <button :data-labez="toolbar.labez" type="button"
-                class="btn btn-primary dropdown-toggle dropdown-toggle-labez bg_labez"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Variant:
-          <span class="btn_text">{{ toolbar.labez }}</span> <span class="caret" />
-        </button>
-        <div class="dropdown-menu dropdown-menu-horiz dropdown-menu-labez">
-          <div class="btn-group btn-group-xs" data-toggle="buttons">
-            <template v-for="[labez, labez_i18n] in dd_labez">
-              <label :key="labez" :data-labez="labez"
-                     class="btn btn-primary btn-labez bg_labez">
-                <input :data-opt="labez" type="radio"
-                       data-type="dropdown" name="labez" />{{ labez_i18n }}
-              </label>
-            </template>
-          </div>
+    <div v-if="'labez' in toolbar"
+         class="btn-group btn-group-sm toolbar-labez">
+      <button :data-labez="toolbar.labez" type="button"
+              class="btn btn-primary dropdown-toggle dropdown-toggle-labez bg_labez"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Variant:
+        <span class="btn_text">{{ toolbar.labez }}</span> <span class="caret" />
+      </button>
+      <div class="dropdown-menu dropdown-menu-labez">
+        <div class="btn-group btn-group-sm">
+          <button v-for="[labez, labez_i18n] in dd_labez"
+                  :key="labez" :data-labez="labez"
+                  type="radio" data-type="dropdown"
+                  class="btn btn-primary btn-labez bg_labez"
+                  @click="on_dropdown_click ('labez', labez, $event)">{{ labez_i18n }}</button>
         </div>
-      </div>
-
-      <div v-if="['local', 'variant'].includes (mode)" class="toolbar-connectivity btn-group btn-group-xs"
-           data-toggle="buttons">
-        <label class="btn btn-primary">
-          Conn:
-          <span class="connectivity-label">{{ connectivity_formatter (toolbar.connectivity) }}</span>
-          <input :value="toolbar.connectivity" type="text" data-type="slider" name="connectivity" />
-        </label>
-      </div>
-
-      <div v-if="['global', 'local', 'variant', 'relatives'].includes (mode)"
-           class="toolbar-range btn-group btn-group-xs">
-        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-range"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Chapter:
-          <span class="btn_text">{{ toolbar.range }}</span> <span class="caret" />
-        </button>
-        <div class="dropdown-menu dropdown-menu-horiz dropdown-menu-range">
-          <div class="btn-group btn-group-xs" data-toggle="buttons">
-            <template v-for="range in dd_range">
-              <label :key="range.range" :data-range="range.value"
-                     class="btn btn-primary btn-range">
-                <input :data-opt="range.value" type="radio"
-                       data-type="dropdown" name="range" />{{ range.range }}
-              </label>
-            </template>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="['global', 'local', 'variant', 'relatives'].includes (mode)"
-           class="toolbar-include btn-group btn-group-xs" data-toggle="buttons">
-        <label class="btn btn-primary" title="Include A">
-          <input type="checkbox" name="include" data-opt="A" />A
-        </label>
-        <label class="btn btn-primary" title="Include Byzantine Text">
-          <input type="checkbox" name="include" data-opt="MT" />MT
-        </label>
-        <label class="btn btn-primary" title="Include text families">
-          <input type="checkbox" name="include" data-opt="F" />Fam
-        </label>
-        <label v-if="mode === 'global'" class="btn btn-primary" title="Include mss. lacking this passage">
-          <input type="checkbox" name="include" data-opt="Z" />Z
-        </label>
-      </div>
-
-      <div v-if="['local', 'relatives'].includes (mode)"
-           class="coherence-fragments btn-group btn-group-xs" data-toggle="buttons">
-        <label class="btn btn-primary">
-          <input type="checkbox" name="fragments" data-opt="fragments" />Frag
-        </label>
-      </div>
-
-      <div v-if="['global', 'local', 'variant', 'relatives'].includes (mode)"
-           class="toolbar-mode btn-group btn-group-xs" data-toggle="buttons">
-        <label class="btn btn-primary">
-          <input type="radio" name="mode" data-opt="rec" />Rec
-        </label>
-        <label class="btn btn-primary">
-          <input type="radio" name="mode" data-opt="sim" />Sim
-        </label>
-      </div>
-
-      <div v-if="['local', 'variant'].includes (mode)" class="toolbar-hyp_a btn-group btn-group-xs">
-        <button :data-labez="toolbar.hyp_a" type="button"
-                class="btn btn-primary dropdown-toggle dropdown-toggle-hyp_a bg_labez"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <span>A =</span> <span class="btn_text">{{ toolbar.hyp_a }}</span> <span class="caret" />
-        </button>
-        <div class="dropdown-menu dropdown-menu-horiz dropdown-menu-hyp_a">
-          <div class="btn-group btn-group-xs" data-toggle="buttons">
-            <template v-for="[labez, labez_i18n] in dd_hypa">
-              <label :key="labez" :data-labez="labez"
-                     class="btn btn-primary btn-labez bg_labez">
-                <input :data-opt="labez" type="radio"
-                       data-type="dropdown" name="hyp_a" />{{ labez_i18n }}
-              </label>
-            </template>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="mode == 'notes'" class="coherence-notes btn-group btn-group-xs" data-toggle="buttons">
-        <button type="button" class="btn btn-primary" name="save" data-opt="save"
-                title="Save Notes">Save</button>
-      </div>
-
-      <div v-if="['stemma', 'global', 'local', 'variant'].includes (mode)"
-           class="coherence-dot btn-group btn-group-xs" data-toggle="buttons">
-        <a :href="$parent.toolbar.png_url"
-           type="button" class="btn btn-primary" name="png" data-opt="png"
-           title="Download graph in PNG format">PNG</a>
-        <a :href="$parent.toolbar.dot_url" :download="$parent.caption.trim () + '.dot'"
-           type="button" class="btn btn-primary" name="dot" data-opt="dot"
-           title="Download graph in GraphViz .dot format">DOT</a>
       </div>
     </div>
-  </div>
+
+    <!-- connectivity slider -->
+
+    <div v-if="'connectivity' in toolbar"
+         class="toolbar-connectivity btn-group btn-group-sm" role="group" data-toggle="buttons">
+
+      <label class="btn btn-primary">
+        Conn:
+        <span class="connectivity-label">{{ connectivity_formatter (connectivity) }}</span>
+        <input v-model="connectivity" type="range" class="custom-range" min="1" max="21"
+               @change="on_connectivity_change" />
+        <datalist id="ticks" style="display: none">
+          <option value="1"  label="1" />
+          <option value="5"  label="5" />
+          <option value="10" label="10" />
+          <option value="20" label="20" />
+          <option value="21" label="All" />
+        </datalist>
+      </label>
+    </div>
+
+    <div v-if="'range' in toolbar"
+         class="btn-group btn-group-sm toolbar-range" role="group">
+      <button type="button"
+              class="btn btn-primary dropdown-toggle dropdown-toggle-range"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Chapter:
+        <span class="btn_text">{{ toolbar.range }}</span> <span class="caret" />
+      </button>
+      <div class="dropdown-menu dropdown-menu-range">
+        <div class="btn-group btn-group-sm">
+          <button v-for="range in dd_range" :key="range.range" :data-range="range.value"
+                  type="radio" data-type="dropdown" class="btn btn-primary btn-range"
+                  @click="on_dropdown_click ('range', range.value, $event)">{{ range.range }}</button>
+        </div>
+      </div>
+    </div>
+
+    <b-form-checkbox-group v-if="'include' in toolbar" v-model="toolbar.include"
+                           :options="include_checkbox_options"
+                           buttons button-variant="primary" size="sm" />
+
+    <b-form-checkbox-group v-if="'fragments' in toolbar" v-model="toolbar.fragments"
+                           :options="fragments_checkbox_options"
+                           buttons button-variant="primary" size="sm" />
+
+    <b-form-radio-group v-if="'mode' in toolbar" v-model="toolbar.mode"
+                        :options="mode_checkbox_options"
+                        buttons button-variant="primary" size="sm" />
+
+    <div v-if="'hyp_a' in toolbar"
+         class="btn-group btn-group-sm toolbar-hyp_a">
+      <button :data-labez="toolbar.hyp_a" type="button"
+              class="btn btn-primary dropdown-toggle dropdown-toggle-hyp_a bg_labez"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span>A =</span> <span class="btn_text">{{ toolbar.hyp_a }}</span> <span class="caret" />
+      </button>
+      <div class="dropdown-menu dropdown-menu-hyp_a">
+        <div class="btn-group btn-group-sm">
+          <button v-for="[labez, labez_i18n] in dd_hypa" :key="labez" :data-labez="labez"
+                  type="radio" data-type="dropdown" class="btn btn-primary btn-labez bg_labez"
+                  @click="on_dropdown_click ('hyp_a', labez, $event)">{{ labez_i18n }}</button>
+        </div>
+      </div>
+    </div>
+
+    <b-button-group size="sm" class="mr-auto">
+      <b-button v-if="'save' in toolbar"
+                :disabled="!toolbar.save" variant="primary" size="sm" class="d-print-none"
+                @click="$emit ('save')">Save</b-button>
+    </b-button-group>
+
+    <b-button-group size="sm" class="d-print-none">
+      <b-button v-if="'dot' in toolbar"
+                variant="primary" title="Download graph in PNG format"
+                @click="$emit ('png')">PNG</b-button>
+      <b-button v-if="'png' in toolbar"
+                variant="primary" title="Download graph in GraphViz .dot format"
+                @click="$emit ('dot')">DOT</b-button>
+      <b-button v-if="'csv' in toolbar"
+                variant="primary" title="Download table in .csv format"
+                @click="$emit ('csv')">CSV</b-button>
+    </b-button-group>
+  </b-button-toolbar>
 </template>
 
 <script>
 /**
- * This module implements the toolbar that is on most of the panels.
+ * This module implements the toolbar that is on most of the cards.
  *
  * @module toolbar
  *
@@ -162,124 +126,64 @@
  */
 
 import $ from 'jquery';
-import _ from 'lodash';
-import 'tools';
 import 'bootstrap';
-import 'bootstrap-slider';
-
-import 'bootstrap-slider.css';
-
-function get_control_type ($input) {
-    return $input.attr ('data-type') || $input.attr ('type') || 'button';
-}
-
-/**
- * Read the status of the toolbar buttons after event
- *
- * @function handle_toolbar_events
- *
- * @param {Object} event - The event.  The status is saved in
- *                         event.data.data
- */
-
-function handle_toolbar_events (event, opts) {
-    if (event.type === 'click' || event.type === 'slideStop') {
-        var $target = $ (event.target);
-        var $group  = $target.closest ('.btn-group');
-        var name    = $target.attr ('name');
-        var type    = get_control_type ($target);
-
-        switch (type) {
-        case 'checkbox':
-            opts[name] = [];
-            $group.find ('input:checked').each (function (i, btn) {
-                opts[name].push ($ (btn).attr ('data-opt'));
-            });
-            return 1;
-        case 'radio':
-            opts[name] = $target.attr ('data-opt');
-            return 1;
-        case 'slider':
-            opts[name] = $target.bootstrapSlider ('getValue');
-            return 1;
-        case 'dropdown':
-            opts[name] = $target.attr ('data-opt');
-            var $dropdown = $group.parent ().closest ('.btn-group').find ('button[data-toggle="dropdown"]');
-            $dropdown.dropdown ('toggle'); // close
-            return 1;
-        default:
-        }
-    }
-    return 0;
-}
-
-/**
- * Set the status of the toolbar buttons
- *
- * @function set_toolbar_buttons
- *
- * @param {Object} vm - The Vue instance
- */
-
-function set_toolbar_buttons (vm) {
-    const $root = $ (vm.$el);
-    const opts = vm.toolbar;
-
-    _.forEach (opts, function (value, key) {
-        var $input = $root.find ('input[name="' + key  + '"]');
-        var $group = $input.closest ('.btn-group');
-        var type   = get_control_type ($input);
-
-        switch (type) {
-        case 'checkbox':
-            $group.find ('label.btn').removeClass ('active');
-            $group.find ('input').prop ('checked', false);
-
-            _.forEach (value, function (v) {
-                $input = $group.find ('input[name="' + key  + '"][data-opt="' + v + '"]');
-                $input.prop ('checked', true);
-                $input.closest ('label.btn').addClass ('active');
-            });
-            break;
-        case 'radio':
-            $input = $group.find ('input[name="' + key  + '"][data-opt="' + value + '"]');
-            $input.checked = true;
-            $group.find ('label.btn').removeClass ('active');
-            $input.closest ('label.btn').addClass ('active');
-            break;
-        case 'slider':
-            // $input.bootstrapSlider ('setValue', +value);
-            // $root.find ('span.connectivity-label').text (connectivity_formatter (value));
-            break;
-        case 'dropdown':
-            /* if (key === 'hyp_a') {
-                key = 'labez';
-            }
-            var $dropdown = $group.parent ().closest ('.btn-group').find ('button[data-toggle="dropdown"]');
-            $dropdown.attr ('data-' + key, value);
-            var i18n = $.trim ($group.find (`label.btn[data-${key}="${value}"]`).text ());
-            $dropdown.find ('span.btn_text').text (i18n);
-            */
-            break;
-        default:
-        }
-    });
-}
 
 export default {
-    'props' : ['name', 'mode'],
-    'data'  : function () {
+    'data' : function () {
+        const type_checkbox_options = [
+            { 'text' : 'Rel', 'value' : 'rel', 'title' : 'Show all relatives'    },
+            { 'text' : 'Anc', 'value' : 'anc', 'title' : 'Show only ancestors'   },
+            { 'text' : 'Des', 'value' : 'des', 'title' : 'Show only descendants' },
+        ];
+        const limit_checkbox_options = [
+            { 'text' : '10',  'value' : '10', 'title' : 'Show 10 items'  },
+            { 'text' : '20',  'value' : '20', 'title' : 'Show 20 items'  },
+            { 'text' : 'All', 'value' : '0',  'title' : 'Show all items' },
+        ];
+        const include_checkbox_options = [
+            { 'text' : 'A',   'value' : 'A',  'title' : 'Include A'  },
+            { 'text' : 'MT',  'value' : 'MT', 'title' : 'Include Byzantine text' },
+            { 'text' : 'Fam', 'value' : 'F',  'title' : 'Include text families'  },
+        ];
+        const mode_checkbox_options = [
+            { 'text' : 'Sim', 'value' : 'sim', 'title' : 'Use simple priority calculation'  },
+            { 'text' : 'Rec', 'value' : 'rec', 'title' : 'Use recursive priority calculation' },
+        ];
+        const cliques_checkbox_options = [
+            { 'text' : 'Splits', 'value' : 'cliques', 'title' : 'Show split attestations'  },
+        ];
+        const fragments_checkbox_options = [
+            { 'text' : 'Frag', 'value' : 'fragments', 'title' : 'Include document fragments'  },
+        ];
+
+        if (!('connectivity' in this.$parent.toolbar)) {
+            include_checkbox_options.push ({
+                'text'  : 'Z',
+                'value' : 'Z',
+                'title' : 'Include mss. lacking this passage',
+            });
+        }
         return {
+            // The trick is to reference the parent's toolbar instead of passing
+            // it as prop.  Both the toolbar and the parent will watch the same
+            // object.
+            'toolbar' : this.$parent.toolbar,
+
+            'limit_checkbox_options'     : limit_checkbox_options,
+            'type_checkbox_options'      : type_checkbox_options,
+            'include_checkbox_options'   : include_checkbox_options,
+            'mode_checkbox_options'      : mode_checkbox_options,
+            'cliques_checkbox_options'   : cliques_checkbox_options,
+            'fragments_checkbox_options' : fragments_checkbox_options,
+            'connectivity'               : 5,
         };
     },
     'computed' : {
-        toolbar () {
-            return this.$parent.toolbar;
-        },
         passage () {
             return this.$store.state.passage;
         },
         readings () {
+            // FIXME: filter zu
             return this.$store.state.passage.readings || [];
         },
         ranges () {
@@ -287,7 +191,8 @@ export default {
         },
         dd_labez () {
             const prefix = this.toolbar.labez_dropdown_prefix || [];
-            return prefix.concat (this.readings);
+            const suffix = this.toolbar.labez_dropdown_suffix || [];
+            return prefix.concat (this.readings).concat (suffix);
         },
         dd_hypa () {
             const prefix = [['A', 'A']];
@@ -302,7 +207,7 @@ export default {
         readings () {
             // reset toolbar if reading is not in new passage
             const mapped_readings = this.readings.map (item => item[0]);
-            if (this.toolbar.labez
+            if (this.toolbar.labez && this.toolbar.reduce_labez
                 && !mapped_readings.includes (this.toolbar.labez)) {
                 this.toolbar.labez = mapped_readings[0];
             }
@@ -310,128 +215,91 @@ export default {
                 && !mapped_readings.includes (this.toolbar.hyp_a)) {
                 this.toolbar.hyp_a = 'A';
             }
-            set_toolbar_buttons (this);
-        },
-        ranges () {
-            set_toolbar_buttons (this);
         },
     },
     'methods' : {
+        on_dropdown_click (name, data, event) {
+            const $dropdown = $ (event.target).closest ('.dropdown-menu').parent ().find ('[data-toggle="dropdown"]');
+            $dropdown.dropdown ('toggle');
+            this.toolbar[name] = data;
+        },
+        on_connectivity_change () {
+            this.toolbar.connectivity = this.connectivity;
+        },
         connectivity_formatter (s) {
-            return (s === 21) ? 'All' : s;
+            return (s === '21') ? 'All' : s;
         },
     },
     mounted () {
-        let $toolbar = $ (this.$el);
-
-        // Init toolbar.
-        $toolbar.find ('.dropdown-toggle').dropdown ();
-
-        $toolbar.find ('input[name="connectivity"]').bootstrapSlider ({
-            'value'           : 5,
-            'ticks'           : [1,  5, 10, 20,  21],
-            'ticks_positions' : [0, 25, 50, 90, 100],
-            'formatter'       : this.connectivity_formatter,
-        });
-
-        const vm = this;
-        set_toolbar_buttons (vm);
-        $toolbar.on ('click slideStop', 'input', this, function (event) {
-            if (handle_toolbar_events (event, vm.toolbar)) {
-                // Answer toolbar activity.
-                vm.$parent.get_view_vm ().load_passage ();  // reload the view with the new params
-                set_toolbar_buttons (vm);
-            }
-            event.stopPropagation ();
-        });
+        $ (this.$el).find ('.dropdown-toggle').dropdown ();
     },
 };
 </script>
 
-<style lang="less">
-@import "@{BS}/variables.less";
-@import "@{BS}/mixins.less";
-
-div.toolbar-connectivity {
-    .slider {
-        margin-left: 1em;
-        margin-right: 1em;
-    }
-
-    span.connectivity-label {
-        display: inline-block;
-        width: 1.5em;
-        text-align: right;
-    }
-}
-
-div.panel-toolbar {
-    .slider-handle {
-        width: 12px;
-        height: 12px;
-        opacity: 1;
-    }
-
-    .slider-tick {
-        width: 8px;
-        height: 8px;
-        opacity: 1;
-    }
-
-    .slider.slider-horizontal {
-        width: 200px;
-        height: 16px;
-
-        .slider-handle {
-            top: 50%;
-            margin-top: -6px;
-            margin-left: -6px;
-        }
-
-        .slider-tick {
-            top: 50%;
-            margin-top: -4px;
-            margin-left: -4px;
-        }
-
-        .slider-track {
-            top: 50%;
-            height: 4px;
-            margin-top: -2px;
-        }
-
-        .slider-tick-container {
-            top: 50%;
-        }
-    }
-}
+<style lang="scss">
+/* toolbar.vue */
+@import "bootstrap-custom";
 
 div.btn-toolbar {
-    margin-top: -5px;
+    margin-bottom: $spacer * -0.5;
+    margin-right: $spacer * -0.5;
 
-    > div.btn-group {
-        margin-top: 5px;
+    div.btn-group {
+        margin-right: $spacer * 0.5;
+        margin-bottom: $spacer * 0.5;
+    }
 
-        &.coherence-dot {
-            float: right;
+    div.dropdown-menu {
+        border: 0;
+        padding: 0;
+        background: transparent;
+        min-width: 20rem;
+
+        div.btn-group {
+            flex-wrap: wrap;
+        }
+
+        button.btn {
+            min-width: 2rem;
+        }
+    }
+
+    div.dropdown-menu-range {
+        button.btn {
+            min-width: 3rem;
+        }
+    }
+
+    label.btn.active {
+        @media print {
+            color: black !important;
         }
     }
 }
 
-div.dropdown-menu div.btn-group {
-    margin-top: 0;
+div.card-relatives {
+    div.dropdown-menu-labez {
+        button.btn {
+            min-width: 3rem;
+        }
+    }
 }
 
-div.dropdown-menu-horiz {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    border-width: 0;
-    padding: 0;
-    min-width: 20px;
-    width: 160px;
-    width: -moz-max-content;
-    width: -webkit-max-content;
-    width: max-content;
+div.toolbar-connectivity {
+    label {
+        margin-bottom: 0;
+
+        span.connectivity-label {
+            display: inline-block;
+            width: 1.5em;
+            text-align: right;
+        }
+    }
+
+    input[type="range"] {
+        width: 12em;
+        padding-left:  ($spacer * 0.5);
+        padding-right: ($spacer * 0.5);
+    }
 }
 </style>

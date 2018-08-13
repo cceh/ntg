@@ -1,29 +1,35 @@
 <template>
-  <tr class="no-padding">
-    <td class="no-padding" />
-    <td class="no-padding" colspan="99">
-      <div class="slider">
-        <table ref="table" cellspacing="0" width="100%"
-               class="comparison-detail table table-bordered table-condensed table-hover">
-          <caption>
-            <span class="caption">Comparison of {{ ms1.hs }} and {{ ms2.hs }} in Chapter {{ range }}</span>
-            <div ref="toolbar" class="btn-toolbar toolbar toolbar-comparison-detail" role="toolbar" />
-          </caption>
-          <thead>
-            <tr>
-              <th class="passage exportable">Passage</th>
-              <th class="lesart lesart1 exportable">Lesart</th>
-              <th class="ms ms1 exportable">{{ ms1.hs }}</th>
-              <th class="direction exportable">Dir</th>
-              <th class="ms ms2 exportable">{{ ms2.hs }}</th>
-              <th class="lesart lesart2 exportable">Lesart</th>
-            </tr>
-          </thead>
-          <tbody />
-        </table>
-      </div>
-    </td>
-  </tr>
+  <div class="comparison-details slider"> <!-- table cannot animate height -->
+    <table ref="table" cellspacing="0" width="100%"
+           class="table table-bordered table-condensed table-hover table-comparison-details">
+      <caption>
+        <div class="d-flex justify-content-between">
+          <div class="caption">Comparison of {{ ms1.hs }} and {{ ms2.hs }} in Chapter {{ range }}</div>
+          <toolbar @csv="download ()" />
+        </div>
+      </caption>
+      <thead>
+        <tr @click="on_sort">
+          <th class="passage" data-sort-by="pass_id">Passage</th>
+          <th class="lesart lesart1" data-sort-by="lesart1">Lesart</th>
+          <th class="ms ms1" data-sort-by="labez_clique1">{{ ms1.hs }}</th>
+          <th class="direction" data-sort-by="direction">Dir</th>
+          <th class="ms ms2" data-sort-by="labez_clique2">{{ ms2.hs }}</th>
+          <th class="lesart lesart2" data-sort-by="lesart2">Lesart</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="r in rows" :class="(r.newer ? 'newer' : '') + (r.older ? 'older' : '')" :key="r.pass_id">
+          <td class="passage"><a :href="'coherence#' + r.pass_id">{{ r.pass_hr }}</a></td>
+          <td class="lesart lesart1">{{ r.lesart1 }}</td>
+          <td class="ms ms1">{{ r.labez_clique1 }}</td>
+          <td class="direction">{{ r.direction }}</td>
+          <td class="ms ms2">{{ r.labez_clique2 }}</td>
+          <td class="lesart lesart2">{{ r.lesart2 }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script>
@@ -36,15 +42,8 @@
  */
 
 import $ from 'jquery';
+import _ from 'lodash';
 import csv_parse from 'csv-parse/lib/sync';
-
-import 'datatables.net';
-import 'datatables.net-bs';
-
-import 'bootstrap.css';
-import 'datatables.net-bs.css';
-
-import { default_table_options } from 'comparison_table.vue';
 
 /**
  * Return a direction marker: <, >, NoRel or Uncl.
@@ -95,120 +94,128 @@ function row_conversion (d) {
     return r;
 }
 
-
-export default {
-    'props' : ['ms1', 'ms2', 'range'],
+export const sort_mixin = {
     data () {
         return {
+            'sorted_by'   : '',
+            'sorted_desc' : false,
+            'toolbar'   : {
+                'csv' : true, // show a download csv button
+            },
+        };
+    },
+    'watch' : {
+        'sorted_by'   : function () { this.sort (); },
+        'sorted_desc' : function () { this.sort (); },
+    },
+    'methods' : {
+        on_sort (event) {
+            const $th = $ (event.target);
+            const sort_by = $th.attr ('data-sort-by');
+
+            if (this.sorted_by === sort_by) {
+                this.sorted_desc = !this.sorted_desc;
+            } else {
+                this.sorted_desc = false;
+                this.sorted_by = sort_by;
+            }
+        },
+        sort () {
+            const vm = this;
+            const rows = _.sortBy (vm.rows, [vm.sorted_by]);
+            if (vm.sorted_desc) {
+                _.reverse (rows);
+            }
+            vm.rows = rows;
+
+            $ (vm.$el).find ('th[data-sort-by]').each (function (index, e) {
+                const $th = $ (e);
+                const sort_by = $th.attr ('data-sort-by');
+                $th.toggleClass ('asc', false);
+                $th.toggleClass ('desc', false);
+                if (sort_by === vm.sorted_by) {
+                    if (vm.sorted_desc) {
+                        $th.toggleClass ('desc', true);
+                    } else {
+                        $th.toggleClass ('asc', true);
+                    }
+                }
+            });
+        },
+    },
+};
+
+
+export default {
+    'mixins' : [sort_mixin],
+    'props'  : ['ms1', 'ms2', 'range'],
+    data () {
+        return {
+            'rows'      : [],
+            'sorted_by' : 'pass_id',
         };
     },
     'methods' : {
         load_data () {
-            let url = 'comparison-detail.csv?' + $.param ({
+            const vm = this;
+            vm.get (this.build_url ()).then ((response) => {
+                const rows = csv_parse (response.data, { 'columns' : true });
+                vm.rows = rows.map (row_conversion);
+                this.sort ();
+                const $el = $ (vm.$el);
+                $el.slideDown ();
+            });
+        },
+        build_url (page = 'comparison-detail.csv') {
+            return page + '?' + $.param ({
                 'ms1'   : 'id' + this.ms1.ms_id,
                 'ms2'   : 'id' + this.ms2.ms_id,
                 'range' : this.range,
             });
-
-            const vm = this;
-            vm.get (url).then ((response) => {
-                const rows = csv_parse (response.data, { 'columns' : true });
-                const $el = $ (vm.$el);
-                $el.addClass ('csv-loaded');
-                const $table = $ (vm.$refs.table);
-                const data_table = $table.DataTable (); // eslint-disable-line new-cap
-                data_table.clear ().rows.add (rows.map (row_conversion)).draw ();
-                $ ('div.slider', $el).slideDown ();
-            });
+        },
+        download () {
+            window.open (this.build_full_api_url (this.build_url (), '_blank'));
         },
     },
     mounted () {
-        /**
-         * Initialize the details table structure.  This has to be done only once.
-         * On navigation we'll throw the details table away.
-         */
-
-        const $table = $ (this.$refs.table);
-
-        $table.DataTable ( // eslint-disable-line new-cap
-            $.extend ({}, default_table_options, {
-                'columns' : [
-                    {
-                        'data' : function (r, type /* , val, meta */) {
-                            if (type === 'sort') {
-                                return r.pass_id;
-                            }
-                            return '<a href="coherence#' + r.pass_id + '">' + r.pass_hr + '</a>';
-                        },
-                        'class' : 'passage',
-                        'type'  : 'num',
-                    },
-                    {
-                        'data'  : 'lesart1',
-                        'class' : 'lesart lesart1',
-                    },
-                    {
-                        'data'  : 'labez_clique1',
-                        'class' : 'ms ms1',
-                    },
-                    {
-                        'data'  : 'direction',
-                        'class' : 'direction',
-                    },
-                    {
-                        'data'  : 'labez_clique2',
-                        'class' : 'ms ms2',
-                    },
-                    {
-                        'data'  : 'lesart2',
-                        'class' : 'lesart lesart2',
-                    },
-                ],
-                'order'      : [[0, 'asc']],
-                'createdRow' : function (r, d /* , index */) {
-                    let $row = $ (r);
-                    $row.toggleClass ('newer', d.newer);
-                    $row.toggleClass ('older', d.older);
-                },
-            })
-        );
-
         this.load_data ();
     },
 };
 </script>
 
-<style lang="less">
-@import "@{BS}/variables.less";
-@import "@{BS}/mixins.less";
+<style lang="scss">
+/* comparison_table_details.vue */
+@import "bootstrap-custom";
 
-table.comparison-detail {
-    text-align: left;
-    border-width: 0;
-
-    th,
-    td {
-        &.passage {
-            width: 15%;
-        }
-
-        &.direction {
-            text-align: center;
-            width: 5%;
-        }
-
-        &.lesart {
-            width: 35%;
-        }
+div.comparison-details {
+    &.slider {
+        display: none;
     }
 
-    tbody {
-        tr.older td.direction {
-            background-color: #cfc;
+    table.table-comparison-details {
+        border-width: 0;
+
+        th,
+        td {
+            text-align: left;
+
+            &.passage {
+                width: 15%;
+            }
+
+            &.direction {
+                text-align: center;
+                width: 5%;
+            }
+
+            &.lesart {
+                width: 35%;
+            }
         }
 
-        tr.newer td.direction {
-            background-color: #fcc;
+        th[data-sort-by]::after {
+            left: auto;
+            right: ($spacer * 0.25);
         }
     }
 }

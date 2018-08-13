@@ -1,17 +1,24 @@
 <template>
-  <ul class="panel-content panel-slidable list-group wrapper apparatus-wrapper">
-    <li v-for="group in groups" :key="group.group" class="list-group-item">
-      <h4 class="list-group-item-heading">
-        <a :data-labez="group.labez" class="apparatus-labez fg_labez"
-           @click="goto_attestation">{{ group.group }} {{ group.reading }}</a>
-      </h4>
-      <ul class="list-group-item-text attesting-mss list-inline">
-        <li v-for="item in group.items" :key="item.ms_id">
-          <a :data-ms-id="item.ms_id" class="ms">{{ item.hs }}{{ (item.certainty === 1.0) ? '' : '?' }}.</a>
-        </li>
-      </ul>
-    </li>
-  </ul>
+  <div class="apparatus-vm card-slidable">
+    <div class="card-header">
+      <toolbar />
+    </div>
+
+    <ul class="list-group list-group-flush wrapper apparatus-wrapper">
+      <li v-for="group in groups" :key="group.group" class="list-group-item">
+        <h3 class="list-group-item-heading">
+          <a :data-labez="group.labez" class="apparatus-labez fg_labez"
+             @click="goto_attestation">{{ group.group }} {{ group.reading }}</a>
+        </h3>
+        <ul class="list-group-item-text attesting-mss list-inline">
+          <li v-for="item in group.items" :key="item.ms_id">
+            <a :data-ms-id="item.ms_id" class="ms">{{ item.hs }}{{ (item.certainty === 1.0) ? '' : '?' }}.</a>
+            <span> </span>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>
@@ -24,9 +31,10 @@
  * @author Marcello Perathoner
  */
 
-import { mapGetters } from 'vuex';
 import $ from 'jquery';
 import _ from 'lodash';
+import { mapGetters } from 'vuex';
+
 import tools from 'tools';
 
 /**
@@ -50,7 +58,7 @@ function load_passage (vm, passage) {
         // select a grouping function
         const labez_grouper  = (g) => g.labez;
         const clique_grouper = (g) => g.labez_clique;
-        const grouper = vm.$parent.toolbar.cliques.includes ('cliques') ? clique_grouper : labez_grouper;
+        const grouper = vm.toolbar.cliques.includes ('cliques') ? clique_grouper : labez_grouper;
 
         // load readings into a dictionary for faster lookup
         const readings = [];
@@ -71,15 +79,14 @@ function load_passage (vm, passage) {
             });
         });
 
-        // save current height of panel
-        const $wrapper = vm.$wrapper;
-        const old_height = tools.save_height ($wrapper);
+        // save current height of card
+        const old_height = tools.save_height (vm.$wrapper);
 
         // update
         vm.groups = new_groups;
 
         vm.$nextTick (function () {
-            tools.slide_from ($wrapper, old_height);
+            tools.slide_from (vm.$wrapper, old_height);
         });
     });
 }
@@ -87,6 +94,9 @@ function load_passage (vm, passage) {
 export default {
     'data' : function () {
         return {
+            'toolbar' : {
+                'cliques' : [],  // Show readings or cliques.
+            },
             'groups' : [],
         };
     },
@@ -99,6 +109,12 @@ export default {
         passage () {
             this.load_passage ();
         },
+        'toolbar' : {
+            handler () {
+                this.load_passage ();
+            },
+            'deep' : true,
+        },
     },
     'methods' : {
         load_passage () {
@@ -106,7 +122,7 @@ export default {
         },
 
         /**
-         * Show the attestation in the Coherence panel and scroll to it.
+         * Show the attestation in the *Coherence in Attestations* card and scroll to it.
          *
          * @function goto_attestation
          *
@@ -114,43 +130,50 @@ export default {
          */
         goto_attestation (event) {
             event.stopPropagation ();
-            const panel = this.$parent.$parent.$refs.ltpanel;
+            const lt = this.$parent.$parent.$refs.lt;
             const labez = $ (event.currentTarget).attr ('data-labez');
-            panel.toolbar.labez = labez;
-            panel.get_view_vm ().load_passage ();
+            lt.toolbar.labez = labez;
+            lt.load_passage ();
 
             $ ('html, body').animate ({
-                'scrollTop' : $ ('div.panel-local-textflow').offset ().top,
+                'scrollTop' : $ ('div.card-local-textflow').offset ().top,
             }, 500);
         },
     },
-    created () {
-        this.$parent.toolbar = {
-            'cliques' : [],  // Show readings or cliques.
-        };
-    },
     mounted () {
-        this.$wrapper = $ (this.$el.closest ('.panel-content'));
+        this.$card    = $ (this.$el).closest ('.card');
+        this.$wrapper = $ (this.$el).find ('.wrapper');
         this.load_passage ();
     },
 };
 </script>
 
-<style lang="less">
-ul.apparatus-wrapper {
-    font-size: smaller;
+<style lang="scss">
+/* apparatus.vue */
+@import "bootstrap-custom";
 
-    h4.list-group-item-heading {
-        display: inline;
+div.apparatus-vm {
+    a:not([href]):not([tabindex]) {
+        color: var(--primary);
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
+        }
     }
 
-    ul.list-group-item-text {
+    h3.list-group-item-heading {
         display: inline;
-        padding-left: 2em;
+        padding-right: 1em;
+        font-size: 1.2rem;
     }
-}
 
-a.apparatus-labez {
-    cursor: pointer;
+    ul.list-inline {
+        display: inline;
+
+        li {
+            display: inline;
+        }
+    }
 }
 </style>

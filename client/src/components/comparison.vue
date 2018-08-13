@@ -1,28 +1,41 @@
 <template>
-  <div>
+  <div class="comparison_vm">
     <page-header :caption="caption" />
 
     <div class="container bs-docs-container">
+
       <div class="navigator">
-        <form class="manuscripts-selector form-inline" @submit.prevent="submit">
-          <div class="form-group">
-            <label>Witness 1:</label>
-            <input v-model="input1" type="text" class="form-control" name="ms1"
-                   title="Enter the Gregory-Aland no. of the first witness ('A' for the initial text)." />
-            <label>Witness 2:</label>
-            <input v-model="input2" type="text" class="form-control" name="ms2"
-                   title="Enter the Gregory-Aland no. of the second witness ('A' for the initial text)." />
+        <form class="form-inline" @submit.prevent="submit">
+
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Witness 1:</span>
+            </div>
+            <input v-model="input1" type="text" class="form-control" id="ms1"
+                   title="Enter the Gregory-Aland no. of the first witness ('A' for the initial text)."
+                   aria-label="Witness 1" />
           </div>
+
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Witness 2:</span>
+            </div>
+            <input v-model="input2" type="text" class="form-control" id="ms2"
+                   title="Enter the Gregory-Aland no. of the second witness ('A' for the initial text)."
+                   aria-label="Witness 2" />
+          </div>
+
           <button type="submit" data="Go" class="btn btn-primary"
                   title="Start the comparison.">Go</button>
+
         </form>
       </div>
 
-      <div class="panel panel-default panel-comparison">
+      <card :caption="caption" cssclass="card-comparison">
         <comparison-table :ms1="ms1" :ms2="ms2" />
-      </div>
-    </div>
+      </card>
 
+    </div>
   </div>
 </template>
 
@@ -41,8 +54,6 @@ import $ from 'jquery';
 import Vue from 'vue';
 
 import tools from 'tools';
-
-import 'bootstrap.css';
 
 import comparison_table from 'comparison_table.vue';
 
@@ -107,19 +118,30 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import "@{BS}/variables.less";
-@import "@{BS}/mixins.less";
+<style lang="scss">
+/* comparison.vue */
+@import "bootstrap-custom";
 
-div.navigator {
-    margin-bottom: 1em;
+div.comparison_vm {
+    div.navigator {
+        margin-bottom: $spacer;
 
-    input[type=text] {
-        width: 6em;
+        form.form-inline {
+            /* make button same height as inputs */
+            align-items: stretch;
+        }
+
+        .input-group {
+            margin-right: ($spacer * 0.5);
+        }
+
+        input[type=text] {
+            width: 6em;
+        }
+
+        @media print {
+            display: none;
+        }
     }
-}
-
-div.panel-comparison {
-    background-color: @panel-default-heading-bg;
 }
 </style>

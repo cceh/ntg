@@ -1,7 +1,13 @@
 <template>
-  <div :class="'panel-content svg-wrapper panel-slidable ' + cssclass"
-       @contextmenu.prevent="on_contextmenu">
-    <slot />
+  <div class="textflow-vm card-slidable">
+    <div class="card-header">
+      <toolbar @dot="download ('textflow.dot')" @png="download ('textflow.png')" />
+    </div>
+
+    <div :class="'card-body wrapper svg-wrapper ' + cssclass"
+         @contextmenu.prevent="on_contextmenu">
+      <slot />
+    </div>
   </div>
 </template>
 
@@ -16,11 +22,15 @@
  * @author Marcello Perathoner
  */
 
-import { mapGetters } from 'vuex';
 import $ from 'jquery';
 import _ from 'lodash';
+import { mapGetters } from 'vuex';
+import 'jquery-ui/menu.js';
+
+import 'jquery-ui-css/theme.css';
+import 'jquery-ui-css/menu.css';
+
 import tools from 'tools';
-import 'bootstrap';
 
 /**
  * Open a context menu when right clicked on a node.
@@ -85,8 +95,8 @@ function open_contextmenu (event, vm) {
             xhr2.then (() => {
                 $ (window).trigger ('hashchange');
             });
-            xhr2.fail ((xhrobj) => {
-                tools.xhr_alert (xhrobj, event.data.$wrapper);
+            xhr2.catch ((reason) => {
+                tools.xhr_alert (reason, event.data.$wrapper);
             });
             menu.fadeOut (() => { menu.remove (); });
         },
@@ -95,52 +105,42 @@ function open_contextmenu (event, vm) {
 }
 
 /**
- * Load a new passage.
- *
- * @function load_passage
- *
- * @param {Object} passage - Which passage to load.
- */
-function load_passage (vm, passage) {
-    if (passage.pass_id === 0) {
-        return Promise.resolve ();
-    }
-
-    const tb = vm.$parent.toolbar;
-
-    const params = _.pick (tb, [
-        'labez', 'connectivity', 'range', 'include', 'fragments',
-        'mode', 'hyp_a', 'var_only', 'width', 'fontsize', 'cliques',
-    ]);
-
-    // dirty hack! Make panel visible so SVG getBBox () will work.
-    vm.$wrapper.slideDown ();
-
-    // provide a width and fontsize for GraphViz to format the graph
-    params.width = vm.$wrapper.width ();                            // in px
-    params.fontsize = parseFloat (vm.$wrapper.css ('font-size'));   // in px
-
-    tb.dot_url = 'textflow.dot/' + passage.pass_id + '?' + $.param (params);
-    tb.png_url = 'textflow.png/' + passage.pass_id + '?' + $.param (params);
-
-    const graph_vm = vm.get_graph_vm ();
-    const p1 = graph_vm.load_dot (tb.dot_url);
-    p1.then (() => {
-        vm.$panel.animate ({ 'width' : (graph_vm.bbox.width + 20) + 'px' });
-    });
-    return p1;
-}
-
-/**
  * @param {bool}   cssclass - CSS classes to apply on the wrapper element.
  * @param {bool}   global   - Display global textual flow
  * @param {bool}   var_only - Display only nodes and links between different readings.
+ *
+ * Coherence at variant passages:  global var_only
+ * Coherence in attestations:
+ * General textual flow:           global
  */
 
 export default {
     'props' : ['cssclass', 'global', 'var_only'],
-    'data'  : function () {
+    data () {
+        const tb = {
+            'range'   : 'All',
+            'include' : [],
+            'mode'    : 'sim',
+            'dot'     : true, // show a download dot button
+            'png'     : true, // show a download png button
+        };
+        if (!this.global && !this.var_only) {
+            tb.labez = 'a';
+            tb.reduce_labez = true;
+            tb.connectivity = 5;
+            tb.fragments = [];
+            tb.hyp_a = 'A';
+        }
+        if (this.global && this.var_only) {
+            tb.cliques = [];
+            tb.connectivity = 5;
+            tb.var_only = ['var_only'];
+            tb.hyp_a = 'A';
+        }
         return {
+            'toolbar' : tb,
+            'dot_url' : null,
+            'png_url' : null,
         };
     },
     'computed' : {
@@ -152,61 +152,87 @@ export default {
         passage () {
             this.load_passage ();
         },
+        'toolbar' : {
+            handler () {
+                this.load_passage ();
+            },
+            'deep' : true,
+        },
     },
     'methods' : {
+        /**
+         * Load a new passage.
+         *
+         * @function load_passage
+         */
         load_passage () {
-            return load_passage (this, this.passage);
+            const vm = this;
+
+            if (vm.passage.pass_id === 0) {
+                return Promise.resolve ();
+            }
+
+            // dirty hack! Make content visible so SVG getBBox () will work.
+            vm.$wrapper.slideDown ();
+
+            const graph_vm = vm.get_graph_vm ();
+            const p1 = graph_vm.load_dot (vm.build_url ('textflow.dot'));
+            p1.then (() => {
+                vm.$card.animate ({ 'width' : (graph_vm.bbox.width + 20) + 'px' });
+            });
+            return p1;
         },
         get_graph_vm () {
-            return this.$children[0];
+            return this.$children[1];
         },
         on_contextmenu (event) {
             if (this.$store.state.current_user.is_editor) {
                 open_contextmenu (event, this);
             }
         },
-    },
-    created () {
-        this.$parent.toolbar = {
-            'global'       : this.global,
-            'labez'        : this.global ? '' : 'a',
-            'connectivity' : '5',
-            'range'        : 'All',
-            'include'      : [],
-            'fragments'    : [],
-            'mode'         : 'sim',
-            'hyp_a'        : 'A',
-            'var_only'     : this.var_only ? ['var_only'] : [],
-            'cliques'      : [],
-            'dot_url'      : null,
-            'png_url'      : null,
-        };
+        build_url (page) {
+            const vm = this;
+            const params = _.pick (vm.toolbar, [
+                'labez', 'connectivity', 'range', 'include', 'fragments',
+                'mode', 'hyp_a', 'var_only', 'cliques',
+            ]);
+
+            // provide a width and fontsize for GraphViz to format the graph
+            params.width = vm.$wrapper.width ();                          // in px
+            params.fontsize = parseFloat ($ ('body').css ('font-size'));  // in px
+
+            return page + '/' + vm.passage.pass_id + '?' + $.param (params);
+        },
+        download (page) {
+            window.open (this.build_full_api_url (this.build_url (page), '_blank'));
+        },
     },
     mounted () {
-        this.$panel   = $ (this.$el).closest ('.panel');
-        this.$wrapper = $ (this.$el).closest ('.panel-content');
+        this.$card    = $ (this.$el).closest ('.card');
+        this.$wrapper = $ (this.$el).find ('.wrapper');
         this.load_passage ();
     },
 };
 </script>
 
-<style lang="less">
-@import "@{BS}/variables.less";
-@import "@{BS}/mixins.less";
+<style lang="scss">
+/* textflow.vue */
+@import "bootstrap-custom";
 
-div.panel table.contextmenu {
+div.card table.contextmenu {
     position: absolute;
-    z-index: @zindex-dropdown;
+    z-index: $zindex-dropdown;
     margin: 0;
     padding: 5px 0;
-    font-size: @font-size-base;
+    font-size: $font-size-base;
     text-align: left;
-    background-color: @dropdown-bg;
-    border: 1px solid @dropdown-fallback-border;
-    border: 1px solid @dropdown-border;
-    border-radius: @border-radius-base;
+    background-color: $dropdown-bg;
+    border: $dropdown-border-width solid $dropdown-border-color;
     background-clip: padding-box;
-    .box-shadow(0 6px 12px rgba(0,0,0,.175));
+
+    /* stylelint-disable at-rule-no-unknown */
+    @include border-radius($dropdown-border-radius);
+    @include box-shadow($dropdown-box-shadow);
 
     tr.ui-menu-item {
         &.ui-state-active {
@@ -221,8 +247,8 @@ div.panel table.contextmenu {
         &.ui-state-active {
             margin: 0;
             border-width: 0;
-            color: @dropdown-link-active-color;
-            background: @dropdown-link-active-bg;
+            color: $dropdown-link-active-color;
+            background: $dropdown-link-active-bg;
         }
         &.menu-label { text-align: right; }
         &.menu-description { padding-left: 0; }

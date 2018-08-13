@@ -80,3 +80,15 @@ export default {
 };
 
 </script>
+
+<style lang="scss">
+@import "../css/bootstrap-custom.scss";
+
+@import "../../node_modules/bootstrap/scss/bootstrap";
+@import "../../node_modules/bootstrap-vue/dist/bootstrap-vue.css";
+
+/* List of icons at: http://astronautweb.co/snippet/font-awesome/ */
+@import "../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
+@import "../../node_modules/@fortawesome/fontawesome-free/css/solid.css";
+
+</style>

@@ -1,4 +1,3 @@
-const webpack         = require ('webpack');
 const path            = require ('path');
 const VueLoaderPlugin = require ('vue-loader/lib/plugin');
 const precss          = require ('precss');
@@ -55,32 +54,6 @@ module.exports = {
                 ],
             },
             {
-                test: /\.less$/,
-                use: [
-                    'vue-style-loader',
-                    'css-loader',
-                    {
-                        loader: 'postcss-loader',
-                        options: {
-                            plugins: function () { // post css plugins, can be exported to postcss.config.js
-                                return [
-                                    precss,
-                                    autoprefixer,
-                                ];
-                            },
-                        },
-                    },
-                    {
-                        loader: 'less-loader',
-                        options: {
-                            globalVars : {
-                                BS : "'" + path.resolve (__dirname, 'node_modules/bootstrap/less') + "'",
-                            },
-                        },
-                    },
-                ],
-            },
-            {
                 test: /\.(png|jpg|jpeg|gif)$/,
                 use: [
                     {
@@ -113,14 +86,13 @@ module.exports = {
     },
     plugins: [
         new VueLoaderPlugin (),
-        // new ExtractTextPlugin('bundle.styles.css'),
-        new webpack.ProvidePlugin ({
-            // inject ES5 modules as global vars mainly for bootstrap 3
-            '$'            : 'jquery',
-            'jQuery'       : 'jquery',
-            'window.jQuery': 'jquery',
-        }),
     ],
+    devServer: {
+        host: '127.0.6.1',
+        port: 8080,
+        contentBase: './build',
+        public: 'ntg.fritz.box:8080',
+    },
     optimization: {
         splitChunks: {
             cacheGroups: {
@@ -143,23 +115,16 @@ module.exports = {
     resolve: {
         modules: [
             path.resolve (__dirname, 'src'),
-            path.resolve (__dirname, 'src/js'),
-            path.resolve (__dirname, 'src/less'),
             path.resolve (__dirname, 'src/components'),
+            path.resolve (__dirname, 'src/css'),
+            path.resolve (__dirname, 'src/js'),
             'node_modules',
         ],
         alias: {
             /* See: https://webpack.js.org/configuration/resolve/#resolve-alias */
             'vue$' : path.resolve (__dirname, 'node_modules/vue/dist/vue.esm.js'),
-            'bootstrap.css' : path.resolve (__dirname, 'node_modules/bootstrap/dist/css/bootstrap.css'),
-            'bootstrap-slider.css' : path.resolve (
-                __dirname, 'node_modules/bootstrap-slider/dist/css/bootstrap-slider.css'
-            ),
-            'datatables.net-bs.css' : path.resolve (
-                __dirname, 'node_modules/datatables.net-bs/css/dataTables.bootstrap.css'
-            ),
-            'datatables.net-buttons-bs.css' : path.resolve (
-                __dirname, 'node_modules/datatables.net-buttons-bs/css/buttons.bootstrap.css'
+            'bootstrap-custom' : path.resolve (
+                __dirname, 'src/css/bootstrap-custom.scss'
             ),
             'jquery-ui'      : path.resolve (__dirname, 'node_modules/jquery-ui/ui/widgets'),
             'jquery-ui-css'  : path.resolve (__dirname, 'node_modules/jquery-ui/themes/base'),

@@ -977,7 +977,7 @@ def apparatus_json (passage_or_id):
         SELECT labez, clique, labez_clique, ms_id, hs, hsnr, certainty
         FROM apparatus_cliques_view
         WHERE pass_id = :pass_id
-        ORDER BY labez, clique, hsnr
+        ORDER BY hsnr, labez, clique
         """, dict (parameters, pass_id = passage.pass_id))
 
         Manuscripts = collections.namedtuple ('Manuscripts', 'labez clique labez_clique ms_id hs hsnr certainty')

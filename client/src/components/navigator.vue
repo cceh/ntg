@@ -1,47 +1,50 @@
 <template>
-  <div class="navigator">
-    <form class="passage-selector form-inline" @submit="on_nav">
+  <div class="navigator_vm">
+    <form class="form-inline" @submit="on_nav">
 
-      <label class="sr-only">Previous Passage:</label>
-      <button type="button" data="-1" class="btn btn-primary" title="Previous Passage" @click="on_nav">
-        <span class="glyphicon glyphicon-triangle-left"/>
-      </button>
+        <button type="button" data="-1" class="btn btn-primary mr-2"
+                aria-label="Previous Passage" title="Previous Passage" @click="on_nav">
+          <span class="fas fa-chevron-left" />
+        </button>
 
-      <div class="form-group">
         <div class="input-group">
-          <span class="input-group-addon input-group-addon-leftmost">Nav:</span>
+          <div class="input-group-prepend">
+            <span class="input-group-text">Nav:</span>
+          </div>
 
-          <label class="sr-only">Book:</label>
-          <input type="text" class="form-control" name="siglum" data-autocomplete="siglum" title="Book" />
+          <input type="text" class="form-control" name="siglum" data-autocomplete="siglum"
+                 aria-label="Book" title="Book" />
+          <input type="text" class="form-control" name="chapter" data-autocomplete="chapter"
+                 aria-label="Chapter" title="Chapter" />
 
-          <label class="sr-only">Chapter:</label>
-          <input type="text" class="form-control" name="chapter" data-autocomplete="chapter" title="Chapter" />
+          <div class="input-group-prepend input-group-append">
+            <span class="input-group-text">:</span>
+          </div>
 
-          <span class="input-group-addon input-group-addon-chapter">:</span>
+          <input type="text" class="form-control" name="verse" data-autocomplete="verse"
+                 aria-label="Verse" title="Verse" />
 
-          <label class="sr-only">Verse:</label>
-          <input type="text" class="form-control" name="verse" data-autocomplete="verse" title="Verse" />
+          <div class="input-group-prepend input-group-append">
+            <span class="input-group-text">/</span>
+          </div>
 
-          <span class="input-group-addon input-group-addon-verse">/</span>
+          <input type="text" class="form-control" name="word" data-autocomplete="word"
+                 aria-label="Word" title="Word" />
 
-          <label class="sr-only">Word:</label>
-          <input type="text" class="form-control" name="word" data-autocomplete="word" title="Word" />
-
-          <span class="input-group-btn">
-            <label class="sr-only">Go:</label>
-            <button type="button" data="Go" class="btn btn-primary" title="Go" @click="on_nav">
-              <span class="glyphicon glyphicon-ok"/>
+          <span class="input-group-btn input-group-append">
+            <button type="button" data="Go" class="btn btn-primary mr-2"
+                    aria-label="Go" title="Go" @click="on_nav">
+              <span class="fas fa-check" />
             </button>
           </span>
         </div>
-      </div>
 
-      <label class="sr-only">Next Passage:</label>
-      <button type="button" data="1" class="btn btn-primary" title="Next Passage" @click="on_nav">
-        <span class="glyphicon glyphicon-triangle-right"/>
-      </button>
+        <button type="button" data="1" class="btn btn-primary"
+                aria-label="Next Passage" title="Next Passage" @click="on_nav">
+          <span class="fas fa-chevron-right" />
+        </button>
 
-      <input :value="this.$store.state.passage.pass_id" name="pass_id" type="hidden" />
+        <input :value="this.$store.state.passage.pass_id" name="pass_id" type="hidden" />
     </form>
 
     <div class="leitzeile" v-html="leitzeile" />
@@ -62,7 +65,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import 'jquery-ui/autocomplete.js';
 
-import 'jquery-ui-css/all.css';
+import 'jquery-ui-css/autocomplete.css';
 
 /*
  * 1. Extend the stock autocomplete to use a <table> instead of a <ul> and give
@@ -73,7 +76,7 @@ import 'jquery-ui-css/all.css';
 $.widget ('custom.tableautocomplete', $.ui.autocomplete, {
     '_renderMenu' : function (ul, items) {
         this._super (ul, items);
-        ul.addClass ('dropdown-menu-table'); // give it the bootstrap look
+        ul.addClass ('custom-dropdown-menu-table'); // give it the bootstrap look
     },
     '_renderItem' : (table, item) => {
         let tr = $ ('<tr></tr>').data ('item.autocomplete', item);
@@ -273,18 +276,20 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import "@{BS}/variables.less";
-@import "@{BS}/mixins.less";
+<style lang="scss">
+/* navigator.vue */
+@import "bootstrap-custom";
 
-form.passage-selector {
-    margin-bottom: 20px;
-
-    input[type=text] {
-        width: 12em;
+div.navigator_vm {
+    @media print {
+        display: none;
     }
 
-    .input-group {
+    form.form-inline {
+        margin-bottom: $spacer;
+        /* make buttons the same height as inputs */
+        align-items: stretch;
+
         input.form-control {
             text-align: right;
             width: 3.5em;
@@ -298,34 +303,80 @@ form.passage-selector {
                 width: 6.5em;
             }
         }
-
-        span.input-group-addon-chapter,
-        span.input-group-addon-verse {
-            padding: 6px;
-            border-width: 1px 0;
-        }
     }
 
-    span.glyphicon {
-        top: 2px;
-        font-size: 90%;
+    div.leitzeile {
+        margin-bottom: 20px;
+        font-size: larger;
+
+        .leitzeile-current {
+            color: #d62728;
+            pointer-events: none;
+        }
+
+        .leitzeile-spanned {
+            display: none;
+            border-bottom: 1px dotted grey;
+        }
+
+        .leitzeile-inserted {
+            &::before {
+                content: '⸆'; /* 2e06 */
+            }
+        }
+
+        .xxx {
+            .leitzeile-replaced.leitzeile-one {
+                &::before {
+                    content: '⸀'; /* 2e00 */
+                }
+            }
+
+            .leitzeile-replaced.leitzeile-many {
+                &::before {
+                    content: '⸂';
+                }
+
+                &::after {
+                    content: '⸃';
+                }
+            }
+
+            .leitzeile-deleted.leitzeile-one {
+                &::before {
+                    content: '⸋'; /* 2e0b */
+                }
+            }
+
+            .leitzeile-deleted.leitzeile-many {
+                &::before {
+                    content: '⸍'; /* 2e0d */
+                }
+
+                &::after {
+                    content: '⸌'; /* 2e0c */
+                }
+            }
+        }
     }
 }
 
-.dropdown-menu-table {
+/* displayed outside of parent ! */
+.custom-dropdown-menu-table {
     display: table;
-    z-index: @zindex-dropdown;
+    z-index: $zindex-dropdown;
     float: left;
     padding: 5px 0;
     margin: 0;
-    font-size: @font-size-base;
+    font-size: $font-size-base;
     text-align: left;
-    background-color: @dropdown-bg;
-    border: 1px solid @dropdown-fallback-border;
-    border: 1px solid @dropdown-border;
-    border-radius: @border-radius-base;
+    background-color: $dropdown-bg;
+    border: $dropdown-border-width solid $dropdown-border-color;
     background-clip: padding-box;
-    .box-shadow(0 6px 12px rgba(0,0,0,.175));
+
+    /* stylelint-disable at-rule-no-unknown */
+    @include border-radius($dropdown-border-radius);
+    @include box-shadow($dropdown-box-shadow);
 
     &.ui-menu td.ui-menu-item-wrapper {
         padding: 3px 20px;
@@ -333,8 +384,8 @@ form.passage-selector {
         &.ui-state-active {
             margin: 0;
             border-width: 0;
-            color: @dropdown-link-active-color;
-            background: @dropdown-link-active-bg;
+            color: $dropdown-link-active-color;
+            background: $dropdown-link-active-bg;
         }
         &.menu-label { text-align: right; }
         &.menu-description { padding-left: 0; }
@@ -349,58 +400,4 @@ form.passage-selector {
     }
 }
 
-div.leitzeile {
-    margin-bottom: 20px;
-    font-size: larger;
-
-    .leitzeile-current {
-        color: #d62728;
-        pointer-events: none;
-    }
-
-    .leitzeile-spanned {
-        display: none;
-        border-bottom: 1px dotted grey;
-    }
-
-    .leitzeile-inserted {
-        &::before {
-            content: '⸆'; /* 2e06 */
-        }
-    }
-
-    .xxx {
-        .leitzeile-replaced.leitzeile-one {
-            &::before {
-                content: '⸀'; /* 2e00 */
-            }
-        }
-
-        .leitzeile-replaced.leitzeile-many {
-            &::before {
-                content: '⸂';
-            }
-
-            &::after {
-                content: '⸃';
-            }
-        }
-
-        .leitzeile-deleted.leitzeile-one {
-            &::before {
-                content: '⸋'; /* 2e0b */
-            }
-        }
-
-        .leitzeile-deleted.leitzeile-many {
-            &::before {
-                content: '⸍'; /* 2e0d */
-            }
-
-            &::after {
-                content: '⸌'; /* 2e0c */
-            }
-        }
-    }
-}
 </style>

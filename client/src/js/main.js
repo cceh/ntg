@@ -7,16 +7,15 @@
 
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
-
-import 'bootstrap.css';
 
 import app         from '../components/app.vue';
 import index       from '../components/index.vue';
 import coherence   from '../components/coherence.vue';
 import comparison  from '../components/comparison.vue';
 
-
+Vue.use (BootstrapVue);
 Vue.use (VueRouter);
 
 const routes = [

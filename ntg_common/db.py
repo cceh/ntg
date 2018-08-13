@@ -853,7 +853,7 @@ class MsCliques (MsCliques_Mixin, Base2):
     __tablename__ = 'ms_cliques'
 
     __table_args__ = (
-        PrimaryKeyConstraint ('ms_id', 'pass_id'),
+        PrimaryKeyConstraint ('ms_id', 'pass_id', 'labez'),
         ForeignKeyConstraint (['ms_id', 'pass_id', 'labez'], ['apparatus.ms_id', 'apparatus.pass_id', 'apparatus.labez'],
                               deferrable = True),
         ForeignKeyConstraint (['pass_id', 'labez', 'clique'], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),

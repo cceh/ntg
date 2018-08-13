@@ -1,7 +1,13 @@
 <template>
-  <div :class="'panel-content svg-wrapper panel-slidable ' + cssclass"
-       @contextmenu.prevent="on_contextmenu">
-    <slot />
+  <div class="local-stemma-vm card-slidable">
+    <div class="card-header">
+      <toolbar @dot="download ('stemma.dot')" @png="download ('stemma.png')" />
+    </div>
+
+    <div :class="'card-body wrapper svg-wrapper ' + cssclass"
+         @contextmenu.prevent="on_contextmenu">
+      <slot />
+    </div>
   </div>
 </template>
 
@@ -271,32 +277,16 @@ function load_passage (vm, passage) {
         return Promise.resolve ();
     }
 
-    const params = ['width', 'fontsize'];
-
-    // provide a width and fontsize for GraphViz to format the graph
-    let data = {};
-    data.width = vm.$wrapper.width ();                            // in px
-    data.fontsize = parseFloat (vm.$wrapper.css ('font-size'));   // in px
-
-    let url     = 'stemma.dot/' + passage.pass_id + '?' + $.param (_.pick (data, params));
-    let png_url = 'stemma.png/' + passage.pass_id + '?' + $.param (_.pick (data, params));
-
-    let panel_vm = vm.$parent;
-    let name = panel_vm.caption.trim ();
-    let $toolbar = $ (panel_vm.get_toolbar_vm ().$el);
-    $toolbar.find ('a[name="dot"]').attr ('href', url).attr ('download', name + '.dot');
-    $toolbar.find ('a[name="png"]').attr ('href', png_url);
-
-    let graph_vm = vm.get_graph_vm ();
-    let p1 = graph_vm.load_dot (url);
+    const graph_vm = vm.get_graph_vm ();
+    const p1 = graph_vm.load_dot (vm.build_url ('stemma.dot'));
     p1.then (() => {
-        vm.$panel.animate ({ 'width' : (graph_vm.bbox.width + 20) + 'px' });
+        vm.$card.animate ({ 'width' : (graph_vm.bbox.width + 20) + 'px' });
 
         if (vm.$store.state.current_user.is_editor) {
             // Drag a node.
-            d3.selectAll ('div.panel-local-stemma g.node.draggable')
+            d3.selectAll ('div.local-stemma-vm g.node.draggable')
                 .call (dragListener (vm));
-            d3.selectAll ('div.panel-local-stemma g.node.droptarget')
+            d3.selectAll ('div.local-stemma-vm g.node.droptarget')
                 .on ('mouseover', function (dummy_d) {
                     if (dragged_node && d3.select (this) !== dragged_node) {
                         target_node = d3.select (this);
@@ -318,6 +308,10 @@ export default {
     'props' : ['cssclass', 'global', 'var_only'],
     'data'  : function () {
         return {
+            'toolbar' : {
+                'dot' : true, // show a download dot button
+                'png' : true, // show a download png button
+            },
         };
     },
     'computed' : {
@@ -329,21 +323,40 @@ export default {
         passage () {
             this.load_passage ();
         },
+        'toolbar' : {
+            handler () {
+                this.load_passage ();
+            },
+            'deep' : true,
+        },
     },
     'methods' : {
         load_passage () {
             return load_passage (this, this.passage);
         },
         get_graph_vm () {
-            return this.$children[0];
+            return this.$children[1];
+        },
+        build_url (page) {
+            const vm = this;
+
+            // provide a width and fontsize for GraphViz to format the graph
+            const data = {};
+            data.width = vm.$wrapper.width ();                            // in px
+            data.fontsize = parseFloat (vm.$wrapper.css ('font-size'));   // in px
+
+            return page + '/' + vm.passage.pass_id + '?' + $.param (data);
         },
         on_contextmenu (event) {
             open_contextmenu (event, this);
         },
+        download (page) {
+            window.open (this.build_full_api_url (this.build_url (page), '_blank'));
+        },
     },
     'mounted' : function () {
-        this.$panel   = $ (this.$el).closest ('.panel');
-        this.$wrapper = $ (this.$el).closest ('.panel-content');
+        this.$card    = $ (this.$el).closest ('.card');
+        this.$wrapper = $ (this.$el).find ('.wrapper');
         this.load_passage ();
     },
 };

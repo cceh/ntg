@@ -1,22 +1,35 @@
 <template>
-  <textarea class="panel-slidable" @input="changed" />
+  <div class="notes-vm card-slidable">
+    <div class="card-header">
+      <toolbar @save="on_save" />
+    </div>
+
+    <div class="wrapper notes-wrapper">
+      <textarea v-model="current_text" />
+    </div>
+  </div>
 </template>
 
 <script>
 /**
- * This module implements the editor notes panel.
+ * This module implements the editor notes card.
  *
  * @module notes
  * @author Marcello Perathoner
  */
 
-import { mapGetters } from 'vuex';
 import $     from 'jquery';
 import tools from 'tools';
+import { mapGetters } from 'vuex';
 
 export default {
     'data' : function () {
         return {
+            'original_text' : '',
+            'current_text'  : '',
+            'toolbar'       : {
+                'save' : false,
+            },
         };
     },
     'computed' : {
@@ -27,6 +40,14 @@ export default {
     'watch' : {
         passage () {
             this.load_passage ();
+        },
+        current_text () {
+            const vm = this;
+            vm.toolbar.save = vm.current_text !== vm.original_text;
+        },
+        original_text () {
+            const vm = this;
+            vm.toolbar.save = vm.current_text !== vm.original_text;
         },
     },
     'methods' : {
@@ -47,10 +68,9 @@ export default {
             const p1 = $ta.animate ({ 'opacity' : 0.0 }, 300).promise ();
 
             return Promise.all ([xhr, p1]).then (function (p) {
-                $ta.val (p[0].data);
-                vm.original_text = $ta.val ();
+                vm.current_text  = p[0].data;
+                vm.original_text = vm.current_text;
                 tools.slide_from ($ta, old_height);
-                vm.changed ();
             });
         },
 
@@ -59,48 +79,42 @@ export default {
          *
          * @function save_passage
          */
-        save_passage () {
+        on_save () {
             const vm = this;
 
-            const xhr = vm.put ('notes.txt/' + vm.passage.pass_id, { 'remarks' : vm.$textarea.val () });
-            xhr.then ((dummy_response) => {
-                vm.original_text = vm.$textarea.val ();
-                vm.changed ();
-                tools.xhr_alert (xhr, vm.$wrapper);
+            const xhr = vm.put ('notes.txt/' + vm.passage.pass_id, { 'remarks' : vm.current_text });
+            xhr.then ((value) => {
+                vm.original_text = vm.current_text;
+                tools.xhr_alert (value, vm.$wrapper);
             });
-        },
-        changed () {
-            const vm = this;
-            vm.$save_button.prop ('disabled', vm.original_text === vm.$textarea.val ());
+            xhr.catch ((reason) => {
+                tools.xhr_alert (reason, vm.$wrapper);
+            });
         },
     },
     mounted () {
         const vm = this;
-        vm.$panel    = $ (vm.$el).closest ('.panel');
-        vm.$wrapper  = $ (vm.$el).closest ('.panel-content');
-        vm.$textarea = $ (vm.$el);
-
-        vm.$save_button = vm.$panel.find ('button[name="save"]');
-        vm.$save_button.on ('click', () => { vm.save_passage (); });
-
+        vm.$card     = $ (vm.$el).closest ('.card');
+        vm.$wrapper  = $ (vm.$el).find ('.wrapper');
+        vm.$textarea = $ (vm.$el).find ('textarea');
         vm.load_passage ();
     },
 };
 </script>
 
-<style lang="less">
-@import "@{BS}/variables.less";
-@import "@{BS}/mixins.less";
+<style lang="scss">
+/* notes.vue */
+@import "bootstrap-custom";
 
-.panel-notes {
+.notes-vm {
     textarea {
         display: block;
         resize: vertical;
         width: 100%;
         max-height: 500px;
         border: none;
-        padding: @panel-body-padding;
-        border-radius: @border-radius-base;
+        padding: $card-spacer-x;
+        border-radius: $card-border-radius;
     }
 }
 </style>
