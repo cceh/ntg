@@ -1,22 +1,23 @@
+NTG_HOST    := ntg.cceh.uni-koeln.de
+NTG_USER    := ntg
+
+NTG         := $(NTG_USER)@$(NTG_HOST)
+NTG_PRJ     := $(NTG):/home/$(NTG_USER)/prj/ntg/ntg
+NTG_SERVER  := $(NTG_PRJ)/server
+NTG_CLIENT  := $(NTG):/var/www/ntg.cceh.uni-koeln.de
+
 RSYNC       := /usr/bin/rsync -azv --exclude '*~'
 SHELL       := /bin/bash
 PYTHON      := /usr/bin/python3
 MYSQL       := mysql --defaults-file=~/.my.cnf.ntg
 BROWSER     := firefox
 
-NTG_VM      := ntg.cceh.uni-koeln.de
-NTG_USER    := ntg
-NTG         := $(NTG_USER)@$(NTG_VM)
-NTG_ROOT    := $(NTG):/home/$(NTG_USER)/prj/ntg/ntg
 PSQL_PORT   := 5432
-SERVER      := server
-CLIENT      := client
-
 PSQL        := psql -p $(PSQL_PORT)
 PGDUMP      := pg_dump -p $(PSQL_PORT)
 
-NTG_SERVER  := $(NTG_ROOT)/$(SERVER)
-NTG_CLIENT  := $(NTG_ROOT)/$(CLIENT)
+SERVER      := server
+CLIENT      := client
 
 JS_SRC      := `find $(CLIENT)/src -name '*.js'`
 VUE_SRC     := $(wildcard $(CLIENT)/src/components/*.vue)
@@ -55,7 +56,7 @@ clean: client-clean
 	find . -depth -name "*~" -delete
 
 psql:
-	ssh -f -L 1$(PSQL_PORT):localhost:$(PSQL_PORT) $(NTG_USER)@$(NTG_VM) sleep 120
+	ssh -f -L 1$(PSQL_PORT):localhost:$(PSQL_PORT) $(NTG) sleep 120
 	sleep 1
 	psql -h localhost -p 1$(PSQL_PORT) -U $(NTG_USER) acts_ph4
 
@@ -113,13 +114,13 @@ upload_dbs_from_home: upload_$(1)_from_home
 
 # from work (fast connection, pipe to psql on the host)
 upload_$(1)_from_work:
-	$(PGDUMP) --clean --if-exists $(1) | psql -h $(NTG_VM) -U $(NTG_USER) $(1)
+	$(PGDUMP) --clean --if-exists $(1) | psql -h $(NTG_HOST) -U $(NTG_USER) $(1)
 
 # from home (slow connection, upload bzipped file and then ssh to host)
 upload_$(1)_from_home:
 	-rm /tmp/$(1).pg_dump.sql.bz2
 	$(PGDUMP) --clean --if-exists $(1) | bzip2 > /tmp/$(1).pg_dump.sql.bz2
-	scp /tmp/$(1).pg_dump.sql.bz2 $(NTG_USER)@$(NTG_VM):~/
+	scp /tmp/$(1).pg_dump.sql.bz2 $(NTG_USER)@$(NTG_HOST):~/
 
 endef
 
@@ -127,9 +128,12 @@ DBS := acts_ph4 john_ph1 john_f1_ph1 mark_ph1
 
 $(foreach db,$(DBS),$(eval $(call UPLOAD_TEMPLATE,$(db))))
 
-upload_scripts:
-	$(RSYNC) --exclude "**/__pycache__"  --exclude "*.pyc"  ntg_common $(NTG_ROOT)/
-	$(RSYNC) --exclude "**/instance/**"                     server     $(NTG_ROOT)/
+upload_server:
+	$(RSYNC) --exclude "**/__pycache__"  --exclude "*.pyc"  ntg_common $(NTG_PRJ)/
+	$(RSYNC) --exclude "**/instance/**"                     server     $(NTG_PRJ)/
+
+upload_client:
+	$(RSYNC) --exclude "api.conf.js" $(CLIENT)/build/* $(NTG_CLIENT)/
 
 diff_affinity_acts:
 	scripts/cceh/sqldiff.sh acts_ph4 "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 94 order by ms_id1, ms_id2" | less
@@ -186,11 +190,10 @@ install-prerequisites:
 	sudo apt-get install apache2 libapache2-mod-wsgi-py3 \
 		postgresql libpg-dev postgresql-10-mysql-fdw \
 		mysql default-libmysqlclient-dev \
-		python3 python3-pip graphviz git plantuml
+		python3 python3-pip graphviz git make plantuml
 	sudo pip3 install --upgrade pip
 	sudo pip3 install --upgrade \
 		numpy networkx matplotlib pillow \
 		psycopg2 mysqlclient sqlalchemy sqlalchemy-utils intervals \
 		flask babel flask-babel flask-sqlalchemy jinja2 flask-user \
 		sphinx sphinx_rtd_theme sphinx_js sphinxcontrib-plantuml \
-	yarn

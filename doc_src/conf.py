@@ -41,10 +41,10 @@ extensions = [
     'sauml.sauml',
 ]
 
-js_source_path = '../server/es6'
+js_source_path = '../client/src/js/'
 jsdoc_config_path = '../jsdoc.json'
 
-sauml_arguments = ['postgresql+psycopg2://ntg@localhost:5432/ntg_ph4']
+sauml_arguments = ['postgresql+psycopg2://ntg@localhost:5432/acts_ph4']
 sauml_dot_table = 'bgcolor=#e7f2fa&color=#2980B9'
 
 # Add any paths that contain templates here, relative to this directory.
@@ -63,7 +63,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'NTG'
-copyright = '2016-17 CCeH - Licensed under the GNU GPL v3 or later'
+copyright = '2016-18 CCeH - Licensed under the GNU GPL v3 or later'
 author = 'Marcello Perathoner'
 
 # The version info for the project you're documenting, acts as replacement for

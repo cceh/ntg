@@ -36,8 +36,8 @@
     <div v-if="'connectivity' in toolbar"
          class="toolbar-connectivity btn-group btn-group-sm" role="group" data-toggle="buttons">
 
-      <label class="btn btn-primary">
-        Conn:
+      <label class="btn btn-primary d-flex align-items-center"> <!-- moz needs align-center -->
+        <span>Conn:</span>
         <span class="connectivity-label">{{ connectivity_formatter (connectivity) }}</span>
         <input v-model="connectivity" type="range" class="custom-range" min="1" max="21"
                @change="on_connectivity_change" />

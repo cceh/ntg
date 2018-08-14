@@ -138,7 +138,7 @@ function insert_css_palette (css) {
  *
  * @return {jQuery.selection} - The jQuery selection object.
  *
- * @see http://collaboradev.com/2014/03/18/d3-and-jquery-interoperability/
+ * @see {@link http://collaboradev.com/2014/03/18/d3-and-jquery-interoperability/}
  */
 function to_jquery (d3_selection) {
     return $ (d3_selection.nodes ());

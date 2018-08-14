@@ -2,13 +2,38 @@
  Installation
 ==============
 
-1. Install the software:
+
+Install Prerequisites
+=====================
+
+The application should run as a user that has no special privileges.
+
+.. warning::
+
+   Do not run the application as a user with administrative rights.
+
+As a user with admin privileges do:
+
+1. Create user *ntg*
+
+   .. code-block:: shell
+
+      sudo useradd -m -d /home/ntg -s /bin/bash -U ntg
+      sudo passwd ntg
+
+2. Install the software:
 
    .. code-block:: shell
 
       sudo apt-get install git make
+
+      sudo -u ntg bash
+      mkdir -p ~/prj/ntg
+      cd !!$
       git clone https://github.com/cceh/ntg
       cd ntg
+      exit
+
       make install-prerequisites
 
 
@@ -50,7 +75,7 @@ Postgres database
 1. Create a postgres user and a foreign data wrapper for MySQL.  The FDW allows
    Postgres to access the MySQL databases.
 
-   Login to postgres as superuser and say:
+   Login as administrative user and say:
 
    .. code-block:: shell
 
@@ -60,15 +85,19 @@ Postgres database
 
       CREATE USER ntg CREATEDB PASSWORD '<password>';
       CREATE DATABASE ntg_user OWNER ntg;
-      CREATE DATABASE ntg_ph4 OWNER ntg;
-      \c ntg_ph4
+      CREATE DATABASE acts_ph4 OWNER ntg;
+      \c acts_ph4
       CREATE EXTENSION mysql_fdw;
       GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
       \q
 
    Replace <password> with a real password.
 
+   Logout.
+
 2. Edit (or create) your :file:`~/.pgpass` and add this line:
+
+   Login as user *ntg* and say:
 
    .. code-block:: none
 
@@ -85,8 +114,9 @@ Postgres database
 
       .. code-block:: shell
 
-         psql -h localhost -U ntg -d ntg_ph4
+         psql -h localhost -U ntg -d acts_ph4
 
+   Logout.
 
 
 Application server
@@ -96,7 +126,7 @@ Application server
    user management database that holds user credentials and has to send
    confirmation mails.
 
-   Edit (or create) your :file:`server/instance/_global.conf`
+   Login as user *ntg* and edit (or create) your :file:`server/instance/_global.conf`
 
    .. code-block:: ini
 
@@ -124,21 +154,33 @@ Application server
    multiple databases from different mount points.  This concerns the CBGM
    database(s).
 
-   Edit (or create) your :file:`server/instance/ph4.conf`
+   Edit (or create) your :file:`server/instance/acts_ph4.conf`
 
    .. code-block:: ini
 
-      APPLICATION_NAME="Phase 4"
-      APPLICATION_ROOT="/ph4"
+      APPLICATION_NAME="Acts Phase 4"
+      APPLICATION_ROOT="/acts/ph4"
+      BOOK="Acts"
 
       PGHOST="localhost"
       PGPORT="5432"
-      PGDATABASE="ntg_ph4"
+      PGDATABASE="acts_ph4"
       PGUSER="ntg"
 
-      MYSQL_GROUP="ntg"
+      MYSQL_CONF="~/.my.cnf.ntg"
+      MYSQL_GROUP="mysql"
+
       MYSQL_ECM_DB="ECM_ActsPh4"
+      MYSQL_ATT_TABLES="Acts{n}GVZ"
+      MYSQL_LAC_TABLES="Acts{n}GVZlac"
+
       MYSQL_VG_DB="VarGenAtt_ActPh4"
+      MYSQL_LOCSTEM_TABLES="LocStemEdAct{n}"
+      MYSQL_RDG_TABLES="RdgAct{n}"
+      MYSQL_VAR_TABLES="VarGenAttAct{n}"
+      MYSQL_MEMO_TABLE="Memo"
+
+      MYSQL_NESTLE_DB="Nestle29"
 
 
 3. Initialize the user management database and add an administrator user for the
@@ -169,7 +211,7 @@ CBGM
 
    .. code-block:: shell
 
-      python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/ph4.conf
+      python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/acts_ph4.conf
 
 
 Run Server

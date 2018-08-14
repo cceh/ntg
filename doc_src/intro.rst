@@ -19,33 +19,31 @@ contains a greater percentage of prior readings than posterior readings.  Then
 we build a global stemma of manuscripts by using the most similar prior
 manuscripts as the parent manuscript.
 
-The program suite consists of scripts for setting up the CBGM database and an
-application server for interactive graphic interrogation of the CBGM database.
+The program suite consists of:
+
+1. scripts for setting up the CBGM database, and an
+2. API server, and a
+3. client for interactive graphic interrogation of the CBGM database.
 
 
 Database preparation
 ====================
 
-The preparation step copies and normalizes the input data and computes the
-affinity matrix.
+As input we use the database that contains the apparatus of the *Editio Critica
+Maior* publication.  Supplemental data comes from a database of editorial
+decisions (VarGen) regarding the priority of the readings.  The Nestle database
+contains the "Leitzeile".
 
-The input are 3 MySQL databases.  The ECM database contains an apparatus and the
-VarGen database records editorial decisions about the priority of readings.  The
-Nestle database contains the "Leitzeile".
-
-The output is one Postgres database.  It contains all necessary data for the
-CBGM.
+The preparation step transforms the input databases into the CBGM database.
 
 .. uml::
    :align: center
    :caption: Database Preparation
 
-   skinparam handwritten true
-
    database "ECM"    as dbsrc1
    database "VarGen" as dbsrc2
    database "Nestle" as dbsrc3
-   component "prepare4cbgm" as p4c
+   component "prepare4cbgm script" as p4c
    database "CBGM"   as db
 
    dbsrc1 --> p4c
@@ -57,36 +55,32 @@ CBGM.
 Online Application
 ==================
 
-A Javascript library calls an application server and displays the results
-graphically.
+A client / server architecture.  The client in the user's browser uses the API server
+to interrogate the CBGM database.
 
 .. uml::
    :align: center
    :caption: Online Application
 
-   skinparam handwritten true
    skinparam NodeSep 100
    skinparam RankSep 50
 
-   cloud "Application Server\n" as server {
-      database "CBGM"
-      [Python/Flask] as Flask
-      file "JS\nCSS" AS JS
-      [Apache]
+   database "CBGM"
+   [API Server] as api
+   [Client] as client
 
-      [Flask]  <--> CBGM
-      [Flask]  <-> [Apache]
-      [Apache]  <--> JS
-   }
+   CBGM  <-> api
+   api <-> client
 
-   rectangle "Application Client" as client {
-      [Browser\nClient Library] as Browser
-   }
-
-   [Apache] <-> [Browser]
+The client is written in Javascript using the Vue.js and D3.js libraries.  The
+API server is written in Python using the Flask framework.  The CBGM database is
+a PostgreSQL database.
 
 
-The application is online at: http://ntg.cceh.uni-koeln.de
+Links
+=====
+
+The application is online at: http://ntg.cceh.uni-koeln.de/acts/ph4/
 
 The source code is online at: https://github.com/cceh/ntg
 

@@ -4,7 +4,7 @@
       <toolbar @dot="download ('stemma.dot')" @png="download ('stemma.png')" />
     </div>
 
-    <div :class="'card-body wrapper svg-wrapper ' + cssclass"
+    <div :class="'wrapper svg-wrapper ' + cssclass"
          @contextmenu.prevent="on_contextmenu">
       <slot />
     </div>

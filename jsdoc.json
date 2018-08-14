@@ -1,8 +1,10 @@
 {
-    "plugins": [],
+    "plugins": [
+        "client/node_modules/jsdoc-vuejs"
+    ],
     "recurseDepth": 10,
     "source": {
-        "includePattern": ".+\\.(js(doc|x)?|es6)$",
+        "includePattern": ".+\\.(js(doc|x)?|vue)$",
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "sourceType": "module",
