@@ -1,15 +1,15 @@
 # -*- encoding: utf-8 -*-
 
-"""Prepare the database for CBGM
+"""Initialize a CBGM database.
 
-This script converts the apparatus tables used in the production of Nestle-Aland
-into tables suitable for doing CBGM:
+This script converts the databases used in the production of the ECM into a
+database suitable for doing CBGM. It
 
-- copy the data from multiple mysql tables to a single postgres table
-- remove unwanted readings
-- build a positive apparatus
-- calculate the pre-coherence similarity of manuscripts
-- calculate the post-coherence ancestrality of manuscripts
+- copies the data from multiple mysql databases into a single postgres database,
+- removes unwanted readings,
+- builds a positive apparatus,
+- calculates the pre-coherence similarity of manuscripts, and
+- calculates the post-coherence ancestrality of manuscripts.
 
 """
 
@@ -2107,17 +2107,20 @@ def print_stats (dba, parameters):
         """, parameters)
 
 
-if __name__ == '__main__':
+def build_parser ():
+    parser = argparse.ArgumentParser (description = __doc__)
 
-    parser = argparse.ArgumentParser (description='Prepare a database for CBGM')
-
-    parser.add_argument ('profile', metavar='PROFILE', help="the database profile file (required)")
-
+    parser.add_argument ('profile', metavar='path/to/file.conf',
+                         help="a .conf file (required)")
     parser.add_argument ('-v', '--verbose', dest='verbose', action='count',
                          help='increase output verbosity', default=0)
     parser.add_argument ('-r', '--range', default='',
                          help='range of steps (default: all)')
+    return parser
 
+
+if __name__ == '__main__':
+    parser = build_parser ()
     parser.parse_args (namespace = args)
 
     config = tools.config_from_pyfile (args.profile)

@@ -36,9 +36,9 @@
 
 <script>
 /**
- * The page header.
+ * The page header with the violet ribbon.
  *
- * @module page_header
+ * @component page_header
  * @author Marcello Perathoner
  */
 

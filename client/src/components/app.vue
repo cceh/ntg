@@ -4,15 +4,15 @@
 
 <script>
 /**
- * The vue.js application
+ * The Vue.js application
  *
- * @module app
+ * @component app
  * @author Marcello Perathoner
  */
 
-import Vue from 'vue';
+import Vue  from 'vue';
 import Vuex from 'vuex';
-import url from 'url';
+import url  from 'url';
 
 Vue.use (Vuex);
 

@@ -8,13 +8,13 @@
  * pre-processed in order to contain coordinates for each node and bezier paths
  * for each edge.
  *
- * @module d3-stemma-layout
+ * @component d3_stemma_layout
  * @author Marcello Perathoner
  */
 
 import _ from 'lodash';
 import * as d3 from 'd3';
-import d3_common from 'd3-common';
+import d3_common from 'd3_common';
 
 
 /**

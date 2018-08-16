@@ -3,8 +3,8 @@
 ====================
 
 
-:mod:`ntg_common.db` --- Work Database
-======================================
+CBGM Database
+=============
 
 .. figure:: uml.*
    :align: center
@@ -71,12 +71,12 @@ Tables
    :members:
 
 
-:mod:`ntg_common.src_db` --- Source Database
-============================================
+Source Database
+===============
 
 This is the legacy database used in Münster.
 There are 28 instances of each table, one for each chapter of Acts.
-These tables are only used once for building the :mod:`work database <ntg_common.db>`.
+These tables are only used once for building the :mod:`CBGM database <ntg_common.db>`.
 The database system is MySQL.
 
 .. sauml:: mysql:///ECM_ActsPh4?read_default_group=ntg

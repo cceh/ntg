@@ -23,7 +23,7 @@
 /**
  * The card caption with min/max/close buttons.
  *
- * @module card_caption
+ * @component card_caption
  * @author Marcello Perathoner
  */
 

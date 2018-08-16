@@ -7,107 +7,156 @@
 The Javascript client on the browser.  Written with Vue.js, D3.js and bootstrap.
 It uses internal roting of URLs.
 
+Most of the application is placed inside Vue.js components.
 
-:mod:`coherence` --- The Coherence Page
-=======================================
+You probably want to start looking at the :mod:`coherence` or :mod:`comparison`
+components.
+
+
+The Main Module
+===============
+
+.. module:: main
+
+
+The Application Component
+=========================
+
+.. module:: app
+
+
+The Coherence Page Component
+============================
 
 .. module:: coherence
 
 
-:mod:`navigator` --- The Navigator Gadget
-=========================================
+The Comparison Page Component
+=============================
+
+.. module:: comparison
+
+
+The Page Header Component
+=========================
+
+.. module:: page_header
+
+
+The Navigator Component
+=======================
 
 .. module:: navigator
 
 
-:mod:`apparatus` --- The Apparatus Panel
-========================================
+The Apparatus Component
+=======================
 
 .. module:: apparatus
 
 
-:mod:`notes` --- The Notes Panel
-================================
+The Local Stemma Component
+==========================
+
+.. module:: local_stemma
+
+
+The Notes Component
+===================
+
+Displays an editable textarea for editor notes.
 
 .. module:: notes
 
 
-:mod:`local-stemma` --- The Local Stemma Panel
-==============================================
-
-.. module:: local-stemma
-
-
 .. _textflow:
 
-:mod:`textflow` --- The 3 Coherence and the General Textual Flow Panels
-=======================================================================
+The 3 Coherence and the General Textual Flow Cards
+==================================================
 
 .. module:: textflow
 
 The javascript module that displays the textflow diagrams.
 
 
-:mod:`relatives` --- The Relatives Popup
-========================================
+The Relatives Popup Component
+=============================
 
 .. module:: relatives
 
 
-:mod:`panel` --- The Panel Module
-=================================
+The Relatives Metrics Component
+===============================
 
-.. module:: panel
+.. module:: relatives_metrics
 
 
-:mod:`toolbar` --- The Toolbar Module
-=====================================
+The Comparison Table Component
+==============================
+
+.. module:: comparison_table
+
+
+The Comparison Details Table Component
+======================================
+
+.. module:: comparison_details_table
+
+
+The Card Component
+==================
+
+.. module:: card
+
+
+The Card Caption Component
+==========================
+
+.. module:: card_caption
+
+
+The Toolbar Component
+=====================
 
 .. module:: toolbar
 
 
-:mod:`d3-chord-layout` --- The Chord Layout Engine
-==================================================
+The Chord Layout Engine Component
+=================================
 
-.. module:: d3-chord-layout
-
-
-:mod:`d3-stemma-layout` --- The Stemma Layout Engine
-====================================================
-
-.. module:: d3-stemma-layout
+.. module:: d3_chord_layout
 
 
+The Stemma Layout Engine Component
+==================================
 
-:mod:`comparison` --- The Comparison Page
-=========================================
-
-.. module:: comparison
+.. module:: d3_stemma_layout
 
 
-:mod:`d3-common` --- Various functions for D3
-=============================================
 
-.. module:: d3-common
+Various functions for D3
+========================
+
+.. module:: d3_common
 
 Useful functions for wrestling with D3.
 
-.. autofunction:: module:d3-common~color_string_to_palette
-.. autofunction:: module:d3-common~generate_css_palette
-.. autofunction:: module:d3-common~insert_css_palette
-.. autofunction:: module:d3-common~to_jquery
-.. autofunction:: module:d3-common~to_d3
-.. autofunction:: module:d3-common~append_marker
-.. autofunction:: module:d3-common~parse_pt
-.. autofunction:: module:d3-common~parse_bbox
-.. autofunction:: module:d3-common~parse_path
-.. autofunction:: module:d3-common~parse_path_svg
-.. autofunction:: module:d3-common~inflate_bbox
-.. autofunction:: module:d3-common~dot
+.. autofunction:: module:d3_common~color_string_to_palette
+.. autofunction:: module:d3_common~generate_css_palette
+.. autofunction:: module:d3_common~insert_css_palette
+.. autofunction:: module:d3_common~to_jquery
+.. autofunction:: module:d3_common~to_d3
+.. autofunction:: module:d3_common~append_marker
+.. autofunction:: module:d3_common~parse_pt
+.. autofunction:: module:d3_common~parse_bbox
+.. autofunction:: module:d3_common~parse_path
+.. autofunction:: module:d3_common~parse_path_svg
+.. autofunction:: module:d3_common~inflate_bbox
+.. autofunction:: module:d3_common~dot
 
 
-:mod:`tools` --- Various Functions
-==================================
+Various Functions
+=================
 
 .. module:: tools
 

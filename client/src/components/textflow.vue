@@ -18,7 +18,7 @@
  * one reading at one passage.  It can be used to deduce where a reading
  * originated.
  *
- * @module textflow
+ * @component textflow
  * @author Marcello Perathoner
  */
 
@@ -40,6 +40,7 @@ import tools from 'tools';
  * @function open_contextmenu
  *
  * @param {Object} event - The event
+ * @param {Object} vm    - The Vue instance
  */
 
 function open_contextmenu (event, vm) {
@@ -104,10 +105,10 @@ function open_contextmenu (event, vm) {
     tools.svg_contextmenu (menu, event.target);
 }
 
-/**
- * @param {bool}   cssclass - CSS classes to apply on the wrapper element.
- * @param {bool}   global   - Display global textual flow
- * @param {bool}   var_only - Display only nodes and links between different readings.
+/*
+ * @vue-prop {String} cssclass - CSS classes to apply on the wrapper element.
+ * @vue-prop {bool}   global   - Display global textual flow
+ * @vue-prop {bool}   var_only - Display only nodes and links between different readings.
  *
  * Coherence at variant passages:  global var_only
  * Coherence in attestations:

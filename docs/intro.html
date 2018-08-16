@@ -38,7 +38,7 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
-        <link rel="next" title="Installation" href="install.html"/>
+        <link rel="next" title="User Manual" href="user.html"/>
         <link rel="prev" title="NTG Documentation" href="index.html"/> 
 
   
@@ -87,103 +87,86 @@
             
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#database-preparation">Database preparation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#online-application">Online Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#web-application">Web Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#database-setup">Database Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#links">Links</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#database-access">Database Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#prepare4cbgm-py">prepare4cbgm.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#mk-users-py">mk_users.py</a></li>
 </ul>
 </li>
 </ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Short Introduction to the Problem Domain (German)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="developer.html#das-neue-testament">Das Neue Testament</a></li>
-<li class="toctree-l2"><a class="reference internal" href="developer.html#editionen">Editionen</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#nestle-aland">Nestle-Aland</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#editio-critica-maior">Editio Critica Maior</a></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Manual</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="domain.html">Introduction to the Problem Domain (German)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#das-neue-testament">Das Neue Testament</a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#editionen">Editionen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#die-textzeugen">Die Textzeugen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#textformen-texttypen">Textformen (Texttypen)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#textkritik">Textkritik</a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#terminologie">Terminologie</a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#literatur">Literatur</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="developer.html#die-textzeugen">Die Textzeugen</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#papyri">Papyri</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#majuskeln">Majuskeln</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#minuskeln">Minuskeln</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#lektionare">Lektionare</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#ubersetzungen-versionen">Übersetzungen (Versionen)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#zitate-bei-den-kirchenvatern-kommentare">Zitate bei den Kirchenvätern (Kommentare)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appclient.html">Application Client</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-main">The Main Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-app">The Application Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-coherence">The Coherence Page Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison">The Comparison Page Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-page_header">The Page Header Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-navigator">The Navigator Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-apparatus">The Apparatus Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-local_stemma">The Local Stemma Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#the-notes-component">The Notes Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-relatives">The Relatives Popup Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison_table">The Comparison Table Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-card">The Card Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-card_caption">The Card Caption Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-toolbar">The Toolbar Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_common">Various functions for D3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-tools">Various Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="developer.html#textformen-texttypen">Textformen (Texttypen)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#alexandrinischer-text">Alexandrinischer Text</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#majority-text">Majority Text</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#textus-receptus">Textus Receptus</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#westlicher-text-d-text">Westlicher Text (D-Text)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appserver.html">Application Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.server">Main Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.editor">Editor Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.security">User Management Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.helpers">Helper Functions Module</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="developer.html#textkritik">Textkritik</a></li>
-<li class="toctree-l2"><a class="reference internal" href="developer.html#terminologie">Terminologie</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#lesart">Lesart</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#variierte-stelle">Variierte Stelle</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#umfaszte-varianten">Umfaßte Varianten</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#fehlverse">Fehlverse</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#splitt">Splitt</a></li>
-<li class="toctree-l3"><a class="reference internal" href="developer.html#zusammenlegung">Zusammenlegung</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare4cbgm">prepare4cbgm.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.mk_users">mk_users.py</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="developer.html#literatur">Literatur</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html">Database Structure</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#cbgm-database">CBGM Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="database.html#source-database">Source Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="database.html#literature">Literature</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="database.html">Database Structure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-db-work-database"><code class="docutils literal notranslate"><span class="pre">ntg_common.db</span></code> — Work Database</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="database.html#transform-the-negative-apparatus-into-a-positive-apparatus">Transform the negative apparatus into a positive apparatus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html">Various Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools">db_tools — Various Functions for Database Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">tools — Various Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="database.html#ntg-common-src-db-source-database"><code class="docutils literal notranslate"><span class="pre">ntg_common.src_db</span></code> — Source Database</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="database.html#id2">Tables</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="database.html#literature">Literature</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="appserver.html">Application Server</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.server"><code class="docutils literal notranslate"><span class="pre">server.server</span></code> — Main Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.editor"><code class="docutils literal notranslate"><span class="pre">server.editor</span></code> — Editor Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html#module-server.security"><code class="docutils literal notranslate"><span class="pre">server.security</span></code> — User Management Module</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="appclient.html">Application Client</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-coherence"><code class="docutils literal notranslate"><span class="pre">coherence</span></code> — The Coherence Page</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-navigator"><code class="docutils literal notranslate"><span class="pre">navigator</span></code> — The Navigator Gadget</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-apparatus"><code class="docutils literal notranslate"><span class="pre">apparatus</span></code> — The Apparatus Panel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-notes"><code class="docutils literal notranslate"><span class="pre">notes</span></code> — The Notes Panel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-local-stemma"><code class="docutils literal notranslate"><span class="pre">local-stemma</span></code> — The Local Stemma Panel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-textflow"><code class="docutils literal notranslate"><span class="pre">textflow</span></code> — The 3 Coherence and the General Textual Flow Panels</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-relatives"><code class="docutils literal notranslate"><span class="pre">relatives</span></code> — The Relatives Popup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-panel"><code class="docutils literal notranslate"><span class="pre">panel</span></code> — The Panel Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-toolbar"><code class="docutils literal notranslate"><span class="pre">toolbar</span></code> — The Toolbar Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-chord-layout"><code class="docutils literal notranslate"><span class="pre">d3-chord-layout</span></code> — The Chord Layout Engine</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-stemma-layout"><code class="docutils literal notranslate"><span class="pre">d3-stemma-layout</span></code> — The Stemma Layout Engine</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-comparison"><code class="docutils literal notranslate"><span class="pre">comparison</span></code> — The Comparison Page</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-d3-common"><code class="docutils literal notranslate"><span class="pre">d3-common</span></code> — Various functions for D3</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html#module-tools"><code class="docutils literal notranslate"><span class="pre">tools</span></code> — Various Functions</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="scripts.html">Scripts</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="scripts.html#module-scripts.cceh.prepare4cbgm"><code class="docutils literal notranslate"><span class="pre">scripts.cceh.prepare4cbgm</span></code> — prepare4cbgm</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ntg_common.html">Various Functions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools"><code class="docutils literal notranslate"><span class="pre">ntg_common.db_tools</span></code> — Various Functions for Database Access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools"><code class="docutils literal notranslate"><span class="pre">ntg_common.tools</span></code> — Various Functions</a></li>
 </ul>
 </li>
 </ul>
@@ -412,54 +395,66 @@ we build a global stemma of manuscripts by using the most similar prior
 manuscripts as the parent manuscript.</p>
 <p>The program suite consists of:</p>
 <ol class="arabic simple">
-<li>scripts for setting up the CBGM database, and an</li>
-<li>API server, and a</li>
-<li>client for interactive graphic interrogation of the CBGM database.</li>
+<li>a web application, and</li>
+<li>a set of scripts for setting up the CBGM database.</li>
 </ol>
-<div class="section" id="database-preparation">
-<h2>Database preparation<a class="headerlink" href="#database-preparation" title="Permalink to this headline">¶</a></h2>
-<p>As input we use the database that contains the apparatus of the <em>Editio Critica
-Maior</em> publication.  Supplemental data comes from a database of editorial
-decisions (VarGen) regarding the priority of the readings.  The Nestle database
-contains the “Leitzeile”.</p>
-<p>The preparation step transforms the input databases into the CBGM database.</p>
+<div class="section" id="web-application">
+<h2>Web Application<a class="headerlink" href="#web-application" title="Permalink to this headline">¶</a></h2>
+<p>The web application consists of a client and an API server. The client runs in
+the user’s browser.  The API server runs on a CCeH server and can manage
+multiple databases.</p>
 <div class="figure align-center" id="id2">
 <p class="plantuml">
-<img src="_images/plantuml-83ec0254154fa638f8d114c88a9256fe8bddab03.png" alt="database &quot;ECM&quot;    as dbsrc1
+<img src="_images/plantuml-01237eb012b2c8173db215c2581ef249c4e9bec7.png" alt="skinparam backgroundColor transparent
+
+component &quot;Web Client&quot; as client
+component &quot;API Server&quot; as api
+database &quot;Acts&quot; as db1
+database &quot;John&quot; as db2
+database &quot;Mark&quot; as db3
+
+client &lt;--&gt; api
+api &lt;--&gt; db1
+api &lt;--&gt; db2
+api &lt;--&gt; db3"/>
+</p>
+<p class="caption"><span class="caption-text">Web Application</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+<p>The client is written in Javascript using the Vue.js and D3.js libraries.  The
+API server is written in Python using the Flask framework.  The database is a
+PostgreSQL database.</p>
+</div>
+<div class="section" id="database-setup">
+<h2>Database Setup<a class="headerlink" href="#database-setup" title="Permalink to this headline">¶</a></h2>
+<p>Currently we host the CBGM for three books, namely Acts, John and Mark, by
+different editorial teams and in different stages of completion.  Each book gets
+its own database.</p>
+<p>As raw input we use the database that contains the apparatus of the <em>Editio
+Critica Maior</em> publication.  Supplemental data comes from a database of
+editorial decisions (VarGen) regarding the priority of the readings.  The Nestle
+database contains the “Leitzeile”.</p>
+<p>The preparation step transforms the many input databases into one database
+suitable for the API server.</p>
+<div class="figure align-center" id="id3">
+<p class="plantuml">
+<img src="_images/plantuml-47e0ba1acfa09547b4d519564940ec26f9804695.png" alt="skinparam backgroundColor transparent
+
+database &quot;ECM&quot;    as dbsrc1
 database &quot;VarGen&quot; as dbsrc2
 database &quot;Nestle&quot; as dbsrc3
 component &quot;prepare4cbgm script&quot; as p4c
-database &quot;CBGM&quot;   as db
+database &quot;Acts&quot;   as db
 
 dbsrc1 --&gt; p4c
 dbsrc2 --&gt; p4c
 dbsrc3 --&gt; p4c
 p4c --&gt; db"/>
 </p>
-<p class="caption"><span class="caption-text">Database Preparation</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">Database Preparation</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </div>
-</div>
-<div class="section" id="online-application">
-<h2>Online Application<a class="headerlink" href="#online-application" title="Permalink to this headline">¶</a></h2>
-<p>A client / server architecture.  The client in the user’s browser uses the API server
-to interrogate the CBGM database.</p>
-<div class="figure align-center" id="id3">
-<p class="plantuml">
-<img src="_images/plantuml-53a19ca3b27f8d41a5b96b7506f0875d4d175cf4.png" alt="skinparam NodeSep 100
-skinparam RankSep 50
-
-database &quot;CBGM&quot;
-[API Server] as api
-[Client] as client
-
-CBGM  &lt;-&gt; api
-api &lt;-&gt; client"/>
-</p>
-<p class="caption"><span class="caption-text">Online Application</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
-</div>
-<p>The client is written in Javascript using the Vue.js and D3.js libraries.  The
-API server is written in Python using the Flask framework.  The CBGM database is
-a PostgreSQL database.</p>
+<p>The databases for John and Mark are prepared in a similar way.  Each team has a
+different workflow, and uses a different structure in their input databases.
+The preparation script tries to accomodate all those differences.</p>
 </div>
 <div class="section" id="links">
 <h2>Links<a class="headerlink" href="#links" title="Permalink to this headline">¶</a></h2>
@@ -479,7 +474,7 @@ a PostgreSQL database.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="install.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="user.html" class="btn btn-neutral float-right" title="User Manual" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral" title="NTG Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

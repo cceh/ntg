@@ -3,16 +3,16 @@
 </template>
 
 <script>
-/*
+/**
  * This module converts a graph in .dot format into a SVG chord layout.
  *
- * @module d3-chord-layout
+ * @component d3_chord_layout
  * @author Marcello Perathoner
  */
 
 import _ from 'lodash';
 import * as d3 from 'd3';
-import d3_common from 'd3-common';
+import d3_common from 'd3_common';
 
 /**
  * Create an SVG graph from a dot file.
@@ -262,5 +262,4 @@ export default {
         d3_common.append_marker (d3.select (this.$el), this.prefix);
     },
 };
-
 </script>

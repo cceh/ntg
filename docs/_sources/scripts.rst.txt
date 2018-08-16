@@ -2,7 +2,8 @@
  Scripts
 =========
 
-Transform the Nestle-Aland database into a database suitable for the CBGM.
+Transform the ECM and VarGen mysql-databases into a database suitable for the
+CBGM.
 
 Die mysql-Datenbank, die uns zur Verfügung gestellt wurde, enthält 28 +
 28 Tabellen, je zwei für jedes Kapitel der Apostelgeschichte.  Die erste
@@ -53,9 +54,14 @@ Konventionen zurückgehen.
    :members:
 
 
-:mod:`scripts.cceh.prepare4cbgm` --- prepare4cbgm
-=================================================
+:mod:`scripts.cceh.prepare4cbgm` --- Initialize a CBGM database
+===============================================================
+
+.. argparse::
+   :module:  scripts.cceh.prepare4cbgm
+   :func: build_parser
+   :prog: prepare4cbgm
 
 .. automodule:: scripts.cceh.prepare4cbgm
-   :synopsis: Initialize the CBGM Database
+   :synopsis: Initialize a CBGM Database
    :members:

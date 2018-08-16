@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-"""Initialize the tables for user authentication and authorization.
+"""Initialize the database for user authentication and authorization.
 
 """
 
@@ -18,15 +18,15 @@ sys.path.append (os.path.dirname (os.path.abspath (__file__)) + "/../..")
 
 from ntg_common import db
 from ntg_common import tools
-from ntg_common.db import execute
+from ntg_common.db_tools import execute
 from ntg_common.tools import log
 from ntg_common.config import args
 
-if __name__ == '__main__':
+def build_parser ():
+    parser = argparse.ArgumentParser (description='Initialize the user authentication database.')
 
-    parser = argparse.ArgumentParser (description='Initialize the tables for user auth.')
-
-    parser.add_argument ('profile', metavar='PROFILE', help="the database profile file (required)")
+    parser.add_argument ('profile', metavar='path/to/_global.conf',
+                         help="path to the _global.conf file (required)")
 
     parser.add_argument ('-e', '--email',    required = True, help='email')
     parser.add_argument ('-u', '--username', default = '',    help='username')
@@ -34,7 +34,12 @@ if __name__ == '__main__':
 
     parser.add_argument ('-v', '--verbose', dest='verbose', action='count',
                          help='increase output verbosity', default=0)
+    return parser
 
+
+if __name__ == '__main__':
+
+    parser = build_parser ()
     parser.parse_args (namespace = args)
 
     config = tools.config_from_pyfile (args.profile)

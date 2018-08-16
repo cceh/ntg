@@ -11,7 +11,6 @@
  * This module is the base for a card.
  *
  * @component card
- *
  * @author Marcello Perathoner
  */
 

@@ -1,5 +1,5 @@
 /**
- * This module implements helper functions and is a container for all stuiff
+ * This module implements helper functions and is a container for all stuff
  * that doesn't fit elsewhere.
  *
  * @module tools
@@ -14,10 +14,10 @@ import _ from 'lodash';
  *
  * @function format
  *
- * @param {string} s  - The string to format
+ * @param {String} s  - The string to format
  * @param {dict} data - A dictionary of key: value
  *
- * @return {string} - The formatted string
+ * @returns {String} The formatted string
  */
 
 export function format (s, data) {
@@ -34,9 +34,9 @@ export function format (s, data) {
  *
  * @function natural_sort
  *
- * @param {string} s - The input string
+ * @param {String} s - The input string
  *
- * @return {string} - The transformed string
+ * @returns {String} The transformed string
  */
 
 export function natural_sort (s) {
@@ -48,9 +48,9 @@ export function natural_sort (s) {
  *
  * @function deparam
  *
- * @param {string} query_string - A string in the form "p=1&q=2"
+ * @param {String} query_string - A string in the form "p=1&q=2"
  *
- * @return {Object} { p : 1, q : 2 }
+ * @returns {Object} { p : 1, q : 2 }
  */
 
 export function deparam (query_string) {
@@ -136,9 +136,9 @@ export function xhr_alert (reason, $card) {
  * @function bfs
  *
  * @param {Object} edges - The edges list
- * @param {string} start - The start node id
+ * @param {String} start - The start node id
  *
- * @return A list of node ids in breadth-first order
+ * @returns A list of node ids in breadth-first order
  */
 
 export function bfs (edges, start) {

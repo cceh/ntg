@@ -1,7 +1,7 @@
 /**
  * This module contains common functions built around the D3 library.
  *
- * @module d3-common
+ * @module d3_common
  * @author Marcello Perathoner
  */
 
@@ -38,7 +38,7 @@ var Greys = 'fffffff0f0f0d9d9d9bdbdbd969696737373525252252525000000';
  *
  * @function color_string_to_palette
  *
- * @param {string} s - The color palette as string
+ * @param {String} s - The color palette as string
  *
  * @returns {Object} The color palette as D3 scale.
  */
@@ -71,7 +71,7 @@ var cliques_palette = color_string_to_palette (Greys);
  * @param {d3.scale} labez_scale  - The color palette for labez as D3 scale.
  * @param {d3.scale} clique_scale - The color palette for cliques as D3 scale.
  *
- * @return {string} - The color palette as CSS
+ * @returns {String} The color palette as CSS
  */
 function generate_css_palette (labez_scale, clique_scale) {
     var style;
@@ -123,7 +123,7 @@ function generate_css_palette (labez_scale, clique_scale) {
  *
  * @function insert_css_palette
  *
- * @param {string} css - The color palette as CSS.
+ * @param {String} css - The color palette as CSS.
  */
 function insert_css_palette (css) {
     $ ('<style type="text/css">' + css + '</style>').appendTo ('head');
@@ -136,9 +136,9 @@ function insert_css_palette (css) {
  *
  * @param {d3.selection} d3_selection - The D3 selection object
  *
- * @return {jQuery.selection} - The jQuery selection object.
+ * @returns {jQuery.selection} The jQuery selection object.
  *
- * @see {@link http://collaboradev.com/2014/03/18/d3-and-jquery-interoperability/}
+ * See: http://collaboradev.com/2014/03/18/d3-and-jquery-interoperability/
  */
 function to_jquery (d3_selection) {
     return $ (d3_selection.nodes ());
@@ -151,7 +151,7 @@ function to_jquery (d3_selection) {
  *
  * @param {jQuery.selection} jquery_selection - The jQuery selection object
  *
- * @return {D3.selection} - The D3 selection object.
+ * @returns {D3.selection} The D3 selection object.
  */
 function to_d3 (jquery_selection) {
     return d3.selectAll (jquery_selection.toArray ());
@@ -163,7 +163,7 @@ function to_d3 (jquery_selection) {
  * @function append_marker
  *
  * @param {jQuery.selection|d3.selection} svg - The SVG element.
- * @param {string} id_prefix                  - The id prefix.
+ * @param {String} id_prefix                  - The id prefix.
  */
 function append_marker (svg, id_prefix) {
     svg
@@ -187,9 +187,9 @@ function append_marker (svg, id_prefix) {
  *
  * @function parse_pt
  *
- * @param {string} commasep - The pt as comma-separated values.
+ * @param {String} commasep - The pt as comma-separated values.
  *
- * @return {Object} The point as dictionary { x, y }
+ * @returns {Object} The point as dictionary { x, y }
  */
 function parse_pt (commasep) {
     var pt = commasep.split (',');
@@ -212,9 +212,9 @@ function parse_pt (commasep) {
  *
  * @function parse_bbox
  *
- * @param {string} commasep - The bbox as comma-separated values.
+ * @param {String} commasep - The bbox as comma-separated values.
  *
- * @return {Object} The bbox as dictionary { x, y, width, height }
+ * @returns {Object} The bbox as dictionary { x, y, width, height }
  */
 function parse_bbox (commasep) {
     var bb = commasep.split (',');
@@ -235,9 +235,9 @@ function parse_bbox (commasep) {
  *
  * @function parse_path
  *
- * @param {string} path - The path in .dot format
+ * @param {String} path - The path in .dot format
  *
- * @return {Array} The path as array of objects  { x, y }
+ * @returns {Array} The path as array of objects  { x, y }
  */
 function parse_path (path) {
     path = $.trim (path.replace ('\\\n', ''));
@@ -251,9 +251,9 @@ function parse_path (path) {
  *
  * @function parse_path_svg
  *
- * @param {string} path - The path in .dot format
+ * @param {String} path - The path in .dot format
  *
- * @return {string} The path as 'Mx,y Cx,y x,y x,y ...'
+ * @returns {String} The path as 'Mx,y Cx,y x,y x,y ...'
  */
 
 function parse_path_svg (path) {
@@ -285,7 +285,7 @@ function parse_path_svg (path) {
  * @param {Object} bbox - The bbox as dictionary of x, y, width, height
  * @param {float}  len  - The bbox will be twice this wider and taller.
  *
- * @return {Object} The bbox as dictionary of x, y, width, height
+ * @returns {Object} The bbox as dictionary of x, y, width, height
  */
 function inflate_bbox (bbox, len) {
     return {
@@ -301,10 +301,10 @@ function inflate_bbox (bbox, len) {
  *
  * @function dot
  *
- * @param {string} data       - The data in .dot format
+ * @param {String} data       - The data in .dot format
  * @param {function} callback - The callback function.
  *
- * @return {Promise}
+ * @returns {Promise}
  */
 function dot (data, callback) {
     var graph = dot_parser.parse (data);

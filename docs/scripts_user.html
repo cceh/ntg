@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>NTG Documentation &mdash; NTG 0.1.1 documentation</title>
+  <title>Scripts &mdash; NTG 0.1.1 documentation</title>
   
 
   
@@ -37,8 +37,10 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="NTG 0.1.1 documentation" href="#"/>
-        <link rel="next" title="Introduction" href="intro.html"/> 
+    <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
+        <link rel="up" title="User Manual" href="user.html"/>
+        <link rel="next" title="Developer Manual" href="developer.html"/>
+        <link rel="prev" title="Installation" href="install.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -57,7 +59,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> NTG
+            <a href="index.html" class="icon icon-home"> NTG
           
 
           
@@ -84,14 +86,14 @@
               
             
             
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#web-application">Web Application</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#database-setup">Database Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="user.html">User Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install.html#database-access">Database Access</a></li>
@@ -101,9 +103,9 @@
 <li class="toctree-l3"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#prepare4cbgm-py">prepare4cbgm.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#mk-users-py">mk_users.py</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Scripts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prepare4cbgm-py">prepare4cbgm.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mk-users-py">mk_users.py</a></li>
 </ul>
 </li>
 </ul>
@@ -182,7 +184,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">NTG</a>
+          <a href="index.html">NTG</a>
         
       </nav>
 
@@ -210,15 +212,17 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="#">Docs</a> &raquo;</li>
+      <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>NTG Documentation</li>
+          <li><a href="user.html">User Manual</a> &raquo;</li>
+        
+      <li>Scripts</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/scripts_user.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -231,39 +235,104 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="ntg-documentation">
-<span id="contents"></span><h1>NTG Documentation<a class="headerlink" href="#ntg-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#web-application">Web Application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#database-setup">Database Setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="domain.html">Introduction to the Problem Domain (German)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html">Application Client</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html">Application Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="database.html">Database Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html">Various Functions</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="section" id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="scripts">
+<h1>Scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="prepare4cbgm-py">
+<h2>prepare4cbgm.py<a class="headerlink" href="#prepare4cbgm-py" title="Permalink to this headline">¶</a></h2>
+<p><p>Initialize a CBGM database.</p>
+<p>This script converts the databases used in the production of the ECM into a
+database suitable for doing CBGM. It</p>
 <ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+<li>copies the data from multiple mysql databases into a single postgres database,</li>
+<li>removes unwanted readings,</li>
+<li>builds a positive apparatus,</li>
+<li>calculates the pre-coherence similarity of manuscripts, and</li>
+<li>calculates the post-coherence ancestrality of manuscripts.</li>
 </ul>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">prepare4cbgm</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="n">RANGE</span><span class="p">]</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd>path/to/file.conf</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>a .conf file (required)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>-v, --verbose</kbd></td>
+<td><p class="first">increase output verbosity</p>
+<p class="last">Default: 0</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-r, --range</kbd></td>
+<td><p class="first">range of steps (default: all)</p>
+<p class="last">Default: “”</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="mk-users-py">
+<h2>mk_users.py<a class="headerlink" href="#mk-users-py" title="Permalink to this headline">¶</a></h2>
+<p>Initialize the user authentication database.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">mk_users</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">-</span><span class="n">e</span> <span class="n">EMAIL</span> <span class="p">[</span><span class="o">-</span><span class="n">u</span> <span class="n">USERNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PASSWORD</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span>
+                <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">_global</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd>path/to/_global.conf</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>path to the _global.conf file (required)</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>-e, --email</kbd></td>
+<td>email</td></tr>
+<tr><td class="option-group">
+<kbd>-u, --username</kbd></td>
+<td><p class="first">username</p>
+<p class="last">Default: “”</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-p, --password</kbd></td>
+<td><p class="first">password</p>
+<p class="last">Default: “”</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>-v, --verbose</kbd></td>
+<td><p class="first">increase output verbosity</p>
+<p class="last">Default: 0</p>
+</td></tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 
@@ -277,8 +346,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="intro.html" class="btn btn-neutral float-right" title="Introduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="developer.html" class="btn btn-neutral float-right" title="Developer Manual" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
+      
+        <a href="install.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

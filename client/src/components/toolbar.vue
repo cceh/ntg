@@ -120,7 +120,7 @@
 /**
  * This module implements the toolbar that is on most of the cards.
  *
- * @module toolbar
+ * @component toolbar
  *
  * @author Marcello Perathoner
  */

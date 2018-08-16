@@ -14,7 +14,7 @@
 /**
  * This module implements the editor notes card.
  *
- * @module notes
+ * @component notes
  * @author Marcello Perathoner
  */
 

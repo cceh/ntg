@@ -57,7 +57,7 @@
  *
  * To actually navigate this module changes the hash.
  *
- * @module navigator
+ * @component navigator
  * @author Marcello Perathoner
  */
 

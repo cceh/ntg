@@ -20,7 +20,7 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-sys.path.insert (0, os.path.abspath ('..'))
+sys.path.insert (0, os.path.abspath ('.'))
 
 # -- General configuration ------------------------------------------------
 
@@ -31,6 +31,7 @@ sys.path.insert (0, os.path.abspath ('..'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinxarg.ext',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.graphviz',
@@ -41,8 +42,12 @@ extensions = [
     'sauml.sauml',
 ]
 
-js_source_path = '../client/src/js/'
-jsdoc_config_path = '../jsdoc.json'
+js_source_path    = ['client/src/js/', 'client/src/components/']
+#js_source_path    = ['client/src/components/']
+#js_source_path    = ['client/src/js/']
+#root_for_relative_js_paths = 'client/src/js/'
+root_for_relative_js_paths = 'client/src/'
+jsdoc_config_path = 'jsdoc.conf.js'
 
 sauml_arguments = ['postgresql+psycopg2://ntg@localhost:5432/acts_ph4']
 sauml_dot_table = 'bgcolor=#e7f2fa&color=#2980B9'
@@ -163,7 +168,7 @@ def setup (app):
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ['doc_src/_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied

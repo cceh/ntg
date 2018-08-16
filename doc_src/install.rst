@@ -2,6 +2,8 @@
  Installation
 ==============
 
+This chapter describes how to install the software on a linux system.
+
 
 Install Prerequisites
 =====================
@@ -26,14 +28,16 @@ As a user with admin privileges do:
    .. code-block:: shell
 
       sudo apt-get install git make
-
       sudo -u ntg bash
+
       mkdir -p ~/prj/ntg
       cd !!$
       git clone https://github.com/cceh/ntg
       cd ntg
       exit
 
+      sudo bash
+      cd ~ntg/prj/ntg/ntg/
       make install-prerequisites
 
 
@@ -122,8 +126,8 @@ Postgres database
 Application server
 ==================
 
-1. Configure the global settings for the application server.  This concerns the
-   user management database that holds user credentials and has to send
+1. Configure the global settings for the application server.  This configures
+   the user management database that holds user credentials and the sending of
    confirmation mails.
 
    Login as user *ntg* and edit (or create) your :file:`server/instance/_global.conf`
@@ -133,7 +137,7 @@ Application server
       APPLICATION_NAME    = "Root"
       APPLICATION_ROOT    = "/"
       SESSION_COOKIE_PATH = "/"
-      SECRET_KEY          = "<a random string>"
+      SECRET_KEY          = "<a long random string>"
 
       PGHOST="localhost"
       PGPORT="5432"
@@ -150,9 +154,12 @@ Application server
       MAIL_DEFAULT_SENDER = "ntg appserver <noreply@domain.tld>"
 
 
-2. Per-database setting of the application server.  The server can serve
-   multiple databases from different mount points.  This concerns the CBGM
-   database(s).
+2. Configure the CBGM database or databases.  Create one .conf file per
+   database, the name of the file may be chosen at will but should not start
+   with an underscore.
+
+   The APPLICATION_ROOT is the root of the url.  It must have two segments and
+   must be different for each database.
 
    Edit (or create) your :file:`server/instance/acts_ph4.conf`
 
@@ -204,8 +211,9 @@ CBGM
 
    .. code-block:: shell
 
-      mysql -D "VarGenAtt_ActPh4" < VarGenAtt_ActPh4.dump
       mysql -D "ECM_ActsPh4"      < ECM_ActsPh4.dump
+      mysql -D "VarGenAtt_ActPh4" < VarGenAtt_ActPh4.dump
+      mysql -D "Nestle29"         < Nestle29.dump
 
 2. Now run the CBGM process. This will fill the Postgres database.
 
@@ -222,3 +230,18 @@ Run Server
    .. code-block:: shell
 
       make server
+
+
+Build and run client
+====================
+
+1. Build and run the client
+
+   .. code-block:: shell
+
+      cd client
+      npm install
+      cd ..
+      make dev-server
+
+Point your browser to http://localhost:5000/acts/ph4/

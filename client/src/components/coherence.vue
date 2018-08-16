@@ -69,17 +69,17 @@
 
 <script>
 /**
- * This module is the main entry point and displays the main page.  This module
- * is only a container for the other modules that actually display the gadgets.
+ * This module displays the coherence page.  This module is only a container for
+ * the Vue.js components that actually display the gadgets.
  *
- * @module coherence
+ * @component coherence
  * @author Marcello Perathoner
  */
 
 import $ from 'jquery';
 import Vue from 'vue';
 
-import d3common  from 'd3-common';
+import d3common  from 'd3_common';
 
 import page_header      from 'page_header.vue';
 import navigator        from 'navigator.vue';

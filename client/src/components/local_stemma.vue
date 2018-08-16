@@ -13,9 +13,9 @@
 
 <script>
 /**
- * This module implements the local stemma drag-and-drop editing.
+ * This module implements the local stemma with drag-and-drop editing.
  *
- * @module local-stemma
+ * @component local_stemma
  * @author Marcello Perathoner
  */
 

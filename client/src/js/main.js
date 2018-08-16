@@ -1,14 +1,14 @@
 /**
- * Startup script.
+ * Main entry point.
  *
- * @module app
+ * @module main
  * @author Marcello Perathoner
  */
 
-import Vue from 'vue';
-import VueRouter from 'vue-router';
+import Vue          from 'vue';
+import VueRouter    from 'vue-router';
 import BootstrapVue from 'bootstrap-vue';
-import axios from 'axios';
+import axios        from 'axios';
 
 import app         from '../components/app.vue';
 import index       from '../components/index.vue';
@@ -43,14 +43,15 @@ const router = new VueRouter ({
 });
 
 /**
- * Ascend the VM tree until you find an api_url.
+ * Ascend the VM tree until you find an api_url and use it as prefix to build
+ * the full API url.
  *
  * @function build_full_api_url
  *
- * @param {} vm -
- * @param {} url - Url Suffix
+ * @param {Object} vm  - The Vue instance
+ * @param {String} url - Url suffix
  *
- * @returns {string} Full API url
+ * @returns {String} Full API url
  */
 
 Vue.prototype.build_full_api_url = function (url) {
@@ -69,12 +70,12 @@ Vue.prototype.build_full_api_url = function (url) {
 };
 
 /**
- * Make an API request.
+ * Make a GET request to the API server.
  *
  * @function get
  *
- * @param {string} url  - The url
- * @param {object} data - Params for axios call
+ * @param {String} url  - Url suffix
+ * @param {Object} data - Params for axios call
  *
  * @returns {Promise}
  */

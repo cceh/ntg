@@ -9,25 +9,33 @@
    :members:
 
 
-:mod:`server.server` --- Main Module
-------------------------------------
+Main Module
+-----------
 
 .. automodule:: server.server
    :synopsis: Main Module
    :members:
 
 
-:mod:`server.editor` --- Editor Module
---------------------------------------
+Editor Module
+-------------
 
 .. automodule:: server.editor
    :synopsis: Editor Module
    :members:
 
 
-:mod:`server.security` --- User Management Module
--------------------------------------------------
+User Management Module
+----------------------
 
 .. automodule:: server.security
    :synopsis: User Management Module
+   :members:
+
+
+Helper Functions Module
+-----------------------
+
+.. automodule:: server.helpers
+   :synopsis: Helper Functions Module
    :members:

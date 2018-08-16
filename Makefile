@@ -11,6 +11,7 @@ SHELL       := /bin/bash
 PYTHON      := /usr/bin/python3
 MYSQL       := mysql --defaults-file=~/.my.cnf.ntg
 BROWSER     := firefox
+JSDOC       := node client/node_modules/jsdoc/jsdoc.js -c jsdoc.conf.js
 
 PSQL_PORT   := 5432
 PSQL        := psql -p $(PSQL_PORT)
@@ -18,15 +19,18 @@ PGDUMP      := pg_dump -p $(PSQL_PORT)
 
 SERVER      := server
 CLIENT      := client
+SCRIPTS     := scripts
+DOCS        := docs
 
 JS_SRC      := `find $(CLIENT)/src -name '*.js'`
 VUE_SRC     := $(wildcard $(CLIENT)/src/components/*.vue)
 
 PY_SOURCES  := scripts/cceh/*.py ntg_common/*.py
 
+
 .PHONY: client server upload vpn psql
 .PHONY: lint pylint eslint csslint
-.PHONY: doc jsdoc sphinx
+.PHONY: docs jsdoc sphinxdoc
 
 client:
 	cd client; make build; cd ..
@@ -93,6 +97,11 @@ import_mark:
 	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph1"
 	cat ../dumps/ECM_Mk_CBGM.dump | $(MYSQL) -D ECM_Mark_Ph1
 
+import_nestle:
+	-$(MYSQL) -e "DROP DATABASE Nestle29"
+	$(MYSQL) -e "CREATE DATABASE Nestle29"
+	cat ../dumps/Nestle29.dump | $(MYSQL) -D Nestle29
+
 acts:
 	python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/acts_ph4.conf
 
@@ -153,8 +162,6 @@ csslint:
 eslint:
 	cd client ; make eslint ; cd ..
 
-doc: sphinx
-
 .PRECIOUS: doc_src/%.jsgraph.dot
 
 doc_src/%.jsgraph.dot : $(CLIENT)/src/js/%.js
@@ -172,12 +179,17 @@ doc_src/%.nolibs.jsgraph.dot : doc_src/%.jsgraph.dot
 jsgraphs: doc_src/coherence.jsgraph.dot doc_src/comparison.jsgraph.dot \
 			doc_src/coherence.nolibs.jsgraph.dot doc_src/comparison.nolibs.jsgraph.dot
 
-sphinx: jsgraphs
-	-rm docs/_images/*
-	cd doc_src; make html; cd ..
+docs: sphinxdoc
 
-jsdoc: js
-	jsdoc -c jsdoc.json -d jsdoc -a all $(JS_SRC) && $(BROWSER) jsdoc/index.html
+sphinxdoc:
+	-rm $(DOCS)/_images/*
+	python3 -msphinx -c . -T -a -E -b html -d $(DOCS)/doctrees doc_src $(DOCS)
+	cp doc_src/_config.yml $(DOCS)/
+	@echo
+	@echo "Build finished. The HTML pages are in $(DOCS)."
+
+jsdoc:
+	$(JSDOC) -d jsdoc -a all $(JS_SRC) $(VUE_SRC) && $(BROWSER) jsdoc/index.html
 
 sqlacodegen:
 	sqlacodegen mysql:///ECM_ActsPh4?read_default_group=ntg
@@ -190,7 +202,8 @@ install-prerequisites:
 	sudo apt-get install apache2 libapache2-mod-wsgi-py3 \
 		postgresql libpg-dev postgresql-10-mysql-fdw \
 		mysql default-libmysqlclient-dev \
-		python3 python3-pip graphviz git make plantuml
+		python3 python3-pip \
+	    git make npm graphviz plantuml
 	sudo pip3 install --upgrade pip
 	sudo pip3 install --upgrade \
 		numpy networkx matplotlib pillow \

@@ -27,7 +27,7 @@
  * JSON format and builds a list of readings and of the manuscripts that attest
  * that reading.
  *
- * @module apparatus
+ * @component apparatus
  * @author Marcello Perathoner
  */
 
@@ -40,11 +40,9 @@ import tools from 'tools';
 /**
  * Load a new passage.
  *
- * @function load_passage
- *
- * @param {Object} passage - Which passage to load.
- *
- * @return {Promise} Promise, resolved when the new passage has loaded.
+ * @function
+ * @param {Object} passage - The passage to load.
+ * @returns {Promise} Promise, resolved when the passage has loaded.
  */
 function load_passage (vm, passage) {
     if (passage.pass_id === 0) {
@@ -122,10 +120,9 @@ export default {
         },
 
         /**
-         * Show the attestation in the *Coherence in Attestations* card and scroll to it.
+         * Show the attestation in the "Coherence in Attestations" card and scroll to it.
          *
-         * @function goto_attestation
-         *
+         * @method goto_attestation
          * @param {Object} event - The event
          */
         goto_attestation (event) {
