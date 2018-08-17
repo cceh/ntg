@@ -43,9 +43,6 @@ PLOT = 0 # plot pretty pictures
 if PLOT:
     from ntg_common import plot
 
-NULL_FIELDS = 'lemma lesart labezsuf'.split ()
-""" Fields to look for data entry error NULL, and change it into '' """
-
 MS_ID_A  = 1
 MS_ID_MT = 2
 
@@ -219,34 +216,22 @@ def copy_att_fdw (dba, dbs, parameters):
         SET labezorig = labez, labezsuforig = labezsuf
         """, parameters)
 
-        execute (conn, """
-        UPDATE att
-        SET lesart = NULL
-        WHERE lesart = '' AND labez ~ '^z[u-z]';
-        """, parameters)
+        for t in ('att', 'lac'):
+            execute (conn, """
+            UPDATE {t}
+            SET lemma    = TRIM (COALESCE (lemma,    '')),
+                lesart   = TRIM (COALESCE (lesart,   '')),
+                labez    = TRIM (COALESCE (labez,    '')),
+                labezsuf = trim (COALESCE (labezsuf, ''))
+            """, dict (parameters, t = t))
 
         execute (conn, """
         UPDATE att
         SET lesart = ''
-        WHERE lesart ~ ' ?om[ .]?';
+        WHERE lesart ~ 'om[.]?';
         """, parameters)
 
         if book == 'Acts':
-            execute (conn, """
-            UPDATE att
-            SET labez = labezsuf, labezsuf = ''
-            WHERE labez = 'zw'
-            """, parameters)
-
-            for t in ('att', 'lac'):
-                # Normalize NULL to ''
-                for col in NULL_FIELDS:
-                    execute (conn, """
-                    UPDATE {t}
-                    SET {col} = ''
-                    WHERE {col} IS NULL
-                    """, dict (parameters, t = t, col = col))
-
             fix (conn, "Wrong labez Acts", """
             SELECT labez, labezsuf, adr2chapter (begadr), count (*) AS anzahl
             FROM att
@@ -264,17 +249,14 @@ def copy_att_fdw (dba, dbs, parameters):
             SET labez = 'd', labezsuf = 'f'
             WHERE labez = 'df';
             UPDATE att
-            SET labez = 'k', labezsuf = ''
-            WHERE labez = 'k ';
-            UPDATE att
-            SET labez = 'a', labezsuf = ''
+            SET labez = 'a/ao1-4'
             WHERE labez = 'a/ao1-ao4';
+            """, parameters)
+
+            execute (conn, """
             UPDATE att
-            SET labez = 'a', labezsuf = ''
-            WHERE labez = 'ao1-3';
-            UPDATE att
-            SET labez = 'b', labezsuf = ''
-            WHERE labez = 'b/bo1-3'
+            SET labez = labezsuf, labezsuf = ''
+            WHERE labez = 'zw'
             """, parameters)
 
             fix (conn, "Wrong hs Acts", """
@@ -297,6 +279,16 @@ def copy_att_fdw (dba, dbs, parameters):
             DELETE FROM lac WHERE hsnr = 411882;
             UPDATE lac SET hs = REGEXP_REPLACE (hs, '[Ss][1-2]*', 's') WHERE hsnr = 411881;
             """, parameters)
+
+            fix (conn, "A reads 'f'", """
+            SELECT begadr, endadr, hs, hsnr, labez, labezsuf
+            FROM att
+            WHERE hs = 'A' and labez = 'f'
+            """, """
+            DELETE FROM att
+            WHERE hs = 'A' and labez = 'f'
+            """, parameters)
+
 
         if book == 'Mark':
             # Rule: zv should be treated like zz. Meeting 28.06.2018
@@ -662,9 +654,6 @@ def unroll_zw (dba, parameters):
 
     """
 
-    def unroll_labez (m):
-        return '/'.join ([chr (n) for n in range (ord (m.group (1)), ord (m.group (2)) + 1)])
-
     with dba.engine.begin () as conn:
 
         fields = 'hsnr hs begadr endadr labez labezsuf labezorig labezsuforig certainty lemma lesart irange created'.split ()
@@ -672,7 +661,8 @@ def unroll_zw (dba, parameters):
         res = execute (conn, """
         SELECT %s
         FROM att
-        WHERE labez ~ '[-/]'""" % ', '.join (fields),
+        WHERE labez ~ '[-/]'
+        """ % ', '.join (fields),
         parameters)
         zws = list (map (Zw._make, res))
 
@@ -687,12 +677,22 @@ def unroll_zw (dba, parameters):
             values = ':' + ', :'.join (fields)
         )
         for zw in zws:
+            segments = []
+            for segment in zw.labez.split ('/'):
+                m = re.match (r'(\w)-(\w)', segment)
+                if m:
+                    segments += [chr (n) for n in range (ord (m.group (1)), ord (m.group (2)) + 1)]
+                    continue
+                m = re.match (r'(\w+)(\d)-(\d)', segment)
+                if m:
+                    segments += [m.group (1) + chr (n) for n in range (ord (m.group (2)), ord (m.group (3)) + 1)]
+                    continue
+                segments.append (segment)
+
             unique_labez = collections.defaultdict (list)
+            for seg in segments:
+                unique_labez[seg[0]].append (seg[1:].replace ('_', ''))
 
-            labez = re.sub (r'([a-y])-([a-y])', unroll_labez, zw.labez)
-
-            for suf in labez.split ('/'):
-                unique_labez[suf[0]].append (suf[1:].replace ('_', ''))
             options = len (unique_labez)
             if options > 0:
                 updated += options
@@ -704,7 +704,28 @@ def unroll_zw (dba, parameters):
                     INSERT INTO att ({fields}) VALUES ({values})
                     """, dict (parameters, **params, **more_params), 4)
 
+        fix (conn, "More than one lesart for labez", """
+        SELECT begadr, endadr, labez
+        FROM att
+        WHERE labezsuf = '' AND certainty = 1.0
+        GROUP BY begadr, endadr, labez
+        HAVING count (distinct lesart) > 1
+        ORDER by begadr, endadr, labez;
+        """, """
+        UPDATE att
+        SET labez = 'p'
+        WHERE (begadr, endadr, hs) =  (52621006, 52621010, '431');
+        """, parameters)
+
+        # eg. if labezsuf = 'a/b/c/d/e2', zap the '2' until don't know what it means
+        execute (conn, """
+        UPDATE att
+        SET labezsuf = ''
+        WHERE labezsuf ~ '^[0-9]$';
+        """, parameters)
+
     log (logging.DEBUG, "          %d 'zw' rows unrolled" % updated)
+
 
 
 def delete_passages_without_variants (dba, parameters):
@@ -1125,30 +1146,39 @@ def fill_readings_table (dba, parameters):
 
         execute (conn, """
         INSERT INTO readings (pass_id, labez, lesart)
+        SELECT p.pass_id, a.labez, a.lesart
+        FROM att a
+        JOIN passages p
+        USING (begadr, endadr)
+        WHERE labez != 'zz' AND certainty = 1.0 AND labezsuf = '' AND labezorig != 'zw'
+        GROUP BY p.pass_id, a.labez, a.lesart
+        """, parameters)
+
+        # Add an 'f' or 'o' reading where there is no standard reading.
+        # The MODE() aggregate function arbitrarily selects the first value if
+        # there are multiple equally frequent values.
+        # This is just a hack to get *any* reading in place.
+        execute (conn, """
+        INSERT INTO readings (pass_id, labez, lesart)
         SELECT p.pass_id, a.labez, MODE () WITHIN GROUP (ORDER BY a.lesart) AS lesart
         FROM att a
         JOIN passages p
         USING (begadr, endadr)
-        WHERE certainty = 1.0
+        WHERE labez != 'zz' AND certainty = 1.0 AND labezsuf != ''
         GROUP BY p.pass_id, a.labez
+        ON CONFLICT DO NOTHING
         """, parameters)
 
-        # We need to keep 'zz' readings for referential integrity, but we must
+        # We need to have 'zz' readings for referential integrity, but we must
         # set them to NULL.  'zz' readings in `att` may still contain a few
-        # readable characters, but those characters cannot be recorded here
-        # because what is recorded here is shared by all mss.
-        execute (conn, """
-        UPDATE readings
-        SET lesart = NULL
-        WHERE labez IN ('zu', 'zz');
-        """, parameters)
+        # readable characters, but those characters cannot be put in the
+        # readings table because what is recorded there is shared by all mss.
 
         # Insert a 'zz' reading for every passage, and a 'zu' for Fehlverse.
         execute (conn, """
         INSERT INTO readings (pass_id, labez, lesart)
         SELECT p.pass_id, 'zz', NULL
-        FROM passages p
-        ON CONFLICT DO NOTHING;
+        FROM passages p;
         INSERT INTO readings (pass_id, labez, lesart)
         SELECT p.pass_id, 'zu', NULL
         FROM passages p
@@ -1188,13 +1218,16 @@ def fill_cliques_table (db, parameters):
                OR (begadr, endadr, varid) = (50424028, 50424030, 'e');
             """, parameters)
 
-            warn (conn, "Readings in readings but not in locstemed", """
+            fix (conn, "Readings in readings but not in locstemed", """
             SELECT r.begadr, r.endadr, r.labez
             FROM readings_view r
             LEFT JOIN tmp_locstemed l
               ON (r.begadr, r.endadr, r.labez) = (l.begadr, l.endadr, l.varid)
             WHERE r.labez !~ '^z[u-z]' AND l.varid IS NULL
             ORDER BY r.pass_id, r.labez
+            """, """
+            INSERT INTO tmp_locstemed (begadr, endadr, varid, varnew, s1)
+            VALUES (52621006, 52621010, 'p', 'p', 'b1')
             """, parameters)
 
         # copy all known readings into cliques
@@ -1500,6 +1533,11 @@ def fill_ms_cliques_table (dba, parameters):
             FROM apparatus_view a
             WHERE (v.begadr, v.endadr, v.ms) = (a.begadr, a.endadr, a.hsnr)
               AND (a.begadr, a.endadr, a.labez, v.varid) = (50405022, 50405034, 'd', 'a');
+            UPDATE tmp_var v
+            SET varid = 'p', varnew = 'p'
+            FROM apparatus_view a
+            WHERE (v.begadr, v.endadr, v.ms) = (a.begadr, a.endadr, a.hsnr)
+              AND (a.begadr, a.endadr, a.hs) = (52621006, 52621010, '431');
             """, parameters)
 
             # update cliques > 1 from varnew
@@ -2151,7 +2189,7 @@ if __name__ == '__main__':
                                              # do not match 'A' and 'L2010' !!!
         parameters['re_comm']  = 'T[1-9]'    # commentaries
         parameters['re_vid']   = 'V'         # videtur (visual guesswork)
-        parameters['re_labez'] = '^([-a-y1-9/_]+|z[u-z])$'
+        parameters['re_labez'] = '^([a-y]|z[u-z])$'
     if book == 'Mark':
         parameters['re_hs']    = '^(A|MT|([P0L]?[1-9][0-9]*)([sS][1-9]?)?)'
         parameters['re_supp']  = '[sS][1-9]?'  # later supplements
