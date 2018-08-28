@@ -11,39 +11,26 @@ CBGM Database
 
    Overview of the CBGM database (some columns omitted)
 
-This work database is built
-from the :mod:`source database <ntg_common.src_db>`
-by the :mod:`prepare4cbgm <scripts.cceh.prepare4cbgm>` script.
-The :mod:`online application <server>` reads this database.
+The CBGM database is built from the mysql `source-database`
+by the :mod:`import <scripts.cceh.import>` script.
+The :mod:`API server <server>` uses this database.
 
 The editors update the green tables through a graphical editor.  These tables
-are journalled to provide undo functionality.
+are `journalled <tts>` to provide undo functionality.
 
 The CBGM process populates the red tables.
+
+The `web-client` uses all these table.
 
 .. Palette https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Paired.js
 
 .. sauml::
-   :include: books passages ranges readings cliques manuscripts ms_cliques locstem apparatus ms_ranges affinity
+   :include: books passages ranges readings cliques manuscripts ms_cliques locstem notes apparatus ms_ranges affinity
    :caption: Work database structure
    :align: center
-   :dot-table: bgcolor.ms_cliques=#b2df8a&color.ms_cliques=#33a02c&bgcolor.locstem=#b2df8a&color.locstem=#33a02c&bgcolor.cliques=#b2df8a&color.cliques=#33a02c&bgcolor.affinity=#fb9a99&color.affinity=#e31a1c&bgcolor.ms_ranges=#fb9a99&color.ms_ranges=#e31a1c
+   :dot-table: bgcolor.ms_cliques=#b2df8a&color.ms_cliques=#33a02c&bgcolor.locstem=#b2df8a&color.locstem=#33a02c&bgcolor.notes=#b2df8a&color.notes=#33a02c&bgcolor.cliques=#b2df8a&color.cliques=#33a02c&bgcolor.affinity=#fb9a99&color.affinity=#e31a1c&bgcolor.ms_ranges=#fb9a99&color.ms_ranges=#e31a1c
 
    { rank=same; passages, ranges }
-
-
-Transform the negative apparatus into a positive apparatus
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-1. Set all passages in all manuscripts to the reading 'a'.
-
-2. Overwrite all Fehlverse in all manuscripts with the reading 'zu'.
-
-3. Unroll the lacuna table. Overwrite with 'zz' every passage that is inside a
-   lacuna.
-
-4. Overwrite everything with the reading from the negative apparatus, if there
-   is one.
 
 
 .. _tts:
@@ -70,6 +57,8 @@ Tables
    :synopsis: Database Structure
    :members:
 
+
+.. _source-database:
 
 Source Database
 ===============

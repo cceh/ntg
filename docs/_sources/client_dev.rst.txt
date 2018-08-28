@@ -1,13 +1,19 @@
-====================
- Application Client
-====================
+.. module:: client
+   :synopsis: Web Client
+
+.. _web-client:
+
+============
+ Web Client
+============
 
 .. default-domain:: js
 
-The Javascript client on the browser.  Written with Vue.js, D3.js and bootstrap.
-It uses internal roting of URLs.
+The web client runs on the user's browser.
 
-Most of the application is placed inside Vue.js components.
+The web client is written in Javascript with Vue.js, D3.js, and bootstrap.  It
+uses internal routing of URLs.  Most of the application is placed inside Vue.js
+components.
 
 You probably want to start looking at the :mod:`coherence` or :mod:`comparison`
 components.

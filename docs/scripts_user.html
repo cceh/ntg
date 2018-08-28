@@ -89,7 +89,9 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#web-application">Web Application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#database-setup">Database Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#applying-the-cbgm">Applying the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#updating-the-apparatus">Updating the Apparatus</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
@@ -104,8 +106,12 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Scripts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#prepare4cbgm-py">prepare4cbgm.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#mk-users-py">mk_users.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scripts-cceh-import-py">scripts/cceh/import.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scripts-cceh-prepare-py">scripts/cceh/prepare.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scripts-cceh-cbgm-py">scripts/cceh/cbgm.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scripts-cceh-save-edits-py">scripts/cceh/save_edits.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scripts-cceh-load-edits-py">scripts/cceh/load_edits.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scripts-cceh-mk-users-py">scripts/cceh/mk_users.py</a></li>
 </ul>
 </li>
 </ul>
@@ -121,40 +127,44 @@
 <li class="toctree-l3"><a class="reference internal" href="domain.html#literatur">Literatur</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html">Application Client</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-main">The Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-app">The Application Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-coherence">The Coherence Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison">The Comparison Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-page_header">The Page Header Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-navigator">The Navigator Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-apparatus">The Apparatus Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-local_stemma">The Local Stemma Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#the-notes-component">The Notes Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-relatives">The Relatives Popup Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison_table">The Comparison Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-card">The Card Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-card_caption">The Card Caption Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-toolbar">The Toolbar Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_common">Various functions for D3</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-tools">Various Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-main">The Main Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-app">The Application Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-coherence">The Coherence Page Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison">The Comparison Page Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-page_header">The Page Header Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-navigator">The Navigator Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-apparatus">The Apparatus Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-local_stemma">The Local Stemma Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#the-notes-component">The Notes Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives">The Relatives Popup Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_table">The Comparison Table Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card">The Card Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card_caption">The Card Caption Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-toolbar">The Toolbar Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_common">Various functions for D3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-tools">Various Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html">Application Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.server">Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.editor">Editor Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.security">User Management Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.helpers">Helper Functions Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">sever.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.security">server.security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare4cbgm">prepare4cbgm.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.mk_users">mk_users.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import">scripts.cceh.import</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare">scripts.cceh.prepare</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.cbgm">scripts.cceh.cbgm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.save_edits">scripts.cceh.save_edits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.load_edits">scripts.cceh.load_edits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.mk_users">scripts.cceh.mk_users</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="database.html">Database Structure</a><ul>
@@ -164,8 +174,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ntg_common.html">Various Functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools">db_tools — Various Functions for Database Access</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">tools — Various Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools">ntg_common.db_tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">ntg_common.tools</a></li>
 </ul>
 </li>
 </ul>
@@ -237,102 +247,252 @@
             
   <div class="section" id="scripts">
 <h1>Scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="prepare4cbgm-py">
-<h2>prepare4cbgm.py<a class="headerlink" href="#prepare4cbgm-py" title="Permalink to this headline">¶</a></h2>
-<p><p>Initialize a CBGM database.</p>
-<p>This script converts the databases used in the production of the ECM into a
-database suitable for doing CBGM. It</p>
+<div class="section" id="scripts-cceh-import-py">
+<span id="import-py"></span><h2>scripts/cceh/import.py<a class="headerlink" href="#scripts-cceh-import-py" title="Permalink to this headline">¶</a></h2>
+<p>Import databases from mysql.</p>
+<p>This script creates the postgres database and then imports the data from one or
+more mysql databases into it.</p>
+<p>The first mysql database contains the apparatus of the <em>Editio Critica Maior</em>
+publication.  Another database contains the editorial decisions (VarGen)
+regarding the priority of the readings.  The third database (Nestle) contains
+the “Leitzeile”.</p>
+<p>The mysql databases for Acts contain sets of 28 tables, one for each respective
+chapter of Acts.  This is a historical incident: The software used when the CBGM
+was first implemented could not handle big tables.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/import.py [-h] [-v] path/to/file.conf</span>
+</pre></div>
+</div>
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-import-py-arg-path">
+<code class="descname">path</code><code class="descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-import-py-arg-path" title="Permalink to this definition">¶</a></dt>
+<dd><p>a .conf file (required)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-import-py-h">
+<code class="descname">-h</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--help</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-import-py-h" title="Permalink to this definition">¶</a></dt>
+<dd><p>show this help message and exit</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-import-py-v">
+<code class="descname">-v</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--verbose</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-import-py-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>increase output verbosity</p>
+</dd></dl>
+
+</div>
+<div class="section" id="scripts-cceh-prepare-py">
+<span id="prepare-py"></span><h2>scripts/cceh/prepare.py<a class="headerlink" href="#scripts-cceh-prepare-py" title="Permalink to this headline">¶</a></h2>
+<p>Initialize a CBGM database.</p>
+<p>This script converts the databases structure used in the production of the <em>ECM</em>
+into a database structure suitable for doing CBGM. It</p>
 <ul class="simple">
-<li>copies the data from multiple mysql databases into a single postgres database,</li>
-<li>removes unwanted readings,</li>
-<li>builds a positive apparatus,</li>
+<li>normalizes the databases,</li>
+<li>removes manuscripts, passages and readings irrelevant to the CBGM,</li>
+<li>builds a positive apparatus from the negative apparatus,</li>
+<li>reconstructs the <a class="reference internal" href="domain.html#mt"><span class="std std-ref">Majority Text</span></a>.</li>
+</ul>
+<p>Database normalization is the usual process of restructuring your tables so they
+don’t contain redundant data.</p>
+<p>The database must then be purged from all readings that are relevant for the
+<em>ECM</em> and the <em>Nestle-Aland</em> only, but not for the CBGM, eg. all passages
+without variants (about 2/3 of the New Testament), all corrections except those
+by the first hand, and readings that are clearly orthographic errors or
+differing only by orthgographic convention.</p>
+<p>The script then <a class="reference internal" href="scripts_dev.html#transform-positive"><span class="std std-ref">transforms</span></a> the negative apparatus into a
+positive apparatus, that is, an apparatus that is defined for all manuscripts at
+all passages.</p>
+<p>Finally the script reconstructs the <a class="reference internal" href="domain.html#mt"><span class="std std-ref">Majority Text</span></a>.</p>
+<blockquote>
+<div><p>Ausgangspunkt ist der Apparat mit allen für die Druckfassung notwendigen
+Informationen.  Diese Datenbasis muss für die CBGM bearbeitet werden.  Die
+Ausgangsdaten stellen einen negativen Apparat dar, d.h. die griechischen
+handschriftlichen Zeugen, die mit dem rekonstruierten Ausgangstext
+übereinstimmen, werden nicht ausdrücklich aufgelistet.  Aufgelistet werden
+alle Zeugen, die von diesem Text abweichen bzw. Korrekturen oder
+Alternativlesarten haben.  Ziel ist es, einen positiven Apparat zu erhalten.
+Wir benötigen einen Datensatz pro griechischem handschriftlichen Zeugen
+erster Hand und variierten Stelle (einschließlich der Lücken).  D.h. für jede
+variierte Stelle liegt die explizite Information vor, ob die Handschrift dem
+Ausgangstext folgt, einen anderen Text oder gar keinen Text hat, weil
+z.B. die Seite beschädigt ist.  Korrekturen oder Alternativlesarten werden
+für die CBGM ignoriert.</p>
+<p class="attribution">&mdash;ArbeitsablaufCBGMApg_Db.docx</p>
+</div></blockquote>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/prepare.py [-h] [-v] [-r RANGE] path/to/file.conf</span>
+</pre></div>
+</div>
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-prepare-py-arg-path">
+<code class="descname">path</code><code class="descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-prepare-py-arg-path" title="Permalink to this definition">¶</a></dt>
+<dd><p>a .conf file (required)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-prepare-py-h">
+<code class="descname">-h</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--help</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-prepare-py-h" title="Permalink to this definition">¶</a></dt>
+<dd><p>show this help message and exit</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-prepare-py-v">
+<code class="descname">-v</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--verbose</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-prepare-py-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>increase output verbosity</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-prepare-py-r">
+<code class="descname">-r</code><code class="descclassname"> &lt;range&gt;</code><code class="descclassname">, </code><code class="descname">--range</code><code class="descclassname"> &lt;range&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-prepare-py-r" title="Permalink to this definition">¶</a></dt>
+<dd><p>range of steps (default: all)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="scripts-cceh-cbgm-py">
+<span id="cbgm-py"></span><h2>scripts/cceh/cbgm.py<a class="headerlink" href="#scripts-cceh-cbgm-py" title="Permalink to this headline">¶</a></h2>
+<p>Perform the CBGM.</p>
+<p>This script</p>
+<ul class="simple">
+<li>rebuilds the ‘A’ text from the local stemmas,</li>
 <li>calculates the pre-coherence similarity of manuscripts, and</li>
 <li>calculates the post-coherence ancestrality of manuscripts.</li>
 </ul>
-</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">prepare4cbgm</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="n">RANGE</span><span class="p">]</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">conf</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/cbgm.py [-h] [-v] path/to/file.conf</span>
 </pre></div>
 </div>
-<div class="section" id="Positional Arguments">
-<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group" colspan="2">
-<kbd>path/to/file.conf</kbd></td>
-</tr>
-<tr><td>&#160;</td><td>a .conf file (required)</td></tr>
-</tbody>
-</table>
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-cbgm-py-arg-path">
+<code class="descname">path</code><code class="descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-cbgm-py-arg-path" title="Permalink to this definition">¶</a></dt>
+<dd><p>a .conf file (required)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-cbgm-py-h">
+<code class="descname">-h</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--help</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-cbgm-py-h" title="Permalink to this definition">¶</a></dt>
+<dd><p>show this help message and exit</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-cbgm-py-v">
+<code class="descname">-v</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--verbose</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-cbgm-py-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>increase output verbosity</p>
+</dd></dl>
+
 </div>
-<div class="section" id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd>-v, --verbose</kbd></td>
-<td><p class="first">increase output verbosity</p>
-<p class="last">Default: 0</p>
-</td></tr>
-<tr><td class="option-group">
-<kbd>-r, --range</kbd></td>
-<td><p class="first">range of steps (default: all)</p>
-<p class="last">Default: “”</p>
-</td></tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="section" id="mk-users-py">
-<h2>mk_users.py<a class="headerlink" href="#mk-users-py" title="Permalink to this headline">¶</a></h2>
-<p>Initialize the user authentication database.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">mk_users</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">-</span><span class="n">e</span> <span class="n">EMAIL</span> <span class="p">[</span><span class="o">-</span><span class="n">u</span> <span class="n">USERNAME</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PASSWORD</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span>
-                <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">_global</span><span class="o">.</span><span class="n">conf</span>
+<div class="section" id="scripts-cceh-save-edits-py">
+<span id="save-edits-py"></span><h2>scripts/cceh/save_edits.py<a class="headerlink" href="#scripts-cceh-save-edits-py" title="Permalink to this headline">¶</a></h2>
+<p>Save the state of the editor tables.</p>
+<p>This script saves the tables containing the editorial decisions.  It does not
+save the apparatus tables.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/save_edits.py [-h] [-v] -o path/to/output.xml</span>
+<span class="go">                                  path/to/file.conf</span>
 </pre></div>
 </div>
-<div class="section" id="Positional Arguments">
-<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group" colspan="2">
-<kbd>path/to/_global.conf</kbd></td>
-</tr>
-<tr><td>&#160;</td><td>path to the _global.conf file (required)</td></tr>
-</tbody>
-</table>
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-save-edits-py-arg-path">
+<code class="descname">path</code><code class="descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-save-edits-py-arg-path" title="Permalink to this definition">¶</a></dt>
+<dd><p>a .conf file (required)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-save-edits-py-h">
+<code class="descname">-h</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--help</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-save-edits-py-h" title="Permalink to this definition">¶</a></dt>
+<dd><p>show this help message and exit</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-save-edits-py-v">
+<code class="descname">-v</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--verbose</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-save-edits-py-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>increase output verbosity</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-save-edits-py-o">
+<code class="descname">-o</code><code class="descclassname"> &lt;path/to/output.xml&gt;</code><code class="descclassname">, </code><code class="descname">--output</code><code class="descclassname"> &lt;path/to/output.xml&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-save-edits-py-o" title="Permalink to this definition">¶</a></dt>
+<dd><p>the output file (required)</p>
+</dd></dl>
+
 </div>
-<div class="section" id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
-<table class="docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd>-e, --email</kbd></td>
-<td>email</td></tr>
-<tr><td class="option-group">
-<kbd>-u, --username</kbd></td>
-<td><p class="first">username</p>
-<p class="last">Default: “”</p>
-</td></tr>
-<tr><td class="option-group">
-<kbd>-p, --password</kbd></td>
-<td><p class="first">password</p>
-<p class="last">Default: “”</p>
-</td></tr>
-<tr><td class="option-group">
-<kbd>-v, --verbose</kbd></td>
-<td><p class="first">increase output verbosity</p>
-<p class="last">Default: 0</p>
-</td></tr>
-</tbody>
-</table>
+<div class="section" id="scripts-cceh-load-edits-py">
+<span id="load-edits-py"></span><h2>scripts/cceh/load_edits.py<a class="headerlink" href="#scripts-cceh-load-edits-py" title="Permalink to this headline">¶</a></h2>
+<p>Load a saved state of the editor tables.</p>
+<p>This script loads the state of the tables with the editorial decisions as saved
+by the save_edits.py script.  It does not touch the apparatus tables.</p>
+<p>While loading, it checks for errors and discrepancies, eg. different passage
+addresses.  Passages in the apparatus that are not in the save state are reset
+to the default of: reading ‘a’ is original and every other reading is derived
+from ‘a’.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/load_edits.py [-h] [-v] -i path/to/input.xml</span>
+<span class="go">                                  path/to/file.conf</span>
+</pre></div>
 </div>
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-load-edits-py-arg-path">
+<code class="descname">path</code><code class="descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-load-edits-py-arg-path" title="Permalink to this definition">¶</a></dt>
+<dd><p>a .conf file (required)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-load-edits-py-h">
+<code class="descname">-h</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--help</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-load-edits-py-h" title="Permalink to this definition">¶</a></dt>
+<dd><p>show this help message and exit</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-load-edits-py-v">
+<code class="descname">-v</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--verbose</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-load-edits-py-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>increase output verbosity</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-load-edits-py-i">
+<code class="descname">-i</code><code class="descclassname"> &lt;path/to/input.xml&gt;</code><code class="descclassname">, </code><code class="descname">--input</code><code class="descclassname"> &lt;path/to/input.xml&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-load-edits-py-i" title="Permalink to this definition">¶</a></dt>
+<dd><p>the input file (required)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="scripts-cceh-mk-users-py">
+<span id="mk-users-py"></span><h2>scripts/cceh/mk_users.py<a class="headerlink" href="#scripts-cceh-mk-users-py" title="Permalink to this headline">¶</a></h2>
+<p>Initialize the database for user authentication and authorization.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/mk_users.py [-h] -e EMAIL [-u USERNAME] [-p PASSWORD] [-v]</span>
+<span class="go">                                path/to/_global.conf</span>
+</pre></div>
+</div>
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-mk-users-py-arg-path">
+<code class="descname">path</code><code class="descclassname">/to/_global.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-mk-users-py-arg-path" title="Permalink to this definition">¶</a></dt>
+<dd><p>path to the _global.conf file (required)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-mk-users-py-h">
+<code class="descname">-h</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--help</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-mk-users-py-h" title="Permalink to this definition">¶</a></dt>
+<dd><p>show this help message and exit</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-mk-users-py-e">
+<code class="descname">-e</code><code class="descclassname"> &lt;email&gt;</code><code class="descclassname">, </code><code class="descname">--email</code><code class="descclassname"> &lt;email&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-mk-users-py-e" title="Permalink to this definition">¶</a></dt>
+<dd><p>email</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-mk-users-py-u">
+<code class="descname">-u</code><code class="descclassname"> &lt;username&gt;</code><code class="descclassname">, </code><code class="descname">--username</code><code class="descclassname"> &lt;username&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-mk-users-py-u" title="Permalink to this definition">¶</a></dt>
+<dd><p>username</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-mk-users-py-p">
+<code class="descname">-p</code><code class="descclassname"> &lt;password&gt;</code><code class="descclassname">, </code><code class="descname">--password</code><code class="descclassname"> &lt;password&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-mk-users-py-p" title="Permalink to this definition">¶</a></dt>
+<dd><p>password</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-scripts-cceh-mk-users-py-v">
+<code class="descname">-v</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--verbose</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-mk-users-py-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>increase output verbosity</p>
+</dd></dl>
+
 </div>
 </div>
 

@@ -12,6 +12,7 @@ PYTHON      := /usr/bin/python3
 MYSQL       := mysql --defaults-file=~/.my.cnf.ntg
 BROWSER     := firefox
 JSDOC       := node client/node_modules/jsdoc/jsdoc.js -c jsdoc.conf.js
+RSYNCPY     := $(RSYNC) --exclude "**/__pycache__"  --exclude "*.pyc"
 
 PSQL_PORT   := 5432
 PSQL        := psql -p $(PSQL_PORT)
@@ -68,8 +69,8 @@ psql:
 #
 # CREATE USER ntg CREATEDB PASSWORD '<password>';
 # CREATE DATABASE ntg_user OWNER ntg;
-# CREATE DATABASE ntg_ph4 OWNER ntg;
-# \c ntg_ph4
+# CREATE DATABASE acts_ph4 OWNER ntg;
+# \c acts_ph4
 # CREATE EXTENSION mysql_fdw;
 # GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
 # \q
@@ -77,25 +78,29 @@ psql:
 import_acts:
 	-$(MYSQL) -e "DROP DATABASE ECM_ActsPh4"
 	$(MYSQL) -e "CREATE DATABASE ECM_ActsPh4"
-	cat ../dumps/ECM_ActsPh4.dump | $(MYSQL) -D ECM_ActsPh4
+	cat ../dumps/ECM_ActsPh4_Final_20170712.dump | $(MYSQL) -D ECM_ActsPh4
 	-$(MYSQL) -e "DROP DATABASE VarGenAtt_ActPh4"
 	$(MYSQL) -e "CREATE DATABASE VarGenAtt_ActPh4"
-	cat ../dumps/VarGenAtt_ActPh4.dump | $(MYSQL) -D VarGenAtt_ActPh4
+	cat ../dumps/VarGenAtt_ActPh3_20170712.dump | $(MYSQL) -D VarGenAtt_ActPh4
+	python3 -m scripts.cceh.import -vvv server/instance/acts_ph4.conf
 
 import_john:
 	-$(MYSQL) -e "DROP DATABASE DCPJohnWithFam"
 	$(MYSQL) -e "CREATE DATABASE DCPJohnWithFam"
-	cat ../dumps/DCPJohnWithFam-8.sql | $(MYSQL) -D DCPJohnWithFam
+	gunzip -c ../dumps/DCPJohnWithFam-8.sql | $(MYSQL) -D DCPJohnWithFam
+	python3 -m scripts.cceh.import -vvv server/instance/john_ph1.conf
 
 import_john_f1:
 	-$(MYSQL) -e "DROP DATABASE DCPJohnFamily1"
 	$(MYSQL) -e "CREATE DATABASE DCPJohnFamily1"
 	cat ../dumps/DCPJohnFamily1.sql | $(MYSQL) -D DCPJohnFamily1
+	python3 -m scripts.cceh.import -vvv server/instance/john_f1_ph1.conf
 
 import_mark:
 	-$(MYSQL) -e "DROP DATABASE ECM_Mark_Ph1"
 	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph1"
 	cat ../dumps/ECM_Mk_CBGM.dump | $(MYSQL) -D ECM_Mark_Ph1
+	python3 -m scripts.cceh.import -vvv server/instance/mark_ph1.conf
 
 import_nestle:
 	-$(MYSQL) -e "DROP DATABASE Nestle29"
@@ -103,17 +108,25 @@ import_nestle:
 	cat ../dumps/Nestle29.dump | $(MYSQL) -D Nestle29
 
 acts:
-	python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/acts_ph4.conf
+	python3 -m scripts.cceh.prepare -vvv server/instance/acts_ph4.conf
+	python3 -m scripts.cceh.cbgm    -vvv server/instance/acts_ph4.conf
 
 john:
-	python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/john_ph1.conf
+	python3 -m scripts.cceh.prepare -vvv server/instance/john_ph1.conf
+	python3 -m scripts.cceh.cbgm    -vvv server/instance/john_ph1.conf
 
 john_f1:
-	python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/john_f1_ph1.conf
+	python3 -m scripts.cceh.prepare -vvv server/instance/john_f1_ph1.conf
+	python3 -m scripts.cceh.cbgm    -vvv server/instance/john_f1_ph1.conf
 
 mark:
-	python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/mark_ph1.conf
+	python3 -m scripts.cceh.prepare -vvv server/instance/mark_ph1.conf
+	python3 -m scripts.cceh.cbgm    -vvv server/instance/mark_ph1.conf
 
+load_mark:
+	scp $(NTG_PRJ)/backups/* backups/
+	python3 -m scripts.cceh.load_edits -i backups/saved_edits_mark_ph1_`date -I`.xml -vvv server/instance/mark_ph1.conf
+	python3 -m scripts.cceh.cbgm    -vvv server/instance/mark_ph1.conf
 
 define UPLOAD_TEMPLATE =
 
@@ -126,6 +139,7 @@ upload_$(1)_from_work:
 	$(PGDUMP) --clean --if-exists $(1) | psql -h $(NTG_HOST) -U $(NTG_USER) $(1)
 
 # from home (slow connection, upload bzipped file and then ssh to host)
+#   bunzip2 -c acts_ph4.pg_dump.sql.bz2 | psql -d acts_ph4
 upload_$(1)_from_home:
 	-rm /tmp/$(1).pg_dump.sql.bz2
 	$(PGDUMP) --clean --if-exists $(1) | bzip2 > /tmp/$(1).pg_dump.sql.bz2
@@ -137,12 +151,15 @@ DBS := acts_ph4 john_ph1 john_f1_ph1 mark_ph1
 
 $(foreach db,$(DBS),$(eval $(call UPLOAD_TEMPLATE,$(db))))
 
-upload_server:
-	$(RSYNC) --exclude "**/__pycache__"  --exclude "*.pyc"  ntg_common $(NTG_PRJ)/
-	$(RSYNC) --exclude "**/instance/**"                     server     $(NTG_PRJ)/
-
 upload_client:
 	$(RSYNC) --exclude "api.conf.js" $(CLIENT)/build/* $(NTG_CLIENT)/
+
+upload_server:
+	$(RSYNCPY)                            ntg_common $(NTG_PRJ)/
+	$(RSYNCPY) --exclude "**/instance/**" server     $(NTG_PRJ)/
+
+upload_scripts:
+	$(RSYNC) --exclude "**/__pycache__"  --exclude "*.pyc"  scripts/cceh $(NTG_PRJ)/scripts/
 
 diff_affinity_acts:
 	scripts/cceh/sqldiff.sh acts_ph4 "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 94 order by ms_id1, ms_id2" | less
@@ -154,7 +171,7 @@ lint: pylint eslint csslint
 
 pylint:
 	cd server; make pylint; cd ..
-	-pylint $(PY_SOURCES)
+	-pylint3 $(PY_SOURCES)
 
 csslint:
 	cd client ; make csslint ; cd ..

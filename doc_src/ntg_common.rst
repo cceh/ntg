@@ -1,23 +1,22 @@
+.. module:: ntg_common
+   :synopsis: Various Functions
+
 ===================
  Various Functions
 ===================
 
-.. automodule:: ntg_common
-   :synopsis: Various Functions
-   :members:
 
-
-db_tools --- Various Functions for Database Access
-==================================================
+ntg_common.db_tools
+===================
 
 .. automodule:: ntg_common.db_tools
    :synopsis: Various Functions for Database Access
    :members:
 
 
-tools --- Various Functions
-===========================
+ntg_common.tools
+================
 
 .. automodule:: ntg_common.tools
-   :synopsis: Various Functions
+   :synopsis: Various Functions for General Use
    :members:

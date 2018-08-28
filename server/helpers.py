@@ -396,7 +396,7 @@ def nx_to_dot (G, width = 960.0, fontsize = 10.0, nodesep = 0.1):
 
     """
 
-    dot = dot_skeleton (width = width, fontsize = fontsize, nodesep = nodesep);
+    dot = dot_skeleton (width = width, fontsize = fontsize, nodesep = nodesep)
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
     for n, nodedata in sorted (G.nodes (data = True)):
@@ -423,7 +423,7 @@ def nx_to_dot_subgraphs (G, field, width = 960.0, fontsize = 10.0):
 
     """
 
-    dot = dot_skeleton (width = width, fontsize = fontsize, ranksep = 1.2);
+    dot = dot_skeleton (width = width, fontsize = fontsize, ranksep = 1.2)
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
     sorted_nodes = sorted (G, key = lambda n: (G.node[n][field], G.node[n]['hsnr']))

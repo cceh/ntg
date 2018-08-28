@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Application Client &mdash; NTG 0.1.1 documentation</title>
+  <title>Web Client &mdash; NTG 0.1.1 documentation</title>
   
 
   
@@ -39,7 +39,7 @@
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
         <link rel="up" title="Developer Manual" href="developer.html"/>
-        <link rel="next" title="Application Server" href="appserver.html"/>
+        <link rel="next" title="API Server" href="server_dev.html"/>
         <link rel="prev" title="Introduction to the Problem Domain (German)" href="domain.html"/> 
 
   
@@ -89,7 +89,9 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#web-application">Web Application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#database-setup">Database Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#applying-the-cbgm">Applying the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#updating-the-apparatus">Updating the Apparatus</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
@@ -104,8 +106,12 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#prepare4cbgm-py">prepare4cbgm.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#mk-users-py">mk_users.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-import-py">scripts/cceh/import.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-prepare-py">scripts/cceh/prepare.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-cbgm-py">scripts/cceh/cbgm.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-save-edits-py">scripts/cceh/save_edits.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-load-edits-py">scripts/cceh/load_edits.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-mk-users-py">scripts/cceh/mk_users.py</a></li>
 </ul>
 </li>
 </ul>
@@ -121,7 +127,7 @@
 <li class="toctree-l3"><a class="reference internal" href="domain.html#literatur">Literatur</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Application Client</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Web Client</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-main">The Main Module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-app">The Application Component</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-coherence">The Coherence Page Component</a></li>
@@ -145,16 +151,20 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-tools">Various Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html">Application Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.server">Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.editor">Editor Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.security">User Management Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.helpers">Helper Functions Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">sever.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.security">server.security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare4cbgm">prepare4cbgm.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.mk_users">mk_users.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import">scripts.cceh.import</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare">scripts.cceh.prepare</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.cbgm">scripts.cceh.cbgm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.save_edits">scripts.cceh.save_edits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.load_edits">scripts.cceh.load_edits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.mk_users">scripts.cceh.mk_users</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="database.html">Database Structure</a><ul>
@@ -164,8 +174,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ntg_common.html">Various Functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools">db_tools — Various Functions for Database Access</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">tools — Various Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools">ntg_common.db_tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">ntg_common.tools</a></li>
 </ul>
 </li>
 </ul>
@@ -216,13 +226,13 @@
         
           <li><a href="developer.html">Developer Manual</a> &raquo;</li>
         
-      <li>Application Client</li>
+      <li>Web Client</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/appclient.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/client_dev.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -235,11 +245,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="application-client">
-<h1>Application Client<a class="headerlink" href="#application-client" title="Permalink to this headline">¶</a></h1>
-<p>The Javascript client on the browser.  Written with Vue.js, D3.js and bootstrap.
-It uses internal roting of URLs.</p>
-<p>Most of the application is placed inside Vue.js components.</p>
+  <span class="target" id="module-client"></span><div class="section" id="web-client">
+<span id="id1"></span><h1>Web Client<a class="headerlink" href="#web-client" title="Permalink to this headline">¶</a></h1>
+<p>The web client runs on the user’s browser.</p>
+<p>The web client is written in Javascript with Vue.js, D3.js, and bootstrap.  It
+uses internal routing of URLs.  Most of the application is placed inside Vue.js
+components.</p>
 <p>You probably want to start looking at the <a class="reference internal" href="#coherence" title="coherence"><code class="xref js js-mod docutils literal notranslate"><span class="pre">coherence</span></code></a> or <a class="reference internal" href="#comparison" title="comparison"><code class="xref js js-mod docutils literal notranslate"><span class="pre">comparison</span></code></a>
 components.</p>
 <div class="section" id="module-main">
@@ -686,7 +697,7 @@ position of the menu manually.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="appserver.html" class="btn btn-neutral float-right" title="Application Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="server_dev.html" class="btn btn-neutral float-right" title="API Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="domain.html" class="btn btn-neutral" title="Introduction to the Problem Domain (German)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

@@ -5,8 +5,8 @@ Developer Manual
    :maxdepth: 2
 
    domain
-   appclient
-   appserver
+   client_dev
+   server_dev
    scripts_dev
    database
    ntg_common

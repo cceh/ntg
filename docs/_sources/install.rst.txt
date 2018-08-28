@@ -206,8 +206,8 @@ Application server
 CBGM
 ====
 
-1. Get database dumps from Münster (exercise left to the reader) and import
-   them:
+1. Get the mysql database dumps from Münster (exercise left to the reader) and
+   import them into mysql:
 
    .. code-block:: shell
 
@@ -215,11 +215,34 @@ CBGM
       mysql -D "VarGenAtt_ActPh4" < VarGenAtt_ActPh4.dump
       mysql -D "Nestle29"         < Nestle29.dump
 
-2. Now run the CBGM process. This will fill the Postgres database.
+2. Import the databases into postgres:
 
    .. code-block:: shell
 
-      python3 -m scripts.cceh.prepare4cbgm -vvv server/instance/acts_ph4.conf
+      python3 -m scripts.cceh.import -vvv server/instance/acts_ph4.conf
+
+3. Run the CBGM process once.
+
+   .. code-block:: shell
+
+      python3 -m scripts.cceh.cbgm -vvv server/instance/acts_ph4.conf
+
+4. Setup cron to run the CBGM nightly:
+
+   Edit your user crontab
+
+   .. code-block:: shell
+
+      crontab -e
+
+   and put these lines into it:
+
+   .. code-block:: shell
+
+      MAILTO=user@example.com
+
+      13 02 * * * cd /home/ntg/prj/ntg/ntg && scripts/cceh/update_cbgm
+
 
 
 Run Server

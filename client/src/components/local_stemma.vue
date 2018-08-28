@@ -182,8 +182,12 @@ function trow (data) {
  */
 
 function open_contextmenu (event, vm) {
-    const passage = vm.passage;
+    const $target = $ (event.target);
+    if ($target.closest ('.node.draggable').length === 0) {
+        return;
+    }
 
+    const passage = vm.passage;
     const dataset = event.target.dataset;
     const data = {
         'labez_old'  : dataset.labez,
@@ -252,7 +256,7 @@ function open_contextmenu (event, vm) {
 
             let xhr2 = vm.post ('stemma-edit/' + passage.pass_id, tr.dataset);
             xhr2.then (() => {
-                vm.load_passage ();
+                $ (window).trigger ('hashchange');
             });
             xhr2.catch ((reason) => {
                 tools.xhr_alert (reason, event.data.$wrapper);

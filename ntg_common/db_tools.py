@@ -3,8 +3,10 @@
 """ This module contains functions for database access. """
 
 import collections
+import csv
 import configparser
 import datetime
+import io
 import logging
 import os
 import os.path
@@ -12,7 +14,7 @@ import os.path
 import networkx as nx
 import sqlalchemy
 import sqlalchemy_utils
-from sqlalchemy.sql import table, text
+from sqlalchemy.sql import text
 
 from .tools import log
 from .config import args
@@ -102,6 +104,15 @@ def fix (conn, msg, check_sql, fix_sql, parameters):
                 log (logging.ERROR, msg + '\n' + tabulate (result))
 
 
+def to_csv (fields, rows):
+    fp = io.StringIO ()
+    writer = csv.DictWriter (fp, fields, restval='', extrasaction='raise', dialect='excel')
+    writer.writeheader ()
+    for r in rows:
+        writer.writerow (r._asdict ())
+    return fp.getvalue ()
+
+
 def tabulate (res):
     """ Format and output a rowset
 
@@ -154,6 +165,91 @@ def tabulate (res):
     a.append ('%d rows\n' % len (rows))
 
     return ''.join (a)
+
+
+def truncate_editor_tables (conn):
+    res = execute (conn, """
+    TRUNCATE cliques_tts, ms_cliques_tts, locstem_tts, notes_tts RESTART IDENTITY;
+    TRUNCATE cliques, ms_cliques, locstem, notes RESTART IDENTITY;
+    """, {})
+
+
+def init_default_cliques (conn):
+    """Generate a default cliques table.
+
+    In a default cliques table there is a default clique '1' for every reading
+    in the readings table.
+
+    """
+
+    execute (conn, """
+    ALTER TABLE cliques DISABLE TRIGGER cliques_trigger;
+    INSERT INTO cliques (pass_id, labez, clique, user_id_start)
+    SELECT pass_id, labez, '1', 0
+    FROM readings r;
+    ALTER TABLE cliques ENABLE TRIGGER cliques_trigger;
+    """, {})
+
+
+def init_default_ms_cliques (conn):
+    """Generate a default ms_cliques table.
+
+    In a default ms_cliques table there is a default clique '1' for every reading
+    in the apparatus table.
+
+    """
+
+    execute (conn, """
+    ALTER TABLE ms_cliques DISABLE TRIGGER ms_cliques_trigger;
+    INSERT INTO ms_cliques (ms_id, pass_id, labez, clique, user_id_start)
+    SELECT a.ms_id, a.pass_id, a.labez, '1', 0
+    FROM apparatus a;
+    ALTER TABLE ms_cliques ENABLE TRIGGER ms_cliques_trigger;
+    """, {})
+
+
+def init_default_locstem (conn):
+    """Generate a default locstem table.
+
+    In a default LocStemEd, labez 'a' is the original reading and every other
+    reading depends on labez 'a', except in a Fehlvers, where 'b' is of unknown
+    origin and every other reading depends on 'b'.
+
+    """
+
+    execute (conn, """
+    ALTER TABLE locstem DISABLE TRIGGER locstem_trigger;
+    """, {})
+
+    # insert 'a' as original reading (or 'b' as unknown if Fehlvers)
+    execute (conn, """
+    INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original, user_id_start)
+    SELECT pass_id, 'a', '1', NULL, NULL, true, 0
+    FROM passages p
+    WHERE NOT fehlvers;
+    INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original, user_id_start)
+    SELECT pass_id, 'b', '1', NULL, NULL, false, 0
+    FROM passages p
+    WHERE fehlvers;
+    """, {})
+
+    # make other readings dependent on 'a' (or 'b' in Fehlvers)
+    execute (conn, """
+    INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original, user_id_start)
+    SELECT c.pass_id, c.labez, c.clique, 'a', '1', false, 0
+    FROM cliques_view c
+      JOIN passages p USING (pass_id)
+    WHERE NOT p.fehlvers AND c.labez != 'a' AND c.labez !~ '^z[u-z]';
+    INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original, user_id_start)
+    SELECT c.pass_id, c.labez, c.clique, 'b', '1', false, 0
+    FROM cliques_view c
+      JOIN passages p USING (pass_id)
+    WHERE p.fehlvers AND c.labez != 'b' AND c.labez !~ '^z[u-z]'
+    """, {})
+
+    execute (conn, """
+    ALTER TABLE locstem ENABLE TRIGGER locstem_trigger;
+    """, {})
 
 
 class MySQLEngine (object):
@@ -225,6 +321,11 @@ class PostgreSQLEngine (object):
 
     @staticmethod
     def receive_checkout (dbapi_connection, connection_record, connection_proxy):
+        """Set a default for the postgres variable ntg.user_id that is used by
+        :ref:`tts` tables.
+
+        """
+
         # just give a default value so postgres won't choke.  the actual user is
         # set in editor.py
         dbapi_connection.cursor ().execute ("SET ntg.user_id = 0")
@@ -234,20 +335,17 @@ class PostgreSQLEngine (object):
 
         args = self.get_connection_params (kwargs)
 
-        self.url = 'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'.format (**args)
+        self.url = 'postgresql+psycopg2://{user}@{host}:{port}/{database}?sslmode=disable&server_side_cursors'.format (**args)
 
-        if not sqlalchemy_utils.functions.database_exists (self.url):
-            log (logging.INFO, "PostgreSQLEngine: Creating database '{database}'".format (**args))
-            sqlalchemy_utils.functions.create_database (self.url)
+        log (logging.INFO, "PostgreSQLEngine: Connecting to URL: {url}".format (url = self.url))
 
-        log (logging.INFO, "PostgreSQLEngine: Connecting to postgres database '{database}' as user '{user}'".format (**args))
-
-        self.engine = sqlalchemy.create_engine (self.url + '?sslmode=disable&server_side_cursors')
+        self.engine = sqlalchemy.create_engine (
+            self.url,
+            use_batch_mode = True
+        )
 
         self.params = args
 
-        # N.B. Do not do anything on checkin because that would begin a transaction,
-        # which in turn does not work well with now ().
         sqlalchemy.event.listen (self.engine, 'checkout', self.receive_checkout)
 
 
@@ -255,8 +353,20 @@ class PostgreSQLEngine (object):
         return self.engine.connect ()
 
 
-    def get_connection_params (self, args = None):
-        """ Get connection parameters from environment. """
+    def get_connection_params (self, args = {}):
+        """Get sqlalchemy connection parameters.
+
+        Try to get the connection parameters in turn from these sources:
+
+        1. get host, port, database, user from args
+        2. get PGHOST, PGPORT, PGDATABASE, PGUSER from args
+        3. get PGHOST, PGPORT, PGDATABASE, PGUSER from environment
+        4. use defaults
+
+        N.B. The postgres client library automatically reads the password from
+        the file :file:`~/.pgpass`.  It should be configured there.
+
+        """
 
         defaults = {
             'host'     : 'localhost',
@@ -264,40 +374,31 @@ class PostgreSQLEngine (object):
             'database' : 'ntg',
             'user'     : 'ntg',
         }
-
-        if args is None:
-            args = {}
-
-        params = ('host', 'port', 'database', 'user') # order must match ~/.pgpass
         res = {}
 
-        for p in params:
+        for p in defaults.keys ():
             pu = 'PG' + p.upper ()
             res[p] = args.get (p) or args.get (pu) or os.environ.get (pu) or defaults[p]
 
-        # scan ~/.pgpass for password
-        pgpass = os.path.expanduser ('~/.pgpass')
-        try:
-            with open (pgpass, 'r') as f:
-                for line in f.readlines ():
-                    line = line.strip ()
-                    if line == '' or line.startswith ('#'):
-                        continue
-                    # format: hostname:port:database:username:password
-                    fields = line.split (':')
-                    if all ([field == '*' or field == res[param]
-                             for field, param in zip (fields, params)]):
-                        res['password'] = fields[4]
-                        break
-
-        except IOError:
-            print ('Error: could not open %s for reading' % pgpass)
-
         return res
 
+    def vacuum (self):
+        """Vacuum the database."""
 
-def local_stemma_to_nx (conn, pass_id, show_empty_roots = False):
-    """ Load a passage from the database into an nx Graph. """
+        # turn off auto-transaction because vacuum won't work in a transaction
+        connection = self.engine.raw_connection ()
+        connection.set_isolation_level (0)
+        connection.cursor ().execute ("VACUUM FULL ANALYZE")
+        log (logging.INFO, ''.join (connection.notices))
+
+
+def local_stemma_to_nx (conn, pass_id, add_isolated_roots = False):
+    """Load a passage from the database into an nx Graph.
+
+    :param bool add_isolated_roots: Add an '*' or '?' node even if they are
+                                    isolated.  Needed in edit mode.
+
+    """
 
     res = execute (conn, """
     SELECT labez,
@@ -319,11 +420,12 @@ def local_stemma_to_nx (conn, pass_id, show_empty_roots = False):
 
     G = nx.DiGraph ()
 
+    more_params = dict ()
+    if add_isolated_roots:
+        more_params['draggable'] = '1';
+        more_params['droptarget'] = '1';
+
     for row in rows:
-        more_params = dict ()
-        if show_empty_roots:
-            more_params['draggable'] = '1';
-            more_params['droptarget'] = '1';
         G.add_node (row.labez_clique, label = row.labez_clique,
                     labez = row.labez, clique = row.clique, labez_clique = row.labez_clique,
                     **more_params)
@@ -337,7 +439,7 @@ def local_stemma_to_nx (conn, pass_id, show_empty_roots = False):
             G.add_edge (row.source_labez_clique, row.labez_clique)
 
     more_params = dict ()
-    if show_empty_roots:
+    if add_isolated_roots:
         # Add '*' and '?' nodes
         G.add_node ('*')
         G.add_node ('?')

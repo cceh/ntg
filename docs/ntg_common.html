@@ -88,7 +88,9 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#web-application">Web Application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#database-setup">Database Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#applying-the-cbgm">Applying the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#updating-the-apparatus">Updating the Apparatus</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
@@ -103,8 +105,12 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#prepare4cbgm-py">prepare4cbgm.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#mk-users-py">mk_users.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-import-py">scripts/cceh/import.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-prepare-py">scripts/cceh/prepare.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-cbgm-py">scripts/cceh/cbgm.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-save-edits-py">scripts/cceh/save_edits.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-load-edits-py">scripts/cceh/load_edits.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-mk-users-py">scripts/cceh/mk_users.py</a></li>
 </ul>
 </li>
 </ul>
@@ -120,40 +126,44 @@
 <li class="toctree-l3"><a class="reference internal" href="domain.html#literatur">Literatur</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html">Application Client</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-main">The Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-app">The Application Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-coherence">The Coherence Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison">The Comparison Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-page_header">The Page Header Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-navigator">The Navigator Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-apparatus">The Apparatus Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-local_stemma">The Local Stemma Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#the-notes-component">The Notes Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-relatives">The Relatives Popup Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison_table">The Comparison Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-card">The Card Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-card_caption">The Card Caption Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-toolbar">The Toolbar Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_common">Various functions for D3</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-tools">Various Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-main">The Main Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-app">The Application Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-coherence">The Coherence Page Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison">The Comparison Page Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-page_header">The Page Header Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-navigator">The Navigator Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-apparatus">The Apparatus Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-local_stemma">The Local Stemma Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#the-notes-component">The Notes Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives">The Relatives Popup Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_table">The Comparison Table Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card">The Card Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card_caption">The Card Caption Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-toolbar">The Toolbar Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_common">Various functions for D3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-tools">Various Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html">Application Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.server">Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.editor">Editor Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.security">User Management Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.helpers">Helper Functions Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">sever.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.security">server.security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare4cbgm">prepare4cbgm.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.mk_users">mk_users.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import">scripts.cceh.import</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare">scripts.cceh.prepare</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.cbgm">scripts.cceh.cbgm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.save_edits">scripts.cceh.save_edits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.load_edits">scripts.cceh.load_edits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.mk_users">scripts.cceh.mk_users</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="database.html">Database Structure</a><ul>
@@ -163,8 +173,8 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Various Functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-ntg_common.db_tools">db_tools — Various Functions for Database Access</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-ntg_common.tools">tools — Various Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ntg_common.db_tools">ntg_common.db_tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ntg_common.tools">ntg_common.tools</a></li>
 </ul>
 </li>
 </ul>
@@ -234,12 +244,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-ntg_common">
-<span id="various-functions"></span><h1>Various Functions<a class="headerlink" href="#module-ntg_common" title="Permalink to this headline">¶</a></h1>
-<p>This package contains classes and functions common to the application server
-and the database conversion routines.</p>
+  <span class="target" id="module-ntg_common"></span><div class="section" id="various-functions">
+<h1>Various Functions<a class="headerlink" href="#various-functions" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-ntg_common.db_tools">
-<span id="db-tools-various-functions-for-database-access"></span><h2>db_tools — Various Functions for Database Access<a class="headerlink" href="#module-ntg_common.db_tools" title="Permalink to this headline">¶</a></h2>
+<span id="ntg-common-db-tools"></span><h2>ntg_common.db_tools<a class="headerlink" href="#module-ntg_common.db_tools" title="Permalink to this headline">¶</a></h2>
 <p>This module contains functions for database access.</p>
 <dl class="class">
 <dt id="ntg_common.db_tools.MySQLEngine">
@@ -253,8 +261,30 @@ and the database conversion routines.</p>
 <dd><p>PostgreSQL Database Interface</p>
 <dl class="method">
 <dt id="ntg_common.db_tools.PostgreSQLEngine.get_connection_params">
-<code class="descname">get_connection_params</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.get_connection_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get connection parameters from environment.</p>
+<code class="descname">get_connection_params</code><span class="sig-paren">(</span><em>args={}</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.get_connection_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get sqlalchemy connection parameters.</p>
+<p>Try to get the connection parameters in turn from these sources:</p>
+<ol class="arabic simple">
+<li>get host, port, database, user from args</li>
+<li>get PGHOST, PGPORT, PGDATABASE, PGUSER from args</li>
+<li>get PGHOST, PGPORT, PGDATABASE, PGUSER from environment</li>
+<li>use defaults</li>
+</ol>
+<p>N.B. The postgres client library automatically reads the password from
+the file <code class="file docutils literal notranslate"><span class="pre">~/.pgpass</span></code>.  It should be configured there.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="ntg_common.db_tools.PostgreSQLEngine.receive_checkout">
+<em class="property">static </em><code class="descname">receive_checkout</code><span class="sig-paren">(</span><em>dbapi_connection</em>, <em>connection_record</em>, <em>connection_proxy</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.receive_checkout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a default for the postgres variable ntg.user_id that is used by
+<a class="reference internal" href="database.html#tts"><span class="std std-ref">Transaction-Time State Tables</span></a> tables.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ntg_common.db_tools.PostgreSQLEngine.vacuum">
+<code class="descname">vacuum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.vacuum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vacuum the database.</p>
 </dd></dl>
 
 </dd></dl>
@@ -284,9 +314,43 @@ reports an error if the error condition still exists.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="ntg_common.db_tools.init_default_cliques">
+<code class="descname">init_default_cliques</code><span class="sig-paren">(</span><em>conn</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_cliques" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a default cliques table.</p>
+<p>In a default cliques table there is a default clique ‘1’ for every reading
+in the readings table.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ntg_common.db_tools.init_default_locstem">
+<code class="descname">init_default_locstem</code><span class="sig-paren">(</span><em>conn</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_locstem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a default locstem table.</p>
+<p>In a default LocStemEd, labez ‘a’ is the original reading and every other
+reading depends on labez ‘a’, except in a Fehlvers, where ‘b’ is of unknown
+origin and every other reading depends on ‘b’.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ntg_common.db_tools.init_default_ms_cliques">
+<code class="descname">init_default_ms_cliques</code><span class="sig-paren">(</span><em>conn</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_ms_cliques" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a default ms_cliques table.</p>
+<p>In a default ms_cliques table there is a default clique ‘1’ for every reading
+in the apparatus table.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="ntg_common.db_tools.local_stemma_to_nx">
-<code class="descname">local_stemma_to_nx</code><span class="sig-paren">(</span><em>conn</em>, <em>pass_id</em>, <em>show_empty_roots=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.local_stemma_to_nx" title="Permalink to this definition">¶</a></dt>
+<code class="descname">local_stemma_to_nx</code><span class="sig-paren">(</span><em>conn</em>, <em>pass_id</em>, <em>add_isolated_roots=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.local_stemma_to_nx" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a passage from the database into an nx Graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>add_isolated_roots</strong> (<em>bool</em>) – Add an ‘*’ or ‘?’ node even if they are
+isolated.  Needed in edit mode.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -299,7 +363,7 @@ utility.</p>
 
 </div>
 <div class="section" id="module-ntg_common.tools">
-<span id="tools-various-functions"></span><h2>tools — Various Functions<a class="headerlink" href="#module-ntg_common.tools" title="Permalink to this headline">¶</a></h2>
+<span id="ntg-common-tools"></span><h2>ntg_common.tools<a class="headerlink" href="#module-ntg_common.tools" title="Permalink to this headline">¶</a></h2>
 <p>This module contains some useful functions.</p>
 <dl class="data">
 <dt id="ntg_common.tools.BOOKS">
@@ -321,14 +385,6 @@ to our rules.</p>
 <dd><p>Verses added in later times.</p>
 <p>These verses were added to the NT in later times. Because they are not original
 they are not included in the text of manuscript ‘A’.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="ntg_common.tools.config_from_pyfile">
-<code class="descname">config_from_pyfile</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.config_from_pyfile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mimic Flask config files.</p>
-<p>Emulate the Flask config file parser so we can use the same config files for both,
-the server and this script.</p>
 </dd></dl>
 
 <dl class="function">

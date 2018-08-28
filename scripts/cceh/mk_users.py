@@ -1,29 +1,21 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-"""Initialize the database for user authentication and authorization.
-
-"""
+"""Initialize the database for user authentication and authorization."""
 
 import argparse
-import datetime
 import logging
-import os
-import sys
 
-import sqlalchemy
 from passlib.context import CryptContext
 
-sys.path.append (os.path.dirname (os.path.abspath (__file__)) + "/../..")
-
 from ntg_common import db
-from ntg_common import tools
 from ntg_common.db_tools import execute
 from ntg_common.tools import log
-from ntg_common.config import args
+from ntg_common.config import init_cmdline
+
 
 def build_parser ():
-    parser = argparse.ArgumentParser (description='Initialize the user authentication database.')
+    parser = argparse.ArgumentParser (description = __doc__)
 
     parser.add_argument ('profile', metavar='path/to/_global.conf',
                          help="path to the _global.conf file (required)")
@@ -39,25 +31,7 @@ def build_parser ():
 
 if __name__ == '__main__':
 
-    parser = build_parser ()
-    parser.parse_args (namespace = args)
-
-    config = tools.config_from_pyfile (args.profile)
-
-    args.start_time = datetime.datetime.now ()
-    LOG_LEVELS = { 0: logging.CRITICAL, 1: logging.ERROR, 2: logging.WARN, 3: logging.INFO, 4: logging.DEBUG }
-    args.log_level = LOG_LEVELS.get (args.verbose, logging.CRITICAL)
-
-    logging.getLogger ().setLevel (args.log_level)
-    formatter = logging.Formatter (fmt = '%(relativeCreated)d - %(levelname)s - %(message)s')
-
-    stderr_handler = logging.StreamHandler ()
-    stderr_handler.setFormatter (formatter)
-    logging.getLogger ().addHandler (stderr_handler)
-
-    file_handler = logging.FileHandler ('mk_users.log')
-    file_handler.setFormatter (formatter)
-    logging.getLogger ().addHandler (file_handler)
+    args, config = init_cmdline (build_parser ())
 
     dba = db.PostgreSQLEngine (**config)
 
@@ -72,12 +46,12 @@ if __name__ == '__main__':
 
         if args.email:
             params = {
-                         "username"     : args.username,
-                         "email"        : args.email,
-                         "password"     : pwd_context.hash (args.password) if args.password else '',
-                         "active"       : True,
-                         "confirmed_at" : datetime.datetime.now ()
-                     }
+                "username"     : args.username,
+                "email"        : args.email,
+                "password"     : pwd_context.hash (args.password) if args.password else '',
+                "active"       : True,
+                "confirmed_at" : datetime.datetime.now ()
+            }
 
             execute (src,
                      "INSERT INTO \"user\" (id, username, email, password, active, confirmed_at) " +

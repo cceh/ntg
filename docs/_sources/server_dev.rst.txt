@@ -1,40 +1,38 @@
-.. _server1:
+.. module:: server
+   :synopsis: API Server
 
-====================
- Application Server
-====================
+============
+ API Server
+============
 
-.. automodule:: server
-   :synopsis: Application Server
-   :members:
+The API server is written in Python using the Flask framework.
 
-
-Main Module
------------
+sever.server
+============
 
 .. automodule:: server.server
    :synopsis: Main Module
    :members:
 
 
-Editor Module
--------------
+server.editor
+=============
 
 .. automodule:: server.editor
    :synopsis: Editor Module
    :members:
 
 
-User Management Module
-----------------------
+server.security
+===============
 
 .. automodule:: server.security
    :synopsis: User Management Module
    :members:
 
 
-Helper Functions Module
------------------------
+server.helpers
+==============
 
 .. automodule:: server.helpers
    :synopsis: Helper Functions Module

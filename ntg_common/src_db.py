@@ -6,10 +6,7 @@ classes in the code.
 
 """
 
-import sqlalchemy
-
-from sqlalchemy import String, Integer, Float, Boolean, DateTime, Column, Index, ForeignKey, text
-from sqlalchemy import UniqueConstraint, CheckConstraint, ForeignKeyConstraint, PrimaryKeyConstraint
+from sqlalchemy import String, Integer, Column, text, PrimaryKeyConstraint
 
 from sqlalchemy.ext.declarative import declarative_base
 

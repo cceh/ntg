@@ -12,7 +12,7 @@
         </h3>
         <ul class="list-group-item-text attesting-mss list-inline">
           <li v-for="item in group.items" :key="item.ms_id">
-            <a :data-ms-id="item.ms_id" class="ms">{{ item.hs }}{{ (item.certainty === 1.0) ? '' : '?' }}.</a>
+            <a :data-ms-id="item.ms_id" class="ms">{{ item.hs }}{{ (item.labezsuf !== '') ? '_' + item.labezsuf : ''}}{{ (item.certainty === 1.0) ? '' : '?' }}.</a>
             <span> </span>
           </li>
         </ul>

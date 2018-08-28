@@ -89,7 +89,7 @@ def stemma_edit (passage_or_id):
 
     action = args.get ('action')
 
-    if (action not in ('split', 'merge', 'move', 'move-manuscripts')):
+    if action not in ('split', 'merge', 'move', 'move-manuscripts'):
         raise EditError ('Bad request')
 
     params = { 'original_new' : args.get ('labez_new') == '*' }
@@ -138,7 +138,7 @@ def stemma_edit (passage_or_id):
                 raise EditError ('The graph is not a DAG anymore.')
             # test: not connected
             G.add_edge ('*', '?')
-            if not (nx.is_weakly_connected (G)):
+            if not nx.is_weakly_connected (G):
                 raise EditError ('The graph is not connected anymore.')
             # test: x derived from x
             for e in G.edges:
@@ -227,21 +227,24 @@ def notes (passage_or_id):
 
         if request.method == 'PUT':
             res = execute (conn, """
-            UPDATE passages
-            SET remarks = :remarks
-            WHERE pass_id = :pass_id
+            INSERT INTO notes AS n (pass_id, note)
+            VALUES (:pass_id, :note)
+            ON CONFLICT (pass_id) DO
+            UPDATE
+            SET note = :note
+            WHERE n.pass_id = EXCLUDED.pass_id
             """, dict (parameters,
                        pass_id = passage.pass_id,
-                       remarks = request.get_json ()['remarks']))
+                       note = request.get_json ()['remarks']))
 
             return make_json_response (message = 'Notes saved.')
         else:
             res = execute (conn, """
-            SELECT remarks
-            FROM passages
+            SELECT note
+            FROM notes
             WHERE pass_id = :pass_id
             """, dict (parameters, pass_id = passage.pass_id))
 
             if res.rowcount > 0:
-                return make_text_response (res.fetchone ()[0] or '')
+                return make_text_response (res.fetchone ()[0])
             return make_text_response ('')

@@ -31,21 +31,19 @@ sys.path.insert (0, os.path.abspath ('.'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinxarg.ext',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.graphviz',
     'sphinx.ext.mathjax',
     'sphinx.ext.imgconverter',
-    'sphinx_js',
+    'sphinxcontrib.autoprogram',
     'sphinxcontrib.plantuml',
+    'sphinx_js',
+    #'sphinxjs.sphinx_js',
     'sauml.sauml',
 ]
 
 js_source_path    = ['client/src/js/', 'client/src/components/']
-#js_source_path    = ['client/src/components/']
-#js_source_path    = ['client/src/js/']
-#root_for_relative_js_paths = 'client/src/js/'
 root_for_relative_js_paths = 'client/src/'
 jsdoc_config_path = 'jsdoc.conf.js'
 
@@ -100,7 +98,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
-#default_role = None
+default_role = 'any'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 #add_function_parentheses = True

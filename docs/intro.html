@@ -88,7 +88,9 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#web-application">Web Application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#database-setup">Database Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#applying-the-cbgm">Applying the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#updating-the-apparatus">Updating the Apparatus</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#links">Links</a></li>
 </ul>
 </li>
@@ -103,8 +105,12 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#prepare4cbgm-py">prepare4cbgm.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#mk-users-py">mk_users.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-import-py">scripts/cceh/import.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-prepare-py">scripts/cceh/prepare.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-cbgm-py">scripts/cceh/cbgm.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-save-edits-py">scripts/cceh/save_edits.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-load-edits-py">scripts/cceh/load_edits.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-mk-users-py">scripts/cceh/mk_users.py</a></li>
 </ul>
 </li>
 </ul>
@@ -120,40 +126,44 @@
 <li class="toctree-l3"><a class="reference internal" href="domain.html#literatur">Literatur</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html">Application Client</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-main">The Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-app">The Application Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-coherence">The Coherence Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison">The Comparison Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-page_header">The Page Header Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-navigator">The Navigator Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-apparatus">The Apparatus Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-local_stemma">The Local Stemma Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#the-notes-component">The Notes Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-relatives">The Relatives Popup Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison_table">The Comparison Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-card">The Card Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-card_caption">The Card Caption Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-toolbar">The Toolbar Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_common">Various functions for D3</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-tools">Various Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-main">The Main Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-app">The Application Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-coherence">The Coherence Page Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison">The Comparison Page Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-page_header">The Page Header Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-navigator">The Navigator Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-apparatus">The Apparatus Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-local_stemma">The Local Stemma Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#the-notes-component">The Notes Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives">The Relatives Popup Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_table">The Comparison Table Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card">The Card Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card_caption">The Card Caption Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-toolbar">The Toolbar Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_common">Various functions for D3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-tools">Various Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html">Application Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.server">Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.editor">Editor Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.security">User Management Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.helpers">Helper Functions Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">sever.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.security">server.security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare4cbgm">prepare4cbgm.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.mk_users">mk_users.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import">scripts.cceh.import</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare">scripts.cceh.prepare</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.cbgm">scripts.cceh.cbgm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.save_edits">scripts.cceh.save_edits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.load_edits">scripts.cceh.load_edits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.mk_users">scripts.cceh.mk_users</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="database.html">Database Structure</a><ul>
@@ -163,8 +173,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ntg_common.html">Various Functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools">db_tools — Various Functions for Database Access</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">tools — Various Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools">ntg_common.db_tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">ntg_common.tools</a></li>
 </ul>
 </li>
 </ul>
@@ -396,13 +406,13 @@ manuscripts as the parent manuscript.</p>
 <p>The program suite consists of:</p>
 <ol class="arabic simple">
 <li>a web application, and</li>
-<li>a set of scripts for setting up the CBGM database.</li>
+<li>a set of scripts to manipulate the CBGM database.</li>
 </ol>
 <div class="section" id="web-application">
 <h2>Web Application<a class="headerlink" href="#web-application" title="Permalink to this headline">¶</a></h2>
-<p>The web application consists of a client and an API server. The client runs in
-the user’s browser.  The API server runs on a CCeH server and can manage
-multiple databases.</p>
+<p>The web application consists of a <a class="reference internal" href="client_dev.html#module-client" title="client: Web Client"><code class="xref py py-mod docutils literal notranslate"><span class="pre">web</span> <span class="pre">client</span></code></a> and an <a class="reference internal" href="server_dev.html#module-server" title="server: API Server"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span>
+<span class="pre">server</span></code></a>. The client runs in the user’s browser.  The API server runs on
+a dedicated web server.  It can manage multiple databases.</p>
 <div class="figure align-center" id="id2">
 <p class="plantuml">
 <img src="_images/plantuml-01237eb012b2c8173db215c2581ef249c4e9bec7.png" alt="skinparam backgroundColor transparent
@@ -420,12 +430,9 @@ api &lt;--&gt; db3"/>
 </p>
 <p class="caption"><span class="caption-text">Web Application</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
-<p>The client is written in Javascript using the Vue.js and D3.js libraries.  The
-API server is written in Python using the Flask framework.  The database is a
-PostgreSQL database.</p>
 </div>
-<div class="section" id="database-setup">
-<h2>Database Setup<a class="headerlink" href="#database-setup" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="preparing-the-database-for-the-cbgm">
+<h2>Preparing the Database for the CBGM<a class="headerlink" href="#preparing-the-database-for-the-cbgm" title="Permalink to this headline">¶</a></h2>
 <p>Currently we host the CBGM for three books, namely Acts, John and Mark, by
 different editorial teams and in different stages of completion.  Each book gets
 its own database.</p>
@@ -433,28 +440,64 @@ its own database.</p>
 Critica Maior</em> publication.  Supplemental data comes from a database of
 editorial decisions (VarGen) regarding the priority of the readings.  The Nestle
 database contains the “Leitzeile”.</p>
-<p>The preparation step transforms the many input databases into one database
-suitable for the API server.</p>
+<p>The <a class="reference internal" href="scripts_user.html#import-py"><span class="std std-ref">scripts/cceh/import.py</span></a> script imports the mysql databases into the postgres database
+and the <a class="reference internal" href="scripts_user.html#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> script transforms the structure of the database into one
+suitable for doing the CBGM.</p>
+<p>This process needs to be done only once.</p>
 <div class="figure align-center" id="id3">
 <p class="plantuml">
-<img src="_images/plantuml-47e0ba1acfa09547b4d519564940ec26f9804695.png" alt="skinparam backgroundColor transparent
+<img src="_images/plantuml-c89d2b0a3a3db24c84927d45a2a4fbee99ec50d2.png" alt="skinparam backgroundColor transparent
 
-database &quot;ECM&quot;    as dbsrc1
-database &quot;VarGen&quot; as dbsrc2
-database &quot;Nestle&quot; as dbsrc3
-component &quot;prepare4cbgm script&quot; as p4c
-database &quot;Acts&quot;   as db
+database  &quot;ECM&quot;        as dbsrc1
+database  &quot;VarGen&quot;     as dbsrc2
+database  &quot;Nestle&quot;     as dbsrc3
+component &quot;import.py&quot;  as import
+database  &quot;Acts&quot;       as db
+component &quot;prepare.py&quot; as prepare
 
-dbsrc1 --&gt; p4c
-dbsrc2 --&gt; p4c
-dbsrc3 --&gt; p4c
-p4c --&gt; db"/>
+dbsrc1  --&gt; import
+dbsrc2  --&gt; import
+dbsrc3  --&gt; import
+import  --&gt; prepare
+prepare --&gt; db"/>
 </p>
-<p class="caption"><span class="caption-text">Database Preparation</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">Database Preparation for CBGM</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </div>
-<p>The databases for John and Mark are prepared in a similar way.  Each team has a
+<p>The databases for John and Mark are imported in a similar way.  Each team has a
 different workflow, and uses a different structure in their input databases.
-The preparation script tries to accomodate all those differences.</p>
+The import script tries to accomodate all those differences.</p>
+</div>
+<div class="section" id="applying-the-cbgm">
+<h2>Applying the CBGM<a class="headerlink" href="#applying-the-cbgm" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script recalculates the CBGM.  Whenever a local stemma changes,
+the CBGM coefficients have to be recalculated.  This process is started once
+every night because it takes a few minutes to complete.</p>
+<div class="figure align-center" id="id4">
+<p class="plantuml">
+<img src="_images/plantuml-73be789f634c5e1b9f57e8aa17cee5205c69e691.png" alt="skinparam backgroundColor transparent
+
+component &quot;cbgm script&quot; as cbgm
+database  &quot;Acts&quot;        as db
+
+db -&gt; cbgm
+db &lt;- cbgm"/>
+</p>
+<p class="caption"><span class="caption-text">Applying the CBGM</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="updating-the-apparatus">
+<h2>Updating the Apparatus<a class="headerlink" href="#updating-the-apparatus" title="Permalink to this headline">¶</a></h2>
+<p>If the apparatus needs an update the whole database must be rebuilt from
+scratch, and the editorial decisions have to be saved from the old database and
+reloaded into the new database.</p>
+<ol class="arabic simple">
+<li>the <a class="reference internal" href="scripts_user.html#save-edits-py"><span class="std std-ref">scripts/cceh/save_edits.py</span></a> script is used to save the editorial decisions,</li>
+<li>the <a class="reference internal" href="scripts_user.html#import-py"><span class="std std-ref">scripts/cceh/import.py</span></a> and <a class="reference internal" href="scripts_user.html#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> scripts are used to import and prepare a new
+apparatus, and</li>
+<li>the <a class="reference internal" href="scripts_user.html#load-edits-py"><span class="std std-ref">scripts/cceh/load_edits.py</span></a> script is used to restore the editorial decisions into
+the new database, and finally</li>
+<li>the <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script is run to apply the CBGM to the new data.</li>
+</ol>
 </div>
 <div class="section" id="links">
 <h2>Links<a class="headerlink" href="#links" title="Permalink to this headline">¶</a></h2>

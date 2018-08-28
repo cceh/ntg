@@ -1,6 +1,6 @@
 .PHONY: server pylint
 
-PY_SOURCES := server/*.py
+PY_SOURCES := *.py
 
 pylint:
-	-pylint $(PY_SOURCES)
+	-pylint3 $(PY_SOURCES)

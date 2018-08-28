@@ -5,11 +5,9 @@
 
 import argparse
 import collections
-import csv
 import datetime
 import functools
 import glob
-import io
 import itertools
 import math
 import operator
@@ -34,7 +32,7 @@ from .helpers import parameters, Bag, Passage, Manuscript, make_json_response
 from . import security
 from . import editor
 
-from ntg_common.db_tools import execute
+from ntg_common.db_tools import execute, to_csv
 from ntg_common.config import args
 from ntg_common import tools
 from ntg_common import db_tools
@@ -188,7 +186,7 @@ def cliques_json (passage_or_id):
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
-        return make_json_response (passage.cliques ());
+        return make_json_response (passage.cliques ())
 
 
 @app.endpoint ('leitzeile.json')
@@ -205,8 +203,8 @@ def leitzeile_json (passage_or_id = None):
           EXISTS (SELECT labez from readings r
           WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != '') AS replaced
         FROM nestle l
-          LEFT JOIN passages p ON (p.irange @> l.irange)
-        WHERE int4range (:start, :end + 1) @> l.irange
+          LEFT JOIN passages p ON (p.passage @> l.passage)
+        WHERE int4range (:start, :end + 1) @> l.passage
 
         UNION -- get the insertions
 
@@ -214,7 +212,7 @@ def leitzeile_json (passage_or_id = None):
           EXISTS (SELECT labez from readings r
           WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != '') AS replaced
         FROM passages_view_lemma p
-        WHERE int4range (:start, :end + 1) @> p.irange AND (begadr % 2) = 1
+        WHERE int4range (:start, :end + 1) @> p.passage AND (begadr % 2) = 1
 
         ORDER BY begadr, endadr DESC
         """, dict (parameters, start = verse_start, end = verse_end))
@@ -282,12 +280,15 @@ def suggest_json ():
 
         elif field == 'word':
             res = execute (conn, """
-            SELECT DISTINCT chapter, verse, word,
-                            adr2chapter (endadr), adr2verse (endadr), adr2word (endadr),
-                            lemma
-            FROM passages_view_lemma
+            SELECT chapter, verse, word,
+                            adr2chapter (p.endadr), adr2verse (p.endadr), adr2word (p.endadr),
+                            COALESCE (string_agg (n.lemma, ' ' ORDER BY n.begadr), '') as lemma
+            FROM passages_view p
+            LEFT JOIN nestle n
+              ON (p.passage @> n.passage)
             WHERE variant AND siglum = :siglum AND chapter = :chapter AND verse = :verse AND word::varchar ~ :term
-            ORDER BY word, adr2verse (endadr), adr2word (endadr)
+            GROUP BY chapter, verse, word, p.endadr
+            ORDER BY word, adr2verse (p.endadr), adr2word (p.endadr)
             """, dict (parameters, siglum = siglum, chapter = chapter, verse = verse, term = term))
             res = map (Words._make, res)
             res = map (_f_map_word, res)
@@ -315,7 +316,7 @@ def ranges_json (passage_or_id):
         bk_id   = request.args.get ('bk_id') or passage.bk_id
 
         res = execute (conn, """
-        SELECT DISTINCT range, range, lower (ch.irange) as begadr, upper (ch.irange) as endadr
+        SELECT DISTINCT range, range, lower (ch.passage) as begadr, upper (ch.passage) as endadr
         FROM ranges ch
         WHERE bk_id = :bk_id
         ORDER BY begadr, endadr DESC
@@ -693,8 +694,8 @@ def textflow (passage_or_id):
         tags = set ()
         for step in (1, 2):
             for r in ranks:
-                a1 = G.node[r.ms_id1];
-                a2 = G.node[r.ms_id2];
+                a1 = G.node[r.ms_id1]
+                a2 = G.node[r.ms_id2]
                 if not (global_textflow) and is_z_node (a2):
                     # disregard lacunae
                     continue
@@ -709,7 +710,7 @@ def textflow (passage_or_id):
                 if str (r.ms_id1) + a2[group_field] in tags:
                     # an ancestor of this node that lays within this attestation
                     # was already seen.  we need not look into further nodes
-                    continue;
+                    continue
                 # add a new parent
                 if r.rank > 1:
                     G.add_edge (r.ms_id2, r.ms_id1, rank = r.rank, headlabel = r.rank)
@@ -724,7 +725,7 @@ def textflow (passage_or_id):
                     tags.add (str (r.ms_id1) + a2[group_field])
 
         if not leaf_z:
-            remove_z_leaves (G);
+            remove_z_leaves (G)
 
         G.remove_nodes_from (list (nx.isolates (G)))
 
@@ -804,12 +805,7 @@ def textflow_png (passage_or_id):
 
 
 def csvify (fields, rows):
-    fp = io.StringIO ()
-    writer = csv.DictWriter (fp, fields, restval='', extrasaction='raise', dialect='excel')
-    writer.writeheader ()
-    for r in rows:
-        writer.writerow (r._asdict ())
-    return flask.Response (fp.getvalue (), mimetype = 'text/csv')
+    return flask.Response (to_csv (fields, rows), mimetype = 'text/csv')
 
 
 _ComparisonRow = collections.namedtuple (
@@ -928,7 +924,7 @@ def comparison_detail ():
           is_p_unclear (p.pass_id, v1.labez, v1.clique) OR
           is_p_unclear (p.pass_id, v2.labez, v2.clique) AS unclear
         FROM (SELECT * FROM ranges WHERE range = :range_) r
-          JOIN passages p ON (r.irange @> p.irange )
+          JOIN passages p ON (r.passage @> p.passage )
           JOIN apparatus_cliques_view v1 USING (pass_id)
           JOIN apparatus_cliques_view v2 USING (pass_id)
         WHERE v1.ms_id = :ms1 AND v2.ms_id = :ms2
@@ -974,13 +970,15 @@ def apparatus_json (passage_or_id):
 
         # list of labez_clique => manuscripts
         res = execute (conn, """
-        SELECT labez, clique, labez_clique, ms_id, hs, hsnr, certainty
+        SELECT labez, clique, labez_clique, ms_id, hs, hsnr, certainty, labezsuf
         FROM apparatus_cliques_view
         WHERE pass_id = :pass_id
         ORDER BY hsnr, labez, clique
         """, dict (parameters, pass_id = passage.pass_id))
 
-        Manuscripts = collections.namedtuple ('Manuscripts', 'labez clique labez_clique ms_id hs hsnr certainty')
+        Manuscripts = collections.namedtuple (
+            'Manuscripts', 'labez clique labez_clique ms_id hs hsnr certainty labezsuf'
+        )
         manuscripts = [ Manuscripts._make (r)._asdict () for r in res ]
 
         return make_json_response ({

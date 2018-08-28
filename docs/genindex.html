@@ -87,7 +87,9 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#web-application">Web Application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#database-setup">Database Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#applying-the-cbgm">Applying the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#updating-the-apparatus">Updating the Apparatus</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
@@ -102,8 +104,12 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#prepare4cbgm-py">prepare4cbgm.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#mk-users-py">mk_users.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-import-py">scripts/cceh/import.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-prepare-py">scripts/cceh/prepare.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-cbgm-py">scripts/cceh/cbgm.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-save-edits-py">scripts/cceh/save_edits.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-load-edits-py">scripts/cceh/load_edits.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-mk-users-py">scripts/cceh/mk_users.py</a></li>
 </ul>
 </li>
 </ul>
@@ -119,40 +125,44 @@
 <li class="toctree-l3"><a class="reference internal" href="domain.html#literatur">Literatur</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="appclient.html">Application Client</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-main">The Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-app">The Application Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-coherence">The Coherence Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison">The Comparison Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-page_header">The Page Header Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-navigator">The Navigator Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-apparatus">The Apparatus Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-local_stemma">The Local Stemma Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#the-notes-component">The Notes Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-relatives">The Relatives Popup Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison_table">The Comparison Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-card">The Card Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-card_caption">The Card Caption Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-toolbar">The Toolbar Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-d3_common">Various functions for D3</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appclient.html#module-tools">Various Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-main">The Main Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-app">The Application Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-coherence">The Coherence Page Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison">The Comparison Page Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-page_header">The Page Header Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-navigator">The Navigator Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-apparatus">The Apparatus Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-local_stemma">The Local Stemma Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#the-notes-component">The Notes Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives">The Relatives Popup Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_table">The Comparison Table Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card">The Card Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card_caption">The Card Caption Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-toolbar">The Toolbar Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_common">Various functions for D3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-tools">Various Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="appserver.html">Application Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.server">Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.editor">Editor Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.security">User Management Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="appserver.html#module-server.helpers">Helper Functions Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">sever.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.security">server.security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare4cbgm">prepare4cbgm.py</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.mk_users">mk_users.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import">scripts.cceh.import</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare">scripts.cceh.prepare</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.cbgm">scripts.cceh.cbgm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.save_edits">scripts.cceh.save_edits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.load_edits">scripts.cceh.load_edits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.mk_users">scripts.cceh.mk_users</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="database.html">Database Structure</a><ul>
@@ -162,8 +172,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ntg_common.html">Various Functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools">db_tools — Various Functions for Database Access</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">tools — Various Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools">ntg_common.db_tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">ntg_common.tools</a></li>
 </ul>
 </li>
 </ul>
@@ -233,7 +243,8 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#A"><strong>A</strong></a>
+ <a href="#Symbols"><strong>Symbols</strong></a>
+ | <a href="#A"><strong>A</strong></a>
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
@@ -255,6 +266,90 @@
  | <a href="#W"><strong>W</strong></a>
  
 </div>
+<h2 id="Symbols">Symbols</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    -e &lt;email&gt;, --email &lt;email&gt;
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-e">scripts/cceh/mk_users.py command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -h, --help
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-cbgm-py-h">scripts/cceh/cbgm.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-import-py-h">scripts/cceh/import.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-load-edits-py-h">scripts/cceh/load_edits.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-h">scripts/cceh/mk_users.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-prepare-py-h">scripts/cceh/prepare.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-h">scripts/cceh/save_edits.py command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -i &lt;path/to/input.xml&gt;, --input &lt;path/to/input.xml&gt;
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-load-edits-py-i">scripts/cceh/load_edits.py command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -o &lt;path/to/output.xml&gt;, --output &lt;path/to/output.xml&gt;
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-o">scripts/cceh/save_edits.py command line option</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    -p &lt;password&gt;, --password &lt;password&gt;
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-p">scripts/cceh/mk_users.py command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -r &lt;range&gt;, --range &lt;range&gt;
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-prepare-py-r">scripts/cceh/prepare.py command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -u &lt;username&gt;, --username &lt;username&gt;
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-u">scripts/cceh/mk_users.py command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -v, --verbose
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-cbgm-py-v">scripts/cceh/cbgm.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-import-py-v">scripts/cceh/import.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-load-edits-py-v">scripts/cceh/load_edits.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-v">scripts/cceh/mk_users.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-prepare-py-v">scripts/cceh/prepare.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-v">scripts/cceh/save_edits.py command line option</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -266,24 +361,28 @@
 </li>
       <li><a href="database.html#ntg_common.db.Affinity">Affinity (class in ntg_common.db)</a>
 </li>
-      <li><a href="appserver.html#server.security.AnonymousUserMixin">AnonymousUserMixin (class in server.security)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.ancestor_matrix">ancestor_matrix (CBGM_Params attribute)</a>
 </li>
-      <li><a href="appclient.html#module-app">app (module)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.and_matrix">and_matrix (CBGM_Params attribute)</a>
+</li>
+      <li><a href="server_dev.html#server.security.AnonymousUserMixin">AnonymousUserMixin (class in server.security)</a>
+</li>
+      <li><a href="client_dev.html#module-app">app (module)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Apparatus">Apparatus (class in ntg_common.db)</a>
 </li>
-      <li><a href="appclient.html#module-apparatus">apparatus (module)</a>
+      <li><a href="client_dev.html#module-apparatus">apparatus (module)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Apparatus.f">Apparatus.f (in module ntg_common.db)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Apparatus.o">Apparatus.o (in module ntg_common.db)</a>
 </li>
-      <li><a href="appserver.html#server.server.apparatus_json">apparatus_json() (in module server.server)</a>
-</li>
-      <li><a href="appserver.html#server.server.application_json">application_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.apparatus_json">apparatus_json() (in module server.server)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="server_dev.html#server.server.application_json">application_json() (in module server.server)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Att">Att (class in ntg_common.db)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Att.A">Att.A (in module ntg_common.db)</a>
@@ -314,7 +413,7 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="appserver.html#server.helpers.Bag">Bag (class in server.helpers)</a>
+      <li><a href="server_dev.html#server.helpers.Bag">Bag (class in server.helpers)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Att.base">base (Att attribute)</a>
 </li>
@@ -328,9 +427,9 @@
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.BOOKS">BOOKS (in module ntg_common.tools)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.build_A_text">build_A_text() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.build_A_text">build_A_text() (in module scripts.cceh.cbgm)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.build_MT_text">build_MT_text() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.build_MT_text">build_MT_text() (in module scripts.cceh.prepare)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.BYZ_HSNR_ACTS">BYZ_HSNR_ACTS (in module ntg_common.tools)</a>
 </li>
@@ -340,65 +439,65 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.calculate_mss_similarity_postco">calculate_mss_similarity_postco() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.calculate_mss_similarity_postco">calculate_mss_similarity_postco() (in module scripts.cceh.cbgm)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.calculate_mss_similarity_preco">calculate_mss_similarity_preco() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.calculate_mss_similarity_preco">calculate_mss_similarity_preco() (in module scripts.cceh.cbgm)</a>
 </li>
-      <li><a href="appclient.html#module-card">card (module)</a>
+      <li><a href="client_dev.html#module-card">card (module)</a>
 </li>
-      <li><a href="appclient.html#module-card_caption">card_caption (module)</a>
+      <li><a href="client_dev.html#module-card_caption">card_caption (module)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Apparatus.cbgm">cbgm (Apparatus attribute)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.CBGM_Params">CBGM_Params (class in scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params">CBGM_Params (class in scripts.cceh.cbgm)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Apparatus.certainty">certainty (Apparatus attribute)</a>
+</li>
+      <li><a href="client_dev.html#module-client">client (module)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Cliques.clique">clique (Cliques attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Cliques">Cliques (class in ntg_common.db)</a>
 </li>
-      <li><a href="appserver.html#server.server.cliques_json">cliques_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.cliques_json">cliques_json() (in module server.server)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Cliques_TTS">Cliques_TTS (class in ntg_common.db)</a>
 </li>
-      <li><a href="appclient.html#module-coherence">coherence (module)</a>
+      <li><a href="client_dev.html#module-coherence">coherence (module)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Affinity.common">common (Affinity attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Att.comp">comp (Att attribute)</a>
 </li>
-      <li><a href="appclient.html#module-comparison">comparison (module)</a>
-</li>
-      <li><a href="appserver.html#server.server.comparison_detail">comparison_detail() (in module server.server)</a>
+      <li><a href="client_dev.html#module-comparison">comparison (module)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="appserver.html#server.server.comparison_detail_csv">comparison_detail_csv() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.comparison_detail">comparison_detail() (in module server.server)</a>
 </li>
-      <li><a href="appclient.html#module-comparison_details_table">comparison_details_table (module)</a>
+      <li><a href="server_dev.html#server.server.comparison_detail_csv">comparison_detail_csv() (in module server.server)</a>
 </li>
-      <li><a href="appserver.html#server.server.comparison_summary">comparison_summary() (in module server.server)</a>
+      <li><a href="client_dev.html#module-comparison_details_table">comparison_details_table (module)</a>
 </li>
-      <li><a href="appserver.html#server.server.comparison_summary_csv">comparison_summary_csv() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.comparison_summary">comparison_summary() (in module server.server)</a>
 </li>
-      <li><a href="appclient.html#module-comparison_table">comparison_table (module)</a>
+      <li><a href="server_dev.html#server.server.comparison_summary_csv">comparison_summary_csv() (in module server.server)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.concat_tables">concat_tables() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="client_dev.html#module-comparison_table">comparison_table (module)</a>
 </li>
-      <li><a href="ntg_common.html#ntg_common.tools.config_from_pyfile">config_from_pyfile() (in module ntg_common.tools)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.import.concat_tables_fdw">concat_tables_fdw() (in module scripts.cceh.import)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.copy_att_fdw">copy_att_fdw() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.copy_genealogical">copy_genealogical() (in module scripts.cceh.prepare)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.copy_genealogical_fdw">copy_genealogical_fdw() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.copy_nestle">copy_nestle() (in module scripts.cceh.prepare)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.copy_table">copy_table() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.copy_table">copy_table() (in module scripts.cceh.prepare)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.copy_table_fdw">copy_table_fdw() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.import.copy_table_fdw">copy_table_fdw() (in module scripts.cceh.import)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.count_by_range">count_by_range() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.count_by_range">count_by_range() (in module scripts.cceh.cbgm)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.create_labez_matrix">create_labez_matrix() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.create_labez_matrix">create_labez_matrix() (in module scripts.cceh.cbgm)</a>
 </li>
       <li><a href="database.html#ntg_common.db.CreateFDW">CreateFDW (class in ntg_common.db)</a>
 </li>
@@ -414,17 +513,19 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="appclient.html#module-d3_chord_layout">d3_chord_layout (module)</a>
+      <li><a href="client_dev.html#module-d3_chord_layout">d3_chord_layout (module)</a>
 </li>
-      <li><a href="appclient.html#module-d3_common">d3_common (module)</a>
+      <li><a href="client_dev.html#module-d3_common">d3_common (module)</a>
 </li>
-      <li><a href="appclient.html#module-d3_stemma_layout">d3_stemma_layout (module)</a>
+      <li><a href="client_dev.html#module-d3_stemma_layout">d3_stemma_layout (module)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.delete_corrector_hands">delete_corrector_hands() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.def_matrix">def_matrix (CBGM_Params attribute)</a>
+</li>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.delete_corrector_hands">delete_corrector_hands() (in module scripts.cceh.prepare)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.delete_passages_without_variants">delete_passages_without_variants() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.delete_invariant_passages">delete_invariant_passages() (in module scripts.cceh.prepare)</a>
 </li>
       <li><a href="database.html#ntg_common.db.DropFDW">DropFDW (class in ntg_common.db)</a>
 </li>
@@ -440,15 +541,17 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="appserver.html#server.editor.EditError">EditError</a>
+      <li><a href="server_dev.html#server.editor.EditError">EditError</a>
 </li>
-      <li><a href="appserver.html#server.editor.EditException">EditException</a>
+      <li><a href="server_dev.html#server.editor.EditException">EditException</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.eq_matrix">eq_matrix (CBGM_Params attribute)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Affinity.equal">equal (Affinity attribute)</a>
 </li>
-      <li><a href="appserver.html#server.server.EXCLUDE_REGEX_MAP">EXCLUDE_REGEX_MAP (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.EXCLUDE_REGEX_MAP">EXCLUDE_REGEX_MAP (in module server.server)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -460,17 +563,17 @@
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.FEHLVERSE">FEHLVERSE (in module ntg_common.tools)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.fill_apparatus_table">fill_apparatus_table() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.fill_apparatus_table">fill_apparatus_table() (in module scripts.cceh.prepare)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.fill_manuscripts_table">fill_manuscripts_table() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.fill_manuscripts_table">fill_manuscripts_table() (in module scripts.cceh.prepare)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.fill_ms_cliques_table">fill_ms_cliques_table() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.fill_ms_cliques_table">fill_ms_cliques_table() (in module scripts.cceh.prepare)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.fill_passages_table">fill_passages_table() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.fill_passages_table">fill_passages_table() (in module scripts.cceh.prepare)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.fill_readings_table">fill_readings_table() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.fill_readings_table">fill_readings_table() (in module scripts.cceh.prepare)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db_tools.fix">fix() (in module ntg_common.db_tools)</a>
 </li>
@@ -514,14 +617,28 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.src_db.LocStemEdAct01.id">id (LocStemEdAct01 attribute)</a>
 </li>
-      <li><a href="database.html#ntg_common.db.Books.irange">irange (Books attribute)</a>
-
-      <ul>
-        <li><a href="database.html#ntg_common.db.Passages.irange">(Passages attribute)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.import.import_att_fdw">import_att_fdw() (in module scripts.cceh.import)</a>
 </li>
-        <li><a href="database.html#ntg_common.db.Ranges.irange">(Ranges attribute)</a>
+      <li><a href="database.html#ntg_common.db.Import_Cliques">Import_Cliques (class in ntg_common.db)</a>
 </li>
-      </ul></li>
+      <li><a href="scripts_dev.html#scripts.cceh.import.import_genealogical_fdw">import_genealogical_fdw() (in module scripts.cceh.import)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.Import_LocStem">Import_LocStem (class in ntg_common.db)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="database.html#ntg_common.db.Import_MsCliques">Import_MsCliques (class in ntg_common.db)</a>
+</li>
+      <li><a href="scripts_dev.html#scripts.cceh.import.import_nestle_fdw">import_nestle_fdw() (in module scripts.cceh.import)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.Import_Notes">Import_Notes (class in ntg_common.db)</a>
+</li>
+      <li><a href="ntg_common.html#ntg_common.db_tools.init_default_cliques">init_default_cliques() (in module ntg_common.db_tools)</a>
+</li>
+      <li><a href="ntg_common.html#ntg_common.db_tools.init_default_locstem">init_default_locstem() (in module ntg_common.db_tools)</a>
+</li>
+      <li><a href="ntg_common.html#ntg_common.db_tools.init_default_ms_cliques">init_default_ms_cliques() (in module ntg_common.db_tools)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -534,6 +651,8 @@
         <li><a href="database.html#ntg_common.db.Readings.labez">(Readings attribute)</a>
 </li>
       </ul></li>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.labez_matrix">labez_matrix (CBGM_Params attribute)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Apparatus.labezsuf">labezsuf (Apparatus attribute)</a>
 
       <ul>
@@ -542,7 +661,7 @@
       </ul></li>
       <li><a href="database.html#ntg_common.db.Lac">Lac (class in ntg_common.db)</a>
 </li>
-      <li><a href="appserver.html#server.server.leitzeile_json">leitzeile_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.leitzeile_json">leitzeile_json() (in module server.server)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Att.lekt">lekt (Att attribute)</a>
 </li>
@@ -558,7 +677,7 @@
         <li><a href="database.html#ntg_common.db.Readings.lesart">(Readings attribute)</a>
 </li>
       </ul></li>
-      <li><a href="appclient.html#module-local_stemma">local_stemma (module)</a>
+      <li><a href="client_dev.html#module-local_stemma">local_stemma (module)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db_tools.local_stemma_to_nx">local_stemma_to_nx() (in module ntg_common.db_tools)</a>
 </li>
@@ -576,57 +695,59 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="appclient.html#module-main">main (module)</a>
+      <li><a href="client_dev.html#module-main">main (module)</a>
 </li>
-      <li><a href="appserver.html#server.helpers.Manuscript">Manuscript (class in server.helpers)</a>
+      <li><a href="server_dev.html#server.helpers.Manuscript">Manuscript (class in server.helpers)</a>
 </li>
-      <li><a href="appserver.html#server.server.manuscript_full_json">manuscript_full_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.manuscript_full_json">manuscript_full_json() (in module server.server)</a>
 </li>
-      <li><a href="appserver.html#server.server.manuscript_json">manuscript_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.manuscript_json">manuscript_json() (in module server.server)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Manuscripts">Manuscripts (class in ntg_common.db)</a>
 </li>
-      <li><a href="appserver.html#server.server.messages_json">messages_json() (in module server.server)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.mark_invariant_passages">mark_invariant_passages() (in module scripts.cceh.prepare)</a>
 </li>
-      <li><a href="appclient.html#d3_common.module:d3_common.append_marker">module:d3_common.append_marker() (module:d3_common method)</a>
+      <li><a href="server_dev.html#server.server.messages_json">messages_json() (in module server.server)</a>
 </li>
-      <li><a href="appclient.html#d3_common.module:d3_common.color_string_to_palette">module:d3_common.color_string_to_palette() (module:d3_common method)</a>
+      <li><a href="client_dev.html#d3_common.module:d3_common.append_marker">module:d3_common.append_marker() (module:d3_common method)</a>
 </li>
-      <li><a href="appclient.html#d3_common.module:d3_common.dot">module:d3_common.dot() (module:d3_common method)</a>
+      <li><a href="client_dev.html#d3_common.module:d3_common.color_string_to_palette">module:d3_common.color_string_to_palette() (module:d3_common method)</a>
 </li>
-      <li><a href="appclient.html#d3_common.module:d3_common.generate_css_palette">module:d3_common.generate_css_palette() (module:d3_common method)</a>
+      <li><a href="client_dev.html#d3_common.module:d3_common.dot">module:d3_common.dot() (module:d3_common method)</a>
 </li>
-      <li><a href="appclient.html#d3_common.module:d3_common.inflate_bbox">module:d3_common.inflate_bbox() (module:d3_common method)</a>
+      <li><a href="client_dev.html#d3_common.module:d3_common.generate_css_palette">module:d3_common.generate_css_palette() (module:d3_common method)</a>
 </li>
-      <li><a href="appclient.html#d3_common.module:d3_common.insert_css_palette">module:d3_common.insert_css_palette() (module:d3_common method)</a>
+      <li><a href="client_dev.html#d3_common.module:d3_common.inflate_bbox">module:d3_common.inflate_bbox() (module:d3_common method)</a>
 </li>
-      <li><a href="appclient.html#d3_common.module:d3_common.parse_bbox">module:d3_common.parse_bbox() (module:d3_common method)</a>
+      <li><a href="client_dev.html#d3_common.module:d3_common.insert_css_palette">module:d3_common.insert_css_palette() (module:d3_common method)</a>
 </li>
-      <li><a href="appclient.html#d3_common.module:d3_common.parse_path">module:d3_common.parse_path() (module:d3_common method)</a>
+      <li><a href="client_dev.html#d3_common.module:d3_common.parse_bbox">module:d3_common.parse_bbox() (module:d3_common method)</a>
 </li>
-      <li><a href="appclient.html#d3_common.module:d3_common.parse_path_svg">module:d3_common.parse_path_svg() (module:d3_common method)</a>
+      <li><a href="client_dev.html#d3_common.module:d3_common.parse_path">module:d3_common.parse_path() (module:d3_common method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="appclient.html#d3_common.module:d3_common.parse_pt">module:d3_common.parse_pt() (module:d3_common method)</a>
+      <li><a href="client_dev.html#d3_common.module:d3_common.parse_path_svg">module:d3_common.parse_path_svg() (module:d3_common method)</a>
 </li>
-      <li><a href="appclient.html#d3_common.module:d3_common.to_d3">module:d3_common.to_d3() (module:d3_common method)</a>
+      <li><a href="client_dev.html#d3_common.module:d3_common.parse_pt">module:d3_common.parse_pt() (module:d3_common method)</a>
 </li>
-      <li><a href="appclient.html#d3_common.module:d3_common.to_jquery">module:d3_common.to_jquery() (module:d3_common method)</a>
+      <li><a href="client_dev.html#d3_common.module:d3_common.to_d3">module:d3_common.to_d3() (module:d3_common method)</a>
 </li>
-      <li><a href="appclient.html#tools.module:tools.bfs">module:tools.bfs() (module:tools method)</a>
+      <li><a href="client_dev.html#d3_common.module:d3_common.to_jquery">module:d3_common.to_jquery() (module:d3_common method)</a>
 </li>
-      <li><a href="appclient.html#tools.module:tools.deparam">module:tools.deparam() (module:tools method)</a>
+      <li><a href="client_dev.html#tools.module:tools.bfs">module:tools.bfs() (module:tools method)</a>
 </li>
-      <li><a href="appclient.html#tools.module:tools.format">module:tools.format() (module:tools method)</a>
+      <li><a href="client_dev.html#tools.module:tools.deparam">module:tools.deparam() (module:tools method)</a>
 </li>
-      <li><a href="appclient.html#tools.module:tools.natural_sort">module:tools.natural_sort() (module:tools method)</a>
+      <li><a href="client_dev.html#tools.module:tools.format">module:tools.format() (module:tools method)</a>
 </li>
-      <li><a href="appclient.html#tools.module:tools.svg_contextmenu">module:tools.svg_contextmenu() (module:tools method)</a>
+      <li><a href="client_dev.html#tools.module:tools.natural_sort">module:tools.natural_sort() (module:tools method)</a>
 </li>
-      <li><a href="appclient.html#tools.module:tools.xhr_alert">module:tools.xhr_alert() (module:tools method)</a>
+      <li><a href="client_dev.html#tools.module:tools.svg_contextmenu">module:tools.svg_contextmenu() (module:tools method)</a>
 </li>
-      <li><a href="appserver.html#server.server.ms_attesting">ms_attesting() (in module server.server)</a>
+      <li><a href="client_dev.html#tools.module:tools.xhr_alert">module:tools.xhr_alert() (module:tools method)</a>
+</li>
+      <li><a href="server_dev.html#server.server.ms_attesting">ms_attesting() (in module server.server)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Manuscripts.ms_id">ms_id (Manuscripts attribute)</a>
 </li>
@@ -644,31 +765,39 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="appclient.html#module-navigator">navigator (module)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.n_mss">n_mss (CBGM_Params attribute)</a>
+</li>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.n_passages">n_passages (CBGM_Params attribute)</a>
+</li>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.n_ranges">n_ranges (CBGM_Params attribute)</a>
+</li>
+      <li><a href="client_dev.html#module-navigator">navigator (module)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Nestle">Nestle (class in ntg_common.db)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Affinity.newer">newer (Affinity attribute)</a>
 </li>
-      <li><a href="appclient.html#module-notes">notes (module)</a>
+      <li><a href="database.html#ntg_common.db.Notes">Notes (class in ntg_common.db)</a>
 </li>
-      <li><a href="appserver.html#server.editor.notes">notes() (in module server.editor)</a>
-</li>
-      <li><a href="ntg_common.html#module-ntg_common">ntg_common (module)</a>
+      <li><a href="client_dev.html#module-notes">notes (module)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="server_dev.html#server.editor.notes">notes() (in module server.editor)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.Notes_TTS">Notes_TTS (class in ntg_common.db)</a>
+</li>
+      <li><a href="ntg_common.html#module-ntg_common">ntg_common (module)</a>
+</li>
       <li><a href="database.html#module-ntg_common.db">ntg_common.db (module)</a>
 </li>
       <li><a href="ntg_common.html#module-ntg_common.db_tools">ntg_common.db_tools (module)</a>
 </li>
       <li><a href="ntg_common.html#module-ntg_common.tools">ntg_common.tools (module)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.NULL_FIELDS">NULL_FIELDS (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="server_dev.html#server.helpers.nx_to_dot">nx_to_dot() (in module server.helpers)</a>
 </li>
-      <li><a href="appserver.html#server.helpers.nx_to_dot">nx_to_dot() (in module server.helpers)</a>
-</li>
-      <li><a href="appserver.html#server.helpers.nx_to_dot_subgraphs">nx_to_dot_subgraphs() (in module server.helpers)</a>
+      <li><a href="server_dev.html#server.helpers.nx_to_dot_subgraphs">nx_to_dot_subgraphs() (in module server.helpers)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -690,25 +819,57 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="appclient.html#module-page_header">page_header (module)</a>
+      <li><a href="client_dev.html#module-page_header">page_header (module)</a>
+</li>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.parent_matrix">parent_matrix (CBGM_Params attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Passages.pass_id">pass_id (Passages attribute)</a>
 </li>
-      <li><a href="appserver.html#server.helpers.Passage">Passage (class in server.helpers)</a>
+      <li><a href="database.html#ntg_common.db.Books.passage">passage (Books attribute)</a>
 </li>
-      <li><a href="appserver.html#server.server.passage_json">passage_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.helpers.Passage">Passage (class in server.helpers)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="database.html#ntg_common.db.Passages.passage">passage (Passages attribute)</a>
+
+      <ul>
+        <li><a href="database.html#ntg_common.db.Ranges.passage">(Ranges attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="server_dev.html#server.server.passage_json">passage_json() (in module server.server)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Passages">Passages (class in ntg_common.db)</a>
 </li>
+      <li>
+    path/to/_global.conf
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-arg-path">scripts/cceh/mk_users.py command line option</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    path/to/file.conf
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-cbgm-py-arg-path">scripts/cceh/cbgm.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-import-py-arg-path">scripts/cceh/import.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-load-edits-py-arg-path">scripts/cceh/load_edits.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-prepare-py-arg-path">scripts/cceh/prepare.py command line option</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-arg-path">scripts/cceh/save_edits.py command line option</a>
+</li>
+      </ul></li>
       <li><a href="ntg_common.html#ntg_common.db_tools.PostgreSQLEngine">PostgreSQLEngine (class in ntg_common.db_tools)</a>
 </li>
-      <li><a href="appserver.html#server.editor.PrivilegeError">PrivilegeError</a>
+      <li><a href="server_dev.html#server.editor.PrivilegeError">PrivilegeError</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.process_commentaries">process_commentaries() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.process_commentaries">process_commentaries() (in module scripts.cceh.prepare)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.process_sigla">process_sigla() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.process_sigla">process_sigla() (in module scripts.cceh.prepare)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -718,11 +879,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Ranges.range">range (Ranges attribute)</a>
 </li>
-      <li><a href="appserver.html#server.helpers.Passage.range_id">range_id() (Passage method)</a>
+      <li><a href="server_dev.html#server.helpers.Passage.range_id">range_id() (Passage method)</a>
+</li>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.ranges">ranges (CBGM_Params attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Ranges">Ranges (class in ntg_common.db)</a>
 </li>
-      <li><a href="appserver.html#server.server.ranges_json">ranges_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.ranges_json">ranges_json() (in module server.server)</a>
 </li>
       <li><a href="database.html#ntg_common.src_db.RdgAct01">RdgAct01 (class in ntg_common.src_db)</a>
 </li>
@@ -742,26 +905,26 @@
 </li>
       <li><a href="database.html#ntg_common.db.Readings.zz">Readings.zz (in module ntg_common.db)</a>
 </li>
-      <li><a href="appclient.html#module-relatives">relatives (module)</a>
+      <li><a href="ntg_common.html#ntg_common.db_tools.PostgreSQLEngine.receive_checkout">receive_checkout() (PostgreSQLEngine static method)</a>
 </li>
-      <li><a href="appserver.html#server.server.relatives_csv">relatives_csv() (in module server.server)</a>
+      <li><a href="client_dev.html#module-relatives">relatives (module)</a>
 </li>
-      <li><a href="appclient.html#module-relatives_metrics">relatives_metrics (module)</a>
+      <li><a href="server_dev.html#server.server.relatives_csv">relatives_csv() (in module server.server)</a>
 </li>
-      <li><a href="database.html#ntg_common.db.Passages.remarks">remarks (Passages attribute)</a>
+      <li><a href="client_dev.html#module-relatives_metrics">relatives_metrics (module)</a>
 </li>
-      <li><a href="appserver.html#server.server.remove_z_leaves">remove_z_leaves() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.remove_z_leaves">remove_z_leaves() (in module server.server)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Role">Role (class in ntg_common.db)</a>
 
       <ul>
-        <li><a href="appserver.html#server.security.Role">(class in server.security)</a>
+        <li><a href="server_dev.html#server.security.Role">(class in server.security)</a>
 </li>
       </ul></li>
       <li><a href="database.html#ntg_common.db.Roles_Users">Roles_Users (class in ntg_common.db)</a>
 
       <ul>
-        <li><a href="appserver.html#server.security.Roles_Users">(class in server.security)</a>
+        <li><a href="server_dev.html#server.security.Roles_Users">(class in server.security)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -774,35 +937,123 @@
 </li>
       <li><a href="database.html#ntg_common.src_db.LocStemEdAct01.s2">s2 (LocStemEdAct01 attribute)</a>
 </li>
+      <li><a href="scripts_dev.html#module-scripts">scripts (module)</a>
+</li>
+      <li><a href="scripts_dev.html#module-scripts.cceh.cbgm">scripts.cceh.cbgm (module)</a>, <a href="scripts_dev.html#module-scripts.cceh.cbgm">[1]</a>
+</li>
+      <li><a href="scripts_dev.html#module-scripts.cceh.import">scripts.cceh.import (module)</a>, <a href="scripts_dev.html#module-scripts.cceh.import">[1]</a>
+</li>
+      <li><a href="scripts_dev.html#module-scripts.cceh.load_edits">scripts.cceh.load_edits (module)</a>, <a href="scripts_dev.html#module-scripts.cceh.load_edits">[1]</a>
+</li>
       <li><a href="scripts_dev.html#module-scripts.cceh.mk_users">scripts.cceh.mk_users (module)</a>, <a href="scripts_dev.html#module-scripts.cceh.mk_users">[1]</a>
 </li>
-      <li><a href="scripts_dev.html#module-scripts.cceh.prepare4cbgm">scripts.cceh.prepare4cbgm (module)</a>, <a href="scripts_dev.html#module-scripts.cceh.prepare4cbgm">[1]</a>
+      <li><a href="scripts_dev.html#module-scripts.cceh.prepare">scripts.cceh.prepare (module)</a>, <a href="scripts_dev.html#module-scripts.cceh.prepare">[1]</a>
 </li>
-      <li><a href="appserver.html#module-server">server (module)</a>
+      <li><a href="scripts_dev.html#module-scripts.cceh.save_edits">scripts.cceh.save_edits (module)</a>, <a href="scripts_dev.html#module-scripts.cceh.save_edits">[1]</a>
 </li>
-      <li><a href="appserver.html#module-server.editor">server.editor (module)</a>
+      <li>
+    scripts/cceh/cbgm.py command line option
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-cbgm-py-h">-h, --help</a>
 </li>
-      <li><a href="appserver.html#module-server.helpers">server.helpers (module)</a>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-cbgm-py-v">-v, --verbose</a>
 </li>
-      <li><a href="appserver.html#module-server.security">server.security (module)</a>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-cbgm-py-arg-path">path/to/file.conf</a>
 </li>
-      <li><a href="appserver.html#module-server.server">server.server (module)</a>
+      </ul></li>
+      <li>
+    scripts/cceh/import.py command line option
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-import-py-h">-h, --help</a>
 </li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-import-py-v">-v, --verbose</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-import-py-arg-path">path/to/file.conf</a>
+</li>
+      </ul></li>
+      <li>
+    scripts/cceh/load_edits.py command line option
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-load-edits-py-h">-h, --help</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-load-edits-py-i">-i &lt;path/to/input.xml&gt;, --input &lt;path/to/input.xml&gt;</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-load-edits-py-v">-v, --verbose</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-load-edits-py-arg-path">path/to/file.conf</a>
+</li>
+      </ul></li>
+      <li>
+    scripts/cceh/mk_users.py command line option
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-e">-e &lt;email&gt;, --email &lt;email&gt;</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-h">-h, --help</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-p">-p &lt;password&gt;, --password &lt;password&gt;</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-u">-u &lt;username&gt;, --username &lt;username&gt;</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-v">-v, --verbose</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-arg-path">path/to/_global.conf</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    scripts/cceh/prepare.py command line option
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-prepare-py-h">-h, --help</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-prepare-py-r">-r &lt;range&gt;, --range &lt;range&gt;</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-prepare-py-v">-v, --verbose</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-prepare-py-arg-path">path/to/file.conf</a>
+</li>
+      </ul></li>
+      <li>
+    scripts/cceh/save_edits.py command line option
+
+      <ul>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-h">-h, --help</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-o">-o &lt;path/to/output.xml&gt;, --output &lt;path/to/output.xml&gt;</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-v">-v, --verbose</a>
+</li>
+        <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-arg-path">path/to/file.conf</a>
+</li>
+      </ul></li>
+      <li><a href="server_dev.html#module-server">server (module)</a>
+</li>
+      <li><a href="server_dev.html#module-server.editor">server.editor (module)</a>
+</li>
+      <li><a href="server_dev.html#module-server.helpers">server.helpers (module)</a>
+</li>
+      <li><a href="server_dev.html#module-server.security">server.security (module)</a>
+</li>
+      <li><a href="server_dev.html#module-server.server">server.server (module)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Books.siglum">siglum (Books attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Passages.spanned">spanned (Passages attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Passages.spanning">spanning (Passages attribute)</a>
 </li>
-      <li><a href="appserver.html#server.server.stemma">stemma() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.stemma">stemma() (in module server.server)</a>
 </li>
-      <li><a href="appserver.html#server.editor.stemma_edit">stemma_edit() (in module server.editor)</a>
+      <li><a href="server_dev.html#server.editor.stemma_edit">stemma_edit() (in module server.editor)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Att.suffix">suffix (Att attribute)</a>
 </li>
-      <li><a href="appserver.html#server.server.suggest_json">suggest_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.suggest_json">suggest_json() (in module server.server)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Cliques.sys_period">sys_period (Cliques attribute)</a>
 
@@ -820,15 +1071,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ntg_common.html#ntg_common.db_tools.tabulate">tabulate() (in module ntg_common.db_tools)</a>
 </li>
-      <li><a href="appclient.html#module-textflow">textflow (module)</a>
+      <li><a href="client_dev.html#module-textflow">textflow (module)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="appserver.html#server.server.textflow">textflow() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.textflow">textflow() (in module server.server)</a>
 </li>
-      <li><a href="appclient.html#module-toolbar">toolbar (module)</a>
+      <li><a href="client_dev.html#module-toolbar">toolbar (module)</a>
 </li>
-      <li><a href="appclient.html#module-tools">tools (module)</a>
+      <li><a href="client_dev.html#module-tools">tools (module)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -838,14 +1089,20 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Affinity.unclear">unclear (Affinity attribute)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.unroll_zw">unroll_zw() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.unclear_ancestor_matrix">unclear_ancestor_matrix (CBGM_Params attribute)</a>
+</li>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.unclear_parent_matrix">unclear_parent_matrix (CBGM_Params attribute)</a>
+</li>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.unroll_zw">unroll_zw() (in module scripts.cceh.prepare)</a>
 </li>
       <li><a href="database.html#ntg_common.db.User">User (class in ntg_common.db)</a>
 
       <ul>
-        <li><a href="appserver.html#server.security.User">(class in server.security)</a>
+        <li><a href="server_dev.html#server.security.User">(class in server.security)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Cliques.user_id_start">user_id_start (Cliques attribute)</a>
 
       <ul>
@@ -854,8 +1111,6 @@
         <li><a href="database.html#ntg_common.db.MsCliques.user_id_start">(MsCliques attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Cliques.user_id_stop">user_id_stop (Cliques attribute)</a>
 
       <ul>
@@ -864,7 +1119,7 @@
         <li><a href="database.html#ntg_common.db.MsCliques.user_id_stop">(MsCliques attribute)</a>
 </li>
       </ul></li>
-      <li><a href="appserver.html#server.server.user_json">user_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.user_json">user_json() (in module server.server)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -872,13 +1127,15 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare4cbgm.vacuum">vacuum() (in module scripts.cceh.prepare4cbgm)</a>
+      <li><a href="ntg_common.html#ntg_common.db_tools.PostgreSQLEngine.vacuum">vacuum() (PostgreSQLEngine method)</a>
 </li>
       <li><a href="database.html#ntg_common.src_db.VarGenAttAct01">VarGenAttAct01 (class in ntg_common.src_db)</a>
 </li>
+      <li><a href="database.html#ntg_common.db.Passages.variant">variant (Passages attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="database.html#ntg_common.db.Passages.variant">variant (Passages attribute)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.cbgm.CBGM_Params.variant_matrix">variant_matrix (CBGM_Params attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.src_db.LocStemEdAct01.varid">varid (LocStemEdAct01 attribute)</a>
 </li>
@@ -894,7 +1151,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="appserver.html#server.helpers.Word">Word (class in server.helpers)</a>
+      <li><a href="server_dev.html#server.helpers.Word">Word (class in server.helpers)</a>
 </li>
   </ul></td>
 </tr></table>

@@ -2,14 +2,9 @@
 
 """ This module contains some useful functions. """
 
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import datetime
 import logging
 import subprocess
-import sys
-import types
 
 from .config import args
 
@@ -83,7 +78,7 @@ they are not included in the text of manuscript 'A'.
 """
 
 
-logger = logging.getLogger ('server')
+logger = logging.getLogger ()
 
 LOG_HILITE = {
     logging.ERROR : ('\x1B[1m', '\x1B[0m')
@@ -102,7 +97,8 @@ def log (level, msg, *aargs, **kwargs):
 
     d = {
         'delta': str (datetime.datetime.now () - args.start_time),
-        'hilite' : LOG_HILITE.get (level, ('', ''))
+        'hilitestart' : LOG_HILITE.get (level, ('', ''))[0],
+        'hiliteend'   : LOG_HILITE.get (level, ('', ''))[1],
     }
     logger.log (level, msg, *aargs, extra = d)
 
@@ -135,27 +131,3 @@ def graphviz_layout (dot, format = 'dot'):
         log (logging.ERROR, errs)
 
     return outs
-
-
-def config_from_pyfile (filename):
-    """Mimic Flask config files.
-
-    Emulate the Flask config file parser so we can use the same config files for both,
-    the server and this script.
-
-    """
-
-    d = types.ModuleType ('config')
-    d.__file__ = filename
-    try:
-        with open (filename) as config_file:
-            exec (compile (config_file.read (), filename, 'exec'), d.__dict__)
-    except IOError as e:
-        e.strerror = 'Unable to load configuration file (%s)' % e.strerror
-        raise
-
-    conf = {}
-    for key in dir (d):
-        if key.isupper ():
-            conf[key] = getattr (d, key)
-    return conf

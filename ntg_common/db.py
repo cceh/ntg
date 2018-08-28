@@ -5,12 +5,8 @@ we need for doing the CBGM and running the application server.
 
 """
 
-import sqlalchemy
-import sqlalchemy.types
-
 from sqlalchemy import String, Integer, Float, Boolean, DateTime, Column, Index, ForeignKey
 from sqlalchemy import UniqueConstraint, CheckConstraint, ForeignKeyConstraint, PrimaryKeyConstraint
-from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import TSTZRANGE
 from sqlalchemy.ext import compiler
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
@@ -144,15 +140,15 @@ def generic (metadata, create_cmd, drop_cmd):
 Base = declarative_base ()
 
 class Att (Base):
-    """Input buffer table for the Nestle-Aland ECM_Acts*GVZ tables.
+    r"""Input buffer table for the Nestle-Aland ECM_Acts*GVZ tables.
 
     The Nestle-Aland database contains one table for each chapter (for
     historical reasons). As first step we copy those many tables into one big
     table, this one.
 
-    This table contains a negative apparatus of all manuscripts.  For the CBGM
-    the data in this table has to be normalised into our database structure and
-    converted into a positive apparatus.
+    This table contains a `negative apparatus <transform-positive>` of all
+    manuscripts.  For the CBGM the data in this table has to be normalised into
+    our database structure and converted into a positive apparatus.
 
     .. sauml::
        :include: att
@@ -293,7 +289,7 @@ class Att (Base):
     hs           = Column (String(32),    nullable = False, index = True)
     begadr       = Column (Integer,       nullable = False, index = True)
     endadr       = Column (Integer,       nullable = False, index = True)
-    labez        = Column (String(32),    nullable = False, server_default = '')
+    labez        = Column (String(64),    nullable = False, server_default = '')
     labezsuf     = Column (String(64),    server_default = '')
     certainty    = Column (Float(16),     nullable = False, server_default = '1.0')
     lemma        = Column (String(1024),  server_default = '')
@@ -320,11 +316,11 @@ class Att (Base):
     comp1        = Column (String(1),     server_default = '')
     printout     = Column (String(32),    server_default = '')
     category     = Column (String(1),     server_default = '')
-    irange       = Column (IntRangeType,  nullable = False)
-    created      = Column (DateTime)
+    passage      = Column (IntRangeType,  nullable = False)
 
     __table_args__ = (
-        Index ('ix_att_hs_irange', hs, irange, unique = True, postgresql_where = certainty == 1.0),
+        Index ('ix_att_begadr_endadr_hs', begadr, endadr, hs),
+        Index ('ix_att_hs_passage', hs, passage, unique = True, postgresql_where = certainty == 1.0),
     )
 
 
@@ -354,7 +350,7 @@ class Lac (Base):
     hs        = Column (String(32),    nullable = False)
     begadr    = Column (Integer,       nullable = False)
     endadr    = Column (Integer,       nullable = False)
-    labez     = Column (String(32),    server_default = '')
+    labez     = Column (String(64),    server_default = '')
     labezsuf  = Column (String(64),    server_default = '')
     lemma     = Column (String(1024),  server_default = '')
     lesart    = Column (String(1024),  server_default = '')
@@ -378,12 +374,11 @@ class Lac (Base):
     comp1     = Column (String(1),     server_default = '')
     printout  = Column (String(32),    server_default = '')
     category  = Column (String(1),     server_default = '')
-    irange    = Column (IntRangeType,  nullable = False)
-    created   = Column (DateTime)
+    passage   = Column (IntRangeType,  nullable = False)
 
     __table_args__ = (
-        Index ('ix_lac_irange_gist', irange, postgresql_using = 'gist'),
-        UniqueConstraint (hs, irange)
+        Index ('ix_lac_passage_gist', passage, postgresql_using = 'gist'),
+        UniqueConstraint (hs, passage)
     )
 
 
@@ -479,7 +474,7 @@ class Books (Base2):
 
         The book name, eg. 'Matthew'
 
-    .. attribute:: irange
+    .. attribute:: passage
 
         The book extent in passages.
 
@@ -491,12 +486,12 @@ class Books (Base2):
 
     siglum    = Column (String,        nullable = False)
     book      = Column (String,        nullable = False)
-    irange    = Column (IntRangeType,  nullable = False)
+    passage   = Column (IntRangeType,  nullable = False)
 
     __table_args__ = (
         UniqueConstraint (siglum),
         UniqueConstraint (book),
-        Index ('ix_books_irange_gist', irange, postgresql_using = 'gist'),
+        Index ('ix_books_passage_gist', passage, postgresql_using = 'gist'),
     )
 
 
@@ -514,10 +509,10 @@ class Passages (Base2):
 
        The primary key.  We use a surrogate integer key because we need to
        interface with numpy, which only allows for integer row and column
-       indices.  If we every lose this requirement, irange will become our
+       indices.  If we every lose this requirement, passage will become our
        primary key (but join performance should also be considered).
 
-    .. attribute:: irange
+    .. attribute:: passage
 
         The extent of the passage.
 
@@ -549,10 +544,6 @@ class Passages (Base2):
 
         Only set if the passages is spanned.
 
-    .. attribute:: remarks
-
-        Editor notes.
-
     """
 
     __tablename__ = 'passages'
@@ -563,18 +554,17 @@ class Passages (Base2):
 
     begadr    = Column (Integer,       nullable = False)
     endadr    = Column (Integer,       nullable = False)
-    irange    = Column (IntRangeType,  nullable = False)
+    passage   = Column (IntRangeType,  nullable = False)
 
     variant   = Column (Boolean,       nullable = False, server_default = 'False')
     spanning  = Column (Boolean,       nullable = False, server_default = 'False')
     spanned   = Column (Boolean,       nullable = False, server_default = 'False')
     fehlvers  = Column (Boolean,       nullable = False, server_default = 'False')
-    remarks   = Column (String,        nullable = True)
 
     __table_args__ = (
         ForeignKeyConstraint ([bk_id], ['books.bk_id']),
-        UniqueConstraint (irange, name = 'unique_passages_irange'), # needs name
-        Index ('ix_passages_irange_gist', irange, postgresql_using = 'gist'),
+        UniqueConstraint (passage, name = 'unique_passages_passage'), # needs name
+        Index ('ix_passages_passage_gist', passage, postgresql_using = 'gist'),
     )
 
 
@@ -663,7 +653,7 @@ class Readings (Base2):
 
 
 class Apparatus (Base2):
-    """A table that contains the positive apparatus.
+    """A table that contains the `positive apparatus <transform-positive>`.
 
     .. sauml::
        :include: apparatus
@@ -689,8 +679,12 @@ class Apparatus (Base2):
 
     .. attribute:: certainty
 
-        Certainty of the reading. There can be only one reading of certainty 1.0,
-        but multiple readings of certainty < 1.0.
+        Certainty of the reading for the purposes of the CBGM.  Only readings
+        with a certainty of 1.0 are used by the CBGM. A certainty of 1.0 is
+        given if the reading unequivocally witnesses for one labez.
+
+        There can be only one reading with a certainty of 1.0, but multiple
+        readings with certainty < 1.0, all of them summing to no more than 1.0.
 
     .. attribute:: lesart
 
@@ -756,9 +750,9 @@ class Cliques (Cliques_Mixin, Base2):
     reading.  A reading may have been originated independently more than once,
     but in a clique a reading has been originated only once.
 
-    This is the current table of a transaction state table pair.  `cliques_tts`
-    is the table that contains the past rows.  See :ref:`transaction-time state
-    tables<tts>`.
+    This is the current table of a transaction state table pair.
+    :class:`Cliques_TTS` is the table that contains the past rows.  See
+    :ref:`transaction-time state tables<tts>`.
 
     .. sauml::
        :include: cliques
@@ -795,9 +789,9 @@ class Cliques (Cliques_Mixin, Base2):
 class Cliques_TTS (Cliques_Mixin, Base2):
     """A table that contains the cliques at every passage
 
-    This is the past table of a transaction state table pair.  `cliques` is the
-    table that contains the current rows.  The structure of the two tables is
-    the same.  See :ref:`transaction-time state tables<tts>`.
+    This is the past table of a transaction state table pair.  :class:`Cliques`
+    is the table that contains the current rows.  The structure of the two
+    tables is the same.  See :ref:`transaction-time state tables<tts>`.
 
     """
 
@@ -823,7 +817,7 @@ class MsCliques (MsCliques_Mixin, Base2):
     which other reading(s) at each passage.
 
     This is the current table of a transaction state table pair.
-    `ms_cliques_tts` is the table that contains the past rows.  See
+    :class:`MsCliques_TTS` is the table that contains the past rows.  See
     :ref:`transaction-time state tables<tts>`.
 
     .. sauml::
@@ -853,6 +847,7 @@ class MsCliques (MsCliques_Mixin, Base2):
     __tablename__ = 'ms_cliques'
 
     __table_args__ = (
+        # Apparatus can have more than one labez per passage per manuscript
         PrimaryKeyConstraint ('ms_id', 'pass_id', 'labez'),
         ForeignKeyConstraint (['ms_id', 'pass_id', 'labez'], ['apparatus.ms_id', 'apparatus.pass_id', 'apparatus.labez'],
                               deferrable = True),
@@ -863,9 +858,10 @@ class MsCliques (MsCliques_Mixin, Base2):
 class MsCliques_TTS (MsCliques_Mixin, Base2):
     """A table that relates manuscripts and cliques.
 
-    This is the past table of a transaction state table pair.  `ms_cliques` is
-    the table that contains the current rows.  The structure of the two tables
-    is the same.  See :ref:`transaction-time state tables<tts>`.
+    This is the past table of a transaction state table pair.
+    :class:`MsCliques` is the table that contains the current rows.  The
+    structure of the two tables is the same.  See :ref:`transaction-time state
+    tables<tts>`.
 
     """
 
@@ -894,9 +890,9 @@ class LocStem (LocStem_Mixin, Base2):
     represent each clique.  The editors decide which reading is derived from
     which other reading(s) at each passage.
 
-    This is the current table of a transaction state table pair.  `locstem_tts`
-    is the table that contains the past rows.  See :ref:`transaction-time state
-    tables<tts>`.
+    This is the current table of a transaction state table pair.
+    :class:`LocStem_TTS` is the table that contains the past rows.  See
+    :ref:`transaction-time state tables<tts>`.
 
 
     .. sauml::
@@ -947,9 +943,9 @@ class LocStem (LocStem_Mixin, Base2):
 class LocStem_TTS (LocStem_Mixin, Base2):
     """A table that contains the priority of the cliques at each passage
 
-    This is the past table of a transaction state table pair.  `locstem` is the
-    table that contains the current rows.  The structure of the two tables is
-    the same.  See :ref:`transaction-time state tables<tts>`.
+    This is the past table of a transaction state table pair.  :class:`LocStem`
+    is the table that contains the current rows.  The structure of the two
+    tables is the same.  See :ref:`transaction-time state tables<tts>`.
 
     """
 
@@ -957,6 +953,112 @@ class LocStem_TTS (LocStem_Mixin, Base2):
 
     __table_args__ = (
         PrimaryKeyConstraint ('pass_id', 'labez', 'clique', 'sys_period'),
+    )
+
+
+class Notes_Mixin (TTS_Mixin):
+    pass_id   = Column (Integer, nullable = False)
+    note      = Column (String,  nullable = False)
+
+
+class Notes (Notes_Mixin, Base2):
+    """A table that contains editorial notes attached to passages.
+
+    This is the current table of a transaction state table pair.
+    :class:`Notes_TTS` is the table that contains the past rows.  See
+    :ref:`transaction-time state tables<tts>`.
+
+    """
+
+    __tablename__ = 'notes'
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('pass_id'),
+        ForeignKeyConstraint (['pass_id'], ['passages.pass_id']),
+    )
+
+
+class Notes_TTS (Notes_Mixin, Base2):
+    """A table that contains editorial notes attached to passages.
+
+    This is the past table of a transaction state table pair.  :class:`Notes` is
+    the table that contains the current rows.  The structure of the two tables
+    is the same.  See :ref:`transaction-time state tables<tts>`.
+
+    """
+
+    __tablename__ = 'notes_tts'
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('pass_id', 'sys_period'),
+    )
+
+
+class Import_Cliques (Cliques_Mixin, Base2):
+    """A table to help importing of saved state.
+
+    This table is used only by the import_cbgm.py script.
+    """
+
+    __tablename__ = 'import_cliques'
+
+    pass_id = Column (Integer)
+    passage = Column (IntRangeType, nullable = False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('passage', 'labez', 'clique', 'sys_period'),
+    )
+
+
+class Import_MsCliques (MsCliques_Mixin, Base2):
+    """A table to help importing of saved state.
+
+    This table is used only by the import_cbgm.py script.
+    """
+
+    __tablename__ = 'import_ms_cliques'
+
+    pass_id = Column (Integer)
+    ms_id   = Column (Integer)
+    passage = Column (IntRangeType, nullable = False)
+    hsnr    = Column (Integer,      nullable = False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('hsnr', 'passage', 'labez', 'sys_period'),
+    )
+
+
+class Import_LocStem (LocStem_Mixin, Base2):
+    """A table to help importing of saved state.
+
+    This table is only used by the import_cbgm.py script.
+
+    """
+
+    __tablename__ = 'import_locstem'
+
+    pass_id = Column (Integer)
+    passage = Column (IntRangeType, nullable = False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('passage', 'labez', 'clique', 'sys_period'),
+    )
+
+
+class Import_Notes (Notes_Mixin, Base2):
+    """A table to help importing of saved state.
+
+    This table is only used by the import_cbgm.py script.
+
+    """
+
+    __tablename__ = 'import_notes'
+
+    pass_id = Column (Integer)
+    passage = Column (IntRangeType, nullable = False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('passage'),
     )
 
 
@@ -979,7 +1081,7 @@ class Ranges (Base2):
 
         The name of the range, eg. '1' for Chapter 1.
 
-    .. attribute:: irange
+    .. attribute:: passage
 
         The extent of the range.
 
@@ -993,11 +1095,11 @@ class Ranges (Base2):
 
     range_    = Column ('range', String,  nullable = False)
 
-    irange    = Column (IntRangeType,     nullable = False)
+    passage   = Column (IntRangeType,     nullable = False)
 
     __table_args__ = (
         ForeignKeyConstraint ([bk_id], ['books.bk_id']),
-        Index ('ix_ranges_irange_gist', irange, postgresql_using = 'gist'),
+        Index ('ix_ranges_passage_gist', passage, postgresql_using = 'gist'),
     )
 
 
@@ -1030,7 +1132,7 @@ class Ms_Ranges (Base2):
 
 
 class Affinity (Base2):
-    """A table that contains CBGM output related to each pair of manuscripts.
+    r"""A table that contains CBGM output related to each pair of manuscripts.
 
     This table contains the actual results of applying the CBGM: the priority of
     the manuscripts.  It has one row for each pair of manuscripts that have at
@@ -1145,7 +1247,7 @@ DROP AGGREGATE IF EXISTS labez_agg (CHAR) CASCADE
 )
 
 view ('ranges_view', Base2.metadata, '''
-    SELECT bk.bk_id, bk.siglum, bk.book, ch.rg_id, ch.range, ch.irange
+    SELECT bk.bk_id, bk.siglum, bk.book, ch.rg_id, ch.range, ch.passage
     FROM books bk
     JOIN ranges ch USING (bk_id)
     ''')
@@ -1161,7 +1263,7 @@ view ('passages_view', Base2.metadata, '''
            adr2chapter (p.begadr) AS chapter,
            adr2verse   (p.begadr) AS verse,
            adr2word    (p.begadr) AS word,
-           p.pass_id, p.begadr, p.endadr, p.irange, p.variant, p.spanning, p.spanned, p.fehlvers
+           p.pass_id, p.begadr, p.endadr, p.passage, p.variant, p.spanning, p.spanned, p.fehlvers
     FROM passages p
     JOIN books b USING (bk_id)
     ''')
@@ -1178,25 +1280,38 @@ view ('passages_view_lemma', Base2.metadata, '''
     ''')
 
 view ('locstem_view', Base2.metadata, '''
-    SELECT p.begadr, p.endadr, p.fehlvers, locstem.*
+    SELECT p.begadr, p.endadr, p.passage, p.fehlvers, locstem.*
     FROM locstem
     JOIN passages p USING (pass_id)
     ''')
 
 view ('readings_view', Base2.metadata, '''
-    SELECT p.begadr, p.endadr, p.irange, r.*
+    SELECT p.begadr, p.endadr, p.passage, r.*
     FROM readings r
     JOIN passages p USING (pass_id)
     ''')
 
 view ('cliques_view', Base2.metadata, '''
-    SELECT r.begadr, r.endadr, r.irange, r.lesart, q.*
+    SELECT r.begadr, r.endadr, r.passage, r.lesart, q.*
     FROM cliques q
     JOIN readings_view r USING (pass_id, labez)
     ''')
 
+view ('ms_cliques_view', Base2.metadata, '''
+    SELECT q.begadr, q.endadr, q.passage, q.lesart, ms.hs, ms.hsnr, mq.*
+    FROM ms_cliques mq
+    JOIN cliques_view q USING (pass_id, labez, clique)
+    JOIN manuscripts ms USING (ms_id)
+    ''')
+
+view ('notes_view', Base2.metadata, '''
+    SELECT p.begadr, p.endadr, p.passage, p.fehlvers, n.*
+    FROM notes n
+    JOIN passages p USING (pass_id)
+    ''')
+
 view ('apparatus_view', Base2.metadata, '''
-    SELECT p.pass_id, p.begadr, p.endadr, p.irange, p.spanning, p.spanned, p.fehlvers,
+    SELECT p.pass_id, p.begadr, p.endadr, p.passage, p.spanning, p.spanned, p.fehlvers,
            ms.ms_id, ms.hs, ms.hsnr,
            a.labez, a.cbgm, a.labezsuf, a.certainty, a.origin,
            COALESCE (a.lesart, r.lesart) AS lesart
@@ -1244,6 +1359,53 @@ view ('affinity_p_view', Base2.metadata, '''
     JOIN ms_ranges ch2 ON (aff.ms_id2, aff.rg_id) = (ch2.ms_id, ch2.rg_id)
     ''')
 
+view ('export_cliques', Base2.metadata, '''
+    SELECT passage, labez, clique, sys_period, user_id_start, user_id_stop
+    FROM cliques_view
+    WHERE user_id_start != 0
+    UNION
+    SELECT p.passage, labez, clique, sys_period, user_id_start, user_id_stop
+    FROM cliques_tts cq
+    JOIN passages p USING (pass_id)
+    ORDER BY passage, sys_period, labez, clique
+    ''')
+
+view ('export_ms_cliques', Base2.metadata, '''
+    SELECT passage, hsnr, labez, clique, sys_period, user_id_start, user_id_stop
+    FROM ms_cliques_view
+    WHERE user_id_start != 0
+    UNION
+    SELECT p.passage, m.hsnr, labez, clique, sys_period, user_id_start, user_id_stop
+    FROM ms_cliques_tts mcq
+    JOIN passages p USING (pass_id)
+    JOIN manuscripts m USING (ms_id)
+    ORDER BY passage, sys_period, hsnr, labez, clique
+    ''')
+
+# CREATE OR REPLACE VIEW export_locstem AS
+
+view ('export_locstem', Base2.metadata, '''
+    SELECT passage, labez, clique, source_labez, source_clique, original,
+           sys_period, user_id_start, user_id_stop
+    FROM locstem_view
+    WHERE user_id_start != 0
+    UNION
+    SELECT p.passage, labez, clique, source_labez, source_clique, original,
+           sys_period, user_id_start, user_id_stop
+    FROM locstem_tts lt
+    JOIN passages p USING (pass_id)
+    ORDER BY passage, sys_period, labez, clique
+    ''')
+
+view ('export_notes', Base2.metadata, '''
+    SELECT passage, note, sys_period, user_id_start, user_id_stop
+    FROM notes_view
+    UNION
+    SELECT p.passage, note, sys_period, user_id_start, user_id_stop
+    FROM notes_tts
+    JOIN passages p USING (pass_id)
+    ORDER BY passage, sys_period
+    ''')
 
 generic (Base2.metadata, '''
 CREATE UNIQUE INDEX IF NOT EXISTS readings_unique_pass_id_lesart ON readings (pass_id, lesart) WHERE labez !~ '^z'
@@ -1291,7 +1453,7 @@ function ('user_id', Base2.metadata, '', 'INTEGER', '''
 SELECT current_setting ('ntg.user_id')::int;
 ''', volatility = 'STABLE')
 
-# implement automagic TTS on cliques, locstem and ms_cliques
+# implement automagic TTS on cliques, locstem, ms_cliques, and notes
 
 function ('cliques_trigger_f', Base2.metadata, '', 'TRIGGER', '''
    BEGIN
@@ -1347,6 +1509,24 @@ function ('ms_cliques_trigger_f', Base2.metadata, '', 'TRIGGER', '''
    END;
 ''', language = 'plpgsql', volatility = 'VOLATILE')
 
+function ('notes_trigger_f', Base2.metadata, '', 'TRIGGER', '''
+   BEGIN
+      IF TG_OP IN ('UPDATE', 'DELETE') THEN
+        -- transfer data to tts table
+        INSERT INTO notes_tts (pass_id, note,
+                               sys_period, user_id_start, user_id_stop)
+        VALUES (OLD.pass_id, OLD.note,
+                close_period (OLD.sys_period), OLD.user_id_start, user_id ());
+      END IF;
+      IF TG_OP IN ('UPDATE', 'INSERT') THEN
+        NEW.sys_period = tstzrange (now (), NULL);
+        NEW.user_id_start = user_id ();
+        RETURN NEW;
+      END IF;
+      RETURN OLD;
+   END;
+''', language = 'plpgsql', volatility = 'VOLATILE')
+
 generic (Base2.metadata, '''
     CREATE TRIGGER cliques_trigger
     BEFORE INSERT OR UPDATE OR DELETE ON cliques
@@ -1371,6 +1551,15 @@ generic (Base2.metadata, '''
     FOR EACH ROW EXECUTE PROCEDURE ms_cliques_trigger_f ()
 ''', '''
     DROP TRIGGER IF EXISTS ms_cliques_trigger ON ms_cliques
+'''
+)
+
+generic (Base2.metadata, '''
+    CREATE TRIGGER notes_trigger
+    BEFORE INSERT OR UPDATE OR DELETE ON notes
+    FOR EACH ROW EXECUTE PROCEDURE notes_trigger_f ()
+''', '''
+    DROP TRIGGER IF EXISTS notes_trigger ON notes
 '''
 )
 
@@ -1443,13 +1632,13 @@ class Nestle (Base4):
 
     begadr    = Column (Integer,       nullable = False)
     endadr    = Column (Integer,       nullable = False)
-    irange    = Column (IntRangeType,  nullable = False)
+    passage   = Column (IntRangeType,  nullable = False)
 
     lemma     = Column (String(1024),  server_default = '')
 
     __table_args__ = (
-        UniqueConstraint (irange, name = 'unique_nestle_irange'), # needs name
-        Index ('ix_nestle_irange_gist', irange, postgresql_using = 'gist'),
+        UniqueConstraint (passage, name = 'unique_nestle_passage'), # needs name
+        Index ('ix_nestle_passage_gist', passage, postgresql_using = 'gist'),
     )
 
 

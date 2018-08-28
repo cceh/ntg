@@ -1,7 +1,7 @@
 *~
 \#*\#
+backups/
 pylintgraph.dot
-bower_components/
 node_modules/
 jsdoc/
 output/
