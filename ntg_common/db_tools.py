@@ -13,7 +13,6 @@ import os.path
 
 import networkx as nx
 import sqlalchemy
-import sqlalchemy_utils
 from sqlalchemy.sql import text
 
 from .tools import log
@@ -168,7 +167,7 @@ def tabulate (res):
 
 
 def truncate_editor_tables (conn):
-    res = execute (conn, """
+    execute (conn, """
     TRUNCATE cliques_tts, ms_cliques_tts, locstem_tts, notes_tts RESTART IDENTITY;
     TRUNCATE cliques, ms_cliques, locstem, notes RESTART IDENTITY;
     """, {})
@@ -252,7 +251,7 @@ def init_default_locstem (conn):
     """, {})
 
 
-class MySQLEngine (object):
+class MySQLEngine ():
     """ Database Interface """
 
     def __init__ (self, fn = MYSQL_DEFAULT_FILES, group = MYSQL_DEFAULT_GROUPS, db = ''):
@@ -302,7 +301,7 @@ class MySQLEngine (object):
             section = config[group]
             for key, alias in parameters.items ():
                 if key in section:
-                    params[alias] = section[key].strip ('"');
+                    params[alias] = section[key].strip ('"')
             for key, alias in options.items ():
                 if key in section:
                     params['query'][alias] = section[key].strip ('"')
@@ -316,7 +315,7 @@ class MySQLEngine (object):
         return connection
 
 
-class PostgreSQLEngine (object):
+class PostgreSQLEngine ():
     """ PostgreSQL Database Interface """
 
     @staticmethod
@@ -376,7 +375,7 @@ class PostgreSQLEngine (object):
         }
         res = {}
 
-        for p in defaults.keys ():
+        for p in defaults:
             pu = 'PG' + p.upper ()
             res[p] = args.get (p) or args.get (pu) or os.environ.get (pu) or defaults[p]
 
@@ -418,36 +417,36 @@ def local_stemma_to_nx (conn, pass_id, add_isolated_roots = False):
 
     rows = list (map (Variant._make, res))
 
-    G = nx.DiGraph ()
+    graph = nx.DiGraph ()
 
     more_params = dict ()
     if add_isolated_roots:
-        more_params['draggable'] = '1';
-        more_params['droptarget'] = '1';
+        more_params['draggable'] = '1'
+        more_params['droptarget'] = '1'
 
     for row in rows:
-        G.add_node (row.labez_clique, label = row.labez_clique,
+        graph.add_node (row.labez_clique, label = row.labez_clique,
                     labez = row.labez, clique = row.clique, labez_clique = row.labez_clique,
                     **more_params)
 
         if row.source_labez_clique is None:
             if row.original:
-                G.add_edge ('*', row.labez_clique)
+                graph.add_edge ('*', row.labez_clique)
             else:
-                G.add_edge ('?', row.labez_clique)
+                graph.add_edge ('?', row.labez_clique)
         else:
-            G.add_edge (row.source_labez_clique, row.labez_clique)
+            graph.add_edge (row.source_labez_clique, row.labez_clique)
 
     more_params = dict ()
     if add_isolated_roots:
         # Add '*' and '?' nodes
-        G.add_node ('*')
-        G.add_node ('?')
-        more_params['droptarget'] = '1';
+        graph.add_node ('*')
+        graph.add_node ('?')
+        more_params['droptarget'] = '1'
 
-    if '*' in G:
-        G.node['*'].update (label = '*', labez='*', clique='0', labez_clique='*', **more_params)
-    if '?' in G:
-        G.node['?'].update (label = '?', labez='?', clique='0', labez_clique='?', **more_params)
+    if '*' in graph:
+        graph.node['*'].update (label = '*', labez='*', clique='0', labez_clique='*', **more_params)
+    if '?' in graph:
+        graph.node['?'].update (label = '?', labez='?', clique='0', labez_clique='?', **more_params)
 
-    return G
+    return graph

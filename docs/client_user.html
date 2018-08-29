@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>NTG Documentation &mdash; NTG 0.1.1 documentation</title>
+  <title>Client &mdash; NTG 0.1.1 documentation</title>
   
 
   
@@ -37,8 +37,10 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="NTG 0.1.1 documentation" href="#"/>
-        <link rel="next" title="Introduction" href="intro.html"/> 
+    <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
+        <link rel="up" title="User Manual" href="user.html"/>
+        <link rel="next" title="Server" href="server_user.html"/>
+        <link rel="prev" title="User Manual" href="user.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -57,7 +59,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> NTG
+            <a href="index.html" class="icon icon-home"> NTG
           
 
           
@@ -84,7 +86,7 @@
               
             
             
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#web-application">Web Application</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
@@ -106,8 +108,8 @@
 <li class="toctree-l2"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="client_user.html">Client</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="user.html">User Manual</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="server_user.html">Server</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="server_user.html#server-server-py">server/server.py</a></li>
 </ul>
@@ -201,7 +203,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">NTG</a>
+          <a href="index.html">NTG</a>
         
       </nav>
 
@@ -229,15 +231,17 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="#">Docs</a> &raquo;</li>
+      <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>NTG Documentation</li>
+          <li><a href="user.html">User Manual</a> &raquo;</li>
+        
+      <li>Client</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/client_user.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -250,51 +254,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="ntg-documentation">
-<span id="contents"></span><h1>NTG Documentation<a class="headerlink" href="#ntg-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#web-application">Web Application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#applying-the-cbgm">Applying the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#updating-the-apparatus">Updating the Apparatus</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="client_user.html">Client</a></li>
-<li class="toctree-l2"><a class="reference internal" href="server_user.html">Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="domain.html">Introduction to the Problem Domain (German)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a></li>
-<li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="database.html">Database Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html">Various Functions</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="section" id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
-</ul>
+  <div class="section" id="client">
+<h1>Client<a class="headerlink" href="#client" title="Permalink to this headline">¶</a></h1>
+<p>The client is just a bunch of javascript files that run in your browser.  Start
+the <a class="reference internal" href="server_user.html#server-py"><span class="std std-ref">server/server.py</span></a> and then point your browser to the client’s <code class="file docutils literal notranslate"><span class="pre">index.html</span></code>.</p>
+<p>The only thing the client needs to know is where to find the API.  That is
+configured in <code class="file docutils literal notranslate"><span class="pre">api.conf.js</span></code>:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">api_base_url</span> <span class="o">=</span> <span class="s1">&#39;http://localhost:5000/&#39;</span><span class="p">;</span>
+</pre></div>
 </div>
 </div>
 
@@ -308,8 +275,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="intro.html" class="btn btn-neutral float-right" title="Introduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="server_user.html" class="btn btn-neutral float-right" title="Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
+      
+        <a href="user.html" class="btn btn-neutral" title="User Manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

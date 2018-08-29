@@ -8,6 +8,9 @@ This script
 - calculates the pre-coherence similarity of manuscripts, and
 - calculates the post-coherence ancestrality of manuscripts.
 
+This script updates the tables shown in red in the `overview <db-overwiew>`.
+It also updates the Apparatus table where manuscript 'A is concerned.
+
 """
 
 import argparse
@@ -31,12 +34,14 @@ def build_A_text (dba, parameters):
     The editors' reconstruction of the archetype is recorded in the locstem
     table. This functions generates a virtual manuscript 'A' from those choices.
 
-    The designation as 'Fehlvers' can be seen as (and actually is) an editorial
-    decision that the verse is not original, so we can tranquilly set 'zu'.
+    The designation of a passage as 'Fehlvers' is an editorial decision that the
+    verse is not original, so we set 'zu'.
 
-    If the editors came to no decision, no 'original' reading will be found in
-    locstem.  In this case we set 'A' to 'zz' to signify that there is a gap in
-    the reconstructed text.
+    If the editors came to no final decision, no 'original' reading will be
+    found in locstem.  In this case we set 'A' to 'zz' and there will be a gap
+    in the reconstructed text.
+
+    The Lesart of 'A' is always NULL, because it is a virtual manuscript.
 
     """
 
@@ -48,33 +53,21 @@ def build_A_text (dba, parameters):
         DELETE FROM apparatus      WHERE ms_id = :ms_id;
         """, dict (parameters, ms_id = MS_ID_A))
 
-        # Fill with the original reading in locstem
+        # Fill with the original reading in locstem or 'zz' if none found
         execute (conn, """
-        INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, cbgm, origin)
-          SELECT :ms_id, pass_id, labez, clique, true, 'LOC'
-          FROM locstem l
-          JOIN passages p USING (pass_id)
-          WHERE NOT p.fehlvers AND l.original
+        INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, cbgm, origin, lesart)
+          SELECT :ms_id, p.pass_id, COALESCE (l.labez, 'zz'), COALESCE (l.clique, '1'), true, 'LOC', NULL
+          FROM passages p
+          LEFT JOIN locstem l ON (l.pass_id, l.original) = (p.pass_id, true)
+          WHERE NOT p.fehlvers
         """, dict (parameters, ms_id = MS_ID_A))
 
         # Fill Fehlverse with labez 'zu'
         execute (conn, """
-        INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, cbgm, origin)
-          SELECT :ms_id, p.pass_id, 'zu', '1', true, 'LOC'
+        INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, cbgm, origin, lesart)
+          SELECT :ms_id, p.pass_id, 'zu', '1', true, 'LOC', NULL
           FROM passages p
           WHERE p.fehlvers
-        """, dict (parameters, ms_id = MS_ID_A))
-
-        # Fill with labez 'zz' where locstem offers no original reading
-        execute (conn, """
-        INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, cbgm, origin, lesart)
-          SELECT :ms_id, p.pass_id, 'zz', '1', true, 'LOC', NULL
-          FROM passages p
-          WHERE NOT p.fehlvers AND NOT EXISTS (
-            SELECT 1
-            FROM locstem l
-            WHERE l.pass_id = p.pass_id AND l.original
-          )
         """, dict (parameters, ms_id = MS_ID_A))
 
 
@@ -193,7 +186,7 @@ def create_labez_matrix (dba, parameters, val):
         """, parameters)
         val.n_ranges = res.rowcount
         val.ranges = list (map (Range._make, res))
-        log (logging.INFO, 'No. of ranges: ' + str (val.n_ranges))
+        log (logging.INFO, '  No. of ranges: ' + str (val.n_ranges))
 
         # Matrix ms x pass
 
@@ -226,7 +219,7 @@ def create_labez_matrix (dba, parameters, val):
         val.def_matrix = np.greater (val.labez_matrix, 0)
         val.def_matrix = np.logical_and (val.def_matrix, val.variant_matrix) # mask invariant passages
 
-        log (logging.INFO, 'Size of the labez matrix: ' + str (val.labez_matrix.shape))
+        log (logging.INFO, '  Size of the labez matrix: ' + str (val.labez_matrix.shape))
 
 
 def count_by_range (a, range_starts, range_ends):
@@ -481,8 +474,6 @@ def calculate_mss_similarity_postco (dba, parameters, val):
             log (logging.ERROR, "norel < 0 in mss. %s"
                  % (np.nonzero (np.less (norel_matrix, 0))))
 
-        log (logging.INFO, "          Updating length in Ranges table ...")
-
         # calculate ranges lengths using numpy
         params = []
         for i in range (0, val.n_mss):
@@ -496,7 +487,7 @@ def calculate_mss_similarity_postco (dba, parameters, val):
         WHERE ms_id = :ms_id AND rg_id = :range
         """, parameters, params)
 
-        log (logging.INFO, "          Filling Affinity table ...")
+        log (logging.INFO, "  Filling Affinity table ...")
 
         # execute (conn, "TRUNCATE affinity", parameters) # fast but needs access exclusive lock
         execute (conn, "DELETE FROM affinity", parameters)
@@ -507,13 +498,15 @@ def calculate_mss_similarity_postco (dba, parameters, val):
                 for k in range (0, val.n_mss):
                     if j != k:
                         common = int (val.and_matrix[i,j,k])
+                        equal  = int (val.eq_matrix[i,j,k])
                         if common > 0:
                             values.append ( (
                                 range_.rg_id,
                                 j + 1,
                                 k + 1,
+                                float (equal) / common,
                                 common,
-                                int (val.eq_matrix[i,j,k]),
+                                equal,
                                 int (val.ancestor_matrix[i,j,k]),
                                 int (val.ancestor_matrix[i,k,j]),
                                 int (val.unclear_ancestor_matrix[i,j,k]),
@@ -525,26 +518,17 @@ def calculate_mss_similarity_postco (dba, parameters, val):
             # speed gain for using executemany_raw: 65s to 55s :-(
             # probably the bottleneck here is string formatting with %s
             executemany_raw (conn, """
-            INSERT INTO affinity (rg_id, ms_id1, ms_id2, common, equal,
+            INSERT INTO affinity (rg_id, ms_id1, ms_id2,
+                                  affinity, common, equal,
                                   older, newer, unclear,
                                   p_older, p_newer, p_unclear)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, parameters, values)
-
-        log (logging.INFO, "          Updating affinity in Affinity table ...")
-
-        execute (conn, """
-        UPDATE affinity
-        SET affinity = equal::float / common::float
-        WHERE common > 0
-        """, parameters)
 
         log (logging.DEBUG, "eq:"        + str (val.eq_matrix))
         log (logging.DEBUG, "ancestor:"  + str (val.ancestor_matrix))
         log (logging.DEBUG, "unclear:"   + str (val.unclear_ancestor_matrix))
         log (logging.DEBUG, "and:"       + str (val.and_matrix))
-
-        log (logging.INFO, "          Done with Affinity table ...")
 
 
 def build_parser ():

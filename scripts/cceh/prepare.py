@@ -25,6 +25,8 @@ all passages.
 
 Finally the script reconstructs the `mt`.
 
+After running this script should run the `cbgm.py` script.
+
    Ausgangspunkt ist der Apparat mit allen für die Druckfassung notwendigen
    Informationen.  Diese Datenbasis muss für die CBGM bearbeitet werden.  Die
    Ausgangsdaten stellen einen negativen Apparat dar, d.h. die griechischen
@@ -422,11 +424,13 @@ def copy_att (dba, parameters):
 
 
 def process_commentaries (dba, parameters):
-    """Process differing readings in commentaries (T1, T2)
+    """Process commentaries
 
-    If there is only one T1 or T2 reading for that passage and manuscript, unset
-    the 'T' suffix.  If there are both T1 and T2 readings, merge them into one
-    'zw' reading.
+    Commentaries often contain more than one reading of the same passage.  If
+    those readings are different we must degrade them to uncertain status.
+
+    Also promote the manuscript to 'normal' status by stripping the commentary
+    suffix (in re_comm) from the hs.
 
         20. Mai 2015.  Commentary manuscripts like 307 cannot be treated like
         lectionaries where we choose the first text.  If a T1 or T2 reading is
@@ -448,59 +452,49 @@ def process_commentaries (dba, parameters):
 
     with dba.engine.begin () as conn:
 
-        # T1 or T2 but not both
-        # promote to normal status by stripping T[1-9] from hs
+        # Fix duplicate labez by keeping only non-f readings.  We need this
+        # because we are mixing two different concepts again: An uncertain
+        # reading is *one* reading that may be read in different ways, but a
+        # commentary may well contain *two* different readings that are not
+        # uncertain at all.  The bottom line is: a commentary may offer two
+        # readings with the same labez (one with an 'f' labezsuf), which will
+        # break the primary key of the Apparatus even if marked as uncertain.
         execute (conn, """
+        DELETE FROM att u
+        WHERE id IN (
+          SELECT id
+          FROM (
+            SELECT id, ROW_NUMBER () OVER (partition BY hsnr, begadr, endadr, labez ORDER BY labezsuf) AS rownum
+            FROM att
+            WHERE hs ~ :re_comm
+          ) t
+          WHERE t.rownum > 1
+        )
+        """, parameters)
+
+        # Promote manuscript to normal status by stripping T[1-9] from hs.  If
+        # more than one T-reading is found, degrade both readings to uncertain
+        # status.
+        res = execute (conn, """
         UPDATE att u
-        SET hs = REGEXP_REPLACE (hs, :re_comm, '')
+        SET hs = REGEXP_REPLACE (hs, :re_comm, ''),
+            certainty = 1.0 / cnt
         FROM (
-          SELECT hsnr, begadr, endadr
-          FROM att
+          SELECT hsnr, begadr, endadr, count (*) as cnt
+          FROM att a
           WHERE hs ~ :re_comm
           GROUP BY hsnr, begadr, endadr
-          HAVING count (*) = 1
+          HAVING count (*) > 1
         ) AS t
         WHERE (u.hsnr, u.begadr, u.endadr) = (t.hsnr, t.begadr, t.endadr)
-
         """, parameters)
 
-        # T1 and T2
-        # Original hand wrote both readings.
-        # Group both T readings into one uncertain reading.
+        # Promote lacuna to normal status
         res = execute (conn, """
-        SELECT id, labez, labezsuf, CONCAT (hsnr, begadr, endadr) AS k
-        FROM att
-        WHERE (hsnr, begadr, endadr) IN (
-          SELECT DISTINCT hsnr, begadr, endadr
-          FROM att
-          WHERE hs ~ :re_comm
-        )
-        ORDER BY k  /* key for itertools.groupby */
+        UPDATE lac u
+        SET hs = REGEXP_REPLACE (hs, :re_comm, '')
+        WHERE hs ~ :re_comm
         """, parameters)
-
-        rows = res.fetchall ()
-        if len (rows):
-            for k, group in itertools.groupby (rows, operator.itemgetter (3)):
-                ids = []
-                labez = set ()
-                for row in group:
-                    ids.append (str (row[0]))
-                    labez.add (row[1] + ('_' + row[2] if row[2] else ''))
-
-                assert len (ids) > 1, "Programming error in T1, T2 processing."
-
-                execute (conn, """
-                DELETE FROM att
-                WHERE id IN ({ids})
-                """, dict (parameters, ids = ', '.join (ids[1:])))
-
-                execute (conn, """
-                UPDATE att
-                SET labez = '{labez}',
-                    labezsuf = '',
-                    hs = REGEXP_REPLACE (hs, :re_comm, '')
-                WHERE id = {id}
-                """, dict (parameters, id = ids[0], labez = '/'.join (sorted (labez))))
 
 
 def delete_corrector_hands (dba, parameters):
@@ -508,40 +502,59 @@ def delete_corrector_hands (dba, parameters):
 
     Delete all corrections except those by the first hand.
 
-    Also delete lectionary readings except L1.
-
-        Lesarten löschen, die nicht von der ersten Hand stammen.  Bei mehreren
-        Lektionslesarten gilt die L1-Lesart.  Ausnahme: Bei Selbstkorrekturen
-        wird die *-Lesart gelöscht und die C*-Lesart beibehalten.
+        Lesarten löschen, die nicht von der ersten Hand stammen.  [...]
+        Ausnahme: Bei Selbstkorrekturen wird die *-Lesart gelöscht und die
+        C*-Lesart beibehalten.
 
         --prepare4cbgm_6.py
 
     """
 
-    with dba.engine.begin () as conn:
+    if 're_corr' not in parameters:
+        return
 
+    if 're_corr_keep' not in parameters:
+        return
+
+    with dba.engine.begin () as conn:
         for t in ('att', 'lac'):
+            # Delete all corrections except those by the original hand
+            execute (conn, """
+            DELETE FROM {t}
+            WHERE hs ~ :re_corr AND hs !~ :re_corr_keep
+            """, dict (parameters, t = t))
+
             # Delete all other readings if there is a C* reading.
             execute (conn, """
             DELETE FROM {t}
             WHERE (hsnr, begadr, endadr) IN (
-              SELECT hsnr, begadr, endadr
+              SELECT DISTINCT hsnr, begadr, endadr
               FROM {t}
-              WHERE hs ~  :regexp
-            ) AND   hs !~ :regexp
-            """, dict (parameters, t = t, regexp = 'C[*]'))
+              WHERE hs ~  :re_corr_keep
+            ) AND   hs !~ :re_corr_keep
+            """, dict (parameters, t = t))
 
-            if 're_corr' in parameters:
-                execute (conn, """
-                DELETE FROM {t}
-                WHERE hs ~ :re_corr AND hs !~ 'C[*]'
-                """, dict (parameters, t = t))
 
-            if 're_lekt' in parameters:
-                execute (conn, """
-                DELETE FROM {t}
-                WHERE hs ~ :re_lekt
-                """, dict (parameters, t = t))
+def delete_lectionaries (dba, parameters):
+    """Delete secondary lectionary readings
+
+    Also delete lectionary readings except L1.
+
+        Bei mehreren Lektionslesarten gilt die L1-Lesart.
+
+        --prepare4cbgm_6.py
+
+    """
+
+    if 're_lekt' not in parameters:
+        return
+
+    with dba.engine.begin () as conn:
+        for t in ('att', 'lac'):
+            execute (conn, """
+            DELETE FROM {t}
+            WHERE hs ~ :re_lekt
+            """, dict (parameters, t = t))
 
 
 def process_sigla (dba, parameters):
@@ -573,6 +586,7 @@ def process_sigla (dba, parameters):
             WHERE (hsnr, begadr, endadr) IN (
                SELECT hsnr, begadr, endadr
                FROM att
+               WHERE certainty = 1.0
                GROUP BY hsnr, begadr, endadr
                HAVING count (*) > 1
             )
@@ -1479,7 +1493,7 @@ def fill_apparatus_table (dba, parameters):
         execute (conn, """
         INSERT INTO apparatus (pass_id, ms_id, labez, cbgm, labezsuf, certainty, lesart, origin)
         SELECT p.pass_id, ms.ms_id, a.labez, a.certainty = 1.0, COALESCE (a.labezsuf, ''),
-               a.certainty, NULLIF (a.lesart, r.lesart), 'UNC'
+               a.certainty, NULLIF (a.lesart, r.lesart), 'ZW'
         FROM passages p, manuscripts ms, readings r, att a
         WHERE p.pass_id = r.pass_id AND p.passage = a.passage
           AND ms.hsnr = a.hsnr AND r.labez = a.labez
@@ -1690,7 +1704,8 @@ def build_parser ():
 
 if __name__ == '__main__':
 
-    args, config = init_cmdline (build_parser ())
+    parser = build_parser ()
+    args, config = init_cmdline (parser)
 
     if not re.match ('^[-0-9]*$', args.range):
         print ("Error in range option")
@@ -1712,6 +1727,7 @@ if __name__ == '__main__':
         parameters['re_hs']    = '^(A|MT|([P0L]?[1-9][0-9]*)(s[1-9]?)?)'
         parameters['re_supp']  = 's[1-9]?'   # later supplements
         parameters['re_corr']  = 'C[*1-9]?'  # correctors
+        parameters['re_corr_keep'] = 'C[*]'
         parameters['re_lekt']  = '.[AK]|L2$' # suppress these mss. (eg. secondary readings of lectionaries)
                                              # do not match 'A' and 'L2010' !!!
         parameters['re_comm']  = 'T[1-9]'    # commentaries
@@ -1720,18 +1736,18 @@ if __name__ == '__main__':
     if book == 'Mark':
         parameters['re_hs_t']  = '^(A|MT|([P0L]?[1-9][0-9]*[*]?s?(-[1-9])?r?))$'
         parameters['re_hs']    = '^(A|MT|([P0L]?[1-9][0-9]*s?))'
-        parameters['re_supp']  = 's[1-9]?'  # later supplements
-        parameters['re_corr']  = 'C'           # correctors
+        parameters['re_supp']  = 's[1-9]?'   # later supplements
         parameters['re_lekt']  = '-[2-9]|.[ABDEFHJKL]'   # suppress these mss. (eg. secondary readings of lectionaries)
-        parameters['re_comm']  = 'T[1-9]'      # commentaries
-        parameters['re_vid']   = 'V'           # videtur (visual guesswork)
+        parameters['re_comm']  = 'T[1-9]'    # commentaries
+        parameters['re_vid']   = 'V'         # videtur (visual guesswork)
         parameters['re_labez'] = '^([a-z]|y[a-t]|z[u-z])$'
     if book == 'John':
         parameters['re_hs_t']  = '^(A|MT|FΠ|([P0LF]?[1-9][0-9]*)S?(C[*]?)?)'
         parameters['re_hs']    = '^(A|MT|FΠ|([P0LF]?[1-9][0-9]*)S?(C[*]?)?)'
         parameters['re_supp']  = 'S[*]?'
-        parameters['re_lekt']  = '-[2-9]' # lectionaries
+        parameters['re_lekt']  = '-[2-9]'    # lectionaries
         parameters['re_corr']  = '(C[*1-9]?A?([a-z]+2?)?)'
+        parameters['re_corr_keep'] = 'C[*]'
         parameters['re_labez'] = '^([a-z]+(/[a-z]+)*|z[u-z])$'
 
     dbdest = db_tools.PostgreSQLEngine (**config)
@@ -1739,16 +1755,20 @@ if __name__ == '__main__':
     try:
         for step in range (args.range[0], args.range[1] + 1):
             if step == 2:
-                log (logging.INFO, "Step  2: Making a working copy of the att and lac tables ...")
+                log (logging.INFO, "Step  2 : Making a working copy of the att and lac tables ...")
                 copy_att (dbdest, parameters)
                 continue
             if step == 3:
-                log (logging.INFO, "Step  3: Processing Commentaries ...")
+                log (logging.INFO, "Step  3 : Processing Commentaries ...")
                 process_commentaries (dbdest, parameters)
                 continue
             if step == 4:
                 log (logging.INFO, "Step  4 : Delete corrector hands ...")
                 delete_corrector_hands (dbdest, parameters)
+                continue
+            if step == 5:
+                log (logging.INFO, "Step  5 : Delete lectionaries ...")
+                delete_lectionaries (dbdest, parameters)
                 continue
             if step == 6:
                 log (logging.INFO, "Step  6 : Remove suffixes from sigla ...")

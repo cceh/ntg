@@ -4,6 +4,7 @@
 """Initialize the database for user authentication and authorization."""
 
 import argparse
+import datetime
 import logging
 
 from passlib.context import CryptContext

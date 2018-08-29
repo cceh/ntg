@@ -95,14 +95,23 @@
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#database-access">Database Access</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_user.html">Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_user.html">Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-server-py">server/server.py</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
@@ -248,17 +257,17 @@
   <div class="section" id="database-structure">
 <h1>Database Structure<a class="headerlink" href="#database-structure" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="cbgm-database">
-<h2>CBGM Database<a class="headerlink" href="#cbgm-database" title="Permalink to this headline">¶</a></h2>
+<span id="cbgm-db"></span><h2>CBGM Database<a class="headerlink" href="#cbgm-database" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="#cbgm-db"><span class="std std-ref">CBGM Database</span></a> is built from the <a class="reference internal" href="#source-db"><span class="std std-ref">Source Database</span></a> by the <a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import" title="scripts.cceh.import: Import mysql databases"><code class="xref py py-mod docutils literal notranslate"><span class="pre">import</span></code></a> script.  The <a class="reference internal" href="server_dev.html#module-server" title="server: API Server"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span> <span class="pre">server</span></code></a> uses this
+database.</p>
 <div class="figure align-center" id="id3">
-<img alt="_images/uml.svg" src="_images/uml.svg" /><p class="caption"><span class="caption-text">Overview of the CBGM database (some columns omitted)</span></p>
+<span id="db-overwiew"></span><img alt="_images/uml.svg" src="_images/uml.svg" /><p class="caption"><span class="caption-text">Overview of the CBGM database (some columns omitted)</span></p>
 </div>
-<p>The CBGM database is built from the mysql <a class="reference internal" href="#source-database"><span class="std std-ref">Source Database</span></a>
-by the <a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import" title="scripts.cceh.import: Import mysql databases"><code class="xref py py-mod docutils literal notranslate"><span class="pre">import</span></code></a> script.
-The <a class="reference internal" href="server_dev.html#module-server" title="server: API Server"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span> <span class="pre">server</span></code></a> uses this database.</p>
-<p>The editors update the green tables through a graphical editor.  These tables
-are <a class="reference internal" href="#tts"><span class="std std-ref">journalled</span></a> to provide undo functionality.</p>
-<p>The CBGM process populates the red tables.</p>
-<p>The <a class="reference internal" href="client_dev.html#web-client"><span class="std std-ref">Web Client</span></a> uses all these table.</p>
+<p>The editors update the tables shown in green through a graphical editor.  These
+tables are <a class="reference internal" href="#tts"><span class="std std-ref">journalled</span></a> to provide undo functionality.</p>
+<p>The CBGM process updates the tables shown in red and the Apparatus table where
+manuscript ‘A’ is concerned.</p>
+<p>The <a class="reference internal" href="server_dev.html#module-server" title="server: API Server"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">server</span></code></a> uses all these tables.</p>
 <div class="figure align-center" id="id4">
 <img src="_images/graphviz-15d8a244a9a50064f723879a608669ad2a76ff24.png" alt="UML Database Graph" class="sauml"/>
 <p class="caption"><span class="caption-text">Work database structure</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
@@ -372,17 +381,61 @@ readings with certainty &lt; 1.0, all of them summing to no more than 1.0.</p>
 <dl class="attribute">
 <dt id="ntg_common.db.Apparatus.lesart">
 <code class="descname">lesart</code><a class="headerlink" href="#ntg_common.db.Apparatus.lesart" title="Permalink to this definition">¶</a></dt>
-<dd><p>The actual reading offered by the manuscript if different from the
-normalized reading in readings.lesart.  Readings are NULL if they
-correspond exactly to the reading in the readings table.  For ‘f’ and
-‘o’ readings (errors and orthographic variants) the actual reading is
-inserted.</p>
+<dd><p>The actual reading offered by the manuscript.  A lacuna is stored as
+NULL.  Omitted text is stored as the empty string.</p>
+<p>This field is also set to NULL if the manuscript offers the same reading
+as recorded in the <a class="reference internal" href="#ntg_common.db.Readings" title="ntg_common.db.Readings"><code class="xref py py-class docutils literal notranslate"><span class="pre">Readings</span></code></a> table for the
+manuscript’s labez.  (Saves space and can easily be reconstructed.)</p>
+<p>As a rule of thumb: For ‘f’ and ‘o’ readings (errors and orthographic
+variants) the actual reading will be inserted.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="ntg_common.db.Apparatus.origin">
 <code class="descname">origin</code><a class="headerlink" href="#ntg_common.db.Apparatus.origin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Where does this apparatus entry come from? For debugging purposes.</p>
+<dd><p>Used only for debugging.  Shows where this entry in the positive
+apparatus came from.</p>
+<dl class="data">
+<dt id="ntg_common.db.Apparatus.ATT">
+<code class="descname">ATT</code><a class="headerlink" href="#ntg_common.db.Apparatus.ATT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copied from negative apparatus in att table in
+<a class="reference internal" href="scripts_dev.html#scripts.cceh.prepare.fill_apparatus_table" title="scripts.cceh.prepare.fill_apparatus_table"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fill_apparatus_table()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Apparatus.BYZ">
+<code class="descname">BYZ</code><a class="headerlink" href="#ntg_common.db.Apparatus.BYZ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deduced <a class="reference internal" href="domain.html#mt"><span class="std std-ref">Majority Text</span></a> in <a class="reference internal" href="scripts_dev.html#scripts.cceh.prepare.build_MT_text" title="scripts.cceh.prepare.build_MT_text"><code class="xref py py-meth docutils literal notranslate"><span class="pre">build_MT_text()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Apparatus.DEF">
+<code class="descname">DEF</code><a class="headerlink" href="#ntg_common.db.Apparatus.DEF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default value from conversion to positive apparatus in
+<a class="reference internal" href="scripts_dev.html#scripts.cceh.prepare.fill_apparatus_table" title="scripts.cceh.prepare.fill_apparatus_table"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fill_apparatus_table()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Apparatus.LAC">
+<code class="descname">LAC</code><a class="headerlink" href="#ntg_common.db.Apparatus.LAC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unrolled lacuna from lac table in
+<a class="reference internal" href="scripts_dev.html#scripts.cceh.prepare.fill_apparatus_table" title="scripts.cceh.prepare.fill_apparatus_table"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fill_apparatus_table()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Apparatus.LOC">
+<code class="descname">LOC</code><a class="headerlink" href="#ntg_common.db.Apparatus.LOC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deduced from locstem table in
+<a class="reference internal" href="scripts_dev.html#scripts.cceh.cbgm.build_A_text" title="scripts.cceh.cbgm.build_A_text"><code class="xref py py-meth docutils literal notranslate"><span class="pre">build_A_text()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ntg_common.db.Apparatus.ZW">
+<code class="descname">ZW</code><a class="headerlink" href="#ntg_common.db.Apparatus.ZW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uncertain reading from unrolling of ‘zw’ in
+<a class="reference internal" href="scripts_dev.html#scripts.cceh.prepare.unroll_zw" title="scripts.cceh.prepare.unroll_zw"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unroll_zw()</span></code></a>.</p>
+</dd></dl>
+
 </dd></dl>
 
 </dd></dl>
@@ -1124,7 +1177,7 @@ orthographic variants are normalized.  Following abbreviations are used:</p>
 </div>
 </div>
 <div class="section" id="source-database">
-<span id="id2"></span><h2>Source Database<a class="headerlink" href="#source-database" title="Permalink to this headline">¶</a></h2>
+<span id="source-db"></span><h2>Source Database<a class="headerlink" href="#source-database" title="Permalink to this headline">¶</a></h2>
 <p>This is the legacy database used in Münster.
 There are 28 instances of each table, one for each chapter of Acts.
 These tables are only used once for building the <a class="reference internal" href="#module-ntg_common.db" title="ntg_common.db: Database Structure"><code class="xref py py-mod docutils literal notranslate"><span class="pre">CBGM</span> <span class="pre">database</span></code></a>.
@@ -1135,6 +1188,8 @@ The database system is MySQL.</p>
 <img src="_images/graphviz-342d852185a07bae9f8cfaa89a58efdb205dd290.png" alt="UML Database Graph" class="sauml"/>
 <p class="caption"><span class="caption-text">Source database structure</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </div>
+<div class="section" id="id2">
+<h3>Tables<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="ntg_common.src_db.Acts01GVZ">
 <em class="property">class </em><code class="descname">Acts01GVZ</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.Acts01GVZ" title="Permalink to this definition">¶</a></dt>
@@ -1214,6 +1269,7 @@ which reading is derived from which other reading(s) at each passage.</p>
 <img src="_images/graphviz-caeede30db3ab701a78d4e505195e783943fdd4a.png" alt="UML Database Graph" class="sauml"/>
 </dd></dl>
 
+</div>
 </div>
 <div class="section" id="literature">
 <h2>Literature<a class="headerlink" href="#literature" title="Permalink to this headline">¶</a></h2>

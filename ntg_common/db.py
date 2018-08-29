@@ -688,15 +688,49 @@ class Apparatus (Base2):
 
     .. attribute:: lesart
 
-        The actual reading offered by the manuscript if different from the
-        normalized reading in readings.lesart.  Readings are NULL if they
-        correspond exactly to the reading in the readings table.  For 'f' and
-        'o' readings (errors and orthographic variants) the actual reading is
-        inserted.
+        The actual reading offered by the manuscript.  A lacuna is stored as
+        NULL.  Omitted text is stored as the empty string.
+
+        This field is also set to NULL if the manuscript offers the same reading
+        as recorded in the :class:`~ntg_common.db.Readings` table for the
+        manuscript's labez.  (Saves space and can easily be reconstructed.)
+
+        As a rule of thumb: For 'f' and 'o' readings (errors and orthographic
+        variants) the actual reading will be inserted.
 
     .. attribute:: origin
 
-        Where does this apparatus entry come from? For debugging purposes.
+        Used only for debugging.  Shows where this entry in the positive
+        apparatus came from.
+
+        .. data:: ATT
+
+           Copied from negative apparatus in att table in
+           :meth:`~scripts.cceh.prepare.fill_apparatus_table`.
+
+        .. data:: BYZ
+
+           Deduced `mt` in :meth:`~scripts.cceh.prepare.build_MT_text`.
+
+        .. data:: DEF
+
+           Default value from conversion to positive apparatus in
+           :meth:`~scripts.cceh.prepare.fill_apparatus_table`.
+
+        .. data:: LAC
+
+           Unrolled lacuna from lac table in
+           :meth:`~scripts.cceh.prepare.fill_apparatus_table`.
+
+        .. data:: LOC
+
+           Deduced from locstem table in
+           :meth:`~scripts.cceh.cbgm.build_A_text`.
+
+        .. data:: ZW
+
+           Uncertain reading from unrolling of 'zw' in
+           :meth:`~scripts.cceh.prepare.unroll_zw`.
 
     """
 

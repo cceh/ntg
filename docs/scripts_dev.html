@@ -95,14 +95,23 @@
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#database-access">Database Access</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_user.html">Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_user.html">Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-server-py">server/server.py</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
@@ -584,6 +593,8 @@ oder b/bo_f).  In diesen Fällen tritt die Buchstabenkennung der
 <li>calculates the pre-coherence similarity of manuscripts, and</li>
 <li>calculates the post-coherence ancestrality of manuscripts.</li>
 </ul>
+<p>This script updates the tables shown in red in the <a class="reference internal" href="database.html#db-overwiew"><span class="std std-ref">overview</span></a>.
+It also updates the Apparatus table where manuscript ‘A is concerned.</p>
 <dl class="class">
 <dt id="scripts.cceh.cbgm.CBGM_Params">
 <em class="property">class </em><code class="descname">CBGM_Params</code><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params" title="Permalink to this definition">¶</a></dt>
@@ -684,11 +695,12 @@ database.</p>
 <dd><p>Build the ‘A’ text</p>
 <p>The editors’ reconstruction of the archetype is recorded in the locstem
 table. This functions generates a virtual manuscript ‘A’ from those choices.</p>
-<p>The designation as ‘Fehlvers’ can be seen as (and actually is) an editorial
-decision that the verse is not original, so we can tranquilly set ‘zu’.</p>
-<p>If the editors came to no decision, no ‘original’ reading will be found in
-locstem.  In this case we set ‘A’ to ‘zz’ to signify that there is a gap in
-the reconstructed text.</p>
+<p>The designation of a passage as ‘Fehlvers’ is an editorial decision that the
+verse is not original, so we set ‘zu’.</p>
+<p>If the editors came to no final decision, no ‘original’ reading will be
+found in locstem.  In this case we set ‘A’ to ‘zz’ and there will be a gap
+in the reconstructed text.</p>
+<p>The Lesart of ‘A’ is always NULL, because it is a virtual manuscript.</p>
 </dd></dl>
 
 <dl class="function">

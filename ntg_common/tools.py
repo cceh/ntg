@@ -80,10 +80,6 @@ they are not included in the text of manuscript 'A'.
 
 logger = logging.getLogger ()
 
-LOG_HILITE = {
-    logging.ERROR : ('\x1B[1m', '\x1B[0m')
-}
-
 def quote (s):
     if ' ' in s:
         return '"' + s + '"'
@@ -95,12 +91,7 @@ def log (level, msg, *aargs, **kwargs):
     Low level log function
     """
 
-    d = {
-        'delta': str (datetime.datetime.now () - args.start_time),
-        'hilitestart' : LOG_HILITE.get (level, ('', ''))[0],
-        'hiliteend'   : LOG_HILITE.get (level, ('', ''))[1],
-    }
-    logger.log (level, msg, *aargs, extra = d)
+    logger.log (level, msg, *aargs)
 
 
 def graphviz_layout (dot, format = 'dot'):

@@ -14,6 +14,8 @@ The mysql databases for Acts contain sets of 28 tables, one for each respective
 chapter of Acts.  This is a historical incident: The software used when the CBGM
 was first implemented could not handle big tables.
 
+After running this script should run the `prepare.py` script.
+
 """
 
 import argparse

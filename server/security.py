@@ -2,9 +2,6 @@
 
 """An application server for CBGM.  User management module.  """
 
-import sqlalchemy
-from sqlalchemy import String, Integer, Float, Boolean, DateTime, Column, Index, UniqueConstraint, ForeignKey
-
 from flask_user import UserMixin
 import flask_login
 
@@ -26,12 +23,8 @@ def declare_user_model (db): # db = flask_sqlalchemy.SQLAlchemy ()
     class Role (db.Model, dbx._Role):
         __tablename__ = 'role'
 
-        pass
-
     class Roles_Users (db.Model, dbx._Roles_Users):
         __tablename__ = 'roles_users'
-
-        pass
 
 
 class AnonymousUserMixin (flask_login.AnonymousUserMixin):

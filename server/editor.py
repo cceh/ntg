@@ -2,37 +2,20 @@
 
 """An application server for CBGM.  Editor module.  """
 
-import argparse
-import collections
-import csv
-import datetime
-import functools
-import glob
-import io
-import itertools
 import logging
-import math
-import operator
 import re
-import sys
-import os
-import os.path
-import urllib.parse
 
 import flask
 from flask import request, current_app
-from flask_user import roles_required
 import flask_login
 import networkx as nx
 import sqlalchemy
 
 from ntg_common import tools
 from ntg_common import db_tools
-from ntg_common.db_tools import execute, rollback
-from ntg_common.config import args
+from ntg_common.db_tools import execute
 
-from . import helpers
-from .helpers import parameters, Bag, Passage, Manuscript, make_json_response, make_text_response
+from .helpers import parameters, Passage, make_json_response, make_text_response
 
 RE_VALID_LABEZ  = re.compile ('^([*]|[?]|[a-y]|z[u-z])$')
 RE_VALID_CLIQUE = re.compile ('^[0-9]$')
@@ -124,27 +107,32 @@ def stemma_edit (passage_or_id):
                 """, dict (parameters, **params))
             except sqlalchemy.exc.IntegrityError as e:
                 if 'unique constraint' in str (e):
-                    raise EditError ('Only one original reading allowed. If you want to change the original reading, first remove the old original reading.<br/><br/>' + str (e))
+                    raise EditError (
+                        '''Only one original reading allowed. If you want to change the original
+                        reading, first remove the old original reading.<br/><br/>''' + str (e)
+                    )
                 raise EditError (str (e))
             except sqlalchemy.exc.DatabaseError as e:
                 raise EditError (str (e))
 
             # test the still uncommited changes
 
-            G = db_tools.local_stemma_to_nx (conn, passage.pass_id)
+            graph = db_tools.local_stemma_to_nx (conn, passage.pass_id)
 
             # test: not a DAG
-            if not nx.is_directed_acyclic_graph (G):
+            if not nx.is_directed_acyclic_graph (graph):
                 raise EditError ('The graph is not a DAG anymore.')
             # test: not connected
-            G.add_edge ('*', '?')
-            if not nx.is_weakly_connected (G):
+            graph.add_edge ('*', '?')
+            if not nx.is_weakly_connected (graph):
                 raise EditError ('The graph is not connected anymore.')
             # test: x derived from x
-            for e in G.edges:
+            for e in graph.edges:
                 if e[0][0] == e[1][0]:
-                    raise EditError ('A reading cannot be derived from the same reading.  If you want to <b>merge</b> instead, use shift + drag.')
-
+                    raise EditError (
+                        '''A reading cannot be derived from the same reading.
+                        If you want to <b>merge</b> instead, use shift + drag.'''
+                    )
         elif action == 'split':
             # get the next free clique
             res = execute (conn, """
@@ -238,13 +226,12 @@ def notes (passage_or_id):
                        note = request.get_json ()['remarks']))
 
             return make_json_response (message = 'Notes saved.')
-        else:
-            res = execute (conn, """
-            SELECT note
-            FROM notes
-            WHERE pass_id = :pass_id
-            """, dict (parameters, pass_id = passage.pass_id))
+        res = execute (conn, """
+        SELECT note
+        FROM notes
+        WHERE pass_id = :pass_id
+        """, dict (parameters, pass_id = passage.pass_id))
 
-            if res.rowcount > 0:
-                return make_text_response (res.fetchone ()[0])
-            return make_text_response ('')
+        if res.rowcount > 0:
+            return make_text_response (res.fetchone ()[0])
+        return make_text_response ('')

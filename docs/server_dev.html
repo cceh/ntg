@@ -95,14 +95,23 @@
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#database-access">Database Access</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_user.html">Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_user.html">Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-server-py">server/server.py</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
@@ -250,7 +259,7 @@
 <p>The API server is written in Python using the Flask framework.</p>
 <div class="section" id="module-server.server">
 <span id="sever-server"></span><h2>sever.server<a class="headerlink" href="#module-server.server" title="Permalink to this headline">¶</a></h2>
-<p>An application server for CBGM. Main module.</p>
+<p>API server for CBGM.</p>
 <dl class="data">
 <dt id="server.server.EXCLUDE_REGEX_MAP">
 <code class="descname">EXCLUDE_REGEX_MAP</code><em class="property"> = {'A': 'A', 'F': 'F[1-9Π][0-9]*', 'MT': 'MT'}</em><a class="headerlink" href="#server.server.EXCLUDE_REGEX_MAP" title="Permalink to this definition">¶</a></dt>
@@ -267,6 +276,12 @@
 <dt id="server.server.application_json">
 <code class="descname">application_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.server.application_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  Serve information about the application.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.server.build_parser">
+<code class="descname">build_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.server.build_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the commandlien parser.</p>
 </dd></dl>
 
 <dl class="function">
@@ -311,9 +326,27 @@ per chapters.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="server.server.csvify">
+<code class="descname">csvify</code><span class="sig-paren">(</span><em>fields</em>, <em>rows</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.csvify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a HTTP response in CSV format.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="server.server.leitzeile_json">
 <code class="descname">leitzeile_json</code><span class="sig-paren">(</span><em>passage_or_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.leitzeile_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  Serve the leitzeile for the verse containing passage_or_id.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.server.make_safe_url">
+<code class="descname">make_safe_url</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.make_safe_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turns an usafe absolute URL into a safe relative URL
+by removing the scheme and the hostname</p>
+<dl class="docutils">
+<dt>Example: make_safe_url(‘<a class="reference external" href="http://hostname/path1/path2?q1=v1&amp;q2=v2#fragment">http://hostname/path1/path2?q1=v1&amp;q2=v2#fragment</a>’)</dt>
+<dd>returns: ‘/path1/path2?q1=v1&amp;q2=v2#fragment</dd>
+</dl>
+<p>Copied from flask_user/views.py because it was defective.</p>
 </dd></dl>
 
 <dl class="function">
@@ -409,7 +442,7 @@ manuscript and what they attest.</p>
 
 <dl class="function">
 <dt id="server.server.remove_z_leaves">
-<code class="descname">remove_z_leaves</code><span class="sig-paren">(</span><em>G</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.remove_z_leaves" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_z_leaves</code><span class="sig-paren">(</span><em>graph</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.remove_z_leaves" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes leaves (recursively) if they read z.</p>
 </dd></dl>
 
@@ -433,6 +466,18 @@ the layout on the server.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="server.server.stemma_dot">
+<code class="descname">stemma_dot</code><span class="sig-paren">(</span><em>passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.stemma_dot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a local stemma diagram in .dot format.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.server.stemma_png">
+<code class="descname">stemma_png</code><span class="sig-paren">(</span><em>passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.stemma_png" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a local stemma diagram in .png format.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="server.server.suggest_json">
 <code class="descname">suggest_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.server.suggest_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  The suggestion drop-downs in the navigator.</p>
@@ -445,6 +490,18 @@ the database.</p>
 <dt id="server.server.textflow">
 <code class="descname">textflow</code><span class="sig-paren">(</span><em>passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.textflow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output a stemma of manuscripts.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.server.textflow_dot">
+<code class="descname">textflow_dot</code><span class="sig-paren">(</span><em>passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.textflow_dot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a textflow diagram in .dot format.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.server.textflow_png">
+<code class="descname">textflow_png</code><span class="sig-paren">(</span><em>passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.textflow_png" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a textflow diagram in .png format.</p>
 </dd></dl>
 
 <dl class="function">
@@ -547,7 +604,7 @@ the database.</p>
 
 <dl class="function">
 <dt id="server.helpers.nx_to_dot">
-<code class="descname">nx_to_dot</code><span class="sig-paren">(</span><em>G</em>, <em>width=960.0</em>, <em>fontsize=10.0</em>, <em>nodesep=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.nx_to_dot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">nx_to_dot</code><span class="sig-paren">(</span><em>graph</em>, <em>width=960.0</em>, <em>fontsize=10.0</em>, <em>nodesep=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.nx_to_dot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert an nx graph into a dot file.</p>
 <p>We’d like to sort the nodes in the graph, but nx internally uses
 dictionaries “all the way down”.  Thus the only chance to sort nodes and
@@ -557,7 +614,7 @@ re-implementation of nx.nx_pydot.to_pydot ().</p>
 
 <dl class="function">
 <dt id="server.helpers.nx_to_dot_subgraphs">
-<code class="descname">nx_to_dot_subgraphs</code><span class="sig-paren">(</span><em>G</em>, <em>field</em>, <em>width=960.0</em>, <em>fontsize=10.0</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.nx_to_dot_subgraphs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">nx_to_dot_subgraphs</code><span class="sig-paren">(</span><em>graph</em>, <em>field</em>, <em>width=960.0</em>, <em>fontsize=10.0</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.nx_to_dot_subgraphs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert an nx graph into a dot file.</p>
 <p>We’d like to sort the nodes in the graph, but nx internally uses
 dictionaries “all the way down”.  Thus the only chance to sort nodes and

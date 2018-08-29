@@ -2,25 +2,29 @@
  Database Structure
 ====================
 
+.. _cbgm-db:
 
 CBGM Database
 =============
+
+The `cbgm-db` is built from the `source-db` by the :mod:`import
+<scripts.cceh.import>` script.  The :mod:`API server <server>` uses this
+database.
+
+.. _db-overwiew:
 
 .. figure:: uml.*
    :align: center
 
    Overview of the CBGM database (some columns omitted)
 
-The CBGM database is built from the mysql `source-database`
-by the :mod:`import <scripts.cceh.import>` script.
-The :mod:`API server <server>` uses this database.
+The editors update the tables shown in green through a graphical editor.  These
+tables are `journalled <tts>` to provide undo functionality.
 
-The editors update the green tables through a graphical editor.  These tables
-are `journalled <tts>` to provide undo functionality.
+The CBGM process updates the tables shown in red and the Apparatus table where
+manuscript 'A' is concerned.
 
-The CBGM process populates the red tables.
-
-The `web-client` uses all these table.
+The `server` uses all these tables.
 
 .. Palette https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Paired.js
 
@@ -36,7 +40,7 @@ The `web-client` uses all these table.
 .. _tts:
 
 Transaction-Time State Tables
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A transaction-time state table keeps track of the table's contents as it changes
 over time.  This is the basis for our undo-functionality in the graphical stemma
@@ -51,14 +55,14 @@ operations on the current table automagically update the past table also.
 
 
 Tables
-------
+~~~~~~
 
 .. automodule:: ntg_common.db
    :synopsis: Database Structure
    :members:
 
 
-.. _source-database:
+.. _source-db:
 
 Source Database
 ===============

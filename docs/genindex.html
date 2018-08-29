@@ -93,14 +93,23 @@
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#database-access">Database Access</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client_user.html">Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_user.html">Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-server-py">server/server.py</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
@@ -270,6 +279,13 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
+    -c &lt;config_path&gt;, --config-path &lt;config_path&gt;
+
+      <ul>
+        <li><a href="server_user.html#cmdoption-server-server-py-c">server/server.py command line option</a>
+</li>
+      </ul></li>
+      <li>
     -e &lt;email&gt;, --email &lt;email&gt;
 
       <ul>
@@ -291,6 +307,8 @@
         <li><a href="scripts_user.html#cmdoption-scripts-cceh-prepare-py-h">scripts/cceh/prepare.py command line option</a>
 </li>
         <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-h">scripts/cceh/save_edits.py command line option</a>
+</li>
+        <li><a href="server_user.html#cmdoption-server-server-py-h">server/server.py command line option</a>
 </li>
       </ul></li>
       <li>
@@ -346,6 +364,8 @@
 </li>
         <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-v">scripts/cceh/save_edits.py command line option</a>
 </li>
+        <li><a href="server_user.html#cmdoption-server-server-py-v">server/server.py command line option</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -373,14 +393,26 @@
 </li>
       <li><a href="client_dev.html#module-apparatus">apparatus (module)</a>
 </li>
+      <li><a href="database.html#ntg_common.db.Apparatus.ATT">Apparatus.ATT (in module ntg_common.db)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.Apparatus.BYZ">Apparatus.BYZ (in module ntg_common.db)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.Apparatus.DEF">Apparatus.DEF (in module ntg_common.db)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Apparatus.f">Apparatus.f (in module ntg_common.db)</a>
 </li>
-      <li><a href="database.html#ntg_common.db.Apparatus.o">Apparatus.o (in module ntg_common.db)</a>
+      <li><a href="database.html#ntg_common.db.Apparatus.LAC">Apparatus.LAC (in module ntg_common.db)</a>
 </li>
-      <li><a href="server_dev.html#server.server.apparatus_json">apparatus_json() (in module server.server)</a>
+      <li><a href="database.html#ntg_common.db.Apparatus.LOC">Apparatus.LOC (in module ntg_common.db)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="database.html#ntg_common.db.Apparatus.o">Apparatus.o (in module ntg_common.db)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.Apparatus.ZW">Apparatus.ZW (in module ntg_common.db)</a>
+</li>
+      <li><a href="server_dev.html#server.server.apparatus_json">apparatus_json() (in module server.server)</a>
+</li>
       <li><a href="server_dev.html#server.server.application_json">application_json() (in module server.server)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Att">Att (class in ntg_common.db)</a>
@@ -421,15 +453,17 @@
 </li>
       <li><a href="database.html#ntg_common.db.Books.book">book (Books attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Books">Books (class in ntg_common.db)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ntg_common.html#ntg_common.tools.BOOKS">BOOKS (in module ntg_common.tools)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.cbgm.build_A_text">build_A_text() (in module scripts.cceh.cbgm)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.build_MT_text">build_MT_text() (in module scripts.cceh.prepare)</a>
+</li>
+      <li><a href="server_dev.html#server.server.build_parser">build_parser() (in module server.server)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.BYZ_HSNR_ACTS">BYZ_HSNR_ACTS (in module ntg_common.tools)</a>
 </li>
@@ -471,10 +505,10 @@
 </li>
       <li><a href="client_dev.html#module-comparison">comparison (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="server_dev.html#server.server.comparison_detail">comparison_detail() (in module server.server)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="server_dev.html#server.server.comparison_detail_csv">comparison_detail_csv() (in module server.server)</a>
 </li>
       <li><a href="client_dev.html#module-comparison_details_table">comparison_details_table (module)</a>
@@ -506,6 +540,8 @@
       <li><a href="database.html#ntg_common.db.CreateGeneric">CreateGeneric (class in ntg_common.db)</a>
 </li>
       <li><a href="database.html#ntg_common.db.CreateView">CreateView (class in ntg_common.db)</a>
+</li>
+      <li><a href="server_dev.html#server.server.csvify">csvify() (in module server.server)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -696,6 +732,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="client_dev.html#module-main">main (module)</a>
+</li>
+      <li><a href="server_dev.html#server.server.make_safe_url">make_safe_url() (in module server.server)</a>
 </li>
       <li><a href="server_dev.html#server.helpers.Manuscript">Manuscript (class in server.helpers)</a>
 </li>
@@ -1003,8 +1041,6 @@
         <li><a href="scripts_user.html#cmdoption-scripts-cceh-mk-users-py-arg-path">path/to/_global.conf</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     scripts/cceh/prepare.py command line option
 
@@ -1018,6 +1054,8 @@
         <li><a href="scripts_user.html#cmdoption-scripts-cceh-prepare-py-arg-path">path/to/file.conf</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     scripts/cceh/save_edits.py command line option
 
@@ -1041,6 +1079,17 @@
 </li>
       <li><a href="server_dev.html#module-server.server">server.server (module)</a>
 </li>
+      <li>
+    server/server.py command line option
+
+      <ul>
+        <li><a href="server_user.html#cmdoption-server-server-py-c">-c &lt;config_path&gt;, --config-path &lt;config_path&gt;</a>
+</li>
+        <li><a href="server_user.html#cmdoption-server-server-py-h">-h, --help</a>
+</li>
+        <li><a href="server_user.html#cmdoption-server-server-py-v">-v, --verbose</a>
+</li>
+      </ul></li>
       <li><a href="database.html#ntg_common.db.Books.siglum">siglum (Books attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Passages.spanned">spanned (Passages attribute)</a>
@@ -1049,7 +1098,11 @@
 </li>
       <li><a href="server_dev.html#server.server.stemma">stemma() (in module server.server)</a>
 </li>
+      <li><a href="server_dev.html#server.server.stemma_dot">stemma_dot() (in module server.server)</a>
+</li>
       <li><a href="server_dev.html#server.editor.stemma_edit">stemma_edit() (in module server.editor)</a>
+</li>
+      <li><a href="server_dev.html#server.server.stemma_png">stemma_png() (in module server.server)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Att.suffix">suffix (Att attribute)</a>
 </li>
@@ -1073,9 +1126,13 @@
 </li>
       <li><a href="client_dev.html#module-textflow">textflow (module)</a>
 </li>
+      <li><a href="server_dev.html#server.server.textflow">textflow() (in module server.server)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="server_dev.html#server.server.textflow">textflow() (in module server.server)</a>
+      <li><a href="server_dev.html#server.server.textflow_dot">textflow_dot() (in module server.server)</a>
+</li>
+      <li><a href="server_dev.html#server.server.textflow_png">textflow_png() (in module server.server)</a>
 </li>
       <li><a href="client_dev.html#module-toolbar">toolbar (module)</a>
 </li>

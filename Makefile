@@ -52,7 +52,7 @@ dev-server-production:
 
 # cd server; make server; cd ..
 server:
-	python3 -m server.server -vv
+	python3 -m server.server -vvv
 
 users:
 	scripts/cceh/mk_users.py -vvv server/instance/_global.conf
@@ -171,7 +171,7 @@ lint: pylint eslint csslint
 
 pylint:
 	cd server; make pylint; cd ..
-	-pylint3 $(PY_SOURCES)
+	-pylint $(PY_SOURCES)
 
 csslint:
 	cd client ; make csslint ; cd ..

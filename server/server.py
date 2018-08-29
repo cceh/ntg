@@ -1,46 +1,39 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-"""An application server for CBGM. Main module."""
+"""API server for CBGM."""
 
 import argparse
 import collections
-import datetime
-import functools
 import glob
-import itertools
-import math
-import operator
 import re
-import sys
 import os
 import os.path
 import urllib.parse
 
 import flask
-import sqlalchemy
-import flask_sqlalchemy
 from flask import request, current_app
+import flask_sqlalchemy
 import flask_user
-from flask_user import login_required, roles_required
 import flask_login
 import flask_mail
 import networkx as nx
 
-from . import helpers
-from .helpers import parameters, Bag, Passage, Manuscript, make_json_response
-from . import security
-from . import editor
-
 from ntg_common.db_tools import execute, to_csv
-from ntg_common.config import args
+from ntg_common.config import init_cmdline
+from ntg_common.tools import log
 from ntg_common import tools
 from ntg_common import db_tools
+
+from . import helpers
+from .helpers import parameters, Passage, Manuscript, make_json_response
+from . import security
+from . import editor
 
 app = flask.Blueprint ('the_app', __name__)
 static_app = flask.Flask (__name__)
 dba = flask_sqlalchemy.SQLAlchemy ()
-user_model = security.declare_user_model (dba)
+security.declare_user_model (dba)
 db_adapter = flask_user.SQLAlchemyAdapter (dba, security.User)
 login_manager = flask_login.LoginManager ()
 login_manager.anonymous_user = security.AnonymousUserMixin
@@ -79,12 +72,19 @@ def _f_map_word (t):
         t2 = "%s" % t.wortanf
     return [t2, t2, t.lemma]
 
+
 EXCLUDE_REGEX_MAP = {
     'A'  : 'A',
     'MT' : 'MT',
     'F'  : 'F[1-9Π][0-9]*'
 }
 """ Regexes for the include/exclude toolbar buttons. """
+
+
+def csvify (fields, rows):
+    """ Send a HTTP response in CSV format. """
+    return flask.Response (to_csv (fields, rows), mimetype = 'text/csv')
+
 
 def get_excluded_ms_ids (conn, include):
     exclude = set (EXCLUDE_REGEX_MAP.keys ()) - set (include)
@@ -163,7 +163,7 @@ def passage_json (passage_or_id = None):
     with current_app.config.dba.engine.begin () as conn:
         if siglum and chapter and verse and word and button == 'Go':
             parsed_passage = Passage.parse ("%s %s:%s/%s" % (siglum, chapter, verse, word))
-            # tools.log (logging.INFO, parsed_passage)
+            # log (logging.INFO, parsed_passage)
             passage = Passage (conn, parsed_passage)
             return make_json_response (passage.to_json ())
 
@@ -217,7 +217,8 @@ def leitzeile_json (passage_or_id = None):
         ORDER BY begadr, endadr DESC
         """, dict (parameters, start = verse_start, end = verse_end))
 
-        Leitzeile = collections.namedtuple ('Leitzeile', 'begadr, endadr, lemma, pass_id, spanned, replaced')
+        Leitzeile = collections.namedtuple (
+            'Leitzeile', 'begadr, endadr, lemma, pass_id, spanned, replaced')
         leitzeile = [ Leitzeile._make (r)._asdict () for r in res ]
 
         return make_json_response (leitzeile)
@@ -245,7 +246,8 @@ def suggest_json ():
     chapter = request.args.get ('chapter') or 'All'
     verse   = request.args.get ('verse')   or '1'
 
-    Words = collections.namedtuple ('Words', 'kapanf, versanf, wortanf, kapend, versend, wortend, lemma')
+    Words = collections.namedtuple (
+        'Words', 'kapanf, versanf, wortanf, kapend, versend, wortend, lemma')
 
     res = []
     with current_app.config.dba.engine.begin () as conn:
@@ -258,9 +260,10 @@ def suggest_json ():
             WHERE siglum ~ :term OR book ~ :term
             ORDER BY bk_id
             """, dict (parameters, term = term))
-            return flask.json.jsonify ([ { 'value' : r[0], 'label' : r[1], 'description' : r[2] } for r in res ])
+            return flask.json.jsonify (
+                [ { 'value' : r[0], 'label' : r[1], 'description' : r[2] } for r in res ])
 
-        elif field == 'chapter':
+        if field == 'chapter':
             res = execute (conn, """
             SELECT range, range
             FROM ranges_view
@@ -269,7 +272,7 @@ def suggest_json ():
             """, dict (parameters, siglum = siglum, term = term))
             return flask.json.jsonify ([ { 'value' : r[0], 'label' : r[1] } for r in res ])
 
-        elif field == 'verse':
+        if field == 'verse':
             res = execute (conn, """
             SELECT DISTINCT verse, verse
             FROM passages_view
@@ -278,7 +281,7 @@ def suggest_json ():
             """, dict (parameters, siglum = siglum, chapter = chapter, term = term))
             return flask.json.jsonify ([ { 'value' : r[0], 'label' : r[1] } for r in res ])
 
-        elif field == 'word':
+        if field == 'word':
             res = execute (conn, """
             SELECT chapter, verse, word,
                             adr2chapter (p.endadr), adr2verse (p.endadr), adr2word (p.endadr),
@@ -292,7 +295,8 @@ def suggest_json ():
             """, dict (parameters, siglum = siglum, chapter = chapter, verse = verse, term = term))
             res = map (Words._make, res)
             res = map (_f_map_word, res)
-            return flask.json.jsonify ([ { 'value' : r[0], 'label' : r[1], 'description' : r[2] } for r in res ])
+            return flask.json.jsonify (
+                [ { 'value' : r[0], 'label' : r[1], 'description' : r[2] } for r in res ])
 
     return flask.json.jsonify ([])
 
@@ -419,14 +423,11 @@ def relatives_csv (hs_hsnr_id, passage_or_id):
 
     view = 'affinity_view' if mode == 'rec' else 'affinity_p_view'
 
-    caption = 'Relatives for'
     where = ''
     if type_ == 'anc':
         where =  ' AND older < newer'
-        caption = 'Ancestors for'
     if type_ == 'des':
         where =  ' AND older >= newer'
-        caption = 'Descendants for'
 
     if labez == 'all':
         where += " AND labez !~ '^z'"
@@ -493,7 +494,8 @@ def relatives_csv (hs_hsnr_id, passage_or_id):
               AND a.pass_id = :pass_id {where} {frag_where}
         ORDER BY affinity DESC, r.rank, newer DESC, older DESC, hsnr
         {limit}
-        """, dict (parameters, where = where, frag_where = frag_where, ms_id1 = ms.ms_id, hsnr = ms.hsnr,
+        """, dict (parameters, where = where, frag_where = frag_where,
+                   ms_id1 = ms.ms_id, hsnr = ms.hsnr,
                    pass_id = passage.pass_id, rg_id = rg_id, limit = limit,
                    view = view, exclude = exclude))
 
@@ -526,14 +528,14 @@ def ms_attesting (passage_or_id, labez):
                                       passage = passage, labez = labez, rows = attesting)
 
 
-def remove_z_leaves (G):
+def remove_z_leaves (graph):
     """ Removes leaves (recursively) if they read z. """
 
     # We cannot use DFS because we don't know the root.
-    for n in reversed (list (nx.topological_sort (G))):
-        atts = G.node[n]
-        if G.out_degree (n) == 0 and 'labez' in atts and atts['labez'][0] == 'z':
-            G.remove_node (n)
+    for n in reversed (list (nx.topological_sort (graph))):
+        atts = graph.node[n]
+        if graph.out_degree (n) == 0 and 'labez' in atts and atts['labez'][0] == 'z':
+            graph.remove_node (n)
 
 
 def textflow (passage_or_id):
@@ -613,7 +615,7 @@ def textflow (passage_or_id):
                    pass_id = passage.pass_id, labez = labez,
                    hyp_a = hyp_a, labez_where = labez_where, z_where = z_where))
 
-        nodes = tuple ( row[0] for row in res )
+        nodes = tuple ([ row[0] for row in res ] or [ -1 ]) # avoid SQL syntax error
 
         # rank query
         #
@@ -645,10 +647,10 @@ def textflow (passage_or_id):
         # manuscript.  We will connect the nodes later.  Finally we will remove
         # unconnected nodes.
 
-        G = nx.DiGraph ()
+        graph = nx.DiGraph ()
 
-        dest_nodes = set ([r.ms_id1 for r in ranks])
-        src_nodes  = set ([r.ms_id2 for r in ranks])
+        dest_nodes = { r.ms_id1 for r in ranks }
+        src_nodes  = { r.ms_id2 for r in ranks }
 
         res = execute (conn, """
         SELECT ms.ms_id, ms.hs, ms.hsnr, a.labez, a.clique, a.labez_clique
@@ -675,7 +677,7 @@ def textflow (passage_or_id):
                 attrs['clique']       = ''
                 attrs['labez_clique'] = hyp_a[0]
             # FIXME: attrs['shape'] = SHAPES.get (attrs['labez'], SHAPES['a'])
-            G.add_node (ms.ms_id, **attrs)
+            graph.add_node (ms.ms_id, **attrs)
 
         # Connect the nodes
         #
@@ -694,8 +696,8 @@ def textflow (passage_or_id):
         tags = set ()
         for step in (1, 2):
             for r in ranks:
-                a1 = G.node[r.ms_id1]
-                a2 = G.node[r.ms_id2]
+                a1 = graph.node[r.ms_id1]
+                a2 = graph.node[r.ms_id2]
                 if not (global_textflow) and is_z_node (a2):
                     # disregard lacunae
                     continue
@@ -713,9 +715,9 @@ def textflow (passage_or_id):
                     continue
                 # add a new parent
                 if r.rank > 1:
-                    G.add_edge (r.ms_id2, r.ms_id1, rank = r.rank, headlabel = r.rank)
+                    graph.add_edge (r.ms_id2, r.ms_id1, rank = r.rank, headlabel = r.rank)
                 else:
-                    G.add_edge (r.ms_id2, r.ms_id1)
+                    graph.add_edge (r.ms_id2, r.ms_id1)
 
                 if a1[group_field] == a2[group_field]:
                     # tag: has ancestor node within the same attestation
@@ -725,73 +727,62 @@ def textflow (passage_or_id):
                     tags.add (str (r.ms_id1) + a2[group_field])
 
         if not leaf_z:
-            remove_z_leaves (G)
+            remove_z_leaves (graph)
 
-        G.remove_nodes_from (list (nx.isolates (G)))
+        graph.remove_nodes_from (list (nx.isolates (graph)))
 
         if var_only:
-            # Remove non-variant links
-            #
-            # remove nodes attesting zz/zw and link the children up
-            if 0: # for n in G:
-                if is_z_node (G.node[n]):
-                    pred = list (G.predecessors (n))
-                    if pred:
-                        G.remove_edge (pred[0], n)
-                    for succ in G.successors (n):
-                        G.remove_edge (n, succ)
-                        if pred:
-                            G.add_edge (pred[0], succ)
-
             # if one predecessor is within the same attestation then remove all
             # other predecessors that are not within the same attestation
-            for n in G:
+            for n in graph:
                 within = False
-                attestation_n = G.node[n][group_field]
-                for p in G.predecessors (n):
-                    if G.node[p][group_field] == attestation_n:
+                attestation_n = graph.node[n][group_field]
+                for p in graph.predecessors (n):
+                    if graph.node[p][group_field] == attestation_n:
                         within = True
                         break
                 if within:
-                    for p in G.predecessors (n):
-                        if G.node[p][group_field] != attestation_n:
-                            G.remove_edge (p, n)
+                    for p in graph.predecessors (n):
+                        if graph.node[p][group_field] != attestation_n:
+                            graph.remove_edge (p, n)
 
             # remove edges between nodes within the same attestation
-            for u, v in list (G.edges ()):
-                if G.node[u][group_field] == G.node[v][group_field]:
-                    G.remove_edge (u, v)
+            for u, v in list (graph.edges ()):
+                if graph.node[u][group_field] == graph.node[v][group_field]:
+                    graph.remove_edge (u, v)
 
             # remove now isolated nodes
-            G.remove_nodes_from (list (nx.isolates (G)))
+            graph.remove_nodes_from (list (nx.isolates (graph)))
 
             # unconstrain backward edges
-            for u, v in G.edges ():
-                if G.node[u][group_field] > G.node[v][group_field]:
-                    G.adj[u][v]['constraint'] = 'false'
+            for u, v in graph.edges ():
+                if graph.node[u][group_field] > graph.node[v][group_field]:
+                    graph.adj[u][v]['constraint'] = 'false'
 
         else:
-            for n in G:
+            for n in graph:
                 # Use a different label if the parent's labez_clique differs from this
                 # node's labez_clique.
-                pred = list (G.predecessors (n))
-                attrs = G.node[n]
+                pred = list (graph.predecessors (n))
+                attrs = graph.node[n]
                 if not pred:
                     attrs['label'] = "%s: %s" % (attrs['labez_clique'], attrs['hs'])
                 for p in pred:
-                    if attrs['labez_clique'] != G.node[p]['labez_clique']:
+                    if attrs['labez_clique'] != graph.node[p]['labez_clique']:
                         attrs['label'] = "%s: %s" % (attrs['labez_clique'], attrs['hs'])
-                        G.adj[p][n]['style'] = 'dashed'
+                        graph.adj[p][n]['style'] = 'dashed'
 
     if var_only:
-        dot = helpers.nx_to_dot_subgraphs (G, group_field, width, fontsize)
+        dot = helpers.nx_to_dot_subgraphs (graph, group_field, width, fontsize)
     else:
-        dot = helpers.nx_to_dot (G, width, fontsize)
+        dot = helpers.nx_to_dot (graph, width, fontsize)
     return dot
 
 
 @app.endpoint ('textflow.dot')
 def textflow_dot (passage_or_id):
+    """ Return a textflow diagram in .dot format. """
+
     dot = textflow (passage_or_id)
     dot = tools.graphviz_layout (dot)
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
@@ -799,17 +790,17 @@ def textflow_dot (passage_or_id):
 
 @app.endpoint ('textflow.png')
 def textflow_png (passage_or_id):
+    """ Return a textflow diagram in .png format. """
+
     dot = textflow (passage_or_id)
     png = tools.graphviz_layout (dot, format = 'png')
     return flask.Response (png, mimetype = 'image/png')
 
 
-def csvify (fields, rows):
-    return flask.Response (to_csv (fields, rows), mimetype = 'text/csv')
-
-
 _ComparisonRow = collections.namedtuple (
-    'ComparisonRow', 'rg_id, range, common, equal, older, newer, unclear, affinity, rank, length1, length2')
+    'ComparisonRow',
+    'rg_id, range, common, equal, older, newer, unclear, affinity, rank, length1, length2'
+)
 
 
 class _ComparisonRowCalcFields (_ComparisonRow):
@@ -878,7 +869,8 @@ def comparison_summary ():
         WHERE a.ms_id1 = :ms_id1 AND a.ms_id2 = :ms_id2 AND a.newer = a.older
 
         ORDER BY rg_id
-        """, dict (parameters, ms_id1 = ms1.ms_id, ms_id2 = ms2.ms_id, view = 'affinity_p_view', prefix = 'p_'))
+        """, dict (parameters, ms_id1 = ms1.ms_id, ms_id2 = ms2.ms_id,
+                   view = 'affinity_p_view', prefix = 'p_'))
 
         return list (map (_ComparisonRowCalcFields._make, res))
 
@@ -895,7 +887,7 @@ class _ComparisonDetailRowCalcFields (_ComparisonDetailRow):
 
     @property
     def pass_hr (self):
-        return Passage._to_hr (self.begadr, self.endadr)
+        return Passage.static_to_hr (self.begadr, self.endadr)
 
     @property
     def norel (self):
@@ -1038,15 +1030,17 @@ def stemma (passage_or_id):
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
-        nx = db_tools.local_stemma_to_nx (
+        graph = db_tools.local_stemma_to_nx (
             conn, passage.pass_id, flask_login.current_user.has_role ('editor')
         )
-        dot = helpers.nx_to_dot (nx, width, fontsize, nodesep = 0.2)
+        dot = helpers.nx_to_dot (graph, width, fontsize, nodesep = 0.2)
         return dot
 
 
 @app.endpoint ('stemma.dot')
 def stemma_dot (passage_or_id):
+    """ Return a local stemma diagram in .dot format. """
+
     dot = stemma (passage_or_id)
     dot = tools.graphviz_layout (dot)
     return flask.Response (dot, mimetype = 'text/vnd.graphviz')
@@ -1054,19 +1048,42 @@ def stemma_dot (passage_or_id):
 
 @app.endpoint ('stemma.png')
 def stemma_png (passage_or_id):
+    """ Return a local stemma diagram in .png format. """
+
     dot = stemma (passage_or_id)
     png = tools.graphviz_layout (dot, format = 'png')
     return flask.Response (png, mimetype = 'image/png')
 
 
-# Turns an usafe absolute URL into a safe relative URL by removing the scheme and the hostname
-# Example: make_safe_url('http://hostname/path1/path2?q1=v1&q2=v2#fragment')
-#          returns: '/path1/path2?q1=v1&q2=v2#fragment
-# Copied from flask_user/views.py because it was defective.
-
 def make_safe_url (url):
+    """Turns an usafe absolute URL into a safe relative URL
+    by removing the scheme and the hostname
+
+    Example: make_safe_url('http://hostname/path1/path2?q1=v1&q2=v2#fragment')
+             returns: '/path1/path2?q1=v1&q2=v2#fragment
+
+    Copied from flask_user/views.py because it was defective.
+    """
     parts = urllib.parse.urlsplit (url)
     return urllib.parse.urlunsplit ( ('', '', parts[2], parts[3], parts[4]) )
+
+
+def build_parser ():
+    """ Build the commandlien parser. """
+
+    parser = argparse.ArgumentParser (description = __doc__)
+    config_path = os.path.abspath (os.path.dirname (__file__) + '/instance')
+
+    parser.add_argument (
+        '-v', '--verbose', dest='verbose', action='count',
+        help='increase output verbosity', default=0
+    )
+    parser.add_argument (
+        '-c', '--config-path', dest='config_path',
+        default=config_path, metavar='CONFIG_PATH',
+        help="the directory where the config files reside (default='./instance/')"
+    )
+    return parser
 
 
 if __name__ == "__main__":
@@ -1075,24 +1092,7 @@ if __name__ == "__main__":
     from werkzeug.serving import run_simple
     import logging
 
-    instance_path = os.path.abspath (os.path.dirname (__file__) + '/instance')
-
-    parser = argparse.ArgumentParser (description='An application server for CBGM')
-
-    parser.add_argument ('-v', '--verbose', dest='verbose', action='count',
-                         help='increase output verbosity', default=0)
-    parser.add_argument ('-c', '--config-path', dest='config_path',
-                         default=instance_path, metavar='CONFIG_PATH',
-                         help="the directory where the config files reside (default='%s')" % instance_path)
-
-    args = parser.parse_args (namespace = args)
-    args.start_time = datetime.datetime.now ()
-    LOG_LEVELS = { 0: logging.CRITICAL, 1: logging.ERROR, 2: logging.WARN, 3: logging.INFO, 4: logging.DEBUG }
-    args.log_level = LOG_LEVELS.get (args.verbose + 1, logging.CRITICAL)
-
-    logging.basicConfig (format = '%(asctime)s - %(levelname)s - %(message)s')
-    logging.getLogger ('sqlalchemy.engine').setLevel (args.log_level)
-    logging.getLogger ('server').setLevel (args.log_level)
+    args, dummy = init_cmdline (build_parser ())
 
     instances = collections.OrderedDict ()
 
@@ -1105,7 +1105,8 @@ if __name__ == "__main__":
     static_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     dba.init_app (static_app)
     mail.init_app (static_app)
-    user_manager.init_app (static_app, login_manager = login_manager, make_safe_url_function = make_safe_url)
+    user_manager.init_app (static_app, login_manager = login_manager,
+                           make_safe_url_function = make_safe_url)
 
     for fn in glob.glob (args.config_path.rstrip ('/') + '/*.conf'):
         if fn.endswith ('/_global.conf'):
@@ -1145,7 +1146,7 @@ if __name__ == "__main__":
             Rule ('/stemma-edit/<passage_or_id>',                 endpoint = 'stemma-edit', methods = ['POST']),
         ])
 
-        tools.log (logging.INFO, "{name} at {path} from conf {conf}".format (
+        log (logging.INFO, "{name} at {path} from conf {conf}".format (
             name = sub_app.config['APPLICATION_NAME'],
             path = sub_app.config['APPLICATION_ROOT'],
             conf = fn))

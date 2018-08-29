@@ -12,6 +12,25 @@ class Args:
 args = Args ()
 """ Globally accessible arguments from command line. """
 
+COLORS = {
+    logging.CRITICAL : ('\x1B[38;2;255;0;0m', '\x1B[0m'),
+    logging.ERROR    : ('\x1B[38;2;255;0;0m', '\x1B[0m'),
+    logging.WARN     : ('', ''),
+    logging.INFO     : ('', ''),
+    logging.DEBUG    : ('', ''),
+}
+
+# colorize error log
+old_factory = logging.getLogRecordFactory ()
+
+def record_factory (*args, **kwargs):
+    record = old_factory (*args, **kwargs)
+    record.esc0, record.esc1 = COLORS[record.levelno]
+    return record
+
+logging.setLogRecordFactory (record_factory)
+
+
 def config_from_pyfile (filename):
     """Mimic Flask config files.
 
@@ -41,20 +60,21 @@ def init_cmdline (parser):
 
     parser.parse_args (namespace = args)
 
-    config = config_from_pyfile (args.profile)
-
     args.start_time = datetime.datetime.now ()
     LOG_LEVELS = {
-        0: logging.CRITICAL,
-        1: logging.ERROR,
-        2: logging.WARN,
-        3: logging.INFO,
-        4: logging.DEBUG
+        0: logging.CRITICAL,  #
+        1: logging.ERROR,     # -v
+        2: logging.WARN,      # -vv
+        3: logging.INFO,      # -vvv
+        4: logging.DEBUG      # -vvvv
     }
-    args.log_level = LOG_LEVELS.get (args.verbose, logging.CRITICAL)
+    args.log_level = LOG_LEVELS.get (args.verbose, logging.DEBUG)
 
     logging.getLogger ().setLevel (args.log_level)
-    formatter = logging.Formatter (fmt = '%(hilitestart)s%(relativeCreated)d - %(levelname)s - %(message)s%(hiliteend)s')
+    formatter = logging.Formatter (
+        fmt = '{esc0}{relativeCreated:6.0f} - {levelname:5} - {message}{esc1}',
+        style='{'
+    )
 
     stderr_handler = logging.StreamHandler ()
     stderr_handler.setFormatter (formatter)
@@ -69,4 +89,8 @@ def init_cmdline (parser):
         sqlalchemy_logger = logging.getLogger ('sqlalchemy.engine')
         sqlalchemy_logger.setLevel (logging.WARN)
 
-    return args, config
+
+    try:
+        return args, config_from_pyfile (args.profile)
+    except:
+        return args, None

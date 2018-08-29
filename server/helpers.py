@@ -4,25 +4,12 @@
 """ An application server for CBGM.  Helper classes. """
 
 import collections
-import csv
-import datetime
-import functools
 import itertools
-import math
-import operator
 import re
 import os
 import os.path
-import urllib.parse
 
 import flask
-import sqlalchemy
-import flask_sqlalchemy
-from flask import request, current_app
-import flask_user
-from flask_user import login_required
-import flask_mail
-import networkx as nx
 
 from ntg_common.db_tools import execute
 from ntg_common import tools
@@ -48,12 +35,12 @@ LABEZ_I18N = {
 }
 
 
-class Bag (object):
+class Bag ():
     """ Class to stick values in. """
     pass
 
 
-class Manuscript (object):
+class Manuscript ():
     """ Represent one manuscript. """
 
     RE_HSNR = re.compile (r'^\d{6}$')             # 300180
@@ -107,7 +94,7 @@ class Manuscript (object):
         }
 
 
-class Word (object):
+class Word ():
     """ Represents one word address. """
 
     RE_HR_WORD = re.compile (r'^(?:(\d?\w+)\s+)?(?:(\d+):)?(?:(\d+)/)?(\d+)$')
@@ -134,7 +121,8 @@ class Word (object):
             self.book = 0
             if m.group (1):
                 bk = m.group (1).lower ()
-                books = [book for book in enumerate (tools.BOOKS) if book[1][1].lower () == bk or book[1][2].lower () == bk]
+                books = [book for book in enumerate (tools.BOOKS)
+                         if book[1][1].lower () == bk or book[1][2].lower () == bk]
                 self.book = books[0][0] + 1
             self.chapter = int (m.group (2) or '0')
             self.verse   = int (m.group (3) or '0')
@@ -145,10 +133,12 @@ class Word (object):
     def format (self, start = None):
         # Format a word to the format: "Acts 1:2/3-4"
         if start is None:
-            return "%s %d:%d/%d" % (tools.BOOKS[self.book - 1][1], self.chapter, self.verse, self.word)
+            return "%s %d:%d/%d" % (
+                tools.BOOKS[self.book - 1][1], self.chapter, self.verse, self.word)
 
         if start.book != self.book:
-            return " - %s %d:%d/%d" % (tools.BOOKS[self.book - 1][1], self.chapter, self.verse, self.word)
+            return " - %s %d:%d/%d" % (
+                tools.BOOKS[self.book - 1][1], self.chapter, self.verse, self.word)
         if start.chapter != self.chapter:
             return " - %d:%d/%d" % (self.chapter, self.verse, self.word)
         if start.verse != self.verse:
@@ -158,7 +148,7 @@ class Word (object):
         return ""
 
 
-class Passage (object):
+class Passage ():
     """ Represents one passage. """
 
     def __init__ (self, conn, passage_or_id):
@@ -187,7 +177,7 @@ class Passage (object):
 
 
     @staticmethod
-    def _to_hr (start, end):
+    def static_to_hr (start, end):
         # return passage in human-readable format
         s = Word (start)
         if start == end:
@@ -198,7 +188,7 @@ class Passage (object):
 
     def to_hr (self):
         # return passage in human-readable format
-        return Passage._to_hr (self.start, self.end)
+        return Passage.static_to_hr (self.start, self.end)
 
 
     def to_json (self):
@@ -309,7 +299,8 @@ class Passage (object):
         """, dict (parameters, pass_id = self.pass_id))
 
         Cliques = collections.namedtuple ('Cliques', 'labez clique labez_clique')
-        return list (map (Cliques._make, (r for r in prefix + list (res.fetchall ()) + suffix if r not in delete)))
+        return list (map (Cliques._make, (
+            r for r in prefix + list (res.fetchall ()) + suffix if r not in delete)))
 
 
 def get_locale ():
@@ -386,7 +377,7 @@ def dot_skeleton (width = 960.0, fontsize = 10.0, ranksep = 0.4, nodesep = 0.1):
     )]
 
 
-def nx_to_dot (G, width = 960.0, fontsize = 10.0, nodesep = 0.1):
+def nx_to_dot (graph, width = 960.0, fontsize = 10.0, nodesep = 0.1):
     """Convert an nx graph into a dot file.
 
     We'd like to sort the nodes in the graph, but nx internally uses
@@ -399,12 +390,12 @@ def nx_to_dot (G, width = 960.0, fontsize = 10.0, nodesep = 0.1):
     dot = dot_skeleton (width = width, fontsize = fontsize, nodesep = nodesep)
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
-    for n, nodedata in sorted (G.nodes (data = True)):
+    for n, nodedata in sorted (graph.nodes (data = True)):
         dot.append ("\"%s\" [%s];" %
                     (n, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in nodedata.items ()])))
 
     # Copy edges and sort them.
-    for u, v, edgedata in sorted (G.edges (data = True)):
+    for u, v, edgedata in sorted (graph.edges (data = True)):
         dot.append ("\"%s\" -> \"%s\" [%s];" %
                     (u, v, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in edgedata.items ()])))
 
@@ -413,7 +404,7 @@ def nx_to_dot (G, width = 960.0, fontsize = 10.0, nodesep = 0.1):
     return '\n'.join (dot)
 
 
-def nx_to_dot_subgraphs (G, field, width = 960.0, fontsize = 10.0):
+def nx_to_dot_subgraphs (graph, field, width = 960.0, fontsize = 10.0):
     """Convert an nx graph into a dot file.
 
     We'd like to sort the nodes in the graph, but nx internally uses
@@ -426,8 +417,8 @@ def nx_to_dot_subgraphs (G, field, width = 960.0, fontsize = 10.0):
     dot = dot_skeleton (width = width, fontsize = fontsize, ranksep = 1.2)
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
-    sorted_nodes = sorted (G, key = lambda n: (G.node[n][field], G.node[n]['hsnr']))
-    for key, nodes_for_key in itertools.groupby (sorted_nodes, key = lambda n: G.node[n][field]):
+    sorted_nodes = sorted (graph, key = lambda n: (graph.node[n][field], graph.node[n]['hsnr']))
+    for key, nodes_for_key in itertools.groupby (sorted_nodes, key = lambda n: graph.node[n][field]):
         dot.append ("subgraph \"cluster_%s\" {" % key)
         dot.append ("style=rounded")
         dot.append ("labeljust=l")
@@ -435,13 +426,13 @@ def nx_to_dot_subgraphs (G, field, width = 960.0, fontsize = 10.0):
         dot.append ("rank=%s" % ('source' if key in ('a', 'a1') else 'same'))
         dot.append ("label=\"%s\"" % key)
         for n in nodes_for_key:
-            attr = G.node[n]
+            attr = graph.node[n]
             dot.append ("\"%s\" [%s];" %
                         (n, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in attr.items ()])))
         dot.append ("}")
 
     # Copy edges and sort them.
-    for u, v, edgedata in sorted (G.edges (data = True)):
+    for u, v, edgedata in sorted (graph.edges (data = True)):
         dot.append ("\"%s\" -> \"%s\" [%s];" %
                     (u, v, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in edgedata.items ()])))
 

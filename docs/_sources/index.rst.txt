@@ -8,6 +8,7 @@
    :maxdepth: 2
 
    intro
+   install
    user
    developer
 
