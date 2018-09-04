@@ -12,6 +12,10 @@
                            :options="cliques_checkbox_options"
                            buttons button-variant="primary" size="sm" />
 
+    <b-form-checkbox-group v-if="'ortho' in toolbar" v-model="toolbar.ortho"
+                           :options="ortho_checkbox_options"
+                           buttons button-variant="primary" size="sm" />
+
     <div v-if="'labez' in toolbar"
          class="btn-group btn-group-sm toolbar-labez">
       <button :data-labez="toolbar.labez" type="button"
@@ -152,6 +156,9 @@ export default {
         const cliques_checkbox_options = [
             { 'text' : 'Splits', 'value' : 'cliques', 'title' : 'Show split attestations'  },
         ];
+        const ortho_checkbox_options = [
+            { 'text' : 'Ortho',  'value' : 'ortho',   'title' : 'Show orthographic variations'  },
+        ];
         const fragments_checkbox_options = [
             { 'text' : 'Frag', 'value' : 'fragments', 'title' : 'Include document fragments'  },
         ];
@@ -174,6 +181,7 @@ export default {
             'include_checkbox_options'   : include_checkbox_options,
             'mode_checkbox_options'      : mode_checkbox_options,
             'cliques_checkbox_options'   : cliques_checkbox_options,
+            'ortho_checkbox_options'     : ortho_checkbox_options,
             'fragments_checkbox_options' : fragments_checkbox_options,
             'connectivity'               : 5,
         };

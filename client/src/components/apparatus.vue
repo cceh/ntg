@@ -5,14 +5,14 @@
     </div>
 
     <ul class="list-group list-group-flush wrapper apparatus-wrapper">
-      <li v-for="group in groups" :key="group.group" class="list-group-item">
+      <li v-for="(items, group) in groups" :key="group" class="list-group-item">
         <h3 class="list-group-item-heading">
-          <a :data-labez="group.labez" class="apparatus-labez fg_labez"
-             @click="goto_attestation">{{ group.group }} {{ group.reading }}</a>
+          <a :data-labez="items[0].labez" class="apparatus-labez fg_labez"
+@click="goto_attestation">{{ items[0].caption }}</a>
         </h3>
         <ul class="list-group-item-text attesting-mss list-inline">
-          <li v-for="item in group.items" :key="item.ms_id">
-            <a :data-ms-id="item.ms_id" class="ms">{{ item.hs }}{{ (item.labezsuf !== '') ? '_' + item.labezsuf : ''}}{{ (item.certainty === 1.0) ? '' : '?' }}.</a>
+          <li v-for="item in items" :key="item.ms_id">
+            <a :data-ms-id="item.ms_id" class="ms">{{ item.hs }}{{ (item.certainty === 1.0) ? '' : '?' }}.</a>
             <span> </span>
           </li>
         </ul>
@@ -52,36 +52,43 @@ function load_passage (vm, passage) {
     const xhr = vm.get ('apparatus.json/' + passage.pass_id);
     const p1 = vm.$wrapper.animate ({ 'opacity' : 0.0 }, 300).promise ();
 
-    return Promise.all ([xhr, p1]).then ((p) => {
-        // select a grouping function
-        const labez_grouper  = (g) => g.labez;
-        const clique_grouper = (g) => g.labez_clique;
-        const grouper = vm.toolbar.cliques.includes ('cliques') ? clique_grouper : labez_grouper;
+    return Promise.all ([xhr, p1]).then ((responses) => {
+        const show_cliques = vm.toolbar.cliques.includes ('cliques');
+        const show_ortho   = vm.toolbar.ortho.includes ('ortho');
 
-        // load readings into a dictionary for faster lookup
+        let grouper = item => item.labez;
+        let caption = item => `${item.labez} ${item.reading}`;
+
+        if (!show_cliques && show_ortho) {
+            grouper = item => item.labez + item.suf + item.lesart;
+            caption = item => `${item.labez}${item.labezsuf} ${item.lesart}`;
+        } else if (show_cliques && !show_ortho) {
+            grouper = item => item.labez + item.clique;
+            caption = item => `${item.labez}${item.clique} ${item.reading}`;
+        } else if (show_cliques && show_ortho) {
+            grouper = item => item.labez + item.clique + item.suf + item.lesart;
+            caption = item => `${item.labez}${item.labezsuf}${item.clique} ${item.lesart}`;
+        }
+
         const readings = [];
-        _.forEach (p[0].data.data.readings, (reading) => {
+        responses[0].data.data.readings.map (reading => {
             readings[reading.labez] = reading.lesart;
         });
 
-        // group manuscripts and loop over groups
-        const new_groups = [];
-        _.forEach (_.groupBy (_.sortBy (p[0].data.data.manuscripts, grouper), grouper), (items) => {
-            new_groups.push ({
-                'pass_id'      : passage.pass_id,
-                'labez'        : items[0].labez,
-                'labez_clique' : items[0].labez_clique,
-                'group'        : grouper (items[0]),
-                'items'        : items,
-                'reading'      : _.get (readings, items[0].labez, 'Error: no reading found'),
-            });
+        const mss = responses[0].data.data.manuscripts.map ((ms) => {
+            ms.reading  = readings[ms.labez];
+            ms.lesart   = ms.lesart || '';
+            ms.suf      = (ms.labezsuf === '') ? ' ' : ms.labezsuf;
+            ms.group    = grouper (ms);
+            ms.caption  = caption (ms);
+            return ms;
         });
 
         // save current height of card
         const old_height = tools.save_height (vm.$wrapper);
 
-        // update
-        vm.groups = new_groups;
+        // group manuscripts and loop over groups
+        vm.groups = _.groupBy (_.sortBy (mss, 'group'), 'group');
 
         vm.$nextTick (function () {
             tools.slide_from (vm.$wrapper, old_height);
@@ -94,6 +101,7 @@ export default {
         return {
             'toolbar' : {
                 'cliques' : [],  // Show readings or cliques.
+                'ortho' : [],    // Show orthographic variations.
             },
             'groups' : [],
         };

@@ -267,7 +267,7 @@ def copy_att (dba, parameters):
         execute (conn, """
         UPDATE att
         SET labez = labezsuf, labezsuf = ''
-        WHERE labez = 'zw'
+        WHERE labezsuf ~ '[-/]'
         """, parameters)
 
         execute (conn, """
@@ -342,7 +342,8 @@ def copy_att (dba, parameters):
             WHERE (begadr, endadr, hs) =  (21017022, 21017024, '544');
             -- mail KW 24.08.2018
             UPDATE att
-            SET labezsuf = 'b/c'
+            SET labez = 'zw',
+                labezsuf = 'b/c'
             WHERE (begadr, endadr, hs) =  (21314018, 21314022, '427');
             """, parameters)
 
@@ -658,9 +659,9 @@ def unroll_zw (dba, parameters):
     If :math:`N > 1` labez candidates exists, the certainty of the unrolled
     records will be set to :math:`1 / N`.
 
-    But if all candidate labez are differing only in their errata or
-    ortographica suffix, as in 'a/ao1/ao2' or 'b/b_f' then we will output only
-    one record with a certainty of 1.0.
+    But if all candidate labez differ only in their errata or ortographica
+    suffix, as in 'a/ao1/ao2' or 'b/b_f' then we will output only one record
+    with a certainty of 1.0.
 
     Caveat: in Mark, labezsuf may contain a list of candidate labez even if
     labez is not 'zw'.  This is why we no longer look for 'zw' in labez but for
@@ -713,7 +714,7 @@ def unroll_zw (dba, parameters):
 
             unique_labez = collections.defaultdict (list)
             for seg in segments:
-                unique_labez[seg[0]].append (seg) # .replace ('_', ''))
+                unique_labez[seg[0]].append (seg[1:].replace ('_', ''))
 
             options = len (unique_labez)
             if options > 0:
@@ -1476,7 +1477,10 @@ def fill_apparatus_table (dba, parameters):
         FROM passages p, manuscripts ms, readings r, att a
         WHERE app.pass_id = p.pass_id AND p.passage = a.passage AND r.pass_id = p.pass_id
           AND app.ms_id = ms.ms_id  AND ms.hsnr = a.hsnr AND r.labez = a.labez
-          AND a.certainty = 1.0
+          AND a.certainty = 1.0;
+        UPDATE apparatus app
+        SET lesart = NULL
+        WHERE labez = 'zz' AND lesart = ''
         """, parameters)
 
         # Insert uncertain readings

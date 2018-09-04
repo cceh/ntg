@@ -962,14 +962,15 @@ def apparatus_json (passage_or_id):
 
         # list of labez_clique => manuscripts
         res = execute (conn, """
-        SELECT labez, clique, labez_clique, ms_id, hs, hsnr, certainty, labezsuf
+        SELECT labez, clique, labez_clique, labezsuf, reading (labez, lesart), ms_id, hs, hsnr, certainty
         FROM apparatus_cliques_view
         WHERE pass_id = :pass_id
         ORDER BY hsnr, labez, clique
         """, dict (parameters, pass_id = passage.pass_id))
 
         Manuscripts = collections.namedtuple (
-            'Manuscripts', 'labez clique labez_clique ms_id hs hsnr certainty labezsuf'
+            'Manuscripts',
+            'labez clique labez_clique labezsuf lesart ms_id hs hsnr certainty'
         )
         manuscripts = [ Manuscripts._make (r)._asdict () for r in res ]
 
