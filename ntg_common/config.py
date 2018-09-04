@@ -72,7 +72,7 @@ def init_cmdline (parser):
 
     logging.getLogger ().setLevel (args.log_level)
     formatter = logging.Formatter (
-        fmt = '{esc0}{relativeCreated:6.0f} - {levelname:5} - {message}{esc1}',
+        fmt = '{esc0}{relativeCreated:6.0f} - {levelname:7} - {message}{esc1}',
         style='{'
     )
 

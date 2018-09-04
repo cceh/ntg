@@ -81,7 +81,7 @@ if __name__ == '__main__':
         """, parameters)
 
         warn (conn, "Discarded cliques", """
-        SELECT LOWER (passage) as begadr, UPPER (passage) AS endadr, labez, clique
+        SELECT passage, labez, clique
         FROM import_cliques
         WHERE pass_id IS NULL
         ORDER BY passage, labez, clique
@@ -95,6 +95,7 @@ if __name__ == '__main__':
     with db.engine.begin () as conn:
         execute (conn, """
         ALTER TABLE cliques DISABLE TRIGGER cliques_trigger;
+
         INSERT INTO cliques (pass_id, labez, clique,
                              sys_period, user_id_start, user_id_stop)
         SELECT pass_id, labez, clique,
@@ -131,17 +132,16 @@ if __name__ == '__main__':
                 :sys_period, :user_id_start, :user_id_stop)
         """, parameters, values)
 
+        # do not refer to cliques_view as that could kill entries in the history
         execute (conn, """
         UPDATE import_ms_cliques u
-        SET ms_id = a.ms_id, pass_id = q.pass_id
-        FROM apparatus_view a,
-             cliques_view q
-        WHERE (u.passage, u.labez, u.hsnr)   = (a.passage, a.labez, a.hsnr)
-          AND (u.passage, u.labez, u.clique) = (q.passage, q.labez, q.clique)
+        SET ms_id = a.ms_id, pass_id = a.pass_id
+        FROM apparatus_view a
+        WHERE (u.passage, u.labez, u.hsnr) = (a.passage, a.labez, a.hsnr)
         """, parameters)
 
         warn (conn, "Discarded ms_cliques", """
-        SELECT hsnr, LOWER (passage) as begadr, UPPER (passage) AS endadr, labez, clique
+        SELECT hsnr, passage, labez, clique
         FROM import_ms_cliques
         WHERE pass_id IS NULL OR ms_id IS NULL
         ORDER BY hsnr, passage, labez, clique
@@ -197,15 +197,16 @@ if __name__ == '__main__':
                 :sys_period, :user_id_start, :user_id_stop)
         """, parameters, values)
 
+        # do not refer to cliques_view as that could kill entries in the history
         execute (conn, """
         UPDATE import_locstem u
-        SET pass_id = q.pass_id
-        FROM cliques_view q
-          WHERE (u.passage, u.labez, u.clique) = (q.passage, q.labez, q.clique)
+        SET pass_id = r.pass_id
+        FROM readings_view r
+        WHERE (u.passage, u.labez) = (r.passage, r.labez)
         """, parameters)
 
         warn (conn, "Discarded LocStem", """
-        SELECT LOWER (passage) as begadr, UPPER (passage) AS endadr, labez, clique
+        SELECT passage, labez, clique
         FROM import_locstem
         WHERE pass_id IS NULL
         ORDER BY passage, labez, clique
@@ -280,7 +281,7 @@ if __name__ == '__main__':
         """, parameters)
 
         warn (conn, "Discarded Notes", """
-        SELECT LOWER (passage) as begadr, UPPER (passage) AS endadr
+        SELECT passage
         FROM import_notes
         WHERE pass_id IS NULL
         ORDER BY passage

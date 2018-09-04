@@ -126,7 +126,6 @@ mark:
 load_mark:
 	scp $(NTG_PRJ)/backups/* backups/
 	python3 -m scripts.cceh.load_edits -i backups/saved_edits_mark_ph1_`date -I`.xml -vvv server/instance/mark_ph1.conf
-	python3 -m scripts.cceh.cbgm    -vvv server/instance/mark_ph1.conf
 
 define UPLOAD_TEMPLATE =
 

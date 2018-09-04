@@ -793,7 +793,7 @@ class Cliques (Cliques_Mixin, Base2):
 
     .. attribute:: clique
 
-        Name of the Clique. '0', '1', '2' ...
+        Name of the Clique.  '1', '2' ...
 
     .. attribute:: sys_period
 
@@ -1092,7 +1092,7 @@ class Import_Notes (Notes_Mixin, Base2):
     passage = Column (IntRangeType, nullable = False)
 
     __table_args__ = (
-        PrimaryKeyConstraint ('passage'),
+        PrimaryKeyConstraint ('passage', 'sys_period'),
     )
 
 
@@ -1434,6 +1434,7 @@ view ('export_locstem', Base2.metadata, '''
 view ('export_notes', Base2.metadata, '''
     SELECT passage, note, sys_period, user_id_start, user_id_stop
     FROM notes_view
+    WHERE user_id_start != 0
     UNION
     SELECT p.passage, note, sys_period, user_id_start, user_id_stop
     FROM notes_tts

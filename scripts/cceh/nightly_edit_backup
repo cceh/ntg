@@ -1,0 +1,5 @@
+#!/bin/bash
+
+DATE=`date -I`
+
+python3 -m scripts.cceh.save_edits -vvv -o backups/saved_edits_mark_ph1_$DATE.xml server/instance/mark_ph1.conf

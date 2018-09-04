@@ -226,6 +226,7 @@ def init_default_locstem (conn):
     SELECT pass_id, 'a', '1', NULL, NULL, true, 0
     FROM passages p
     WHERE NOT fehlvers;
+
     INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original, user_id_start)
     SELECT pass_id, 'b', '1', NULL, NULL, false, 0
     FROM passages p
@@ -239,6 +240,7 @@ def init_default_locstem (conn):
     FROM cliques_view c
       JOIN passages p USING (pass_id)
     WHERE NOT p.fehlvers AND c.labez != 'a' AND c.labez !~ '^z[u-z]';
+
     INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original, user_id_start)
     SELECT c.pass_id, c.labez, c.clique, 'b', '1', false, 0
     FROM cliques_view c

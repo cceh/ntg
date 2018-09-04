@@ -215,6 +215,10 @@ def notes (passage_or_id):
 
         if request.method == 'PUT':
             res = execute (conn, """
+            SET LOCAL ntg.user_id = :user_id;
+            """, dict (parameters, user_id = flask_login.current_user.id))
+
+            res = execute (conn, """
             INSERT INTO notes AS n (pass_id, note)
             VALUES (:pass_id, :note)
             ON CONFLICT (pass_id) DO
