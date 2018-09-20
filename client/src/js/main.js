@@ -12,6 +12,7 @@ import axios        from 'axios';
 
 import app         from '../components/app.vue';
 import index       from '../components/index.vue';
+import attestation from '../components/attestation.vue';
 import coherence   from '../components/coherence.vue';
 import comparison  from '../components/comparison.vue';
 
@@ -24,9 +25,10 @@ const routes = [
         'component' : app,
         'props'     : true,
         'children'  : [
-            { 'path' : '',           'component' : index,     'name' : 'index' },
-            { 'path' : 'coherence',  'component' : coherence  },
-            { 'path' : 'comparison', 'component' : comparison },
+            { 'path' : '',            'component' : index,     'name' : 'index' },
+            { 'path' : 'coherence',   'component' : coherence  },
+            { 'path' : 'comparison',  'component' : comparison },
+            { 'path' : 'attestation', 'component' : attestation },
         ],
     },
 

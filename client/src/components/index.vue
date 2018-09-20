@@ -5,6 +5,7 @@
     <div class="container bs-docs-container">
       <router-link class="biglink" to="coherence">Coherence and Textual Flow</router-link>
       <router-link class="biglink" to="comparison">Comparison of Witnesses</router-link>
+      <router-link class="biglink" to="attestation">Find Relatives</router-link>
 
       <a class="biglink" href="/pdfs/GenQ4_Guide.pdf" target="_blank">Short Guide (PDF)</a>
 

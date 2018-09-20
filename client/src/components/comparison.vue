@@ -105,8 +105,8 @@ export default {
     mounted () {
         const vm = this;
 
-        $ (window).off ('hashchange');
-        $ (window).on ('hashchange', function () {
+        $ (window).off ('hashchange.comparison');
+        $ (window).on ('hashchange.comparison', function () {
             vm.on_hashchange ();
         });
 

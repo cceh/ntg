@@ -195,8 +195,8 @@ export default {
 
         // React to hash changes.  All navigation is done by manipulating the
         // hash.
-        $ (window).off ('hashchange');
-        $ (window).on ('hashchange', () => {
+        $ (window).off ('hashchange.coherence');
+        $ (window).on ('hashchange.coherence', () => {
             nav.set_passage (window.location.hash.substring (1));
         });
 

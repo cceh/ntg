@@ -262,7 +262,7 @@ class MySQLEngine ():
         self.params['database'] = db
 
         url = sqlalchemy.engine.url.URL (**(dict (self.params, password = 'password')))
-        log (logging.INFO, 'MySQLEngine: Connecting to URL: {url}'.format (url = url))
+        log (logging.DEBUG, 'MySQLEngine: Connecting to URL: {url}'.format (url = url))
         url = sqlalchemy.engine.url.URL (**self.params)
         self.engine = sqlalchemy.create_engine (url)
 
@@ -338,7 +338,7 @@ class PostgreSQLEngine ():
 
         self.url = 'postgresql+psycopg2://{user}@{host}:{port}/{database}?sslmode=disable&server_side_cursors'.format (**args)
 
-        log (logging.INFO, "PostgreSQLEngine: Connecting to URL: {url}".format (url = self.url))
+        log (logging.DEBUG, "PostgreSQLEngine: Connecting to URL: {url}".format (url = self.url))
 
         self.engine = sqlalchemy.create_engine (
             self.url,

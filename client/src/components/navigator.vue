@@ -1,6 +1,6 @@
 <template>
   <div class="navigator_vm">
-    <form class="form-inline" @submit="on_nav">
+    <form class="form-inline" @submit.prevent="on_nav">
 
         <button type="button" data="-1" class="btn btn-primary mr-2"
                 aria-label="Previous Passage" title="Previous Passage" @click="on_nav">
@@ -31,12 +31,12 @@
           <input type="text" class="form-control" name="word" data-autocomplete="word"
                  aria-label="Word" title="Word" />
 
-          <span class="input-group-btn input-group-append">
-            <button type="button" data="Go" class="btn btn-primary mr-2"
-                    aria-label="Go" title="Go" @click="on_nav">
+          <div class="input-group-btn input-group-append">
+            <button type="submit" data="Go" class="btn btn-primary mr-2"
+                    aria-label="Go" title="Go">
               <span class="fas fa-check" />
             </button>
-          </span>
+          </div>
         </div>
 
         <button type="button" data="1" class="btn btn-primary"
@@ -66,6 +66,8 @@ import _ from 'lodash';
 import 'jquery-ui/autocomplete.js';
 
 import 'jquery-ui-css/autocomplete.css';
+
+import tools from 'tools';
 
 /*
  * 1. Extend the stock autocomplete to use a <table> instead of a <ul> and give
@@ -176,6 +178,9 @@ export default {
         return {
         };
     },
+    'props' : [
+        'param',     // param name to use in the window hash
+    ],
     'computed' : {
         passage () {
             return this.$store.state.passage;
@@ -213,13 +218,11 @@ export default {
          * @function on_nav
          *
          * @param {Object} event - The event
-         *
-         * @return false
          */
         on_nav (event) {
-            let $target = $ (event.currentTarget);
-            let $form   = $target.closest ('form');
-            let data    = { 'button' : $target.attr ('data') || 'Go' };
+            const $target = $ (event.currentTarget);
+            const $form   = $target.closest ('form');
+            const data    = { 'button' : $target.attr ('data') || 'Go' };
 
             _.forEach ($form.serializeArray (), (value) => {
                 data[value.name] = value.value;
@@ -227,9 +230,16 @@ export default {
 
             this.get ('passage.json/', { 'params' : data }).then ((response) => {
                 // a hash change triggers the actual navigation
-                window.location.hash = '#' + response.data.data.passage;
+                const passage = response.data.data.passage;
+                if (this.param) {
+                    const hash = window.location.hash.substring (1);
+                    const params = tools.deparam (hash);
+                    params[this.param] = passage;
+                    window.location.hash = '#' + $.param (params);
+                } else {
+                    window.location.hash = '#' + passage;
+                }
             });
-            return false;
         },
     },
     'watch' : {

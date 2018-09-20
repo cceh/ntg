@@ -506,26 +506,23 @@ def relatives_csv (hs_hsnr_id, passage_or_id):
         return csvify (Relatives._fields, list (map (Relatives._make, res)))
 
 
-@app.endpoint ('ms_attesting')
-def ms_attesting (passage_or_id, labez):
+@app.endpoint ('attesting')
+def attesting (passage_or_id, labez):
     """ Serve all relatives of all mss. attesting labez at passage. """
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
 
         res = execute (conn, """
-        SELECT hsnr
+        SELECT ms_id, hs, hsnr
         FROM apparatus_view
         WHERE pass_id = :pass_id AND labez = :labez
         ORDER BY hsnr
         """, dict (parameters, pass_id = passage.pass_id, labez = labez))
 
-        Attesting = collections.namedtuple ('Attesting', 'hsnr')
-        attesting = list (map (Attesting._make, res))
+        Attesting = collections.namedtuple ('Attesting', 'ms_id hs hsnr')
 
-        # convert tuples to lists
-        return flask.render_template ("ms_attesting.html",
-                                      passage = passage, labez = labez, rows = attesting)
+        return csvify (Attesting._fields, list (map (Attesting._make, res)))
 
 
 def remove_z_leaves (graph):
@@ -1136,7 +1133,7 @@ if __name__ == "__main__":
             Rule ('/passage.json/<passage_or_id>',                endpoint = 'passage.json'),
             Rule ('/cliques.json/<passage_or_id>',                endpoint = 'cliques.json'),
             Rule ('/ranges.json/<passage_or_id>',                 endpoint = 'ranges.json'),
-            Rule ('/ms_attesting/<passage_or_id>/<labez>',        endpoint = 'ms_attesting'),
+            Rule ('/attesting/<passage_or_id>/<labez>',           endpoint = 'attesting'),
             Rule ('/apparatus.json/<passage_or_id>',              endpoint = 'apparatus.json'),
             Rule ('/attestation.json/<passage_or_id>',            endpoint = 'attestation.json'),
             Rule ('/stemma.dot/<passage_or_id>',                  endpoint = 'stemma.dot'),
@@ -1147,7 +1144,7 @@ if __name__ == "__main__":
             Rule ('/stemma-edit/<passage_or_id>',                 endpoint = 'stemma-edit', methods = ['POST']),
         ])
 
-        log (logging.INFO, "{name} at {path} from conf {conf}".format (
+        log (logging.INFO, "Mounted {name} at {path} from conf {conf}".format (
             name = sub_app.config['APPLICATION_NAME'],
             path = sub_app.config['APPLICATION_ROOT'],
             conf = fn))
