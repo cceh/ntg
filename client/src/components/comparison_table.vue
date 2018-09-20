@@ -56,9 +56,9 @@
                 title="Total number of passages where W1 and W2 are both extant">{{ r.common }}</td>
 
             <td class="older"
-                title="Number of variants in W2 that are prior to those in W1">{{ r.older }}</td>
+                title="Number of variants in W2 that are prior to those in W1">{{ r.newer }}</td>
             <td class="newer"
-                title="Number of variants in W1 that are prior to those in W2">{{ r.newer }}</td>
+                title="Number of variants in W1 that are prior to those in W2">{{ r.older }}</td>
             <td class="uncl"
                 title="Number of variants where no decision has been made about priority">{{ r.unclear }}</td>
             <td class="norel"
