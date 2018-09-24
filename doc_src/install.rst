@@ -48,15 +48,15 @@ Database Access
 MySQL database
 --------------
 
-1. Edit (or create) your :file:`~/.my.cnf` and add this section:
+1. Edit (or create) your :file:`~/.my.cnf.ntg` and add this section:
 
    .. code-block:: ini
 
-       [ntg]
-       host='localhost'
-       user='<username>'
-       password='<password>'
-       default-character-set='utf8'
+       [mysql]
+       host="localhost"
+       user="<username>"
+       password="<password>"
+       default-character-set="utf8"
 
    Replace *<username>* and *<password>* with your own MySQL username and password.
 
@@ -75,6 +75,17 @@ MySQL database
 
 Postgres database
 -----------------
+
+0. Make sure you have the following lines in :file:`pg_hba.conf` so you can
+   connect to postgres using password identification.
+
+   .. code-block::
+
+      # IPv4 local connections:
+      host    all             all             127.0.0.1/32            md5
+      # IPv6 local connections:
+      host    all             all             ::1/128                 md5
+
 
 1. Create a postgres user and a foreign data wrapper for MySQL.  The FDW allows
    Postgres to access the MySQL databases.
@@ -200,7 +211,7 @@ Application server
 
    .. code-block:: shell
 
-      python3 -m scripts.cceh.mk_user -e <email> -u <username> -p <password>
+      python3 -m scripts.cceh.mk_users -e <email> -u <username> -p <password> server/instance/_globals.conf
 
 
 CBGM
@@ -220,6 +231,7 @@ CBGM
    .. code-block:: shell
 
       python3 -m scripts.cceh.import -vvv server/instance/acts_ph4.conf
+      python3 -m scripts.cceh.prepare -vvv server/instance/acts_ph4.conf
 
 3. Run the CBGM process once.
 
@@ -228,6 +240,9 @@ CBGM
       python3 -m scripts.cceh.cbgm -vvv server/instance/acts_ph4.conf
 
 4. Setup cron to run the CBGM nightly:
+
+   This step is optional.  You may also run the cbgm script manually whenever
+   you need it.
 
    Edit your user crontab
 

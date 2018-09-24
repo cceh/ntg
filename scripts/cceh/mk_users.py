@@ -10,6 +10,7 @@ import logging
 from passlib.context import CryptContext
 
 from ntg_common import db
+from ntg_common import db_tools
 from ntg_common.db_tools import execute
 from ntg_common.tools import log
 from ntg_common.config import init_cmdline
@@ -34,7 +35,7 @@ if __name__ == '__main__':
 
     args, config = init_cmdline (build_parser ())
 
-    dba = db.PostgreSQLEngine (**config)
+    dba = db_tools.PostgreSQLEngine (**config)
 
     db.Base3.metadata.drop_all   (dba.engine)
     db.Base3.metadata.create_all (dba.engine)

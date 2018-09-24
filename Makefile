@@ -226,3 +226,6 @@ install-prerequisites:
 		psycopg2 mysqlclient sqlalchemy sqlalchemy-utils intervals \
 		flask babel flask-babel flask-sqlalchemy jinja2 flask-user \
 		sphinx sphinx_rtd_theme sphinx_js sphinxcontrib-plantuml \
+
+#	yum install python34-pip python34-pylint mysql-devel python34-devel node mysql_fdw_10 postgresql10-server
+#	pip3 install -U setuptools
