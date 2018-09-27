@@ -19,6 +19,8 @@ dev-server: $(AUX)
 dev-server-production: clean $(AUX)
 	$(WEBPACK_DEV_SERVER) --config webpack.prod.js
 
+lint: eslint csslint
+
 eslint:
 	$(ESLINT) src/components/*.vue src/js/*.js src/*.js *.js *.json
 

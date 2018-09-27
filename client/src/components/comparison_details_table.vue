@@ -5,7 +5,7 @@
       <caption>
         <div class="d-flex justify-content-between">
           <div class="caption">Comparison of {{ ms1.hs }} and {{ ms2.hs }} in Chapter {{ range }}</div>
-          <toolbar @csv="download ()" />
+          <toolbar :toolbar="toolbar" />
         </div>
       </caption>
       <thead>
@@ -20,7 +20,7 @@
       </thead>
       <tbody>
         <tr v-for="r in rows" :class="(r.newer ? 'newer' : '') + (r.older ? 'older' : '')" :key="r.pass_id">
-          <td class="passage"><a :href="'coherence#' + r.pass_id">{{ r.pass_hr }}</a></td>
+          <td class="passage"><a :href="'coherence#pass_id=' + r.pass_id">{{ r.pass_hr }}</a></td>
           <td class="lesart lesart1">{{ r.lesart1 }}</td>
           <td class="ms ms1">{{ r.labez_clique1 }}</td>
           <td class="direction">{{ r.direction }}</td>
@@ -99,8 +99,8 @@ export const sort_mixin = {
         return {
             'sorted_by'   : '',
             'sorted_desc' : false,
-            'toolbar'   : {
-                'csv' : true, // show a download csv button
+            'toolbar'     : {
+                'csv' : () => this.download (), // show a download csv button
             },
         };
     },

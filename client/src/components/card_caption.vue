@@ -50,9 +50,7 @@ export default {
         close (dummy_event) {
             const vm = this;
             vm.$card.fadeOut (() => {
-                // FIXME this works only because currently the relatives popup
-                // is the only card with a close button
-                vm.card_vm.$parent.destroy_relatives_popup (vm.card_vm.card_id);
+                vm.$trigger ('destroy_relatives_popup', vm.card_vm.card_id);
             });
         },
     },

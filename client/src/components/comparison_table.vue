@@ -1,7 +1,7 @@
 <template>
   <div class="comparison-table-vm">
     <div class="card-header">
-      <toolbar @csv="download ()" />
+      <toolbar :toolbar="toolbar" />
     </div>
 
     <table class="table table-bordered table-sm table-hover table-comparison" cellspacing="0">
@@ -154,7 +154,7 @@ export default {
             'rows'      : [],
             'sorted_by' : 'rg_id',
             'toolbar'   : {
-                'csv' : true, // show a download csv button
+                'csv' : () => this.download (), // show a download csv button
             },
         };
     },
@@ -172,7 +172,8 @@ export default {
             this.sort ();
         },
         caption () {
-            this.$parent.set_caption (this.caption);
+            // vue.js `events´ do not bubble, so they are pretty useless
+            this.$trigger ('caption', this.caption);
         },
     },
     'methods' : {

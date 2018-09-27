@@ -1,5 +1,6 @@
 <template>
-  <div class="comparison_vm">
+  <div class="comparison_vm want_hashchange"
+       @hashchange="on_hashchange" @caption="on_caption">
     <page-header :caption="caption" />
 
     <div class="container bs-docs-container">
@@ -11,7 +12,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text">Witness 1:</span>
             </div>
-            <input v-model="input1" type="text" class="form-control" id="ms1"
+            <input id="ms1" v-model="input1" type="text" class="form-control"
                    title="Enter the Gregory-Aland no. of the first witness ('A' for the initial text)."
                    aria-label="Witness 1" />
           </div>
@@ -20,7 +21,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text">Witness 2:</span>
             </div>
-            <input v-model="input2" type="text" class="form-control" id="ms2"
+            <input id="ms2" v-model="input2" type="text" class="form-control"
                    title="Enter the Gregory-Aland no. of the second witness ('A' for the initial text)."
                    aria-label="Witness 2" />
           </div>
@@ -62,16 +63,12 @@ Vue.component ('comparison-table', comparison_table);
 export default {
     data () {
         return {
-            'ms1'    : { 'hs' : '-' },
-            'ms2'    : { 'hs' : '-' },
-            'input1' : '',
-            'input2' : '',
+            'ms1'     : { 'hs' : '-' },
+            'ms2'     : { 'hs' : '-' },
+            'input1'  : '',
+            'input2'  : '',
+            'caption' : 'Comparison of Witnesses',
         };
-    },
-    'computed' : {
-        'caption' : function () {
-            return `Comparison of ${this.ms1.hs} and ${this.ms2.hs}`;
-        },
     },
     'methods' : {
         submit (dummy_event) {
@@ -80,8 +77,11 @@ export default {
                 'ms2' : this.input2,
             });
         },
+        on_caption (event) {
+            this.caption = event.detail.data;
+        },
         on_hashchange () {
-            const hash = window.location.hash.substring (1);
+            const hash = window.location.hash ? window.location.hash.substring (1) : '';
             if (hash) {
                 const vm = this;
                 const params = tools.deparam (hash);
@@ -103,17 +103,7 @@ export default {
         },
     },
     mounted () {
-        const vm = this;
-
-        $ (window).off ('hashchange.comparison');
-        $ (window).on ('hashchange.comparison', function () {
-            vm.on_hashchange ();
-        });
-
-        // On first page load simulate user navigation to hash.
-        if (window.location.hash) {
-            vm.on_hashchange ();
-        }
+        this.on_hashchange ();
     },
 };
 </script>

@@ -5,6 +5,7 @@
  * @author Marcello Perathoner
  */
 
+import $            from 'jquery';
 import Vue          from 'vue';
 import VueRouter    from 'vue-router';
 import BootstrapVue from 'bootstrap-vue';
@@ -94,6 +95,29 @@ Vue.prototype.put = function (url, data = {}) {
     return axios.put (this.build_full_api_url (url), data);
 };
 
+
+/**
+ * Trigger a native event.
+ *
+ * vue.js custom `events´ do not bubble, so they are useless.  Trigger a real
+ * event that bubbles and can be caught by vue.js.
+ *
+ * @function $trigger
+ *
+ * @param {string} name - event name
+ * @param {array}  data - data
+ */
+
+Vue.prototype.$trigger = function (name, data) {
+    // $ (this.$el).trigger (event, data);
+
+    const event = new CustomEvent (name, {
+        'bubbles' : true,
+        'detail'  : { 'data' : data },
+    });
+    this.$el.dispatchEvent (event);
+};
+
 /* eslint-disable no-new */
 new Vue ({
     'data' : {
@@ -103,4 +127,16 @@ new Vue ({
     'router'     : router,
     'el'         : '#app',
     'components' : { app },
+});
+
+$ (document).off ('.data-api'); // turn off bootstrap's data api
+
+// The browser triggers hashchange only on window.  We want it on every app.
+$ (window).on ('hashchange', function () {
+    // Concoct an event that you can actually catch with vue.js. (jquery events
+    // are not real native events.)  This event does not bubble.
+    const event = new CustomEvent ('hashchange');
+    $ ('.want_hashchange').each (function (i, e) {
+        e.dispatchEvent (event);
+    });
 });

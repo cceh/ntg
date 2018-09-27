@@ -1,10 +1,6 @@
 <template>
   <div class="relatives-vm card-slidable">
     <div class="card-header">
-      <toolbar @csv="download ('relatives.csv')" />
-    </div>
-
-    <div class="card-header">
       <relmetrics :ms="ms" />
     </div>
 
@@ -75,24 +71,11 @@ const CAPTIONS = {
 };
 
 export default {
-    'props' : ['ms_id'],
+    'props' : ['ms_id', 'toolbar'],
     data () {
-        const tb = {
-            'type'                  : 'rel',
-            'range'                 : 'All',
-            'limit'                 : '10',
-            'include'               : [],
-            'fragments'             : [],
-            'mode'                  : 'sim',
-            'labez'                 : 'all+lac',
-            'labez_dropdown_prefix' : [['all', 'All']],
-            'labez_dropdown_suffix' : [['all+lac', 'All+Lac']],
-            'csv'                   : true, // show a download csv button
-        };
         return {
-            'toolbar' : tb,
-            'rows'    : [],
-            'ms'      : null,
+            'rows' : [],
+            'ms'   : null,
         };
     },
     'computed' : {
@@ -100,7 +83,7 @@ export default {
             if (!this.ms) {
                 return '';
             }
-            return CAPTIONS[this.toolbar.type] + ` <span class="ms">W1:</span>
+            return `${CAPTIONS[this.toolbar.type]} <span class="ms">W1:</span>
                 <span class="fg_labez" data-labez="${this.ms.labez}"><span
                       class="ms hilite-source" data-ms-id="${this.ms.ms_id}">${this.ms.hs}</span>
                 (<span class="labez">${this.ms.labez}</span>) ${this.ms.length}</span>`;
@@ -120,7 +103,8 @@ export default {
             'deep' : true,
         },
         caption () {
-            this.$parent.set_caption (this.caption);
+            // vue.js `events´ do not bubble, so they are pretty useless
+            this.$trigger ('caption', this.caption);
         },
     },
     'methods' : {
@@ -175,6 +159,9 @@ export default {
         },
     },
     mounted () {
+        if ('csv' in this.toolbar) {
+            this.toolbar.csv = () => this.download ('relatives.csv');
+        }
         this.load_passage ();
     },
 };

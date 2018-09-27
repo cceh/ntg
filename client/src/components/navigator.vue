@@ -1,61 +1,58 @@
 <template>
-  <div class="navigator_vm">
-    <form class="form-inline" @submit.prevent="on_nav">
+  <form class="navigator_vm want_hashchange form-inline"
+        @hashchange="on_hashchange" @submit.prevent="on_nav">
 
-        <button type="button" data="-1" class="btn btn-primary mr-2"
-                aria-label="Previous Passage" title="Previous Passage" @click="on_nav">
-          <span class="fas fa-chevron-left" />
+    <button type="button" data="-1" class="btn btn-primary mr-2"
+            aria-label="Previous Passage" title="Previous Passage" @click="on_nav">
+      <span class="fas fa-chevron-left" />
+    </button>
+
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text">Nav:</span>
+      </div>
+
+      <input type="text" class="form-control" name="siglum" data-autocomplete="siglum"
+             aria-label="Book" title="Book" />
+      <input type="text" class="form-control" name="chapter" data-autocomplete="chapter"
+             aria-label="Chapter" title="Chapter" />
+
+      <div class="input-group-prepend input-group-append">
+        <span class="input-group-text">:</span>
+      </div>
+
+      <input type="text" class="form-control" name="verse" data-autocomplete="verse"
+             aria-label="Verse" title="Verse" />
+
+      <div class="input-group-prepend input-group-append">
+        <span class="input-group-text">/</span>
+      </div>
+
+      <input type="text" class="form-control" name="word" data-autocomplete="word"
+             aria-label="Word" title="Word" />
+
+      <div class="input-group-btn input-group-append">
+        <button type="submit" data="Go" class="btn btn-primary mr-2"
+                aria-label="Go" title="Go">
+          <span class="fas fa-check" />
         </button>
+      </div>
+    </div>
 
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">Nav:</span>
-          </div>
+    <button type="button" data="1" class="btn btn-primary"
+            aria-label="Next Passage" title="Next Passage" @click="on_nav">
+      <span class="fas fa-chevron-right" />
+    </button>
 
-          <input type="text" class="form-control" name="siglum" data-autocomplete="siglum"
-                 aria-label="Book" title="Book" />
-          <input type="text" class="form-control" name="chapter" data-autocomplete="chapter"
-                 aria-label="Chapter" title="Chapter" />
-
-          <div class="input-group-prepend input-group-append">
-            <span class="input-group-text">:</span>
-          </div>
-
-          <input type="text" class="form-control" name="verse" data-autocomplete="verse"
-                 aria-label="Verse" title="Verse" />
-
-          <div class="input-group-prepend input-group-append">
-            <span class="input-group-text">/</span>
-          </div>
-
-          <input type="text" class="form-control" name="word" data-autocomplete="word"
-                 aria-label="Word" title="Word" />
-
-          <div class="input-group-btn input-group-append">
-            <button type="submit" data="Go" class="btn btn-primary mr-2"
-                    aria-label="Go" title="Go">
-              <span class="fas fa-check" />
-            </button>
-          </div>
-        </div>
-
-        <button type="button" data="1" class="btn btn-primary"
-                aria-label="Next Passage" title="Next Passage" @click="on_nav">
-          <span class="fas fa-chevron-right" />
-        </button>
-
-        <input :value="this.$store.state.passage.pass_id" name="pass_id" type="hidden" />
-    </form>
-
-    <div class="leitzeile" v-html="leitzeile" />
-  </div>
+    <input :value="this.$store.state.passage.pass_id" name="pass_id" type="hidden" />
+  </form>
 </template>
 
 <script>
 /**
  * This module implements the tape-recorder-controls navigator.
  *
- * To actually navigate this module changes the hash.
+ * It triggers a 'navigator' custom event with the passage id as parameter.
  *
  * @component navigator
  * @author Marcello Perathoner
@@ -65,9 +62,8 @@ import $ from 'jquery';
 import _ from 'lodash';
 import 'jquery-ui/autocomplete.js';
 
+import 'jquery-ui-css/core.css';
 import 'jquery-ui-css/autocomplete.css';
-
-import tools from 'tools';
 
 /*
  * 1. Extend the stock autocomplete to use a <table> instead of a <ul> and give
@@ -125,68 +121,14 @@ function suggest (data, complete, vm) {
     vm.get ('suggest.json', { 'params' : data }).then ((response) => complete (response.data));
 }
 
-function compute_leitzeile_html (leitzeile_json, current_pass_id) {
-    let accumulator = [[]];
-    let last_pass_id = null;
-    let i = 0;
-
-    // group by pass_id
-    for (const item of leitzeile_json) {
-        if (item.pass_id !== last_pass_id) {
-            i += 1;
-            accumulator[i] = [];
-            last_pass_id = item.pass_id;
-        }
-        accumulator[i].push (item);
-    }
-
-    const leitzeile = [];
-    for (const items of accumulator) {
-        if (items.length !== 0) {
-            const pass_id = items[0].pass_id;
-            const classes = [];
-            let tmp = _.map (items, 'lemma').join (' ');
-            if ((items[0].begadr % 2) === 1) {
-                classes.push ('leitzeile-inserted');
-                tmp = '';
-            } else if (items[0].replaced) {
-                classes.push ('leitzeile-replaced');
-            } else {
-                classes.push ('leitzeile-deleted');
-            }
-            classes.push ((items.length > 1) ? 'leitzeile-many' : 'leitzeile-one');
-            if (items[0].spanned) {
-                classes.push ('leitzeile-spanned');
-            }
-            if (pass_id === current_pass_id) {
-                classes.push ('leitzeile-current');
-            }
-            const class_ = (classes.length) ? ` class="${classes.join (' ')}"` : '';
-
-            if (pass_id) {
-                leitzeile.push (`<a${class_} href="#${pass_id}">${tmp}</a>`);
-            } else {
-                leitzeile.push (`<span>${tmp}</span>`);
-            }
-        }
-    }
-    return leitzeile.join (' ');
-}
-
 export default {
     'data' : function () {
         return {
         };
     },
-    'props' : [
-        'param',     // param name to use in the window hash
-    ],
     'computed' : {
         passage () {
             return this.$store.state.passage;
-        },
-        leitzeile () {
-            return compute_leitzeile_html (this.$store.state.leitzeile, this.$store.state.passage.pass_id);
         },
     },
     'methods' : {
@@ -228,18 +170,17 @@ export default {
                 data[value.name] = value.value;
             });
 
+            // transform user input into pass_id
             this.get ('passage.json/', { 'params' : data }).then ((response) => {
-                // a hash change triggers the actual navigation
-                const passage = response.data.data.passage;
-                if (this.param) {
-                    const hash = window.location.hash.substring (1);
-                    const params = tools.deparam (hash);
-                    params[this.param] = passage;
-                    window.location.hash = '#' + $.param (params);
-                } else {
-                    window.location.hash = '#' + passage;
-                }
+                this.$trigger ('navigator', response.data.data.passage);
             });
+        },
+        on_hashchange () {
+            // update the control if hash changes
+            // no need because we watch the store
+            // const params = tools.deparam (window.location.hash.substring (1));
+            // if ('pass_id' in params) {
+            // }
         },
     },
     'watch' : {
@@ -290,83 +231,27 @@ export default {
 /* navigator.vue */
 @import "bootstrap-custom";
 
-div.navigator_vm {
+.navigator_vm {
     @media print {
         display: none;
     }
 
-    form.form-inline {
-        margin-bottom: $spacer;
-        /* make buttons the same height as inputs */
-        align-items: stretch;
+    margin-bottom: $spacer;
 
-        input.form-control {
-            text-align: right;
-            width: 3.5em;
+    /* make buttons the same height as inputs */
+    align-items: stretch;
 
-            &[name=siglum] {
-                text-align: left;
-                border-right-width: 0;
-            }
+    input.form-control {
+        text-align: right;
+        width: 3.5em;
 
-            &[name=word] {
-                width: 6.5em;
-            }
-        }
-    }
-
-    div.leitzeile {
-        margin-bottom: 20px;
-        font-size: larger;
-
-        .leitzeile-current {
-            color: #d62728;
-            pointer-events: none;
+        &[name=siglum] {
+            text-align: left;
+            border-right-width: 0;
         }
 
-        .leitzeile-spanned {
-            display: none;
-            border-bottom: 1px dotted grey;
-        }
-
-        .leitzeile-inserted {
-            &::before {
-                content: '⸆'; /* 2e06 */
-            }
-        }
-
-        .xxx {
-            .leitzeile-replaced.leitzeile-one {
-                &::before {
-                    content: '⸀'; /* 2e00 */
-                }
-            }
-
-            .leitzeile-replaced.leitzeile-many {
-                &::before {
-                    content: '⸂';
-                }
-
-                &::after {
-                    content: '⸃';
-                }
-            }
-
-            .leitzeile-deleted.leitzeile-one {
-                &::before {
-                    content: '⸋'; /* 2e0b */
-                }
-            }
-
-            .leitzeile-deleted.leitzeile-many {
-                &::before {
-                    content: '⸍'; /* 2e0d */
-                }
-
-                &::after {
-                    content: '⸌'; /* 2e0c */
-                }
-            }
+        &[name=word] {
+            width: 6.5em;
         }
     }
 }

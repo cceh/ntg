@@ -1,7 +1,7 @@
 <template>
   <div class="notes-vm card-slidable">
     <div class="card-header">
-      <toolbar @save="on_save" />
+      <toolbar :toolbar="toolbar" />
     </div>
 
     <div class="wrapper notes-wrapper">
@@ -42,12 +42,10 @@ export default {
             this.load_passage ();
         },
         current_text () {
-            const vm = this;
-            vm.toolbar.save = vm.current_text !== vm.original_text;
+            this.can_save ();
         },
         original_text () {
-            const vm = this;
-            vm.toolbar.save = vm.current_text !== vm.original_text;
+            this.can_save ();
         },
     },
     'methods' : {
@@ -73,7 +71,14 @@ export default {
                 tools.slide_from ($ta, old_height);
             });
         },
-
+        can_save () {
+            const vm = this;
+            if (vm.current_text !== vm.original_text) {
+                vm.toolbar.save = () => this.on_save ();
+            } else {
+                vm.toolbar.save = false;
+            }
+        },
         /**
          * Save an edited passage.
          *

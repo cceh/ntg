@@ -84,6 +84,7 @@ export default {
 <style lang="scss">
 @import "../css/bootstrap-custom.scss";
 
+/* bootstrap */
 @import "../../node_modules/bootstrap/scss/bootstrap";
 @import "../../node_modules/bootstrap-vue/dist/bootstrap-vue.css";
 

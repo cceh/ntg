@@ -45,9 +45,9 @@
         <span class="connectivity-label">{{ connectivity_formatter (connectivity) }}</span>
         <input v-model="connectivity" type="range" class="custom-range" min="1" max="21"
                @change="on_connectivity_change" />
-        <datalist id="ticks" style="display: none">
-          <option value="1"  label="1" />
-          <option value="5"  label="5" />
+        <datalist id="ticks" style="display: none;">
+          <option value="1" label="1" />
+          <option value="5" label="5" />
           <option value="10" label="10" />
           <option value="20" label="20" />
           <option value="21" label="All" />
@@ -103,19 +103,22 @@
     <b-button-group size="sm" class="mr-auto">
       <b-button v-if="'save' in toolbar"
                 :disabled="!toolbar.save" variant="primary" size="sm" class="d-print-none"
-                @click="$emit ('save')">Save</b-button>
+                @click="toolbar.save ()">Save</b-button>
     </b-button-group>
 
     <b-button-group size="sm" class="d-print-none">
-      <b-button v-if="'dot' in toolbar"
-                variant="primary" title="Download graph in PNG format"
-                @click="$emit ('png')">PNG</b-button>
+      <b-button v-if="'find_relatives' in toolbar"
+                variant="primary" title="Find Relatives"
+                @click="toolbar.find_relatives ()">Find Relatives</b-button>
       <b-button v-if="'png' in toolbar"
+                variant="primary" title="Download graph in PNG format"
+                @click="toolbar.png ()">PNG</b-button>
+      <b-button v-if="'dot' in toolbar"
                 variant="primary" title="Download graph in GraphViz .dot format"
-                @click="$emit ('dot')">DOT</b-button>
+                @click="toolbar.dot ()">DOT</b-button>
       <b-button v-if="'csv' in toolbar"
                 variant="primary" title="Download table in .csv format"
-                @click="$emit ('csv')">CSV</b-button>
+                @click="toolbar.csv ()">CSV</b-button>
     </b-button-group>
   </b-button-toolbar>
 </template>
@@ -133,6 +136,12 @@ import $ from 'jquery';
 import 'bootstrap';
 
 export default {
+    'props' : {
+        'toolbar' : {
+            'type'    : Object,
+            'default' : {},
+        },
+    },
     'data' : function () {
         const type_checkbox_options = [
             { 'text' : 'Rel', 'value' : 'rel', 'title' : 'Show all relatives'    },
@@ -145,25 +154,25 @@ export default {
             { 'text' : 'All', 'value' : '0',  'title' : 'Show all items' },
         ];
         const include_checkbox_options = [
-            { 'text' : 'A',   'value' : 'A',  'title' : 'Include A'  },
+            { 'text' : 'A',   'value' : 'A',  'title' : 'Include A'              },
             { 'text' : 'MT',  'value' : 'MT', 'title' : 'Include Byzantine text' },
             { 'text' : 'Fam', 'value' : 'F',  'title' : 'Include text families'  },
         ];
         const mode_checkbox_options = [
-            { 'text' : 'Sim', 'value' : 'sim', 'title' : 'Use simple priority calculation'  },
+            { 'text' : 'Sim', 'value' : 'sim', 'title' : 'Use simple priority calculation'    },
             { 'text' : 'Rec', 'value' : 'rec', 'title' : 'Use recursive priority calculation' },
         ];
         const cliques_checkbox_options = [
-            { 'text' : 'Splits', 'value' : 'cliques', 'title' : 'Show split attestations'  },
+            { 'text' : 'Splits', 'value' : 'cliques', 'title' : 'Show split attestations' },
         ];
         const ortho_checkbox_options = [
-            { 'text' : 'Ortho',  'value' : 'ortho',   'title' : 'Show orthographic variations'  },
+            { 'text' : 'Ortho',  'value' : 'ortho',   'title' : 'Show orthographic variations' },
         ];
         const fragments_checkbox_options = [
-            { 'text' : 'Frag', 'value' : 'fragments', 'title' : 'Include document fragments'  },
+            { 'text' : 'Frag', 'value' : 'fragments', 'title' : 'Include document fragments' },
         ];
 
-        if (!('connectivity' in this.$parent.toolbar)) {
+        if (!('connectivity' in this.toolbar)) {
             include_checkbox_options.push ({
                 'text'  : 'Z',
                 'value' : 'Z',
@@ -171,11 +180,6 @@ export default {
             });
         }
         return {
-            // The trick is to reference the parent's toolbar instead of passing
-            // it as prop.  Both the toolbar and the parent will watch the same
-            // object.
-            'toolbar' : this.$parent.toolbar,
-
             'limit_checkbox_options'     : limit_checkbox_options,
             'type_checkbox_options'      : type_checkbox_options,
             'include_checkbox_options'   : include_checkbox_options,
@@ -306,7 +310,7 @@ div.toolbar-connectivity {
 
     input[type="range"] {
         width: 12em;
-        padding-left:  ($spacer * 0.5);
+        padding-left: ($spacer * 0.5);
         padding-right: ($spacer * 0.5);
     }
 }

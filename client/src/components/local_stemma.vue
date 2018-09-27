@@ -1,7 +1,7 @@
 <template>
   <div class="local-stemma-vm card-slidable">
     <div class="card-header">
-      <toolbar @dot="download ('stemma.dot')" @png="download ('stemma.png')" />
+      <toolbar :toolbar="toolbar" />
     </div>
 
     <div :class="'wrapper svg-wrapper ' + cssclass"
@@ -313,8 +313,8 @@ export default {
     'data'  : function () {
         return {
             'toolbar' : {
-                'dot' : true, // show a download dot button
-                'png' : true, // show a download png button
+                'dot' : () => this.download ('stemma.dot'), // show a download dot button
+                'png' : () => this.download ('stemma.png'), // show a download png button
             },
         };
     },

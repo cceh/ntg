@@ -1,7 +1,6 @@
 <template>
-  <div :class="'card ' + cssclass">
+  <div :class="'card ' + cssclass" @caption="on_caption">
     <card-caption :caption="current_caption" :default_closed="default_closed" />
-
     <slot v-if="visible" />
   </div>
 </template>
@@ -17,6 +16,7 @@
 import $ from 'jquery';
 import 'jquery-ui/draggable.js';
 
+import 'jquery-ui-css/core.css';
 import 'jquery-ui-css/draggable.css';
 
 export default {
@@ -50,8 +50,8 @@ export default {
                 'of'        : event,
             });
         },
-        set_caption (new_caption) {
-            this.current_caption = new_caption;
+        on_caption (event) {
+            this.current_caption = event.detail.data;
         },
     },
     mounted () {

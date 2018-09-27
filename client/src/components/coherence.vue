@@ -1,5 +1,9 @@
 <template>
-  <div>
+  <div class="coherence_vm want_hashchange"
+       @hashchange="on_hashchange"
+       @navigator="on_navigator"
+       @goto_attestation="on_goto_attestation"
+       @destroy_relatives_popup="on_destroy_relatives_popup">
     <page-header :caption="caption" />
 
     <div class="container bs-docs-container">
@@ -11,11 +15,18 @@
         <card v-for="card in floating_cards" :key="card.id"
               :card_id="card.id" :position_target="card.position_target"
               class="card-closable card-draggable card-floating">
-          <relatives :ms_id="card.ms_id" />
+
+          <div class="card-header">
+            <toolbar :toolbar="card.toolbar" />
+          </div>
+
+          <relatives :ms_id="card.ms_id" :toolbar="card.toolbar" />
         </card>
       </div>
 
       <navigator ref="nav" />
+
+      <leitzeile />
 
       <card cssclass="card-apparatus" caption="Apparatus">
         <apparatus />
@@ -80,9 +91,11 @@ import $ from 'jquery';
 import Vue from 'vue';
 
 import d3common  from 'd3_common';
+import tools     from 'tools';
 
 import page_header      from 'page_header.vue';
 import navigator        from 'navigator.vue';
+import leitzeile        from 'leitzeile.vue';
 import card             from 'card.vue';
 import card_caption     from 'card_caption.vue';
 import toolbar          from 'toolbar.vue';
@@ -97,6 +110,7 @@ import relmetrics       from 'relatives_metrics.vue';
 
 Vue.component ('page-header',  page_header);
 Vue.component ('navigator',    navigator);
+Vue.component ('leitzeile',    leitzeile);
 Vue.component ('card',         card);
 Vue.component ('card-caption', card_caption);
 Vue.component ('toolbar',      toolbar);
@@ -123,6 +137,25 @@ export default {
         },
     },
     'methods' : {
+        set_hash (param, data) {
+            const hash = window.location.hash ? window.location.hash.substring (1) : '';
+            const params = tools.deparam (hash);
+            params[param] = data;
+            window.location.hash = '#' + $.param (params);
+        },
+        on_navigator (event) {
+            // All navigation is done by manipulating the hash.
+            this.set_hash ('pass_id', event.detail.data);
+        },
+        on_hashchange () {
+            const nav = this.$refs.nav;
+            const params = tools.deparam (window.location.hash.substring (1));
+            if ('pass_id' in params) {
+                nav.set_passage (params.pass_id);
+            } else {
+                nav.set_passage (1);
+            }
+        },
         /**
          * Create a new popup managed by the relatives module.
          *
@@ -139,10 +172,36 @@ export default {
                 'id'              : this.card_id,
                 'ms_id'           : ms_id,
                 'position_target' : target,
+                'toolbar'         : this.relatives_toolbar (),
             });
         },
-        destroy_relatives_popup (card_id) {
+        on_destroy_relatives_popup (event) {
+            const card_id = event.detail.data;
             this.floating_cards = this.floating_cards.filter (item => item.id !== card_id);
+        },
+        on_goto_attestation (event) {
+            const labez = event.detail.data;
+            const lt = this.$refs.lt;
+            lt.toolbar.labez = labez;
+            lt.load_passage ();
+
+            $ ('html, body').animate ({
+                'scrollTop' : $ (lt.$el).offset ().top,
+            }, 500);
+        },
+        relatives_toolbar () {
+            return {
+                'type'                  : 'rel',
+                'range'                 : 'All',
+                'limit'                 : '10',
+                'include'               : [],
+                'fragments'             : [],
+                'mode'                  : 'sim',
+                'labez'                 : 'all+lac',
+                'labez_dropdown_prefix' : [['all', 'All']],
+                'labez_dropdown_suffix' : [['all+lac', 'All+Lac']],
+                'csv'                   : true, // this will be replaced by a closure later
+            };
         },
     },
     created () {
@@ -151,7 +210,6 @@ export default {
          *
          * @function created
          */
-        $ (document).off ('.data-api');
         const vm = this;
 
         // insert css for color palettes
@@ -191,21 +249,8 @@ export default {
         });
     },
     mounted () {
-        const nav = this.$refs.nav;
-
-        // React to hash changes.  All navigation is done by manipulating the
-        // hash.
-        $ (window).off ('hashchange.coherence');
-        $ (window).on ('hashchange.coherence', () => {
-            nav.set_passage (window.location.hash.substring (1));
-        });
-
         // On first page load simulate user navigation to hash.
-        if (window.location.hash) {
-            nav.set_passage (window.location.hash.substring (1));
-        } else {
-            nav.set_passage (1);
-        }
+        this.on_hashchange ();
     },
 };
 </script>

@@ -1,14 +1,14 @@
 <template>
   <div class="apparatus-vm card-slidable">
     <div class="card-header">
-      <toolbar />
+      <toolbar :toolbar="toolbar" />
     </div>
 
     <ul class="list-group list-group-flush wrapper apparatus-wrapper">
       <li v-for="(items, group) in groups" :key="group" class="list-group-item">
         <h3 class="list-group-item-heading">
           <a :data-labez="items[0].labez" class="apparatus-labez fg_labez"
-@click="goto_attestation">{{ items[0].caption }}</a>
+             @click="goto_attestation (items[0].labez)">{{ items[0].caption }}</a>
         </h3>
         <ul class="list-group-item-text attesting-mss list-inline">
           <li v-for="item in items" :key="item.ms_id">
@@ -73,6 +73,7 @@ function load_passage (vm, passage) {
         const readings = [];
         responses[0].data.data.readings.map (reading => {
             readings[reading.labez] = reading.lesart;
+            return false;
         });
 
         const mss = responses[0].data.data.manuscripts.map ((ms) => {
@@ -100,8 +101,9 @@ export default {
     'data' : function () {
         return {
             'toolbar' : {
-                'cliques' : [],  // Show readings or cliques.
-                'ortho' : [],    // Show orthographic variations.
+                'cliques'        : [],  // Show readings or cliques.
+                'ortho'          : [],  // Show orthographic variations.
+                'find_relatives' : this.find_relatives,
             },
             'groups' : [],
         };
@@ -131,18 +133,12 @@ export default {
          * Show the attestation in the "Coherence in Attestations" card and scroll to it.
          *
          * @method goto_attestation
-         * @param {Object} event - The event
          */
-        goto_attestation (event) {
-            event.stopPropagation ();
-            const lt = this.$parent.$parent.$refs.lt;
-            const labez = $ (event.currentTarget).attr ('data-labez');
-            lt.toolbar.labez = labez;
-            lt.load_passage ();
-
-            $ ('html, body').animate ({
-                'scrollTop' : $ ('div.card-local-textflow').offset ().top,
-            }, 500);
+        goto_attestation (labez) {
+            this.$trigger ('goto_attestation', labez);
+        },
+        find_relatives () {
+            this.$router.push (`attestation#pass_id=${this.passage.pass_id}&labez=a`);
         },
     },
     mounted () {

@@ -1,7 +1,7 @@
 <template>
   <div class="textflow-vm card-slidable">
     <div class="card-header">
-      <toolbar @dot="download ('textflow.dot')" @png="download ('textflow.png')" />
+      <toolbar :toolbar="toolbar" />
     </div>
 
     <div :class="'wrapper svg-wrapper ' + cssclass"
@@ -27,6 +27,7 @@ import _ from 'lodash';
 import { mapGetters } from 'vuex';
 import 'jquery-ui/menu.js';
 
+import 'jquery-ui-css/core.css';
 import 'jquery-ui-css/theme.css';
 import 'jquery-ui-css/menu.css';
 
@@ -122,8 +123,8 @@ export default {
             'range'   : 'All',
             'include' : [],
             'mode'    : 'sim',
-            'dot'     : true, // show a download dot button
-            'png'     : true, // show a download png button
+            'dot'     : () => this.download ('textflow.dot'), // show a download dot button
+            'png'     : () => this.download ('textflow.png'), // show a download png button
         };
         if (!this.global && !this.var_only) {
             tb.labez = 'a';

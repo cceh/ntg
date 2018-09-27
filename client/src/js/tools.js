@@ -56,8 +56,10 @@ export function natural_sort (s) {
 export function deparam (query_string) {
     var params = {};
     query_string.split ('&').forEach (item => {
-        var s = item.split ('=').map (i => decodeURIComponent (i.replace ('+', ' ')));
-        params[s[0]] = s[1];
+        if (item.length) {
+            var s = item.split ('=').map (i => decodeURIComponent (i.replace ('+', ' ')));
+            params[s[0]] = s[1];
+        }
     });
     return params;
 }
