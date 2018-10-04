@@ -4,48 +4,52 @@
       <relmetrics :ms="ms" />
     </div>
 
-    <table class="relatives table table-sm">
-      <tbody>
-        <tr>
-          <th class="ms"
-              title="Witness 2: Witnesses compared to W1">W2</th>
-          <th class="rank"
-              title="Ancestral rank according to the degree of agreement (Perc)">NR</th>
-          <th class="direction"
-              title="Genealogical direction, potential ancestors indicated by “>”">D</th>
-          <th class="labez"
-              title="The reading offered by W2">Rdg</th>
-          <th class="perc"
-              title="Percentaged agreement of W1 and W2 at the variant passages attested by both (Pass)">Perc</th>
-          <th class="equal"
-              title="Number of agreements of W1 and W2 at the variant passages attested by both (Pass)">Eq</th>
-          <th class="common"
-              title="Total number of passages where W1 and W2 are both extant">Pass</th>
-          <th class="older"
-              title="Number of variants in W2 that are prior to those in W1">W1&lt;W2</th>
-          <th class="newer"
-              title="Number of variants in W1 that are prior to those in W2">W1&gt;W2</th>
-          <th class="unclear"
-              title="Number of variants where no decision has been made about priority">Uncl</th>
-          <th class="norel"
-              title="Number of passages where the respective variants are unrelated">NoRel</th>
-        </tr>
-        <tr v-for="r in rows" :key="r.ms_id" :data-labez="r.labez"
-            :data-ms1-id="ms_id" :data-ms2-id="r.ms_id" class="fg_labez comparison">
-          <th class="ms"><span :data-ms-id="r.ms_id" class="ms hilite-target">{{ r.hs }}</span></th>
-          <td class="rank">{{ r.rank }}</td>
-          <td class="direction">{{ r.direction }}</td>
-          <td class="labez">({{ r.labez }})</td>
-          <td class="perc">{{ r.perc }}%</td>
-          <td class="equal">{{ r.equal }}</td>
-          <td class="common">{{ r.common }}</td>
-          <td class="older">{{ r.newer }}</td>
-          <td class="newer">{{ r.older }}</td>
-          <td class="unclear">{{ r.unclear }}</td>
-          <td class="norel">{{ r.norel }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="scroller">
+      <table class="relatives table table-sm">
+        <thead>
+          <tr>
+            <th class="ms"
+                title="Witness 2: Witnesses compared to W1">W2</th>
+            <th class="rank"
+                title="Ancestral rank according to the degree of agreement (Perc)">NR</th>
+            <th class="direction"
+                title="Genealogical direction, potential ancestors indicated by “>”">D</th>
+            <th class="labez"
+                title="The reading offered by W2">Rdg</th>
+            <th class="perc"
+                title="Percentaged agreement of W1 and W2 at the variant passages attested by both (Pass)">Perc</th>
+            <th class="equal"
+                title="Number of agreements of W1 and W2 at the variant passages attested by both (Pass)">Eq</th>
+            <th class="common"
+                title="Total number of passages where W1 and W2 are both extant">Pass</th>
+            <th class="older"
+                title="Number of variants in W2 that are prior to those in W1">W1&lt;W2</th>
+            <th class="newer"
+                title="Number of variants in W1 that are prior to those in W2">W1&gt;W2</th>
+            <th class="unclear"
+                title="Number of variants where no decision has been made about priority">Uncl</th>
+            <th class="norel"
+                title="Number of passages where the respective variants are unrelated">NoRel</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="r in rows" :key="r.ms_id" :data-labez="r.labez"
+              :data-ms1-id="ms_id" :data-ms2-id="r.ms_id" class="fg_labez comparison">
+            <th class="ms"><span :data-ms-id="r.ms_id" class="ms hilite-target">{{ r.hs }}</span></th>
+            <td class="rank">{{ r.rank }}</td>
+            <td class="direction">{{ r.direction }}</td>
+            <td class="labez">({{ r.labez }})</td>
+            <td class="perc">{{ r.perc }}%</td>
+            <td class="equal">{{ r.equal }}</td>
+            <td class="common">{{ r.common }}</td>
+            <td class="older">{{ r.newer }}</td>
+            <td class="newer">{{ r.older }}</td>
+            <td class="unclear">{{ r.unclear }}</td>
+            <td class="norel">{{ r.norel }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
   </div>
 </template>
@@ -175,10 +179,13 @@ div.relatives-vm {
         font-weight: bold;
     }
 
+    div.scroller {
+        max-height: 50em;
+        overflow-y: scroll;
+    }
+
     table.relatives {
         margin-bottom: 0;
-        max-height: 50em;
-        overflow: auto;
 
         th,
         td {
