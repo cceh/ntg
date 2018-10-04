@@ -79,7 +79,7 @@ Postgres database
 0. Make sure you have the following lines in :file:`pg_hba.conf` so you can
    connect to postgres using password identification.
 
-   .. code-block::
+   .. code-block:: none
 
       # IPv4 local connections:
       host    all             all             127.0.0.1/32            md5

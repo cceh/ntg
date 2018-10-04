@@ -292,12 +292,12 @@ make install-prerequisites
 <div class="section" id="mysql-database">
 <h3>MySQL database<a class="headerlink" href="#mysql-database" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic">
-<li><p class="first">Edit (or create) your <code class="file docutils literal notranslate"><span class="pre">~/.my.cnf</span></code> and add this section:</p>
-<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ntg]</span>
-<span class="na">host</span><span class="o">=</span><span class="s">&#39;localhost&#39;</span>
-<span class="na">user</span><span class="o">=</span><span class="s">&#39;&lt;username&gt;&#39;</span>
-<span class="na">password</span><span class="o">=</span><span class="s">&#39;&lt;password&gt;&#39;</span>
-<span class="na">default-character-set</span><span class="o">=</span><span class="s">&#39;utf8&#39;</span>
+<li><p class="first">Edit (or create) your <code class="file docutils literal notranslate"><span class="pre">~/.my.cnf.ntg</span></code> and add this section:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[mysql]</span>
+<span class="na">host</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<span class="na">user</span><span class="o">=</span><span class="s">&quot;&lt;username&gt;&quot;</span>
+<span class="na">password</span><span class="o">=</span><span class="s">&quot;&lt;password&gt;&quot;</span>
+<span class="na">default-character-set</span><span class="o">=</span><span class="s">&quot;utf8&quot;</span>
 </pre></div>
 </div>
 <p>Replace <em>&lt;username&gt;</em> and <em>&lt;password&gt;</em> with your own MySQL username and password.</p>
@@ -316,7 +316,16 @@ sudo mysql -e <span class="s2">&quot;CREATE DATABASE ECM_ActsPh4&quot;</span>
 </div>
 <div class="section" id="postgres-database">
 <h3>Postgres database<a class="headerlink" href="#postgres-database" title="Permalink to this headline">¶</a></h3>
-<ol class="arabic">
+<ol class="arabic" start="0">
+<li><p class="first">Make sure you have the following lines in <code class="file docutils literal notranslate"><span class="pre">pg_hba.conf</span></code> so you can
+connect to postgres using password identification.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span># IPv4 local connections:
+host    all             all             127.0.0.1/32            md5
+# IPv6 local connections:
+host    all             all             ::1/128                 md5
+</pre></div>
+</div>
+</li>
 <li><p class="first">Create a postgres user and a foreign data wrapper for MySQL.  The FDW allows
 Postgres to access the MySQL databases.</p>
 <p>Login as administrative user and say:</p>
@@ -424,7 +433,7 @@ application server.  You’ll need this user to login in the browser.</p>
 <p class="last">This should not be the same username (and password) as the database user
 above!</p>
 </div>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.mk_user -e &lt;email&gt; -u &lt;username&gt; -p &lt;password&gt;
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.mk_users -e &lt;email&gt; -u &lt;username&gt; -p &lt;password&gt; server/instance/_globals.conf
 </pre></div>
 </div>
 </li>
@@ -443,6 +452,7 @@ mysql -D <span class="s2">&quot;Nestle29&quot;</span>         &lt; Nestle29.dump
 </li>
 <li><p class="first">Import the databases into postgres:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.import -vvv server/instance/acts_ph4.conf
+python3 -m scripts.cceh.prepare -vvv server/instance/acts_ph4.conf
 </pre></div>
 </div>
 </li>
@@ -452,6 +462,8 @@ mysql -D <span class="s2">&quot;Nestle29&quot;</span>         &lt; Nestle29.dump
 </div>
 </li>
 <li><p class="first">Setup cron to run the CBGM nightly:</p>
+<p>This step is optional.  You may also run the cbgm script manually whenever
+you need it.</p>
 <p>Edit your user crontab</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>crontab -e
 </pre></div>

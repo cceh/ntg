@@ -7,7 +7,7 @@
 CBGM Database
 =============
 
-The `cbgm-db` is built from the `source-db` by the :mod:`import
+The CBGM database is built from the `source-db` by the :mod:`import
 <scripts.cceh.import>` script.  The :mod:`API server <server>` uses this
 database.
 

@@ -268,6 +268,7 @@ the “Leitzeile”.</p>
 <p>The mysql databases for Acts contain sets of 28 tables, one for each respective
 chapter of Acts.  This is a historical incident: The software used when the CBGM
 was first implemented could not handle big tables.</p>
+<p>After running this script should run the <a class="reference internal" href="scripts_user.html#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> script.</p>
 <dl class="function">
 <dt id="scripts.cceh.import.concat_tables_fdw">
 <code class="descname">concat_tables_fdw</code><span class="sig-paren">(</span><em>conn</em>, <em>meta</em>, <em>dest_table</em>, <em>fdw</em>, <em>source_tables</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.import.concat_tables_fdw" title="Permalink to this definition">¶</a></dt>
@@ -323,6 +324,7 @@ differing only by orthgographic convention.</p>
 positive apparatus, that is, an apparatus that is defined for all manuscripts at
 all passages.</p>
 <p>Finally the script reconstructs the <a class="reference internal" href="domain.html#mt"><span class="std std-ref">Majority Text</span></a>.</p>
+<p>After running this script should run the <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script.</p>
 <blockquote>
 <div><p>Ausgangspunkt ist der Apparat mit allen für die Druckfassung notwendigen
 Informationen.  Diese Datenbasis muss für die CBGM bearbeitet werden.  Die
@@ -413,11 +415,10 @@ no passages in att that are not in locstemed also.</p>
 <code class="descname">delete_corrector_hands</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare.delete_corrector_hands" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete later hands</p>
 <p>Delete all corrections except those by the first hand.</p>
-<p>Also delete lectionary readings except L1.</p>
 <blockquote>
-<div><p>Lesarten löschen, die nicht von der ersten Hand stammen.  Bei mehreren
-Lektionslesarten gilt die L1-Lesart.  Ausnahme: Bei Selbstkorrekturen
-wird die <em>-Lesart gelöscht und die C</em>-Lesart beibehalten.</p>
+<div><p>Lesarten löschen, die nicht von der ersten Hand stammen.  […]
+Ausnahme: Bei Selbstkorrekturen wird die <em>-Lesart gelöscht und die
+C</em>-Lesart beibehalten.</p>
 <p class="attribution">&mdash;prepare4cbgm_6.py</p>
 </div></blockquote>
 </dd></dl>
@@ -439,6 +440,17 @@ suchen also nicht mehr nach einer Variante ‘b’ bis ‘y’, sondern zählen
 die Varianten.  Liefert getReadings nur 1 zurück, gibt es keine
 Varianten.</p>
 <p class="attribution">&mdash;prepare4cbgm_5.py</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="scripts.cceh.prepare.delete_lectionaries">
+<code class="descname">delete_lectionaries</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare.delete_lectionaries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete secondary lectionary readings</p>
+<p>Also delete lectionary readings except L1.</p>
+<blockquote>
+<div><p>Bei mehreren Lektionslesarten gilt die L1-Lesart.</p>
+<p class="attribution">&mdash;prepare4cbgm_6.py</p>
 </div></blockquote>
 </dd></dl>
 
@@ -521,10 +533,11 @@ nur 1 zurück, gibt es keine Varianten.</p>
 <dl class="function">
 <dt id="scripts.cceh.prepare.process_commentaries">
 <code class="descname">process_commentaries</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.prepare.process_commentaries" title="Permalink to this definition">¶</a></dt>
-<dd><p>Process differing readings in commentaries (T1, T2)</p>
-<p>If there is only one T1 or T2 reading for that passage and manuscript, unset
-the ‘T’ suffix.  If there are both T1 and T2 readings, merge them into one
-‘zw’ reading.</p>
+<dd><p>Process commentaries</p>
+<p>Commentaries often contain more than one reading of the same passage.  If
+those readings are different we must degrade them to uncertain status.</p>
+<p>Also promote the manuscript to ‘normal’ status by stripping the commentary
+suffix (in re_comm) from the hs.</p>
 <blockquote>
 <div><p>20. Mai 2015.  Commentary manuscripts like 307 cannot be treated like
 lectionaries where we choose the first text.  If a T1 or T2 reading is
@@ -568,9 +581,9 @@ list of candidate labez in labezsuf.  This list of candidates in labezsuf
 has to be normalized into multiple table records.</p>
 <p>If <span class="math notranslate nohighlight">\(N &gt; 1\)</span> labez candidates exists, the certainty of the unrolled
 records will be set to <span class="math notranslate nohighlight">\(1 / N\)</span>.</p>
-<p>But if all candidate labez are differing only in their errata or
-ortographica suffix, as in ‘a/ao1/ao2’ or ‘b/b_f’ then we will output only
-one record with a certainty of 1.0.</p>
+<p>But if all candidate labez differ only in their errata or ortographica
+suffix, as in ‘a/ao1/ao2’ or ‘b/b_f’ then we will output only one record
+with a certainty of 1.0.</p>
 <p>Caveat: in Mark, labezsuf may contain a list of candidate labez even if
 labez is not ‘zw’.  This is why we no longer look for ‘zw’ in labez but for
 ‘/’ in labezsuf.</p>
