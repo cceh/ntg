@@ -51,7 +51,7 @@ function compute_leitzeile_html (leitzeile_json, current_pass_id) {
             const class_ = (classes.length) ? ` class="${classes.join (' ')}"` : '';
 
             if (pass_id) {
-                leitzeile.push (`<a${class_} href="#${pass_id}">${tmp}</a>`);
+                leitzeile.push (`<a${class_} href="#pass_id=${pass_id}">${tmp}</a>`);
             } else {
                 leitzeile.push (`<span>${tmp}</span>`);
             }
