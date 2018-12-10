@@ -1129,6 +1129,7 @@ if __name__ == "__main__":
             Rule ('/manuscript.json/<hs_hsnr_id>',                endpoint = 'manuscript.json'),
             Rule ('/manuscript-full.json/<passage_or_id>/<hs_hsnr_id>', endpoint = 'manuscript-full.json'),
             Rule ('/relatives.csv/<passage_or_id>/<hs_hsnr_id>',  endpoint = 'relatives.csv'),
+            Rule ('/notes.json',                                  endpoint = 'notes.json'),
             Rule ('/passage.json/',                               endpoint = 'passage.json'),
             Rule ('/passage.json/<passage_or_id>',                endpoint = 'passage.json'),
             Rule ('/cliques.json/<passage_or_id>',                endpoint = 'cliques.json'),

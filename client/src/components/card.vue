@@ -1,6 +1,6 @@
 <template>
   <div :class="'card ' + cssclass" @caption="on_caption">
-    <card-caption :caption="current_caption" :default_closed="default_closed" />
+    <card-caption v-if="current_caption" :caption="current_caption" :default_closed="default_closed" />
     <slot v-if="visible" />
   </div>
 </template>

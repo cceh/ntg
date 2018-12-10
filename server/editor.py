@@ -2,6 +2,7 @@
 
 """An application server for CBGM.  Editor module.  """
 
+import collections
 import logging
 import re
 
@@ -239,3 +240,28 @@ def notes (passage_or_id):
         if res.rowcount > 0:
             return make_text_response (res.fetchone ()[0])
         return make_text_response ('')
+
+
+@app.endpoint ('notes.json')
+def notes_json ():
+    """Endpoint.  Get a list of all editor notes."""
+
+    if not flask_login.current_user.has_role ('editor'):
+        raise PrivilegeError ('You don\'t have editor privilege.')
+
+    with current_app.config.dba.engine.begin () as conn:
+        res = execute (conn, """
+        SELECT pass_id, begadr, endadr, note
+        FROM passages_view
+        JOIN notes
+          USING (pass_id)
+        """, dict (parameters))
+
+        Notes = collections.namedtuple ('Notes', 'pass_id, begadr, endadr, note')
+        notes = []
+        for r in res:
+            note = Notes._make (r)._asdict ()
+            note['hr'] = Passage.static_to_hr (note['begadr'], note['endadr'])
+            notes.append (note)
+
+        return make_json_response (notes)

@@ -6,6 +6,8 @@
       <router-link class="biglink" to="coherence">Coherence and Textual Flow</router-link>
       <router-link class="biglink" to="comparison">Comparison of Witnesses</router-link>
       <router-link class="biglink" to="attestation">Find Relatives</router-link>
+      <router-link v-if="$store.state.current_user.is_logged_in"
+                   class="biglink" to="notes">List of Notes</router-link>
 
       <a class="biglink" href="/pdfs/GenQ4_Guide.pdf" target="_blank">Short Guide (PDF)</a>
 

@@ -16,6 +16,7 @@ import index       from '../components/index.vue';
 import attestation from '../components/attestation.vue';
 import coherence   from '../components/coherence.vue';
 import comparison  from '../components/comparison.vue';
+import notes_list  from '../components/notes_list.vue';
 
 Vue.use (BootstrapVue);
 Vue.use (VueRouter);
@@ -27,9 +28,10 @@ const routes = [
         'props'     : true,
         'children'  : [
             { 'path' : '',            'component' : index,     'name' : 'index' },
-            { 'path' : 'coherence',   'component' : coherence  },
-            { 'path' : 'comparison',  'component' : comparison },
+            { 'path' : 'coherence',   'component' : coherence   },
+            { 'path' : 'comparison',  'component' : comparison  },
             { 'path' : 'attestation', 'component' : attestation },
+            { 'path' : 'notes',       'component' : notes_list  },
         ],
     },
 
