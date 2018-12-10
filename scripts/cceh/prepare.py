@@ -693,53 +693,54 @@ def unroll_zw (dba, parameters):
         """, dict (parameters, fields = fields))
 
         zws = list (map (Zw._make, res))
-
         updated = 0
-        params_list = [] # accumulator
-        for zw in zws:
-            segments = []
-            for segment in zw.labez.split ('/'):
-                segment = segment.strip ('?').strip ()
-                if len (segment) == 0:
-                    continue
-                m = re.match (r'(\w)-(\w)', segment)
-                if m:
-                    segments += [chr (n) for n in range (ord (m.group (1)), ord (m.group (2)) + 1)]
-                    continue
-                m = re.match (r'(\w+)(\d)-(\d)', segment)
-                if m:
-                    segments += [m.group (1) + chr (n) for n in range (ord (m.group (2)), ord (m.group (3)) + 1)]
-                    continue
-                segments.append (segment)
 
-            unique_labez = collections.defaultdict (list)
-            for seg in segments:
-                unique_labez[seg[0]].append (seg[1:].replace ('_', ''))
+        if zws:
+            params_list = [] # accumulator
+            for zw in zws:
+                segments = []
+                for segment in zw.labez.split ('/'):
+                    segment = segment.strip ('?').strip ()
+                    if len (segment) == 0:
+                        continue
+                    m = re.match (r'(\w)-(\w)', segment)
+                    if m:
+                        segments += [chr (n) for n in range (ord (m.group (1)), ord (m.group (2)) + 1)]
+                        continue
+                    m = re.match (r'(\w+)(\d)-(\d)', segment)
+                    if m:
+                        segments += [m.group (1) + chr (n) for n in range (ord (m.group (2)), ord (m.group (3)) + 1)]
+                        continue
+                    segments.append (segment)
 
-            options = len (unique_labez)
-            if options > 0:
-                updated += options
-                certainty = 1.0 / options #  if options > 1 else 0.9
-                more_params = zw._asdict ()
-                for k, v in unique_labez.items ():
-                    params_list.append (dict (more_params, labez = k, labezsuf = '/'.join (v), certainty = certainty))
+                unique_labez = collections.defaultdict (list)
+                for seg in segments:
+                    unique_labez[seg[0]].append (seg[1:].replace ('_', ''))
 
-        execute (conn, """
-        DELETE FROM att
-        WHERE labez ~ '[-/]'
-        """, dict (parameters))
+                options = len (unique_labez)
+                if options > 0:
+                    updated += options
+                    certainty = 1.0 / options #  if options > 1 else 0.9
+                    more_params = zw._asdict ()
+                    for k, v in unique_labez.items ():
+                        params_list.append (dict (more_params, labez = k, labezsuf = '/'.join (v), certainty = certainty))
 
-        executemany (conn, """
-        INSERT INTO att ({fields})
-        VALUES ({values})
-        """, dict (parameters, fields = fields, values = ':' + ', :'.join (Zw._fields)), params_list)
+            execute (conn, """
+            DELETE FROM att
+            WHERE labez ~ '[-/]'
+            """, dict (parameters))
 
-        # eg. if labezsuf = 'a/b/c/d/e2', zap the '2' until we don't know what it means
-        # execute (conn, """
-        # UPDATE att
-        # SET labezsuf = ''
-        # WHERE labezsuf ~ '^[0-9]$';
-        # """, parameters)
+            executemany (conn, """
+            INSERT INTO att ({fields})
+            VALUES ({values})
+            """, dict (parameters, fields = fields, values = ':' + ', :'.join (Zw._fields)), params_list)
+
+            # eg. if labezsuf = 'a/b/c/d/e2', zap the '2' until we don't know what it means
+            # execute (conn, """
+            # UPDATE att
+            # SET labezsuf = ''
+            # WHERE labezsuf ~ '^[0-9]$';
+            # """, parameters)
 
     log (logging.DEBUG, "          %d 'zw' rows unrolled" % updated)
 
