@@ -87,7 +87,7 @@ import_acts:
 import_john:
 	-$(MYSQL) -e "DROP DATABASE DCPJohnWithFam"
 	$(MYSQL) -e "CREATE DATABASE DCPJohnWithFam"
-	gunzip -c ../dumps/DCPJohnWithFam-8.sql | $(MYSQL) -D DCPJohnWithFam
+	gunzip -c ../dumps/DCPJohnWithFam-9.sql | $(MYSQL) -D DCPJohnWithFam
 	python3 -m scripts.cceh.import -vvv server/instance/john_ph1.conf
 
 import_john_f1:
