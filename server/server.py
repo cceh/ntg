@@ -1054,7 +1054,7 @@ def stemma_png (passage_or_id):
 
 
 def make_safe_url (url):
-    """Turns an usafe absolute URL into a safe relative URL
+    """Turns an unsafe absolute URL into a safe relative URL
     by removing the scheme and the hostname
 
     Example: make_safe_url('http://hostname/path1/path2?q1=v1&q2=v2#fragment')
