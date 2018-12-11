@@ -1,9 +1,5 @@
 <template>
   <div class="notes-vm card-slidable">
-    <div class="card-header">
-      <toolbar :toolbar="toolbar" />
-    </div>
-
     <div class="wrapper notes-wrapper">
       <textarea v-model="current_text" />
     </div>
@@ -20,22 +16,14 @@
 
 import $     from 'jquery';
 import tools from 'tools';
-import { mapGetters } from 'vuex';
 
 export default {
+    'props' : [ 'toolbar', 'passage' ],
     'data' : function () {
         return {
             'original_text' : '',
             'current_text'  : '',
-            'toolbar'       : {
-                'save' : false,
-            },
         };
-    },
-    'computed' : {
-        ...mapGetters ([
-            'passage',
-        ]),
     },
     'watch' : {
         passage () {

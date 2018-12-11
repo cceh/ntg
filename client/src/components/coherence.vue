@@ -40,7 +40,10 @@
 
       <card v-if="this.$store.state.current_user.is_editor"
             cssclass="card-notes" caption="Notes" default_closed="true">
-        <notes />
+        <div class="card-header card-slidable">
+          <toolbar :toolbar="tb_notes" />
+        </div>
+        <notes :passage="passage" :toolbar="tb_notes" />
       </card>
 
       <card cssclass="card-textflow card-variant-textflow"
@@ -89,6 +92,7 @@
 
 import $ from 'jquery';
 import Vue from 'vue';
+import { mapGetters } from 'vuex';
 
 import d3common  from 'd3_common';
 import tools     from 'tools';
@@ -129,12 +133,18 @@ export default {
         return {
             'floating_cards' : [],
             'card_id'        : 0,
+            'tb_notes'       : {
+                'save' : false,
+            },
         };
     },
     'computed' : {
         'caption' : function () {
             return `Attestation for ${this.$store.state.passage.hr}`;
         },
+        ...mapGetters ([
+            'passage',
+        ]),
     },
     'methods' : {
         set_hash (param, data) {
