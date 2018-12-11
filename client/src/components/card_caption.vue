@@ -1,5 +1,6 @@
 <template>
-  <div class="card-header d-flex justify-content-between">
+  <div class="card-header">
+    <div class="d-flex justify-content-between">
     <h2 v-html="caption" />
     <div>
       <template v-if="closable">
@@ -15,6 +16,7 @@
           <span class="fas fa-window-minimize"></span>
         </button>
       </template>
+    </div>
     </div>
   </div>
 </template>

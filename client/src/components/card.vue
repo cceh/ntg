@@ -15,9 +15,11 @@
 
 import $ from 'jquery';
 import 'jquery-ui/draggable.js';
+import 'jquery-ui/resizable.js';
 
 import 'jquery-ui-css/core.css';
 import 'jquery-ui-css/draggable.css';
+import 'jquery-ui-css/resizable.css';
 
 export default {
     'props' : ['cssclass', 'caption', 'default_closed', 'card_id', 'position_target'],
@@ -25,6 +27,7 @@ export default {
         return {
             'current_caption' : this.caption,
             'draggable'       : false,
+            'resizable'       : false,
             'visible'         : true,
         };
     },
@@ -57,10 +60,16 @@ export default {
     mounted () {
         this.$card = $ (this.$el);
 
-        // if card is draggable make it so
+        // if card should be draggable make it so
         this.draggable = this.$card.hasClass ('card-draggable');
         if (this.draggable) {
             $ (this.$el).draggable ();
+        }
+
+        // if card should be resizable make it so
+        this.resizable = this.$card.hasClass ('card-resizable');
+        if (this.resizable) {
+            $ (this.$el).resizable ();
         }
 
         // position floating card relative to target
