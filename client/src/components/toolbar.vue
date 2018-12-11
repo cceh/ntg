@@ -172,7 +172,7 @@ export default {
             { 'text' : 'Frag', 'value' : 'fragments', 'title' : 'Include document fragments' },
         ];
 
-        if (!('connectivity' in this.toolbar)) {
+        if (!('labez' in this.toolbar)) {
             include_checkbox_options.push ({
                 'text'  : 'Z',
                 'value' : 'Z',
