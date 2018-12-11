@@ -285,7 +285,7 @@ class Passage ():
             d[k] = LABEZ_I18N.get (d[k], d[k])
 
         Readings = collections.namedtuple ('Readings', 'labez labez_i18n')
-        return list (map (Readings._make, ((k, v) for k, v in d.items ())))
+        return [ Readings._make (r)._asdict () for r in d.items () ]
 
 
     def cliques (self, prefix = [], suffix = [], delete = []):
@@ -299,8 +299,8 @@ class Passage ():
         """, dict (parameters, pass_id = self.pass_id))
 
         Cliques = collections.namedtuple ('Cliques', 'labez clique labez_clique')
-        return list (map (Cliques._make, (
-            r for r in prefix + list (res.fetchall ()) + suffix if r not in delete)))
+        return [ Cliques._make (r)._asdict ()
+                 for r in prefix + list (res.fetchall ()) + suffix if r not in delete ]
 
 
 def get_locale ():
