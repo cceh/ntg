@@ -150,7 +150,7 @@ DBS := acts_ph4 john_ph1 john_f1_ph1 mark_ph1
 
 $(foreach db,$(DBS),$(eval $(call UPLOAD_TEMPLATE,$(db))))
 
-upload_client:
+upload_client: client
 	$(RSYNC) --exclude "api.conf.js" $(CLIENT)/build/* $(NTG_CLIENT)/
 
 upload_server:
