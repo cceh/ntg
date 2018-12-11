@@ -167,6 +167,7 @@ div.attestation_vm {
 
     div.card-attestation {
         break-inside: avoid;
+        max-height: 40em;
     }
 
     ul.list-inline {

@@ -415,7 +415,7 @@ def relatives_csv (hs_hsnr_id, passage_or_id):
 
     type_     = request.args.get ('type') or 'rel'
     chapter   = request.args.get ('range') or 'All'
-    limit     = int (request.args.get ('limit') or 10)
+    limit     = int (request.args.get ('limit') or 0)
     labez     = request.args.get ('labez') or 'all'
     mode      = request.args.get ('mode') or 'sim'
     include   = request.args.getlist ('include[]') or []

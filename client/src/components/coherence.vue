@@ -193,7 +193,7 @@ export default {
             return {
                 'type'                  : 'rel',
                 'range'                 : 'All',
-                'limit'                 : '10',
+                'limit'                 : '0',
                 'include'               : [],
                 'fragments'             : [],
                 'mode'                  : 'sim',
@@ -267,7 +267,7 @@ export default {
         position: fixed;
         z-index: 10;
         width: 38em;
-        min-width: 0;
+        min-width: 38em;
     }
 }
 

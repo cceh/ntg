@@ -180,7 +180,7 @@ div.relatives-vm {
     }
 
     div.scroller {
-        max-height: 50em;
+        max-height: 40em;
         overflow-y: scroll;
     }
 
