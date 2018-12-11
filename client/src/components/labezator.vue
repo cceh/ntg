@@ -10,11 +10,11 @@
 
     <div class="dropdown-menu dropdown-menu-labez">
       <div class="btn-group btn-group-sm">
-        <button v-for="[labez, labez_i18n] in readings"
-                :key="labez" :data-labez="labez"
+        <button v-for="labez in readings"
+                :key="labez.labez" :data-labez="labez.labez"
                 type="radio" data-type="dropdown"
                 class="btn btn-primary btn-labez bg_labez"
-                @click="on_dropdown_click (labez, $event)">{{ labez_i18n }}</button>
+                @click="on_dropdown_click (labez.labez, $event)">{{ labez.labez_i18n }}</button>
       </div>
     </div>
   </div>
@@ -44,13 +44,13 @@ export default {
     'computed' : {
         readings () {
             // FIXME: filter zu
-            return this.$store.state.passage.readings || [['none', '-']];
+            return this.$store.state.passage.readings || [ {'labez' : 'none', 'labez_i18n' : '-' }];
         },
     },
     'watch' : {
         readings () {
             // reset value if reading is not in new passage
-            const mapped_readings = this.readings.map (item => item[0]);
+            const mapped_readings = this.readings.map (item => item.labez);
             if (this.labez && !mapped_readings.includes (this.labez)) {
                 this.change (mapped_readings[0]);
             }

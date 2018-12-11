@@ -26,11 +26,11 @@
       </button>
       <div class="dropdown-menu dropdown-menu-labez">
         <div class="btn-group btn-group-sm">
-          <button v-for="[labez, labez_i18n] in dd_labez"
-                  :key="labez" :data-labez="labez"
+          <button v-for="labez in dd_labez"
+                  :key="labez.labez" :data-labez="labez.labez"
                   type="radio" data-type="dropdown"
                   class="btn btn-primary btn-labez bg_labez"
-                  @click="on_dropdown_click ('labez', labez, $event)">{{ labez_i18n }}</button>
+                  @click="on_dropdown_click ('labez', labez.labez, $event)">{{ labez.labez_i18n }}</button>
         </div>
       </div>
     </div>
@@ -93,9 +93,9 @@
       </button>
       <div class="dropdown-menu dropdown-menu-hyp_a">
         <div class="btn-group btn-group-sm">
-          <button v-for="[labez, labez_i18n] in dd_hypa" :key="labez" :data-labez="labez"
+          <button v-for="labez in dd_hypa" :key="labez.labez" :data-labez="labez.labez"
                   type="radio" data-type="dropdown" class="btn btn-primary btn-labez bg_labez"
-                  @click="on_dropdown_click ('hyp_a', labez, $event)">{{ labez_i18n }}</button>
+                  @click="on_dropdown_click ('hyp_a', labez.labez, $event)">{{ labez.labez_i18n }}</button>
         </div>
       </div>
     </div>
@@ -207,7 +207,7 @@ export default {
             return prefix.concat (this.readings).concat (suffix);
         },
         dd_hypa () {
-            const prefix = [['A', 'A']];
+            const prefix = [{ 'labez' : 'A', 'labez_i18n' : 'A' }];
             return prefix.concat (this.readings);
         },
         dd_range () {
@@ -218,7 +218,7 @@ export default {
     'watch' : {
         readings () {
             // reset toolbar if reading is not in new passage
-            const mapped_readings = this.readings.map (item => item[0]);
+            const mapped_readings = this.readings.map (item => item.labez);
             if (this.toolbar.labez && this.toolbar.reduce_labez
                 && !mapped_readings.includes (this.toolbar.labez)) {
                 this.toolbar.labez = mapped_readings[0];

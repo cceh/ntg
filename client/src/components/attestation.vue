@@ -75,8 +75,8 @@ export default {
                 'fragments'             : [],
                 'mode'                  : 'sim',
                 'labez'                 : 'all+lac',
-                'labez_dropdown_prefix' : [['all', 'All']],
-                'labez_dropdown_suffix' : [['all+lac', 'All+Lac']],
+                'labez_dropdown_prefix' : [{ 'labez' : 'all',     'labez_i18n' : 'All'     }],
+                'labez_dropdown_suffix' : [{ 'labez' : 'all+lac', 'labez_i18n' : 'All+Lac' }],
             },
         };
     },
