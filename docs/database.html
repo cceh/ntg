@@ -24,30 +24,21 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
-        <link rel="up" title="Developer Manual" href="developer.html"/>
-        <link rel="next" title="Various Functions" href="ntg_common.html"/>
-        <link rel="prev" title="Scripts" href="scripts_dev.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Various Functions" href="ntg_common.html" />
+    <link rel="prev" title="Scripts" href="scripts_dev.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -200,7 +191,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">NTG</a>
@@ -208,9 +199,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -269,7 +261,7 @@ tables are <a class="reference internal" href="#tts"><span class="std std-ref">j
 manuscript ‘A’ is concerned.</p>
 <p>The <a class="reference internal" href="server_dev.html#module-server" title="server: API Server"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">server</span></code></a> uses all these tables.</p>
 <div class="figure align-center" id="id4">
-<img src="_images/graphviz-15d8a244a9a50064f723879a608669ad2a76ff24.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-15d8a244a9a50064f723879a608669ad2a76ff24.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <p class="caption"><span class="caption-text">Work database structure</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
 </div>
 <div class="section" id="transaction-time-state-tables">
@@ -297,7 +289,7 @@ least one passage in common and each range we are interested in.</p>
 <p>Two sets of data are included, one for the recursive interpretation of the
 locstem data, and one for the backward-compatible non-recurisve
 interpretation (with ‘p_’ prefix).</p>
-<img src="_images/graphviz-5e679bc9196aba65c68b6fea95d0c6c0405f9c0d.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-5e679bc9196aba65c68b6fea95d0c6c0405f9c0d.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <dl class="attribute">
 <dt id="ntg_common.db.Affinity.common">
 <code class="descname">common</code><a class="headerlink" href="#ntg_common.db.Affinity.common" title="Permalink to this definition">¶</a></dt>
@@ -340,7 +332,7 @@ interpretation (with ‘p_’ prefix).</p>
 <dt id="ntg_common.db.Apparatus">
 <em class="property">class </em><code class="descname">Apparatus</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Apparatus" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains the <a class="reference internal" href="scripts_dev.html#transform-positive"><span class="std std-ref">positive apparatus</span></a>.</p>
-<img src="_images/graphviz-1fa118e3e4743608990cecde06900f6805a69eac.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-1fa118e3e4743608990cecde06900f6805a69eac.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <dl class="attribute">
 <dt id="ntg_common.db.Apparatus.cbgm">
 <code class="descname">cbgm</code><a class="headerlink" href="#ntg_common.db.Apparatus.cbgm" title="Permalink to this definition">¶</a></dt>
@@ -450,7 +442,7 @@ table, this one.</p>
 <p>This table contains a <a class="reference internal" href="scripts_dev.html#transform-positive"><span class="std std-ref">negative apparatus</span></a> of all
 manuscripts.  For the CBGM the data in this table has to be normalised into
 our database structure and converted into a positive apparatus.</p>
-<img src="_images/graphviz-6be7453126c82d0e877b4871222a3b4224fbe1e8.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-6be7453126c82d0e877b4871222a3b4224fbe1e8.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <span class="target" id="att"></span><dl class="attribute">
 <dt id="ntg_common.db.Att.hsnr">
 <code class="descname">hsnr</code><a class="headerlink" href="#ntg_common.db.Att.hsnr" title="Permalink to this definition">¶</a></dt>
@@ -630,7 +622,7 @@ akzeptieren.</p>
 <em class="property">class </em><code class="descname">Books</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Books" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that lists all the books of the New Testament.</p>
 <p>This table lists all the books of the NT and the book id given to them.</p>
-<img src="_images/graphviz-d52371746ed25e8229c07db2a7e766e9ba15af89.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-d52371746ed25e8229c07db2a7e766e9ba15af89.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <dl class="attribute">
 <dt id="ntg_common.db.Books.bk_id">
 <code class="descname">bk_id</code><a class="headerlink" href="#ntg_common.db.Books.bk_id" title="Permalink to this definition">¶</a></dt>
@@ -667,7 +659,7 @@ but in a clique a reading has been originated only once.</p>
 <p>This is the current table of a transaction state table pair.
 <a class="reference internal" href="#ntg_common.db.Cliques_TTS" title="ntg_common.db.Cliques_TTS"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cliques_TTS</span></code></a> is the table that contains the past rows.  See
 <a class="reference internal" href="#tts"><span class="std std-ref">transaction-time state tables</span></a>.</p>
-<img src="_images/graphviz-d8ebb09f3e27acfe16a9f2807e846d6476780e2f.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-d8ebb09f3e27acfe16a9f2807e846d6476780e2f.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <dl class="attribute">
 <dt id="ntg_common.db.Cliques.clique">
 <code class="descname">clique</code><a class="headerlink" href="#ntg_common.db.Cliques.clique" title="Permalink to this definition">¶</a></dt>
@@ -786,7 +778,7 @@ the start and end of each lacuna.  A lacuna entry generally spans many
 passages in the Att table.</p>
 <p>This table has the same structure as table Att.  For the description of the
 columns see <a class="reference internal" href="#att"><span class="std std-ref">table Att</span></a>.</p>
-<img src="_images/graphviz-14e66efec6c01ed40ef13c30a9bae79b42b3f0c6.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-14e66efec6c01ed40ef13c30a9bae79b42b3f0c6.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 </dd></dl>
 
 <dl class="class">
@@ -799,7 +791,7 @@ which other reading(s) at each passage.</p>
 <p>This is the current table of a transaction state table pair.
 <a class="reference internal" href="#ntg_common.db.LocStem_TTS" title="ntg_common.db.LocStem_TTS"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocStem_TTS</span></code></a> is the table that contains the past rows.  See
 <a class="reference internal" href="#tts"><span class="std std-ref">transaction-time state tables</span></a>.</p>
-<img src="_images/graphviz-4fdf05954f5f72c3eb80c0a92ac3eb2c828622f9.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-4fdf05954f5f72c3eb80c0a92ac3eb2c828622f9.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <dl class="attribute">
 <dt>
 <code class="descname">labez, clique</code></dt>
@@ -858,7 +850,7 @@ tables is the same.  See <a class="reference internal" href="#tts"><span class="
 <dd><p>A table that lists all the manuscripts.</p>
 <p>This table lists all the manuscripts of New Testament that we have collated
 for the edition.</p>
-<img src="_images/graphviz-c06af47e1dab539c5fe8dcfc6bcc4983f948ed16.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-c06af47e1dab539c5fe8dcfc6bcc4983f948ed16.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <dl class="attribute">
 <dt id="ntg_common.db.Manuscripts.ms_id">
 <code class="descname">ms_id</code><a class="headerlink" href="#ntg_common.db.Manuscripts.ms_id" title="Permalink to this definition">¶</a></dt>
@@ -900,7 +892,7 @@ which other reading(s) at each passage.</p>
 <p>This is the current table of a transaction state table pair.
 <a class="reference internal" href="#ntg_common.db.MsCliques_TTS" title="ntg_common.db.MsCliques_TTS"><code class="xref py py-class docutils literal notranslate"><span class="pre">MsCliques_TTS</span></code></a> is the table that contains the past rows.  See
 <a class="reference internal" href="#tts"><span class="std std-ref">transaction-time state tables</span></a>.</p>
-<img src="_images/graphviz-f898e82a5cc24c889150b0007ea28e7bee63ce34.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-f898e82a5cc24c889150b0007ea28e7bee63ce34.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <dl class="attribute">
 <dt>
 <code class="descname">labez, clique</code></dt>
@@ -945,7 +937,7 @@ tables</span></a>.</p>
 <em class="property">class </em><code class="descname">Ms_Ranges</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Ms_Ranges" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains CBGM output related to each manuscript.</p>
 <p>Here we hold values that are calculated by CBGM related to one manuscript.</p>
-<img src="_images/graphviz-1fdaa3800b19e670c489498bff46adf599043a46.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-1fdaa3800b19e670c489498bff46adf599043a46.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <dl class="attribute">
 <dt id="ntg_common.db.Ms_Ranges.length">
 <code class="descname">length</code><a class="headerlink" href="#ntg_common.db.Ms_Ranges.length" title="Permalink to this definition">¶</a></dt>
@@ -959,7 +951,7 @@ tables</span></a>.</p>
 <em class="property">class </em><code class="descname">Nestle</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Nestle" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Leitzeile from the Nestle-Aland</p>
 <p>Dient der Darstellung der Leitzeile im Navigator.</p>
-<img src="_images/graphviz-f61ea66c2422ee8b1c586d288b8974643bb8face.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-f61ea66c2422ee8b1c586d288b8974643bb8face.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <span class="target" id="nestle-table"></span><dl class="attribute">
 <dt>
 <code class="descname">begadr, endadr</code></dt>
@@ -1003,7 +995,7 @@ is the same.  See <a class="reference internal" href="#tts"><span class="std std
 <p>This table lists all the passages we established during the collation of the
 manuscripts.  Passages that are the same in all manuscripts (invariant) are
 purged because they are irrelevant to the CBGM.</p>
-<img src="_images/graphviz-346cb8bb084e8bf75704b839e12b288b2ec9b74f.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-346cb8bb084e8bf75704b839e12b288b2ec9b74f.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <dl class="attribute">
 <dt id="ntg_common.db.Passages.pass_id">
 <code class="descname">pass_id</code><a class="headerlink" href="#ntg_common.db.Passages.pass_id" title="Permalink to this definition">¶</a></dt>
@@ -1065,7 +1057,7 @@ passages, although not yet in this implementation).</p>
 each chapter of each book and also one range for each whole book.  The
 ranges corresponding to chapters are named by the chapter number, ‘1’, ‘2’,
 …  The whole book range is called ‘All’.</p>
-<img src="_images/graphviz-03ad61f93b54036ea76ba84f6b59a0ccef1512ef.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-03ad61f93b54036ea76ba84f6b59a0ccef1512ef.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <dl class="attribute">
 <dt id="ntg_common.db.Ranges.range">
 <code class="descname">range</code><a class="headerlink" href="#ntg_common.db.Ranges.range" title="Permalink to this definition">¶</a></dt>
@@ -1087,7 +1079,7 @@ ranges corresponding to chapters are named by the chapter number, ‘1’, ‘2�
 <p>First scribal errors are corrected and orthographical differences are
 normalized, then equal readings are grouped.  Each group of readings is
 assigned an id, the ‘labez’.</p>
-<img src="_images/graphviz-dea9c93e00536e41f11fb655662869753e360ffd.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-dea9c93e00536e41f11fb655662869753e360ffd.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <span class="target" id="labez"></span><dl class="attribute">
 <dt id="ntg_common.db.Readings.labez">
 <code class="descname">labez</code><a class="headerlink" href="#ntg_common.db.Readings.labez" title="Permalink to this definition">¶</a></dt>
@@ -1182,10 +1174,10 @@ orthographic variants are normalized.  Following abbreviations are used:</p>
 There are 28 instances of each table, one for each chapter of Acts.
 These tables are only used once for building the <a class="reference internal" href="#module-ntg_common.db" title="ntg_common.db: Database Structure"><code class="xref py py-mod docutils literal notranslate"><span class="pre">CBGM</span> <span class="pre">database</span></code></a>.
 The database system is MySQL.</p>
-<div align="center" class="align-center"><img src="_images/graphviz-143778a7b0ed5d546ede2756f0059cbdf884606e.png" alt="UML Database Graph" class="sauml"/>
+<div align="center" class="align-center"><div class="graphviz"><img src="_images/graphviz-143778a7b0ed5d546ede2756f0059cbdf884606e.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 </div>
 <div class="figure align-center" id="id5">
-<img src="_images/graphviz-342d852185a07bae9f8cfaa89a58efdb205dd290.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-342d852185a07bae9f8cfaa89a58efdb205dd290.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <p class="caption"><span class="caption-text">Source database structure</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </div>
 <div class="section" id="id2">
@@ -1194,14 +1186,14 @@ The database system is MySQL.</p>
 <dt id="ntg_common.src_db.Acts01GVZ">
 <em class="property">class </em><code class="descname">Acts01GVZ</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.Acts01GVZ" title="Permalink to this definition">¶</a></dt>
 <dd><p>This table contains a negative apparatus.</p>
-<img src="_images/graphviz-5c57cf94b6032dbbbba62785c15388e887a37248.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-5c57cf94b6032dbbbba62785c15388e887a37248.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 </dd></dl>
 
 <dl class="class">
 <dt id="ntg_common.src_db.Acts01GVZlac">
 <em class="property">class </em><code class="descname">Acts01GVZlac</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.Acts01GVZlac" title="Permalink to this definition">¶</a></dt>
 <dd><p>This table contains a list of lacunae.</p>
-<img src="_images/graphviz-32db9bd1f0d547f3913f210faea19177d23db7b6.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-32db9bd1f0d547f3913f210faea19177d23db7b6.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 </dd></dl>
 
 <dl class="class">
@@ -1210,7 +1202,7 @@ The database system is MySQL.</p>
 <dd><p>A table that contains the priority of the cliques at each passage</p>
 <p>This table contains the main output of the editors.  The editors decide
 which reading is derived from which other reading(s) at each passage.</p>
-<img src="_images/graphviz-2f653d644947e0f67f44223f132a8f873a88ebe9.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-2f653d644947e0f67f44223f132a8f873a88ebe9.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <dl class="attribute">
 <dt id="ntg_common.src_db.LocStemEdAct01.id">
 <code class="descname">id</code><a class="headerlink" href="#ntg_common.src_db.LocStemEdAct01.id" title="Permalink to this definition">¶</a></dt>
@@ -1259,14 +1251,14 @@ which reading is derived from which other reading(s) at each passage.</p>
 <dt id="ntg_common.src_db.RdgAct01">
 <em class="property">class </em><code class="descname">RdgAct01</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.RdgAct01" title="Permalink to this definition">¶</a></dt>
 <dd><p>This table contains readings.</p>
-<img src="_images/graphviz-65ce47ac8e371d43f0d00b792e1f1843de87ff59.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-65ce47ac8e371d43f0d00b792e1f1843de87ff59.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 </dd></dl>
 
 <dl class="class">
 <dt id="ntg_common.src_db.VarGenAttAct01">
 <em class="property">class </em><code class="descname">VarGenAttAct01</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.VarGenAttAct01" title="Permalink to this definition">¶</a></dt>
 <dd><p>This table relates splits to manuscripts.</p>
-<img src="_images/graphviz-caeede30db3ab701a78d4e505195e783943fdd4a.png" alt="UML Database Graph" class="sauml"/>
+<div class="graphviz"><img src="_images/graphviz-caeede30db3ab701a78d4e505195e783943fdd4a.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 </dd></dl>
 
 </div>
@@ -1286,9 +1278,7 @@ Francisco.</td></tr>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -1306,11 +1296,11 @@ Francisco.</td></tr>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016-18 CCeH - Licensed under the GNU GPL v3 or later.
+        &copy; Copyright 2016-18 CCeH - Licensed under the GNU GPL v3 or later
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1325,36 +1315,24 @@ Francisco.</td></tr>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.1.1',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

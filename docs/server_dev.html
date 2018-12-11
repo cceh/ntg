@@ -24,30 +24,21 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="NTG 0.1.1 documentation" href="index.html"/>
-        <link rel="up" title="Developer Manual" href="developer.html"/>
-        <link rel="next" title="Scripts" href="scripts_dev.html"/>
-        <link rel="prev" title="Web Client" href="client_dev.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Scripts" href="scripts_dev.html" />
+    <link rel="prev" title="Web Client" href="client_dev.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -200,7 +191,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">NTG</a>
@@ -208,9 +199,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -346,7 +338,7 @@ per chapters.</p>
 <dl class="function">
 <dt id="server.server.make_safe_url">
 <code class="descname">make_safe_url</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.make_safe_url" title="Permalink to this definition">¶</a></dt>
-<dd><p>Turns an usafe absolute URL into a safe relative URL
+<dd><p>Turns an unsafe absolute URL into a safe relative URL
 by removing the scheme and the hostname</p>
 <dl class="docutils">
 <dt>Example: make_safe_url(‘<a class="reference external" href="http://hostname/path1/path2?q1=v1&amp;q2=v2#fragment">http://hostname/path1/path2?q1=v1&amp;q2=v2#fragment</a>’)</dt>
@@ -537,6 +529,12 @@ the database.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="server.editor.notes_json">
+<code class="descname">notes_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.notes_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Endpoint.  Get a list of all editor notes.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="server.editor.stemma_edit">
 <code class="descname">stemma_edit</code><span class="sig-paren">(</span><em>passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.stemma_edit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Edit a local stemma.</p>
@@ -627,9 +625,7 @@ re-implementation of nx.nx_pydot.to_pydot ().</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -647,11 +643,11 @@ re-implementation of nx.nx_pydot.to_pydot ().</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016-18 CCeH - Licensed under the GNU GPL v3 or later.
+        &copy; Copyright 2016-18 CCeH - Licensed under the GNU GPL v3 or later
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -666,36 +662,24 @@ re-implementation of nx.nx_pydot.to_pydot ().</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.1.1',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
