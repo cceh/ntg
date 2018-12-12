@@ -187,7 +187,11 @@ export default {
         },
         on_destroy_relatives_popup (event) {
             const card_id = event.detail.data;
-            this.floating_cards = this.floating_cards.filter (item => item.id !== card_id);
+            if (card_id === 0) {
+                this.floating_cards = [];
+            } else {
+                this.floating_cards = this.floating_cards.filter (item => item.id !== card_id);
+            }
         },
         on_goto_attestation (event) {
             const labez = event.detail.data;

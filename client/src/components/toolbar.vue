@@ -234,6 +234,9 @@ export default {
             const $dropdown = $ (event.target).closest ('.dropdown-menu').parent ().find ('[data-toggle="dropdown"]');
             $dropdown.dropdown ('toggle');
             this.toolbar[name] = data;
+            if (name === 'labez') {
+                this.$trigger ('destroy_relatives_popup', 0); // Fixes #84
+            }
         },
         on_connectivity_change () {
             this.toolbar.connectivity = this.connectivity;
