@@ -1303,7 +1303,7 @@ view ('passages_view', Base2.metadata, '''
     ''')
 
 view ('passages_view_lemma', Base2.metadata, '''
-    SELECT p.*, COALESCE (rl.lesart, 'undef') AS lemma
+    SELECT p.*, COALESCE (rl.lesart, '') AS lemma
     FROM passages_view p
     LEFT JOIN (
       SELECT r.pass_id, r.lesart
