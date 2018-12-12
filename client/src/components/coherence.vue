@@ -16,7 +16,7 @@
               :card_id="card.id" :position_target="card.position_target"
               class="card-closable card-draggable card-floating">
 
-          <div class="card-header">
+          <div class="card-header" @destroy_relatives_popup="nop">
             <toolbar :toolbar="card.toolbar" />
           </div>
 
@@ -184,6 +184,10 @@ export default {
                 'position_target' : target,
                 'toolbar'         : this.relatives_toolbar (),
             });
+        },
+        nop (event) {
+            // do nothing
+            event.stopPropagation ();
         },
         on_destroy_relatives_popup (event) {
             const card_id = event.detail.data;
