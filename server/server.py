@@ -612,7 +612,9 @@ def textflow (passage_or_id):
                    pass_id = passage.pass_id, labez = labez,
                    hyp_a = hyp_a, labez_where = labez_where, z_where = z_where))
 
-        nodes = tuple ([ row[0] for row in res ] or [ -1 ]) # avoid SQL syntax error
+        nodes = { row[0] for row in res }
+        if not nodes:
+            nodes = { -1 } # avoid SQL syntax error
 
         # rank query
         #
@@ -654,7 +656,7 @@ def textflow (passage_or_id):
         FROM apparatus_view_agg a
         JOIN manuscripts ms USING (ms_id)
         WHERE pass_id = :pass_id AND ms_id IN :ms_ids
-        """, dict (parameters, ms_ids = tuple (src_nodes | dest_nodes), pass_id = passage.pass_id))
+        """, dict (parameters, ms_ids = tuple (src_nodes | dest_nodes | nodes), pass_id = passage.pass_id))
 
         Mss = collections.namedtuple ('Mss', 'ms_id hs hsnr labez clique labez_clique')
         mss = list (map (Mss._make, res))
@@ -678,11 +680,11 @@ def textflow (passage_or_id):
 
         # Connect the nodes
         #
-        # Step 1: A node that has ancestors within the same attestation keeps
-        # the top-ranked one of those as the only parent.
+        # Step 1: If the node has internal parents, keep only the top-ranked
+        # internal parent.
         #
-        # Step 2: A node without ancestors from step 1 keeps as parents the
-        # top-ranked parent for each other attestation.
+        # Step 2: If the node has no internal parents, keep the top-ranked
+        # parents for each external attestation.
         #
         # Assumption: ranks are sorted top-ranked first
 
@@ -726,7 +728,8 @@ def textflow (passage_or_id):
         if not leaf_z:
             remove_z_leaves (graph)
 
-        graph.remove_nodes_from (list (nx.isolates (graph)))
+        # the if clause fixes #83
+        graph.remove_nodes_from ([n for n in nx.isolates (graph) if graph.node[n]['labez'] != labez])
 
         if var_only:
             # if one predecessor is within the same attestation then remove all
