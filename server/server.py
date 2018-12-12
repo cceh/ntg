@@ -527,6 +527,11 @@ def remove_z_leaves (graph):
     """ Removes leaves (recursively) if they read z. """
 
     # We cannot use DFS because we don't know the root.
+    try:
+        nodes = list (nx.topological_sort (graph))
+    except nx.NetworkXUnfeasible:
+        return
+
     for n in reversed (list (nx.topological_sort (graph))):
         atts = graph.node[n]
         if graph.out_degree (n) == 0 and 'labez' in atts and atts['labez'][0] == 'z':
