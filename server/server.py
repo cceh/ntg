@@ -199,26 +199,24 @@ def leitzeile_json (passage_or_id = None):
         verse_end = verse_start + 999
 
         res = execute (conn, """
-        SELECT l.begadr, l.endadr, l.lemma, p.pass_id, p.spanned,
-          EXISTS (SELECT labez from readings r
-          WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != '') AS replaced
+        SELECT l.begadr, l.endadr, l.lemma, ARRAY_AGG (p.pass_id)
         FROM nestle l
           LEFT JOIN passages p ON (p.passage @> l.passage)
         WHERE int4range (:start, :end + 1) @> l.passage
+        GROUP BY l.begadr, l.endadr, l.lemma
 
         UNION -- get the insertions
 
-        SELECT p.begadr, p.endadr, p.lemma, p.pass_id, p.spanned,
-          EXISTS (SELECT labez from readings r
-          WHERE r.pass_id = p.pass_id AND r.labez ~ '^[b-y]' AND r.lesart != '') AS replaced
+        SELECT p.begadr, p.endadr, p.lemma, ARRAY_AGG (p.pass_id)
         FROM passages_view_lemma p
         WHERE int4range (:start, :end + 1) @> p.passage AND (begadr % 2) = 1
+        GROUP BY p.begadr, p.endadr, p.lemma
 
         ORDER BY begadr, endadr DESC
         """, dict (parameters, start = verse_start, end = verse_end))
 
         Leitzeile = collections.namedtuple (
-            'Leitzeile', 'begadr, endadr, lemma, pass_id, spanned, replaced')
+            'Leitzeile', 'begadr, endadr, lemma, pass_ids')
         leitzeile = [ Leitzeile._make (r)._asdict () for r in res ]
 
         return make_json_response (leitzeile)
