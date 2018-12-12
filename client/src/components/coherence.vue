@@ -140,7 +140,7 @@ export default {
     },
     'computed' : {
         'caption' : function () {
-            return `Attestation for ${this.$store.state.passage.hr}`;
+            return this.$store.state.passage.hr;
         },
         ...mapGetters ([
             'passage',
