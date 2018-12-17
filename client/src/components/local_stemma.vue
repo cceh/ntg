@@ -1,9 +1,5 @@
 <template>
   <div class="local-stemma-vm card-slidable">
-    <div class="card-header">
-      <toolbar :toolbar="toolbar" />
-    </div>
-
     <div :class="'wrapper svg-wrapper ' + cssclass"
          @contextmenu.prevent="on_contextmenu">
       <slot />
@@ -312,14 +308,9 @@ function load_passage (vm, passage) {
 }
 
 export default {
-    'props' : ['cssclass', 'global', 'var_only'],
+    'props' : ['toolbar', 'cssclass', 'global', 'var_only'],
     'data'  : function () {
-        return {
-            'toolbar' : {
-                'dot' : () => this.download ('stemma.dot'), // show a download dot button
-                'png' : () => this.download ('stemma.png'), // show a download png button
-            },
-        };
+        return {};
     },
     'computed' : {
         ...mapGetters ([
@@ -342,7 +333,7 @@ export default {
             return load_passage (this, this.passage);
         },
         get_graph_vm () {
-            return this.$children[1];
+            return this.$children[0];
         },
         build_url (page) {
             const vm = this;
@@ -362,6 +353,8 @@ export default {
         },
     },
     'mounted' : function () {
+        this.toolbar.dot = () => this.download ('stemma.dot');
+        this.toolbar.png = () => this.download ('stemma.png');
         this.$card    = $ (this.$el).closest ('.card');
         this.$wrapper = $ (this.$el).find ('.wrapper');
         this.load_passage ();

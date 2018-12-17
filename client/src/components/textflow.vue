@@ -1,9 +1,5 @@
 <template>
   <div class="textflow-vm card-slidable">
-    <div class="card-header">
-      <toolbar :toolbar="toolbar" />
-    </div>
-
     <div :class="'wrapper svg-wrapper ' + cssclass"
          @contextmenu.prevent="on_contextmenu">
       <slot />
@@ -117,32 +113,9 @@ function open_contextmenu (event, vm) {
  */
 
 export default {
-    'props' : ['cssclass', 'global', 'var_only'],
+    'props' : ['cssclass', 'global', 'var_only', 'toolbar'],
     data () {
-        const tb = {
-            'range'   : 'All',
-            'include' : [],
-            'mode'    : 'sim',
-            'dot'     : () => this.download ('textflow.dot'), // show a download dot button
-            'png'     : () => this.download ('textflow.png'), // show a download png button
-        };
-        if (!this.global && !this.var_only) {
-            tb.labez = 'a';
-            tb.reduce_labez = true;
-            tb.connectivity = 5;
-            tb.fragments = [];
-            tb.hyp_a = 'A';
-        }
-        if (this.global && this.var_only) {
-            tb.cliques = [];
-            tb.connectivity = 5;
-            tb.var_only = ['var_only'];
-            tb.hyp_a = 'A';
-        }
         return {
-            'toolbar' : tb,
-            'dot_url' : null,
-            'png_url' : null,
         };
     },
     'computed' : {
@@ -185,7 +158,7 @@ export default {
             return p1;
         },
         get_graph_vm () {
-            return this.$children[1];
+            return this.$children[0];
         },
         on_contextmenu (event) {
             if (this.$store.state.current_user.is_editor) {
@@ -210,6 +183,8 @@ export default {
         },
     },
     mounted () {
+        this.toolbar.dot = () => this.download ('textflow.dot');
+        this.toolbar.png = () => this.download ('textflow.png');
         this.$card    = $ (this.$el).closest ('.card');
         this.$wrapper = $ (this.$el).find ('.wrapper');
         this.load_passage ();

@@ -17,61 +17,175 @@
               class="card-closable card-draggable card-floating">
 
           <div class="card-header" @destroy_relatives_popup="nop">
-            <toolbar :toolbar="card.toolbar" />
+            <toolbar :toolbar="card.toolbar">
+              <button-group type="radio" v-model="card.toolbar.type"
+                            :options="options.type" />
+              <button-group type="radio" v-model="card.toolbar.limit"
+                            :options="options.limit" />
+              <labezator v-model="card.toolbar.labez"
+                :prefix="[{ 'labez' : 'all',     'labez_i18n' : 'All'     }]"
+                :suffix="[{ 'labez' : 'all+lac', 'labez_i18n' : 'All+Lac' }]"
+                default="all+lac">Variant:</labezator>
+              <range v-model="card.toolbar.range">Chapter:</range>
+              <button-group type="checkbox" v-model="card.toolbar.include"
+                            :options="options.include" />
+              <button-group type="checkbox" v-model="card.toolbar.fragments"
+                            :options="options.fragments" />
+              <button-group type="radio" v-model="card.toolbar.mode"
+                            :options="options.mode" />
+              <button-group slot="right" :options="options.csv" />
+            </toolbar>
           </div>
 
           <relatives :ms_id="card.ms_id" :toolbar="card.toolbar" />
         </card>
       </div>
 
-      <navigator ref="nav" />
+      <navigator ref="nav" class="mb-3" />
 
       <leitzeile />
 
+      <!-- Apparatus -->
+
       <card cssclass="card-apparatus" caption="Apparatus">
-        <apparatus />
+        <div class="card-header card-slidable">
+          <toolbar :toolbar="tb_apparatus">
+            <button-group type="checkbox" v-model="tb_apparatus.cliques"
+                          :options="options.cliques" />
+            <button-group type="checkbox" v-model="tb_apparatus.ortho"
+                          :options="options.ortho" />
+            <button-group slot="right" :options="options.find_relatives" />
+          </toolbar>
+        </div>
+        <apparatus ref="apparatus" :toolbar="tb_apparatus" />
       </card>
 
+      <!-- Local Stemma -->
+
       <card cssclass="card-local-stemma" caption="Local Stemma">
-        <localstemma cssclass="stemma-wrapper local-stemma-wrapper">
+        <div class="card-header card-slidable">
+          <toolbar :toolbar="tb_local_stemma">
+            <button-group slot="right" :options="options.png_dot" />
+          </toolbar>
+        </div>
+        <localstemma cssclass="stemma-wrapper local-stemma-wrapper" :toolbar="tb_local_stemma">
           <d3stemma prefix="ls_" />
         </localstemma>
       </card>
 
+      <!-- Notes -->
+
       <card v-if="this.$store.state.current_user.is_editor"
             cssclass="card-notes" caption="Notes" default_closed="true">
         <div class="card-header card-slidable">
-          <toolbar :toolbar="tb_notes" />
+          <toolbar :toolbar="tb_notes">
+            <b-button-group size="sm">
+              <b-button :disabled="!tb_notes.save" variant="primary" size="sm" class="d-print-none"
+                        @click="tb_notes.save ()">Save</b-button>
+            </b-button-group>
+          </toolbar>
         </div>
         <notes :passage="passage" :toolbar="tb_notes" />
       </card>
 
+      <!-- Coherence at Variant Passages (GraphViz) -->
+￼
       <card cssclass="card-textflow card-variant-textflow"
             caption="Coherence at Variant Passages (GraphViz)">
-        <textflow cssclass="textflow-wrapper variant-textflow-wrapper"
+        <div class="card-header card-slidable">
+          <toolbar :toolbar="tb_varonly_textflow">
+            <button-group type="checkbox" v-model="tb_varonly_textflow.cliques"
+                          :options="options.cliques" />
+            <connectivity v-model="tb_varonly_textflow.connectivity">Conn:</connectivity>
+            <range v-model="tb_varonly_textflow.range">Chapter:</range>
+            <button-group type="checkbox" v-model="tb_varonly_textflow.include"
+                          :options="options.include" />
+            <button-group type="radio" v-model="tb_varonly_textflow.mode"
+                          :options="options.mode" />
+            <labezator v-model="tb_varonly_textflow.hyp_a"
+                       :reduce="true"
+                       :prefix="[{ 'labez' : 'A', 'labez_i18n' : 'A' }]">A =</labezator>
+            <button-group slot="right" :options="options.png_dot" />
+          </toolbar>
+        </div>
+        <textflow cssclass="textflow-wrapper variant-textflow-wrapper" :toolbar="tb_varonly_textflow"
                   global="true" var_only="true">
           <d3stemma prefix="vtf_" />
         </textflow>
       </card>
 
+      <!-- Coherence at Variant Passages (Chord) -->
+￼
       <card class="card-textflow card-variant-textflow-2"
             caption="Coherence at Variant Passages (Chord)" default_closed="true">
+        <div class="card-header card-slidable">
+          <toolbar :toolbar="tb_varonly_2_textflow">
+            <button-group type="checkbox" v-model="tb_varonly_2_textflow.cliques"
+                          :options="options.cliques" />
+            <connectivity v-model="tb_varonly_2_textflow.connectivity">Conn:</connectivity>
+            <range v-model="tb_varonly_2_textflow.range">Chapter:</range>
+            <button-group type="checkbox" v-model="tb_varonly_2_textflow.include"
+                          :options="options.include" />
+            <button-group type="radio" v-model="tb_varonly_2_textflow.mode"
+                          :options="options.mode" />
+            <labezator v-model="tb_varonly_2_textflow.hyp_a"
+                       :reduce="true"
+                       :prefix="[{ 'labez' : 'A', 'labez_i18n' : 'A' }]">A =</labezator>
+            <button-group slot="right" :options="options.png_dot" />
+          </toolbar>
+        </div>
+
         <textflow cssclass="textflow-wrapper variant-textflow-wrapper"
-                  global="true" var_only="true">
+                  global="true" var_only="true" :toolbar="tb_varonly_2_textflow">
           <d3chord prefix="vtf2_" />
         </textflow>
       </card>
 
+      <!-- Coherence in Attestations -->
+
       <card class="card-textflow card-local-textflow"
             caption="Coherence in Attestations">
-        <textflow ref="lt" cssclass="textflow-wrapper local-textflow-wrapper">
+
+        <div class="card-header card-slidable">
+          <toolbar :toolbar="tb_local_textflow">
+            <labezator v-model="tb_local_textflow.labez" :reduce="true">Variant:</labezator>
+            <connectivity v-model="tb_local_textflow.connectivity">Conn:</connectivity>
+            <range v-model="tb_local_textflow.range">Chapter:</range>
+            <button-group type="checkbox" v-model="tb_local_textflow.include"
+                          :options="options.include" />
+            <button-group type="checkbox" v-model="tb_local_textflow.fragments"
+                          :options="options.fragments" />
+            <button-group type="radio" v-model="tb_local_textflow.mode"
+                          :options="options.mode" />
+            <labezator v-model="tb_local_textflow.hyp_a"
+                       :reduce="true"
+                       :prefix="[{ 'labez' : 'A', 'labez_i18n' : 'A' }]">A =</labezator>
+            <button-group slot="right" :options="options.png_dot" />
+          </toolbar>
+        </div>
+
+        <textflow ref="lt" cssclass="textflow-wrapper local-textflow-wrapper" :toolbar="tb_local_textflow">
           <d3stemma prefix="tf_" />
         </textflow>
       </card>
 
+      <!-- General Textual Flow -->
+￼
       <card class="card-textflow card-global-textflow"
             caption="General Textual Flow">
-        <textflow global="true" cssclass="textflow-wrapper global-textflow-wrapper">
+
+        <div class="card-header card-slidable">
+          <toolbar :toolbar="tb_global_textflow">
+            <range v-model="tb_global_textflow.range">Chapter:</range>
+            <button-group type="checkbox" v-model="tb_global_textflow.include"
+                          :options="options.include_z" />
+            <button-group type="radio" v-model="tb_global_textflow.mode"
+                          :options="options.mode" />
+            <button-group slot="right" :options="options.png_dot" />
+          </toolbar>
+        </div>
+
+        <textflow global="true" cssclass="textflow-wrapper global-textflow-wrapper" :toolbar="tb_global_textflow">
           <d3stemma prefix="gtf_" />
         </textflow>
       </card>
@@ -94,15 +208,20 @@ import $ from 'jquery';
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
-import d3common  from 'd3_common';
-import tools     from 'tools';
+import d3common    from 'd3_common';
+import tools       from 'tools';
+import { options } from 'widgets/options';
 
 import page_header      from 'page_header.vue';
-import navigator        from 'navigator.vue';
 import leitzeile        from 'leitzeile.vue';
 import card             from 'card.vue';
 import card_caption     from 'card_caption.vue';
-import toolbar          from 'toolbar.vue';
+import navigator        from 'widgets/navigator.vue';
+import labezator        from 'widgets/labezator.vue';
+import range            from 'widgets/range.vue';
+import connectivity     from 'widgets/connectivity.vue';
+import button_group     from 'widgets/button_group.vue';
+import toolbar          from 'widgets/toolbar.vue';
 import apparatus        from 'apparatus.vue';
 import notes            from 'notes.vue';
 import d3_stemma_layout from 'd3_stemma_layout.vue';
@@ -114,6 +233,11 @@ import relmetrics       from 'relatives_metrics.vue';
 
 Vue.component ('page-header',  page_header);
 Vue.component ('navigator',    navigator);
+Vue.component ('labezator',    labezator);
+Vue.component ('range',        range);
+Vue.component ('connectivity', connectivity);
+Vue.component ('button-group', button_group);
+Vue.component ('toolbar',      toolbar);
 Vue.component ('leitzeile',    leitzeile);
 Vue.component ('card',         card);
 Vue.component ('card-caption', card_caption);
@@ -133,7 +257,57 @@ export default {
         return {
             'floating_cards' : [],
             'card_id'        : 0,
-            'tb_notes'       : {
+            'options'        : options,
+            'tb_apparatus'   : {
+                'cliques' : [],  // Show readings or cliques.
+                'ortho'   : [],  // Show orthographic variations.
+                'rel'     : () => {},
+            },
+            'tb_local_stemma' : {
+                'dot' : () => {},
+                'png' : () => {},
+            },
+            'tb_varonly_textflow' : {
+                'range'        : 'All',
+                'include'      : [],
+                'mode'         : 'sim',
+                'cliques'      : [],
+                'connectivity' : 5,
+                'var_only'     : ['var_only'],
+                'hyp_a'        : 'A',
+                'dot'          : () => {},
+                'png'          : () => {},
+            },
+            'tb_varonly_2_textflow' : {
+                'range'        : 'All',
+                'include'      : [],
+                'mode'         : 'sim',
+                'cliques'      : [],
+                'connectivity' : 5,
+                'var_only'     : ['var_only'],
+                'hyp_a'        : 'A',
+                'dot'          : () => {},
+                'png'          : () => {},
+            },
+            'tb_local_textflow' : {
+                'range'        : 'All',
+                'include'      : [],
+                'mode'         : 'sim',
+                'labez'        : 'a',
+                'connectivity' :  5,
+                'fragments'    : [],
+                'hyp_a'        : 'A',
+                'dot'          : () => {},
+                'png'          : () => {},
+            },
+            'tb_global_textflow' : {
+                'range'        : 'All',
+                'include'      : [],
+                'mode'         : 'sim',
+                'dot'          : () => {},
+                'png'          : () => {},
+            },
+            'tb_notes' : {
                 'save' : false,
             },
         };
@@ -182,7 +356,7 @@ export default {
                 'id'              : this.card_id,
                 'ms_id'           : ms_id,
                 'position_target' : target,
-                'toolbar'         : this.relatives_toolbar (),
+                'toolbar'         : this.tb_relatives (),
             });
         },
         nop (event) {
@@ -207,18 +381,16 @@ export default {
                 'scrollTop' : $ (lt.$el).offset ().top,
             }, 500);
         },
-        relatives_toolbar () {
+        tb_relatives () {
             return {
-                'type'                  : 'rel',
-                'range'                 : 'All',
-                'limit'                 : '0',
-                'include'               : [],
-                'fragments'             : [],
-                'mode'                  : 'sim',
-                'labez'                 : 'all+lac',
-                'labez_dropdown_prefix' : [{ 'labez' : 'all',     'labez_i18n' : 'All'     }],
-                'labez_dropdown_suffix' : [{ 'labez' : 'all+lac', 'labez_i18n' : 'All+Lac' }],
-                'csv'                   : true, // this will be replaced by a closure later
+                'type'      : 'rel',
+                'range'     : 'All',
+                'labez'     : 'a',
+                'limit'     : '0',
+                'include'   : [],
+                'fragments' : [],
+                'mode'      : 'sim',
+                'csv'       : () => {}, // this will be replaced in relatives.vue
             };
         },
     },

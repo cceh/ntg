@@ -1,9 +1,5 @@
 <template>
   <div class="apparatus-vm card-slidable">
-    <div class="card-header">
-      <toolbar :toolbar="toolbar" />
-    </div>
-
     <ul class="list-group list-group-flush wrapper apparatus-wrapper">
       <li v-for="(items, group) in groups" :key="group" class="list-group-item">
         <h3 class="list-group-item-heading">
@@ -98,13 +94,9 @@ function load_passage (vm, passage) {
 }
 
 export default {
+    'props' : ['toolbar'],
     'data' : function () {
         return {
-            'toolbar' : {
-                'cliques'        : [],  // Show readings or cliques.
-                'ortho'          : [],  // Show orthographic variations.
-                'find_relatives' : this.find_relatives,
-            },
             'groups' : [],
         };
     },
@@ -137,13 +129,17 @@ export default {
         goto_attestation (labez) {
             this.$trigger ('goto_attestation', labez);
         },
+        /**
+         * Open a page listing all manuscripts.
+         */
         find_relatives () {
             this.$router.push (`attestation#pass_id=${this.passage.pass_id}&labez=a`);
         },
     },
     mounted () {
-        this.$card    = $ (this.$el).closest ('.card');
-        this.$wrapper = $ (this.$el).find ('.wrapper');
+        this.toolbar.rel = this.find_relatives,
+        this.$card       = $ (this.$el).closest ('.card');
+        this.$wrapper    = $ (this.$el).find ('.wrapper');
         this.load_passage ();
     },
 };

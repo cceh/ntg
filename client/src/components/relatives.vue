@@ -163,9 +163,7 @@ export default {
         },
     },
     mounted () {
-        if ('csv' in this.toolbar) {
-            this.toolbar.csv = () => this.download ('relatives.csv');
-        }
+        this.toolbar.csv = () => this.download ('relatives.csv');
         this.load_passage ();
     },
 };

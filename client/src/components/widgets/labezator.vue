@@ -1,11 +1,10 @@
 <template>
-  <div class="labezator_vm want_hashchange form-inline"
-       @hashchange="on_hashchange">
-    <button :data-labez="labez" type="button"
+  <div class="labezator-vm btn-group btn-group-sm">
+    <button :data-labez="value" type="button"
             class="btn btn-primary dropdown-toggle dropdown-toggle-labez bg_labez"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Labez:
-      <span class="btn_text">{{ labez }}</span> <span class="caret" />
+      <slot></slot>
+      <span class="btn_text">{{ value }}</span> <span class="caret" />
     </button>
 
     <div class="dropdown-menu dropdown-menu-labez">
@@ -36,29 +35,62 @@ import 'bootstrap';
 import tools from 'tools';
 
 export default {
+    'props' : {
+        'default' : { // the default reading
+            'type'    : String,
+            'default' : 'a',
+        },
+        'prefix'  : { // special readings to add before the actual readings, eg. 'all'
+            'type'    : Array,
+            'default' : function () { return [] },
+        },
+        'suffix'  : { // special readings to add before the actual readings, eg. 'all'
+            'type'    : Array,
+            'default' : function () { return [] },
+        },
+        'eventname' : {
+            'type'    : String,
+            'default' : 'labez',
+        },
+        'reduce' : {
+            'type' :    Boolean,
+            'default' : false,
+        },
+        'value' : {
+            'type'     : String,
+            'required' : true,
+        },
+    },
     'data' : function () {
         return {
-            'labez' : 'a',
         };
     },
     'computed' : {
         readings () {
             // FIXME: filter zu
-            return this.$store.state.passage.readings || [ {'labez' : 'none', 'labez_i18n' : '-' }];
+            return this.prefix.concat (this.$store.state.passage.readings || []).concat (this.suffix);
         },
     },
     'watch' : {
+        value (newVal, oldVal) {
+            if (newVal !== oldVal || newVal !== this.value) {
+                this.$forceUpdate ();
+            }
+        },
         readings () {
             // reset value if reading is not in new passage
-            const mapped_readings = this.readings.map (item => item.labez);
-            if (this.labez && !mapped_readings.includes (this.labez)) {
-                this.change (mapped_readings[0]);
+            if (this.reduce) {
+                const mapped_readings = this.readings.map (item => item.labez);
+                if (this.labez && !mapped_readings.includes (this.labez)) {
+                    this.change (mapped_readings[0]);
+                }
             }
         },
     },
     'methods' : {
-        change (labez) {
-            this.$trigger ('labezator', labez);
+        change (value) {
+            this.$trigger (this.eventname, value);
+            this.$emit ('input', value);  // makes it work with v-model
         },
         on_dropdown_click (data, event) {
             const $dropdown = $ (event.target).closest ('.dropdown-menu').parent ().find ('[data-toggle="dropdown"]');
@@ -67,23 +99,10 @@ export default {
         },
         on_submit () {
         },
-        on_hashchange () {
-            // update control if hash changes
-            const hash = window.location.hash.substring (1);
-            if (hash) {
-                const params = tools.deparam (hash);
-                if ('labez' in params) {
-                    this.labez = params.labez;
-                }
-            } else {
-                this.labez = 'a';
-            }
-        },
     },
     mounted () {
         $ (this.$el).find ('.dropdown-toggle').dropdown ();
-        // On first page load simulate user navigation to hash.
-        this.on_hashchange ();
+        this.change (this.default);
     },
 };
 </script>
@@ -92,30 +111,12 @@ export default {
 /* labezator.vue */
 @import "bootstrap-custom";
 
-.labezator_vm {
+.labezator-vm {
     @media print {
         display: none;
     }
 
-    margin-left: $spacer;
-    margin-bottom: $spacer;
-
     /* make buttons the same height as inputs */
     align-items: stretch;
-
-    div.dropdown-menu {
-        border: 0;
-        padding: 0;
-        background: transparent;
-        min-width: 20rem;
-
-        div.btn-group {
-            flex-wrap: wrap;
-        }
-
-        button.btn {
-            min-width: 2rem;
-        }
-    }
 }
 </style>

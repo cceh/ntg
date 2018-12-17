@@ -1,6 +1,5 @@
 <template>
-  <form class="navigator_vm want_hashchange form-inline"
-        @hashchange="on_hashchange" @submit.prevent="on_nav">
+  <form class="navigator_vm form-inline" @submit.prevent="on_nav">
 
     <button type="button" data="-1" class="btn btn-primary mr-2"
             aria-label="Previous Passage" title="Previous Passage" @click="on_nav">
@@ -175,13 +174,6 @@ export default {
                 this.$trigger ('navigator', response.data.data.passage);
             });
         },
-        on_hashchange () {
-            // update the control if hash changes
-            // no need because we watch the store
-            // const params = tools.deparam (window.location.hash.substring (1));
-            // if ('pass_id' in params) {
-            // }
-        },
     },
     'watch' : {
         passage () {
@@ -235,8 +227,6 @@ export default {
     @media print {
         display: none;
     }
-
-    margin-bottom: $spacer;
 
     /* make buttons the same height as inputs */
     align-items: stretch;

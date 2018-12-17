@@ -33,7 +33,7 @@
 import $   from 'jquery';
 import Vue from 'vue';
 
-import toolbar from 'toolbar.vue';
+import toolbar from 'widgets/toolbar.vue';
 import notes   from 'notes.vue';
 
 Vue.component ('toolbar', toolbar);

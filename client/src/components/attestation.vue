@@ -1,15 +1,16 @@
 <template>
   <div class="attestation_vm want_hashchange"
        @hashchange="on_hashchange"
-       @navigator.prevent="on_navigator"
-       @labezator.prevent="on_labezator">
+       @navigator="on_navigator"
+       >
     <page-header :caption="caption" />
 
     <div class="container bs-docs-container">
 
-      <div class="d-flex">
-        <navigator ref="nav" />
-        <labezator />
+      <div class="d-flex mb-3">
+        <navigator ref="navigator" />
+        <labezator ref="labezator" v-model="labez"
+                   class="ml-2" :reduce="true">Variant:</labezator>
       </div>
 
       <div class="card">
@@ -19,13 +20,29 @@
           </ul>
         </div>
         <div class="card-header d-print-none">
-          <toolbar :toolbar="relatives_toolbar" />
+          <toolbar :toolbar="tb_relatives">
+            <button-group type="radio" v-model="tb_relatives.type"
+                          :options="options.type" />
+            <button-group type="radio" v-model="tb_relatives.limit"
+                          :options="options.limit" />
+            <labezator v-model="tb_relatives.labez"
+              :prefix="[{ 'labez' : 'all',     'labez_i18n' : 'All'     }]"
+              :suffix="[{ 'labez' : 'all+lac', 'labez_i18n' : 'All+Lac' }]"
+              default="all+lac">Variant:</labezator>
+            <range v-model="tb_relatives.range">Chapter:</range>
+            <button-group type="checkbox" v-model="tb_relatives.include"
+                          :options="options.include" />
+            <button-group type="checkbox" v-model="tb_relatives.fragments"
+                          :options="options.fragments" />
+            <button-group type="radio" v-model="tb_relatives.mode"
+                          :options="options.mode" />
+          </toolbar>
         </div>
       </div>
 
       <div class="columns">
         <card v-for="ms in ms_list" :key="ms.ms_id" :id="'id' + ms.ms_id" cssclass="card-attestation">
-          <relatives :ms_id="ms.ms_id" :toolbar="relatives_toolbar" />
+          <relatives :ms_id="ms.ms_id" :toolbar="tb_relatives" />
         </card>
       </div>
 
@@ -50,10 +67,11 @@ import csv_parse from 'csv-parse/lib/sync';
 
 import d3common  from 'd3_common';
 import tools     from 'tools';
+import { options } from 'widgets/options';
 
-import navigator from 'navigator.vue';
-import labezator from 'labezator.vue';
-import toolbar   from 'toolbar.vue';
+import navigator from 'widgets/navigator.vue';
+import labezator from 'widgets/labezator.vue';
+import toolbar   from 'widgets/toolbar.vue';
 import relatives from 'relatives.vue';
 
 Vue.component ('navigator', navigator);
@@ -64,19 +82,18 @@ Vue.component ('relatives', relatives);
 export default {
     data () {
         return {
-            'labez'             : 'a',
-            'pass_id'           : 1,
-            'ms_list'           : [],
-            'relatives_toolbar' : {
-                'type'                  : 'rel',
-                'range'                 : 'All',
-                'limit'                 : '10',
-                'include'               : [],
-                'fragments'             : [],
-                'mode'                  : 'sim',
-                'labez'                 : 'all+lac',
-                'labez_dropdown_prefix' : [{ 'labez' : 'all',     'labez_i18n' : 'All'     }],
-                'labez_dropdown_suffix' : [{ 'labez' : 'all+lac', 'labez_i18n' : 'All+Lac' }],
+            'labez'        : 'a',
+            'pass_id'      : 1,
+            'ms_list'      : [],
+            'options'      : options,
+            'tb_relatives' : {
+                'type'      : 'rel',
+                'limit'     : '10',
+                'labez'     : 'all+lac',
+                'range'     : 'All',
+                'include'   : [],
+                'fragments' : [],
+                'mode'      : 'sim',
             },
         };
     },
@@ -92,6 +109,14 @@ export default {
             'passage',
         ]),
     },
+    'watch' : {
+        labez () {
+            this.set_hash ();
+        },
+        caption () {
+            this.$trigger ('caption', this.caption);
+        },
+    },
     'methods' : {
         set_hash () {
             const hash = window.location.hash ? window.location.hash.substring (1) : '';
@@ -104,15 +129,12 @@ export default {
             this.pass_id = event.detail.data;
             this.set_hash ();
         },
-        on_labezator (event) {
-            this.labez = event.detail.data;
-            this.set_hash ();
-        },
         on_hashchange () {
             const params = tools.deparam (window.location.hash.substring (1));
             const vm = this;
             if ('labez' in params) {
                 vm.labez = params.labez;
+                vm.$refs.labezator.labez = params.labez;
             }
             if ('pass_id' in params) {
                 vm.pass_id = params.pass_id;
@@ -120,7 +142,7 @@ export default {
                 // we need to set it for it.
                 // delete all cards first or set_passage () will reload all cards
                 vm.ms_list = [];
-                vm.$refs.nav.set_passage (params.pass_id);
+                vm.$refs.navigator.set_passage (params.pass_id);
 
                 const requests = [
                     vm.get ('attesting/' + params.pass_id + '/' + params.labez),

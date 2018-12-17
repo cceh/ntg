@@ -5,7 +5,9 @@
       <caption>
         <div class="d-flex justify-content-between">
           <div class="caption">Comparison of {{ ms1.hs }} and {{ ms2.hs }} in Chapter {{ range }}</div>
-          <toolbar :toolbar="toolbar" />
+          <toolbar :toolbar="toolbar">
+            <button-group slot="right" :options="options.csv" />
+          </toolbar>
         </div>
       </caption>
       <thead>
@@ -44,6 +46,8 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import csv_parse from 'csv-parse/lib/sync';
+
+import { options } from 'widgets/options';
 
 /**
  * Return a direction marker: <, >, NoRel or Uncl.
@@ -99,6 +103,7 @@ export const sort_mixin = {
         return {
             'sorted_by'   : '',
             'sorted_desc' : false,
+            'options'     : options,
             'toolbar'     : {
                 'csv' : () => this.download (), // show a download csv button
             },

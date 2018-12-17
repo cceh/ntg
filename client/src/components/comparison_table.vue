@@ -1,7 +1,9 @@
 <template>
   <div class="comparison-table-vm">
     <div class="card-header">
-      <toolbar :toolbar="toolbar" />
+      <toolbar :toolbar="toolbar" >
+        <button-group slot="right" :options="options.csv" />
+      </toolbar>
     </div>
 
     <table class="table table-bordered table-sm table-hover table-comparison" cellspacing="0">
@@ -91,6 +93,7 @@
 import $ from 'jquery';
 import Vue from 'vue';
 import csv_parse from 'csv-parse/lib/sync';
+import { options } from 'widgets/options';
 
 import comparison_details_table from 'comparison_details_table.vue';
 import { sort_mixin } from 'comparison_details_table.vue';
@@ -153,6 +156,7 @@ export default {
         return {
             'rows'      : [],
             'sorted_by' : 'rg_id',
+            'options'   : options,
             'toolbar'   : {
                 'csv' : () => this.download (), // show a download csv button
             },
