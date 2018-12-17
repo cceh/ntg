@@ -1,12 +1,14 @@
 <template>
-  <form class="navigator_vm form-inline" @submit.prevent="on_nav">
+  <form class="navigator-vm form-inline" @submit.prevent="on_nav">
 
-    <button type="button" data="-1" class="btn btn-primary mr-2"
-            aria-label="Previous Passage" title="Previous Passage" @click="on_nav">
-      <span class="fas fa-chevron-left" />
-    </button>
+    <div class="btn-group btn-group-sm mr-2">
+      <button type="button" data="-1" class="btn btn-primary"
+              aria-label="Previous Passage" title="Previous Passage" @click="on_nav">
+        <span class="fas fa-chevron-left" />
+      </button>
+    </div>
 
-    <div class="input-group">
+    <div class="input-group input-group-sm">
       <div class="input-group-prepend">
         <span class="input-group-text">Nav:</span>
       </div>
@@ -31,17 +33,19 @@
              aria-label="Word" title="Word" />
 
       <div class="input-group-btn input-group-append">
-        <button type="submit" data="Go" class="btn btn-primary mr-2"
+        <button type="submit" data="Go" class="btn btn-primary"
                 aria-label="Go" title="Go">
           <span class="fas fa-check" />
         </button>
       </div>
     </div>
 
-    <button type="button" data="1" class="btn btn-primary"
-            aria-label="Next Passage" title="Next Passage" @click="on_nav">
-      <span class="fas fa-chevron-right" />
-    </button>
+    <div class="btn-group btn-group-sm ml-2">
+      <button type="button" data="1" class="btn btn-primary"
+              aria-label="Next Passage" title="Next Passage" @click="on_nav">
+        <span class="fas fa-chevron-right" />
+      </button>
+    </div>
 
     <input :value="this.$store.state.passage.pass_id" name="pass_id" type="hidden" />
   </form>
@@ -223,7 +227,7 @@ export default {
 /* navigator.vue */
 @import "bootstrap-custom";
 
-.navigator_vm {
+.navigator-vm {
     @media print {
         display: none;
     }

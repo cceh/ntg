@@ -7,12 +7,15 @@
 
     <div class="container bs-docs-container">
 
-      <div class="d-flex mb-3">
-        <navigator ref="navigator" />
-        <labezator ref="labezator" v-model="labez" class="ml-2" :options="options.labez" />
-      </div>
-
       <div class="card">
+
+        <div class="card-header">
+          <toolbar>
+            <navigator ref="navigator" />
+            <labezator ref="labezator" v-model="labez" class="ml-2" :options="options.labez" />
+          </toolbar>
+        </div>
+
         <div class="card-header">{{ msg }}
           <ul class="list-inline">
             <li v-for="ms in ms_list" :key="ms.ms_id" @click="scroll_to ('id' + ms.ms_id)">{{ ms.hs }}. </li>
