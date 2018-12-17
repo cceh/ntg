@@ -217,12 +217,15 @@ function open_contextmenu (event, vm) {
 
     // Merge two cliques
 
-    let cliques = _.filter (vm.$store.state.passage.cliques, function (o) { return o[0][0] !== 'z'; });
-    cliques = cliques.concat ([['*', '0', '*'], ['?', '0', '?']]);
+    let cliques = _.filter (vm.$store.state.passage.cliques, function (o) { return o.labez[0] !== 'z'; });
+    cliques = cliques.concat ([
+        { 'labez' : '*', 'clique' : '0', 'labez_clique' : '*' },
+        { 'labez' : '?', 'clique' : '0', 'labez_clique' : '?' },
+    ]);
     _.forEach (cliques, function (value) {
-        data.labez_new  = value[0];
-        data.clique_new = value[1];
-        data.labez_bg   = value[0];
+        data.labez_new  = value.labez;
+        data.clique_new = value.clique;
+        data.labez_bg   = value.labez;
 
         if ((data.labez_new === data.labez_old) && (data.clique_old !== data.clique_new)) {
             data.action = 'merge';
@@ -235,9 +238,9 @@ function open_contextmenu (event, vm) {
     // Reassign Source of clique
 
     _.forEach (cliques, function (value) {
-        data.labez_new  = value[0];
-        data.clique_new = value[1];
-        data.labez_bg   = value[0];
+        data.labez_new  = value.labez;
+        data.clique_new = value.clique;
+        data.labez_bg   = value.labez;
 
         if (data.labez_new !== data.labez_old) {
             data.action = 'move';
