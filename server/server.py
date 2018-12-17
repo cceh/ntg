@@ -207,10 +207,10 @@ def leitzeile_json (passage_or_id = None):
 
         UNION -- get the insertions
 
-        SELECT p.begadr, p.endadr, p.lemma, ARRAY_AGG (p.pass_id)
-        FROM passages_view_lemma p
+        SELECT p.begadr, p.endadr, '', ARRAY_AGG (p.pass_id)
+        FROM passages_view p
         WHERE int4range (:start, :end + 1) @> p.passage AND (begadr % 2) = 1
-        GROUP BY p.begadr, p.endadr, p.lemma
+        GROUP BY p.begadr, p.endadr
 
         ORDER BY begadr, endadr DESC
         """, dict (parameters, start = verse_start, end = verse_end))
