@@ -1,9 +1,9 @@
 <template>
   <div class="labezator-vm btn-group btn-group-sm">
-    <button :data-labez="value" type="button"
+    <button :data-labez="value" type="button" :title="options.title"
             class="btn btn-primary dropdown-toggle dropdown-toggle-labez bg_labez"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <slot></slot>
+      <slot>{{ options.text }}</slot>
       <span class="btn_text">{{ value }}</span> <span class="caret" />
     </button>
 
@@ -36,17 +36,13 @@ import tools from 'tools';
 
 export default {
     'props' : {
-        'default' : { // the default reading
-            'type'    : String,
-            'default' : 'a',
-        },
         'prefix'  : { // special readings to add before the actual readings, eg. 'all'
             'type'    : Array,
-            'default' : function () { return [] },
+            'default' : null,
         },
         'suffix'  : { // special readings to add before the actual readings, eg. 'all'
             'type'    : Array,
-            'default' : function () { return [] },
+            'default' : null,
         },
         'eventname' : {
             'type'    : String,
@@ -54,11 +50,25 @@ export default {
         },
         'reduce' : {
             'type' :    Boolean,
-            'default' : false,
+            'default' : null,
+        },
+        'title' : {
+            'type'    : String,
+            'default' : null,
         },
         'value' : {
             'type'     : String,
             'required' : true,
+        },
+        'options' : {
+            'type' : Object,
+            'default' : () => { return {
+                'text'   : 'Variant: ',
+                'title'  : 'Select a variant.',
+                'reduce' : true,
+                'prefix' : [],
+                'suffix' : [],
+            }},
         },
     },
     'data' : function () {
@@ -68,7 +78,7 @@ export default {
     'computed' : {
         readings () {
             // FIXME: filter zu
-            return this.prefix.concat (this.$store.state.passage.readings || []).concat (this.suffix);
+            return this.options.prefix.concat (this.$store.state.passage.readings || []).concat (this.options.suffix);
         },
     },
     'watch' : {
@@ -79,9 +89,9 @@ export default {
         },
         readings () {
             // reset value if reading is not in new passage
-            if (this.reduce) {
+            if (this.options.reduce) {
                 const mapped_readings = this.readings.map (item => item.labez);
-                if (this.labez && !mapped_readings.includes (this.labez)) {
+                if (this.value && !mapped_readings.includes (this.value)) {
                     this.change (mapped_readings[0]);
                 }
             }
@@ -102,7 +112,19 @@ export default {
     },
     mounted () {
         $ (this.$el).find ('.dropdown-toggle').dropdown ();
-        this.change (this.default);
+        if (this.title) {
+            this.options.title = this.title;
+        }
+        if (this.prefix) {
+            this.options.prefix = this.prefix;
+        }
+        if (this.suffix) {
+            this.options.suffix = this.suffix;
+        }
+        if (this.reduce) {
+            this.options.reduce = this.reduce;
+        }
+        this.change (this.value);
     },
 };
 </script>

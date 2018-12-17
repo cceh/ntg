@@ -9,8 +9,7 @@
 
       <div class="d-flex mb-3">
         <navigator ref="navigator" />
-        <labezator ref="labezator" v-model="labez"
-                   class="ml-2" :reduce="true">Variant:</labezator>
+        <labezator ref="labezator" v-model="labez" class="ml-2" :options="options.labez" />
       </div>
 
       <div class="card">
@@ -25,10 +24,7 @@
                           :options="options.type" />
             <button-group type="radio" v-model="tb_relatives.limit"
                           :options="options.limit" />
-            <labezator v-model="tb_relatives.labez"
-              :prefix="[{ 'labez' : 'all',     'labez_i18n' : 'All'     }]"
-              :suffix="[{ 'labez' : 'all+lac', 'labez_i18n' : 'All+Lac' }]"
-              default="all+lac">Variant:</labezator>
+            <labezator v-model="tb_relatives.labez" :options="options.labez_all" />
             <range v-model="tb_relatives.range">Chapter:</range>
             <button-group type="checkbox" v-model="tb_relatives.include"
                           :options="options.include" />

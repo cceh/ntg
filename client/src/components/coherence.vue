@@ -22,10 +22,7 @@
                             :options="options.type" />
               <button-group type="radio" v-model="card.toolbar.limit"
                             :options="options.limit" />
-              <labezator v-model="card.toolbar.labez"
-                :prefix="[{ 'labez' : 'all',     'labez_i18n' : 'All'     }]"
-                :suffix="[{ 'labez' : 'all+lac', 'labez_i18n' : 'All+Lac' }]"
-                default="all+lac">Variant:</labezator>
+              <labezator v-model="card.toolbar.labez" :options="options.labez_all" />
               <range v-model="card.toolbar.range">Chapter:</range>
               <button-group type="checkbox" v-model="card.toolbar.include"
                             :options="options.include" />
@@ -103,8 +100,7 @@
             <button-group type="radio" v-model="tb_varonly_textflow.mode"
                           :options="options.mode" />
             <labezator v-model="tb_varonly_textflow.hyp_a"
-                       :reduce="true"
-                       :prefix="[{ 'labez' : 'A', 'labez_i18n' : 'A' }]">A =</labezator>
+                       :options="options.hyp_a" />
             <button-group slot="right" :options="options.png_dot" />
           </toolbar>
         </div>
@@ -129,8 +125,7 @@
             <button-group type="radio" v-model="tb_varonly_2_textflow.mode"
                           :options="options.mode" />
             <labezator v-model="tb_varonly_2_textflow.hyp_a"
-                       :reduce="true"
-                       :prefix="[{ 'labez' : 'A', 'labez_i18n' : 'A' }]">A =</labezator>
+                       :options="options.hyp_a" />
             <button-group slot="right" :options="options.png_dot" />
           </toolbar>
         </div>
@@ -148,7 +143,7 @@
 
         <div class="card-header card-slidable">
           <toolbar :toolbar="tb_local_textflow">
-            <labezator v-model="tb_local_textflow.labez" :reduce="true">Variant:</labezator>
+            <labezator v-model="tb_local_textflow.labez" :options="options.labez" />
             <connectivity v-model="tb_local_textflow.connectivity">Conn:</connectivity>
             <range v-model="tb_local_textflow.range">Chapter:</range>
             <button-group type="checkbox" v-model="tb_local_textflow.include"
@@ -158,8 +153,7 @@
             <button-group type="radio" v-model="tb_local_textflow.mode"
                           :options="options.mode" />
             <labezator v-model="tb_local_textflow.hyp_a"
-                       :reduce="true"
-                       :prefix="[{ 'labez' : 'A', 'labez_i18n' : 'A' }]">A =</labezator>
+                       :options="options.hyp_a" />
             <button-group slot="right" :options="options.png_dot" />
           </toolbar>
         </div>
@@ -385,7 +379,7 @@ export default {
             return {
                 'type'      : 'rel',
                 'range'     : 'All',
-                'labez'     : 'a',
+                'labez'     : 'all+lac',
                 'limit'     : '0',
                 'include'   : [],
                 'fragments' : [],

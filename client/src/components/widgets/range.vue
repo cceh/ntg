@@ -1,6 +1,6 @@
 <template>
   <div class="range-vm btn-group btn-group-sm toolbar-range" role="group">
-    <button type="button"
+    <button type="button" :title="title"
             class="btn btn-primary dropdown-toggle dropdown-toggle-range"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <slot></slot>
@@ -46,6 +46,10 @@ export default {
         'eventname' : {
             'type'    : String,
             'default' : 'range',
+        },
+        'title' : {
+            'type'    : String,
+            'default' : 'Select a chapter.',
         },
         'value' : {
             'type'     : String,

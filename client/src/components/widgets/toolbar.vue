@@ -1,9 +1,11 @@
 <template>
-  <b-button-toolbar class="justify-content-between">
-    <slot></slot>
-    <div class="mr-auto" />
-    <slot name="right"></slot>
-  </b-button-toolbar>
+  <div @ntgclick="on_click">
+    <b-button-toolbar class="justify-content-between">
+      <slot></slot>
+      <div class="mr-auto" />
+      <slot name="right"></slot>
+    </b-button-toolbar>
+  </div>
 </template>
 
 <script>
@@ -33,8 +35,8 @@ export default {
         };
     },
     'methods' : {
-        on_click (data, event) {
-            this.toolbar[data] ();
+        on_click (event) {
+            this.toolbar[event.detail.data] ();
         },
     },
     mounted () {

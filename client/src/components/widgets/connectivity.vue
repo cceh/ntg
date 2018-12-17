@@ -1,7 +1,7 @@
 <template>
   <div class="connectivity-vm btn-group btn-group-sm" role="group" data-toggle="buttons">
 
-    <label class="btn btn-primary d-flex align-items-center"> <!-- moz needs align-center -->
+    <label class="btn btn-primary d-flex align-items-center" :title="title"> <!-- moz needs align-center -->
       <slot></slot>
       <span class="connectivity-label">{{ connectivity_formatter (value) }}</span>
       <input v-model="value" type="range" class="custom-range" min="1" max="21"
@@ -40,6 +40,10 @@ export default {
         'eventname' : {
             'type'    : String,
             'default' : 'connectivity',
+        },
+        'title' : {
+            'type'    : String,
+            'default' : 'Select a connectivity.',
         },
         'value' : {
             'type'     : Number,

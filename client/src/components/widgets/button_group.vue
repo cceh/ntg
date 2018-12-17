@@ -8,7 +8,7 @@
         <input :type="type" :checked="is_active (button.value)"
                @change="on_change (button, $event)" />
       </label>
-      <button v-if="type === 'button'" :type="type" class="btn btn-primary"
+      <button v-if="type === 'button'" :type="type" class="btn btn-primary" :title="button.title"
               @click="on_click (button, $event)">{{ button.text }}</button>
     </template>
   </b-button-group>
@@ -63,7 +63,7 @@ export default {
     'methods' : {
         on_click (data, event) {
             if (this.type === 'button') {
-                this.$parent.$parent.on_click (data.value, event);
+                this.$trigger ('ntgclick', data.value);
             }
         },
         on_change (data, event) {
