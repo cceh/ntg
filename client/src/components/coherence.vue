@@ -371,16 +371,18 @@ marker.link {
     fill: #000;
     fill-opacity: 1;
     stroke-dasharray: none;
-    visibility: hidden;
+    visibility: visible;
 }
 
 div.variant-textflow-wrapper {
     path.link {
         stroke-dasharray: none;
     }
+}
 
+div.local-stemma-wrapper {
     marker.link {
-        visibility: visible;
+        visibility: hidden;
     }
 }
 
