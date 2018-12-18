@@ -3,7 +3,7 @@
        @hashchange="on_hashchange"
        @navigator="on_navigator"
        @goto_attestation="on_goto_attestation"
-       @destroy_relatives_popup="on_destroy_relatives_popup">
+       @destroy_relatives_popup="on_destroy_relatives_popup ($event, $event.detail.data)">
     <page-header :caption="caption" />
 
     <div class="container bs-docs-container">
@@ -16,7 +16,7 @@
               :card_id="card.id" :position_target="card.position_target"
               class="card-closable card-draggable card-floating">
 
-          <div class="card-header" @destroy_relatives_popup="nop">
+          <div class="card-header">
             <toolbar :toolbar="card.toolbar">
               <button-group type="radio" v-model="card.toolbar.type"
                             :options="options.type" />
@@ -141,7 +141,7 @@
       <card class="card-textflow card-local-textflow"
             caption="Coherence in Attestations">
 
-        <div class="card-header card-slidable">
+        <div class="card-header card-slidable" @labez="on_destroy_relatives_popup ($event, 0)">
           <toolbar :toolbar="tb_local_textflow">
             <labezator v-model="tb_local_textflow.labez" :options="options.labez" />
             <connectivity v-model="tb_local_textflow.connectivity">Conn:</connectivity>
@@ -353,12 +353,7 @@ export default {
                 'toolbar'         : this.tb_relatives (),
             });
         },
-        nop (event) {
-            // do nothing
-            event.stopPropagation ();
-        },
-        on_destroy_relatives_popup (event) {
-            const card_id = event.detail.data;
+        on_destroy_relatives_popup (event, card_id) {
             if (card_id === 0) {
                 this.floating_cards = [];
             } else {
