@@ -61,10 +61,10 @@ function open_contextmenu (event, vm) {
     )));
     menu.append ($ ('<tr><td>-</td><td>-</td></tr>'));
 
-    const cliques = _.filter (vm.$store.state.passage.cliques, (o) => (o[0][0] !== 'z'));
+    const cliques = _.filter (vm.$store.state.passage.cliques, (o) => (o.labez[0] !== 'z'));
     _.forEach (cliques, (value) => {
-        data.labez_new  = value[0];
-        data.clique_new = value[1];
+        data.labez_new  = value.labez;
+        data.clique_new = value.clique;
 
         if (data.labez_new === data.labez_old && data.clique_new !== data.clique_old) {
             menu.append ($ (tools.format (
