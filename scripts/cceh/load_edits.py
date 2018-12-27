@@ -269,7 +269,7 @@ if __name__ == '__main__':
         executemany (conn, """
         INSERT INTO import_notes (passage, note,
                                   sys_period, user_id_start, user_id_stop)
-        VALUES (:passage, :note,
+        VALUES (:passage, COALESCE (:note, ''),
                 :sys_period, :user_id_start, :user_id_stop)
         """, parameters, values)
 
