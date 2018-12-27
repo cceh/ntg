@@ -102,6 +102,12 @@ import_mark:
 	cat ../dumps/ECM_Mk_CBGM.dump | $(MYSQL) -D ECM_Mark_Ph1
 	python3 -m scripts.cceh.import -vvv server/instance/mark_ph1.conf
 
+import_mark_2:
+	-$(MYSQL) -e "DROP DATABASE ECM_Mark_Ph12"
+	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph12"
+	cat ../dumps/ECM_Mk_CBGM_Milestone2.dump | $(MYSQL) -D ECM_Mark_Ph12
+	python3 -m scripts.cceh.import -vvv server/instance/mark_ph12.conf
+
 import_nestle:
 	-$(MYSQL) -e "DROP DATABASE Nestle29"
 	$(MYSQL) -e "CREATE DATABASE Nestle29"
@@ -123,9 +129,17 @@ mark:
 	python3 -m scripts.cceh.prepare -vvv server/instance/mark_ph1.conf
 	python3 -m scripts.cceh.cbgm    -vvv server/instance/mark_ph1.conf
 
+mark_2:
+	python3 -m scripts.cceh.prepare -vvv server/instance/mark_ph12.conf
+	python3 -m scripts.cceh.cbgm    -vvv server/instance/mark_ph12.conf
+
 load_mark:
 	scp $(NTG_PRJ)/backups/* backups/
 	python3 -m scripts.cceh.load_edits -i backups/saved_edits_mark_ph1_`date -I`.xml -vvv server/instance/mark_ph1.conf
+
+load_mark_2:
+	scp $(NTG_PRJ)/backups/* backups/
+	python3 -m scripts.cceh.load_edits -i backups/saved_edits_mark_ph1_`date -I`.xml -vvv server/instance/mark_ph12.conf
 
 define UPLOAD_TEMPLATE =
 
@@ -146,7 +160,7 @@ upload_$(1)_from_home:
 
 endef
 
-DBS := acts_ph4 john_ph1 john_f1_ph1 mark_ph1
+DBS := acts_ph4 john_ph1 john_f1_ph1 mark_ph1 mark_ph12
 
 $(foreach db,$(DBS),$(eval $(call UPLOAD_TEMPLATE,$(db))))
 
