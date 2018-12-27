@@ -138,6 +138,7 @@ def generic (metadata, create_cmd, drop_cmd):
 # Input tables from the Nestle-Aland database
 
 Base = declarative_base ()
+Base.metadata.schema = 'ntg'
 
 class Att (Base):
     r"""Input buffer table for the Nestle-Aland ECM_Acts*GVZ tables.
@@ -410,6 +411,7 @@ function ('adr2word', Base.metadata, 'adr INTEGER', 'INTEGER', '''
 # Tables for the CBGM / App Server
 
 Base2 = declarative_base ()
+Base2.metadata.schema = 'ntg'
 
 class Manuscripts (Base2):
     """A table that lists all the manuscripts.
@@ -1636,6 +1638,7 @@ generic (Base2.metadata, '''
 
 
 Base4 = declarative_base ()
+Base4.metadata.schema = 'ntg'
 
 class Nestle (Base4):
     """The Leitzeile from the Nestle-Aland
@@ -1680,6 +1683,7 @@ class Nestle (Base4):
 # Tables for flask_login / flask_user / flask_security / whatever
 
 Base3 = declarative_base ()
+Base4.metadata.schema = 'ntg'
 
 class _User ():
     __tablename__ = 'user'
