@@ -240,7 +240,7 @@ def suggest_json ():
     term    = '^' + re.escape (term.split ('-')[0])
 
     # terms entered in previous fields
-    siglum  = request.args.get ('siglum')  or 'Act'
+    siglum  = request.args.get ('siglum')  or ''
     chapter = request.args.get ('chapter') or 'All'
     verse   = request.args.get ('verse')   or '1'
 
