@@ -70,15 +70,12 @@ export default {
             this.$emit ('input', value);  // makes it work with v-model
         },
         on_change (event) {
-            const $dropdown = $ (event.target).closest ('.dropdown-menu').parent ().find ('[data-toggle="dropdown"]');
-            $dropdown.dropdown ('toggle');
             this.change (event.target.value);
         },
         on_submit () {
         },
     },
     mounted () {
-        $ (this.$el).find ('.dropdown-toggle').dropdown ();
     },
 };
 </script>
