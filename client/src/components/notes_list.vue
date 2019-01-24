@@ -11,7 +11,7 @@
           </tr>
           <tr v-for="note in notes" :key="note.pass_id">
             <th><a :href="'coherence#pass_id=' + note.pass_id">{{ note.hr }}</a></th>
-            <td>{{ note.note }}</td>
+            <td class="prewrap">{{ note.note }}</td>
           </tr>
         </table>
       </card>
@@ -65,5 +65,8 @@ export default {
 @import "bootstrap-custom";
 
 div.notes_list_vm {
+    .prewrap {
+        white-space: pre-wrap;
+    }
 }
 </style>
