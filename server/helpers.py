@@ -320,7 +320,28 @@ def make_json_response (json = None, status = 200, message = None):
     })
 
 
-def make_text_response (text = None, status = 200):
+def make_dot_response (dot, status = 200):
+    return flask.make_response (dot, status, {
+        'content-type' : 'text/vnd.graphviz;charset=utf-8',
+        'Access-Control-Allow-Origin' : '*',
+    })
+
+
+def make_csv_response (csv, status = 200):
+    return flask.make_response (csv, status, {
+        'content-type' : 'text/csv;charset=utf-8',
+        'Access-Control-Allow-Origin' : '*',
+    })
+
+
+def make_png_response (png, status = 200):
+    return flask.make_response (png, status, {
+        'content-type' : 'image/png',
+        'Access-Control-Allow-Origin' : '*',
+    })
+
+
+def make_text_response (text, status = 200):
     return flask.make_response (text, status, {
         'content-type' : 'text/plain;charset=utf-8',
         'Access-Control-Allow-Origin' : '*',

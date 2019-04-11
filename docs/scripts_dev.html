@@ -17,13 +17,21 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
@@ -32,21 +40,16 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Database Structure" href="database.html" />
     <link rel="prev" title="API Server" href="server_dev.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -600,100 +603,6 @@ oder b/bo_f).  In diesen Fällen tritt die Buchstabenkennung der
 </ul>
 <p>This script updates the tables shown in red in the <a class="reference internal" href="database.html#db-overwiew"><span class="std std-ref">overview</span></a>.
 It also updates the Apparatus table where manuscript ‘A is concerned.</p>
-<dl class="class">
-<dt id="scripts.cceh.cbgm.CBGM_Params">
-<em class="property">class </em><code class="descname">CBGM_Params</code><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Structure that holds intermediate results of the CBGM.</p>
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.ancestor_matrix">
-<code class="descname">ancestor_matrix</code><em class="property"> = None</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.ancestor_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integer matrix (ranges x mss x mss) with counts of the passages that are
-older in ms1 than in ms2.  This matrix is asymmetrical.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.and_matrix">
-<code class="descname">and_matrix</code><em class="property"> = None</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.and_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integer matrix (ranges x mss x mss) with counts of the passages that are
-defined in both mss.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.def_matrix">
-<code class="descname">def_matrix</code><em class="property"> = None</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.def_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Boolean matrix (mss x passages) set if ms. is defined at passage.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.eq_matrix">
-<code class="descname">eq_matrix</code><em class="property"> = None</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.eq_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integer matrix (ranges x mss x mss) with counts of the passages that are
-equal in both mss.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.labez_matrix">
-<code class="descname">labez_matrix</code><em class="property"> = None</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.labez_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integer matrix (mss x passages) of labez.  Each entry represents one reading:
-0 = lacuna, 1 = ‘a’, 2 = ‘b’, …  Used by the pre-coherence computations.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.n_mss">
-<code class="descname">n_mss</code><em class="property"> = 0</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.n_mss" title="Permalink to this definition">¶</a></dt>
-<dd><p>No. of manuscripts</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.n_passages">
-<code class="descname">n_passages</code><em class="property"> = 0</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.n_passages" title="Permalink to this definition">¶</a></dt>
-<dd><p>No. of passages</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.n_ranges">
-<code class="descname">n_ranges</code><em class="property"> = 0</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.n_ranges" title="Permalink to this definition">¶</a></dt>
-<dd><p>No. of ranges</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.parent_matrix">
-<code class="descname">parent_matrix</code><em class="property"> = None</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.parent_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integer matrix (ranges x mss x mss) with counts of the passages that are
-older in ms1 than in ms2, using only immediate descendence.  This matrix is
-asymmetrical.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.ranges">
-<code class="descname">ranges</code><em class="property"> = None</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.ranges" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of (named tuple Range)</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.unclear_ancestor_matrix">
-<code class="descname">unclear_ancestor_matrix</code><em class="property"> = None</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.unclear_ancestor_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integer matrix (ranges x mss x mss) with counts of the passages whose
-relationship is unclear in ms1 and ms2.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.unclear_parent_matrix">
-<code class="descname">unclear_parent_matrix</code><em class="property"> = None</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.unclear_parent_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integer matrix (ranges x mss x mss) with counts of the passages whose
-relationship is unclear in ms1 and ms2, using only immediate descendence.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="scripts.cceh.cbgm.CBGM_Params.variant_matrix">
-<code class="descname">variant_matrix</code><em class="property"> = None</em><a class="headerlink" href="#scripts.cceh.cbgm.CBGM_Params.variant_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Boolean (1 x passages) matrix of invariant passages.  We will need this the
-day we decide <em>not</em> to eliminate all invariant readings from the
-database.</p>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="function">
 <dt id="scripts.cceh.cbgm.build_A_text">
 <code class="descname">build_A_text</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.cbgm.build_A_text" title="Permalink to this definition">¶</a></dt>
@@ -706,58 +615,6 @@ verse is not original, so we set ‘zu’.</p>
 found in locstem.  In this case we set ‘A’ to ‘zz’ and there will be a gap
 in the reconstructed text.</p>
 <p>The Lesart of ‘A’ is always NULL, because it is a virtual manuscript.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="scripts.cceh.cbgm.calculate_mss_similarity_postco">
-<code class="descname">calculate_mss_similarity_postco</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em>, <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.cbgm.calculate_mss_similarity_postco" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate post-coherence mss similarity</p>
-<p>Genealogical coherence outputs asymmetrical matrices.
-Loop over all mss O(n_mss² * n_ranges * n_passages).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="scripts.cceh.cbgm.calculate_mss_similarity_preco">
-<code class="descname">calculate_mss_similarity_preco</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em>, <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.cbgm.calculate_mss_similarity_preco" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate pre-coherence mss similarity</p>
-<p>The pre-coherence similarity is defined as:</p>
-<div class="math notranslate nohighlight">
-\[\mbox{similarity}=\frac{\mbox{equal passages}}{\mbox{passages in common}}\]</div>
-<blockquote>
-<div><p>Kapitelweise füllen auf Basis von Vergleichen einzelner
-Variantenspektren in ECM_Acts_Sp.  Vergleich von je zwei Handschriften:
-An wieviel Stellen haben sie gemeinsam Text, an wieviel Stellen stimmen
-sie überein bzw. unterscheiden sie sich (inklusive Quotient)?  Die
-Informationen werden sowohl auf Kapitel- wie auch Buchebene
-festgehalten.</p>
-<p class="attribution">&mdash;VGA/VG05_all3.pl</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="function">
-<dt id="scripts.cceh.cbgm.count_by_range">
-<code class="descname">count_by_range</code><span class="sig-paren">(</span><em>a</em>, <em>range_starts</em>, <em>range_ends</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.cbgm.count_by_range" title="Permalink to this definition">¶</a></dt>
-<dd><p>Count true bits in array ranges</p>
-<p>Count the bits that are true in multiple ranges of the same array of booleans.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>a</strong> (<em>np.Array of np.bool:</em>) – Input array</li>
-<li><strong>range_starts</strong> (<em>int</em><em>[</em><em>]</em>) – Starting offsets of the ranges to count.</li>
-<li><strong>range_ends</strong> (<em>int</em><em>[</em><em>]</em>) – Ending offsets of the ranges to count.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="scripts.cceh.cbgm.create_labez_matrix">
-<code class="descname">create_labez_matrix</code><span class="sig-paren">(</span><em>dba</em>, <em>parameters</em>, <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.cceh.cbgm.create_labez_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create the <a class="reference internal" href="#scripts.cceh.cbgm.CBGM_Params.labez_matrix" title="scripts.cceh.cbgm.CBGM_Params.labez_matrix"><code class="xref py py-attr docutils literal notranslate"><span class="pre">labez</span> <span class="pre">matrix</span></code></a>.</p>
 </dd></dl>
 
 <span class="target" id="module-scripts.cceh.save_edits"></span></div>
@@ -794,7 +651,7 @@ from ‘a’.</p>
         <a href="database.html" class="btn btn-neutral float-right" title="Database Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="server_dev.html" class="btn btn-neutral" title="API Server" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="server_dev.html" class="btn btn-neutral float-left" title="API Server" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -820,26 +677,16 @@ from ‘a’.</p>
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

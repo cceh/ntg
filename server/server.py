@@ -26,9 +26,11 @@ from ntg_common import tools
 from ntg_common import db_tools
 
 from . import helpers
-from .helpers import parameters, Passage, Manuscript, make_json_response
+from .helpers import parameters, Passage, Manuscript, \
+     make_json_response, make_dot_response, make_csv_response, make_png_response
 from . import security
 from . import editor
+from . import set_cover
 
 app = flask.Blueprint ('the_app', __name__)
 static_app = flask.Flask (__name__)
@@ -83,7 +85,8 @@ EXCLUDE_REGEX_MAP = {
 
 def csvify (fields, rows):
     """ Send a HTTP response in CSV format. """
-    return flask.Response (to_csv (fields, rows), mimetype = 'text/csv')
+
+    return make_csv_response (to_csv (fields, rows))
 
 
 def get_excluded_ms_ids (conn, include):
@@ -788,7 +791,7 @@ def textflow_dot (passage_or_id):
 
     dot = textflow (passage_or_id)
     dot = tools.graphviz_layout (dot)
-    return flask.Response (dot, mimetype = 'text/vnd.graphviz')
+    return make_dot_response (dot)
 
 
 @app.endpoint ('textflow.png')
@@ -797,7 +800,7 @@ def textflow_png (passage_or_id):
 
     dot = textflow (passage_or_id)
     png = tools.graphviz_layout (dot, format = 'png')
-    return flask.Response (png, mimetype = 'image/png')
+    return make_png_response (png)
 
 
 _ComparisonRow = collections.namedtuple (
@@ -1047,7 +1050,7 @@ def stemma_dot (passage_or_id):
 
     dot = stemma (passage_or_id)
     dot = tools.graphviz_layout (dot)
-    return flask.Response (dot, mimetype = 'text/vnd.graphviz')
+    return make_dot_response (dot)
 
 
 @app.endpoint ('stemma.png')
@@ -1056,7 +1059,7 @@ def stemma_png (passage_or_id):
 
     dot = stemma (passage_or_id)
     png = tools.graphviz_layout (dot, format = 'png')
-    return flask.Response (png, mimetype = 'image/png')
+    return make_png_response (png)
 
 
 def make_safe_url (url):
@@ -1123,6 +1126,7 @@ if __name__ == "__main__":
 
         sub_app.register_blueprint (app)
         sub_app.register_blueprint (editor.app)
+        sub_app.register_blueprint (set_cover.app)
 
         sub_app.url_map = Map ([
             Rule ('/comparison-summary.csv',                      endpoint = 'comparison-summary.csv'),
@@ -1149,6 +1153,8 @@ if __name__ == "__main__":
             Rule ('/textflow.png/<passage_or_id>',                endpoint = 'textflow.png'),
             Rule ('/notes.txt/<passage_or_id>',                   endpoint = 'notes.txt', methods = ['GET', 'PUT']),
             Rule ('/stemma-edit/<passage_or_id>',                 endpoint = 'stemma-edit', methods = ['POST']),
+            Rule ('/set-cover.json/<hs_hsnr_id>',                 endpoint = 'set-cover.json'),
+            Rule ('/exhaustive-search.json/<hs_hsnr_id>',         endpoint = 'exhaustive-search.json'),
         ])
 
         log (logging.INFO, "Mounted {name} at {path} from conf {conf}".format (
@@ -1162,6 +1168,7 @@ if __name__ == "__main__":
         dba.init_app (sub_app)
         mail.init_app (sub_app)
         user_manager.init_app (sub_app, login_manager = login_manager, make_safe_url_function = make_safe_url)
+        set_cover.init_app (sub_app)
 
         instances[sub_app.config['APPLICATION_ROOT']] = sub_app
 

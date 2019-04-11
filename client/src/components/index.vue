@@ -8,6 +8,10 @@
       <router-link class="biglink" to="attestation">Find Relatives</router-link>
       <router-link v-if="$store.state.current_user.is_logged_in"
                    class="biglink" to="notes">List of Notes</router-link>
+      <router-link v-if="$store.state.current_user.is_logged_in"
+                   class="biglink" to="ex_search">Optimal Substemma</router-link>
+      <router-link v-if="$store.state.current_user.is_logged_in"
+                   class="biglink" to="set_cover">Set Cover</router-link>
 
       <a class="biglink" href="/pdfs/GenQ4_Guide.pdf" target="_blank">Short Guide (PDF)</a>
 

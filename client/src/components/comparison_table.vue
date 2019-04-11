@@ -6,7 +6,7 @@
       </toolbar>
     </div>
 
-    <table class="table table-bordered table-sm table-hover table-comparison" cellspacing="0">
+    <table class="table table-bordered table-sm table-hover table-sortable table-comparison" cellspacing="0">
       <thead>
         <tr @click="on_sort">
           <th class="details-control" />
@@ -253,40 +253,6 @@ table.table-comparison-details {
 
     thead {
         background-color: $card-cap-bg;
-
-        tr th {
-            position: relative;
-
-            &[data-sort-by] {
-                cursor: pointer;
-            }
-
-            &[data-sort-by]::after {
-                position: absolute;
-                top: ($spacer * 0.25);
-                display: block;
-                /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
-                font-family: 'Font Awesome 5 Free';
-                font-weight: 900;
-                content: "\f0dc";
-                color: var(--green);
-                opacity: 1;
-
-                @media print {
-                    display: none;
-                }
-            }
-
-            &.asc[data-sort-by]::after {
-                content: "\f0de";
-                color: var(--red);
-            }
-
-            &.desc[data-sort-by]::after {
-                content: "\f0dd";
-                color: var(--red);
-            }
-        }
     }
 
     tbody {
@@ -354,4 +320,43 @@ table.table-comparison {
         color: var(--red);
     }
 }
+
+table.table-sortable {
+    thead {
+        tr th {
+            position: relative;
+
+            &[data-sort-by] {
+                cursor: pointer;
+            }
+
+            &[data-sort-by]::after {
+                position: absolute;
+                top: ($spacer * 0.25);
+                display: block;
+                /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
+                font-family: 'Font Awesome 5 Free';
+                font-weight: 900;
+                content: "\f0dc";
+                color: var(--green);
+                opacity: 1;
+
+                @media print {
+                    display: none;
+                }
+            }
+
+            &.asc[data-sort-by]::after {
+                content: "\f0de";
+                color: var(--red);
+            }
+
+            &.desc[data-sort-by]::after {
+                content: "\f0dd";
+                color: var(--red);
+            }
+        }
+    }
+}
+
 </style>

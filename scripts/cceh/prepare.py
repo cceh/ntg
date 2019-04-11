@@ -1222,6 +1222,10 @@ def fill_readings_table (dba, parameters):
         # The MODE() aggregate function arbitrarily selects the first value if
         # there are multiple equally frequent values.
         # This is just a hack to get *any* reading in place.
+        #
+        # FIXME: this excludes all readings attested only with a certainty <
+        # 1.0. Do we want this? or do we want (ORDER BY a.lesart, a.certainty
+        # DESC)? See also issue #97.
         execute (conn, """
         INSERT INTO readings (pass_id, labez, lesart)
         SELECT p.pass_id, a.labez, MODE () WITHIN GROUP (ORDER BY a.lesart) AS lesart

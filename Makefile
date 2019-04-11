@@ -84,6 +84,12 @@ import_acts:
 	cat ../dumps/VarGenAtt_ActPh3_20170712.dump | $(MYSQL) -D VarGenAtt_ActPh4
 	python3 -m scripts.cceh.import -vvv server/instance/acts_ph4.conf
 
+import_cl:
+	-$(MYSQL) -e "DROP DATABASE ECM_CLPh2"
+	$(MYSQL) -e "CREATE DATABASE ECM_CLPh2"
+	cat ../dumps/CLBez.dump | $(MYSQL) -D ECM_CLPh2
+	python3 -m scripts.cceh.import -vvv server/instance/cl_ph2.conf
+
 import_john:
 	-$(MYSQL) -e "DROP DATABASE DCPJohnWithFam"
 	$(MYSQL) -e "CREATE DATABASE DCPJohnWithFam"
@@ -111,11 +117,15 @@ import_mark_2:
 import_nestle:
 	-$(MYSQL) -e "DROP DATABASE Nestle29"
 	$(MYSQL) -e "CREATE DATABASE Nestle29"
-	cat ../dumps/Nestle29.dump | $(MYSQL) -D Nestle29
+	cat ../dumps/Nestle29-2.dump | $(MYSQL) -D Nestle29
 
 acts:
 	python3 -m scripts.cceh.prepare -vvv server/instance/acts_ph4.conf
 	python3 -m scripts.cceh.cbgm    -vvv server/instance/acts_ph4.conf
+
+cl:
+	python3 -m scripts.cceh.prepare -vvv server/instance/cl_ph2.conf
+	python3 -m scripts.cceh.cbgm    -vvv server/instance/cl_ph2.conf
 
 john:
 	python3 -m scripts.cceh.prepare -vvv server/instance/john_ph1.conf

@@ -17,6 +17,8 @@ import attestation from '../components/attestation.vue';
 import coherence   from '../components/coherence.vue';
 import comparison  from '../components/comparison.vue';
 import notes_list  from '../components/notes_list.vue';
+import set_cover   from '../components/set_cover.vue';
+import ex_search   from '../components/exhaustive_search.vue';
 
 Vue.use (BootstrapVue);
 Vue.use (VueRouter);
@@ -32,6 +34,8 @@ const routes = [
             { 'path' : 'comparison',  'component' : comparison  },
             { 'path' : 'attestation', 'component' : attestation },
             { 'path' : 'notes',       'component' : notes_list  },
+            { 'path' : 'set_cover',   'component' : set_cover   },
+            { 'path' : 'ex_search',   'component' : ex_search   },
         ],
     },
 

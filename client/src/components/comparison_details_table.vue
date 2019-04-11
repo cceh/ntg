@@ -1,7 +1,7 @@
 <template>
   <div class="comparison-details slider"> <!-- table cannot animate height -->
     <table ref="table" cellspacing="0" width="100%"
-           class="table table-bordered table-condensed table-hover table-comparison-details">
+           class="table table-bordered table-condensed table-hover table-sortable table-comparison-details">
       <caption>
         <div class="d-flex justify-content-between">
           <div class="caption">Comparison of {{ ms1.hs }} and {{ ms2.hs }} in Chapter {{ range }}</div>
@@ -103,10 +103,6 @@ export const sort_mixin = {
         return {
             'sorted_by'   : '',
             'sorted_desc' : false,
-            'options'     : options,
-            'toolbar'     : {
-                'csv' : () => this.download (), // show a download csv button
-            },
         };
     },
     'watch' : {
@@ -158,6 +154,10 @@ export default {
         return {
             'rows'      : [],
             'sorted_by' : 'pass_id',
+            'options'   : options,
+            'toolbar'   : {
+                'csv' : () => this.download (), // show a download csv button
+            },
         };
     },
     'methods' : {

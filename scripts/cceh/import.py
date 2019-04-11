@@ -2,17 +2,27 @@
 
 """Import databases from mysql.
 
-This script creates the postgres database and then imports the data from one or
-more mysql databases into it.
+This script initializes the postgres database and then imports data from one or
+more mysql databases.
 
-The first mysql database contains the apparatus of the *Editio Critica Maior*
-publication.  Another database contains the editorial decisions (VarGen)
-regarding the priority of the readings.  The third database (Nestle) contains
-the “Leitzeile”.
+.. note::
 
-The mysql databases for Acts contain sets of 28 tables, one for each respective
-chapter of Acts.  This is a historical incident: The software used when the CBGM
-was first implemented could not handle big tables.
+   Make sure to follow the steps in :ref:`docs/install.html#database-access`
+   first.
+
+The source databases are:
+
+1. a database containing the apparatus of the *Editio Critica Maior*
+   publication (ECM).
+
+2. a database containing the editorial decisions regarding the priority of the
+   readings (VarGen).
+
+3. a database containing the “Leitzeile” (Nestle).
+
+The source tables for Acts are partitioned into 28 chapters.  This is a
+historical incident: The software used when the CBGM was first implemented could
+not handle big tables.  The import script is able to join partitioned tables.
 
 After running this script should run the `prepare.py` script.
 
@@ -30,8 +40,6 @@ from ntg_common.db_tools import execute, warn, debug
 from ntg_common.tools import log
 from ntg_common.config import init_cmdline
 
-
-book = None
 
 def copy_table_fdw (conn, dest_table, fdw, source_table):
     """Copy a table. """
@@ -103,13 +111,12 @@ def import_att_fdw (dbsrc, dbdest, parameters):
     with dbdest.engine.begin () as dest:
         concat_tables_fdw (dest, dbsrc_meta, 'original_att', 'app_fdw', config['MYSQL_ATT_TABLES'])
 
-    log (logging.INFO, "  Importing mysql lac tables ...")
-
     with dbdest.engine.begin () as dest:
-        if book in ('Acts', 'Mark'):
+        if config.get ('MYSQL_LAC_TABLES'):
+            log (logging.INFO, "  Importing mysql lac tables ...")
             concat_tables_fdw (dest, dbsrc_meta, 'original_lac', 'app_fdw', config['MYSQL_LAC_TABLES'])
-        if book == 'John':
-            # John does not use the lacuna table
+        else:
+            # no lacuna tables provided (eg. John)
             execute (dest, """
 	        DROP TABLE IF EXISTS original_lac;
 	        CREATE TABLE original_lac (LIKE original_att);
@@ -129,23 +136,26 @@ def import_genealogical_fdw (dbsrc, dbdest, parameters):
 
     """
 
+    if not config.get ('MYSQL_VG_DB'):
+        return
+
     dbsrc_meta = sqlalchemy.schema.MetaData (bind = dbsrc.engine)
     dbsrc_meta.reflect ()
 
     with dbdest.engine.begin () as dest:
-        if 'MYSQL_LOCSTEM_TABLES' in config:
+        if config.get ('MYSQL_LOCSTEM_TABLES'):
             log (logging.INFO, "  Importing mysql locstem tables ...")
             concat_tables_fdw (dest, dbsrc_meta, 'original_locstemed', 'var_fdw', config['MYSQL_LOCSTEM_TABLES'])
 
-        if 'MYSQL_RDG_TABLES' in config:
+        if config.get ('MYSQL_RDG_TABLES'):
             log (logging.INFO, "  Importing mysql rdg tables ...")
             concat_tables_fdw (dest, dbsrc_meta, 'original_rdg',       'var_fdw', config['MYSQL_RDG_TABLES'])
 
-        if 'MYSQL_VAR_TABLES' in config:
+        if config.get ('MYSQL_VAR_TABLES'):
             log (logging.INFO, "  Importing mysql var tables ...")
             concat_tables_fdw (dest, dbsrc_meta, 'original_var',       'var_fdw', config['MYSQL_VAR_TABLES'])
 
-        if 'MYSQL_MEMO_TABLE' in config:
+        if config.get ('MYSQL_MEMO_TABLE'):
             log (logging.INFO, "  Importing mysql memo table ...")
             copy_table_fdw    (dest,             'original_memo',      'var_fdw', config['MYSQL_MEMO_TABLE'])
             execute (dest, """
@@ -156,7 +166,7 @@ def import_genealogical_fdw (dbsrc, dbdest, parameters):
 def import_nestle_fdw (dbsrc, dbdest, parameters):
     """Import Nestle table from mysql."""
 
-    if 'MYSQL_NESTLE_TABLE' in config:
+    if config.get ('MYSQL_NESTLE_TABLE'):
         with dbdest.engine.begin () as dest:
             log (logging.INFO, "  Importing mysql nestle table ...")
             copy_table_fdw (dest, 'original_nestle', 'nestle_fdw', config['MYSQL_NESTLE_TABLE'])
@@ -177,7 +187,6 @@ if __name__ == '__main__':
     args, config = init_cmdline (build_parser ())
 
     parameters = dict ()
-    book = config['BOOK']
 
     dbsrc1 = db_tools.MySQLEngine      (config['MYSQL_CONF'], config['MYSQL_GROUP'], config['MYSQL_ECM_DB'])
     dbsrc2 = db_tools.MySQLEngine      (config['MYSQL_CONF'], config['MYSQL_GROUP'], config['MYSQL_VG_DB'])

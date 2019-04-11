@@ -102,6 +102,8 @@ Postgres database
       CREATE DATABASE ntg_user OWNER ntg;
       CREATE DATABASE acts_ph4 OWNER ntg;
       \c acts_ph4
+      CREATE SCHEMA ntg AUTHORIZATION ntg;
+      ALTER DATABASE acts_ph4 SET search_path = ntg, public;
       CREATE EXTENSION mysql_fdw;
       GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
       \q
