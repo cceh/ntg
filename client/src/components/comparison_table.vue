@@ -6,7 +6,8 @@
       </toolbar>
     </div>
 
-    <table class="table table-bordered table-sm table-hover table-sortable table-comparison" cellspacing="0">
+    <table class="table table-bordered table-sm table-hover table-with-details table-sortable table-comparison"
+           ref="table" cellspacing="0">
       <thead>
         <tr @click="on_sort">
           <th class="details-control" />
@@ -38,7 +39,7 @@
         <template v-for="r in rows">
           <tr :class="rowclass (r)"
               :data-range="r.range" :key="r.rg_id ">
-            <td class="details-control" @click="toggle_details_table (r)" />
+            <td class="details-control" @click="toggle_details_table (r, $event)" />
 
             <td class="range">{{ r.range }}</td>
             <td class="direction"
@@ -96,7 +97,8 @@ import csv_parse from 'csv-parse/lib/sync';
 import { options } from 'widgets/options';
 
 import comparison_details_table from 'comparison_details_table.vue';
-import { sort_mixin } from 'comparison_details_table.vue';
+import sort_mixin   from 'table_sort_mixin.vue';
+import toggle_mixin from 'table_toggle_mixin.vue';
 
 Vue.component ('comparison-details-table', comparison_details_table);
 
@@ -150,7 +152,7 @@ function row_conversion (d) {
 }
 
 export default {
-    'mixins' : [sort_mixin],
+    'mixins' : [sort_mixin, toggle_mixin],
     'props'  : ['ms1', 'ms2'],
     data () {
         return {
@@ -193,21 +195,6 @@ export default {
                 'ms1' : 'id' + this.ms1.ms_id,
                 'ms2' : 'id' + this.ms2.ms_id,
             });
-        },
-
-        /**
-         * Opens a table containing a detailed view of one range.
-         *
-         * @function toggle_details_table
-         */
-
-        toggle_details_table (row) {
-            if (row.child) {
-                const $slider = $ (`table.table-comparison tr.child[data-range=${row.range}] div.slider`);
-                $slider.slideUp (() => { row.child = false; });
-            } else {
-                row.child = true;
-            }
         },
         download () {
             window.open (this.build_full_api_url (this.build_url (), '_blank'));
@@ -278,83 +265,6 @@ table.table-comparison {
 
         &.direction {
             text-align: center;
-        }
-    }
-
-    th[data-sort-by]::after {
-        left: ($spacer * 0.25);
-    }
-
-    tr.child {
-        padding: 0;
-
-        &:hover {
-            background-color: $card-bg;
-        }
-
-        > td {
-            padding: 0;
-        }
-    }
-
-    tr .details-control {
-        text-align: center;
-        width: $spacer;
-
-        @media print {
-            display: none;
-        }
-    }
-
-    tr td.details-control::after {
-        /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
-        content: "\f055";
-        color: var(--green);
-        cursor: pointer;
-    }
-
-    tr.shown td.details-control::after {
-        content: "\f056";
-        color: var(--red);
-    }
-}
-
-table.table-sortable {
-    thead {
-        tr th {
-            position: relative;
-
-            &[data-sort-by] {
-                cursor: pointer;
-            }
-
-            &[data-sort-by]::after {
-                position: absolute;
-                top: ($spacer * 0.25);
-                display: block;
-                /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
-                font-family: 'Font Awesome 5 Free';
-                font-weight: 900;
-                content: "\f0dc";
-                color: var(--green);
-                opacity: 1;
-
-                @media print {
-                    display: none;
-                }
-            }
-
-            &.asc[data-sort-by]::after {
-                content: "\f0de";
-                color: var(--red);
-            }
-
-            &.desc[data-sort-by]::after {
-                content: "\f0dd";
-                color: var(--red);
-            }
         }
     }
 }

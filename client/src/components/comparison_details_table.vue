@@ -47,7 +47,9 @@ import $ from 'jquery';
 import _ from 'lodash';
 import csv_parse from 'csv-parse/lib/sync';
 
-import { options } from 'widgets/options';
+import { options }  from 'widgets/options';
+
+import sort_mixin   from 'table_sort_mixin.vue';
 
 /**
  * Return a direction marker: <, >, NoRel or Uncl.
@@ -97,55 +99,6 @@ function row_conversion (d) {
     r.direction = dir (r);
     return r;
 }
-
-export const sort_mixin = {
-    data () {
-        return {
-            'sorted_by'   : '',
-            'sorted_desc' : false,
-        };
-    },
-    'watch' : {
-        'sorted_by'   : function () { this.sort (); },
-        'sorted_desc' : function () { this.sort (); },
-    },
-    'methods' : {
-        on_sort (event) {
-            const $th = $ (event.target);
-            const sort_by = $th.attr ('data-sort-by');
-
-            if (this.sorted_by === sort_by) {
-                this.sorted_desc = !this.sorted_desc;
-            } else {
-                this.sorted_desc = false;
-                this.sorted_by = sort_by;
-            }
-        },
-        sort () {
-            const vm = this;
-            const rows = _.sortBy (vm.rows, [vm.sorted_by]);
-            if (vm.sorted_desc) {
-                _.reverse (rows);
-            }
-            vm.rows = rows;
-
-            $ (vm.$el).find ('th[data-sort-by]').each (function (index, e) {
-                const $th = $ (e);
-                const sort_by = $th.attr ('data-sort-by');
-                $th.toggleClass ('asc', false);
-                $th.toggleClass ('desc', false);
-                if (sort_by === vm.sorted_by) {
-                    if (vm.sorted_desc) {
-                        $th.toggleClass ('desc', true);
-                    } else {
-                        $th.toggleClass ('asc', true);
-                    }
-                }
-            });
-        },
-    },
-};
-
 
 export default {
     'mixins' : [sort_mixin],
@@ -203,6 +156,9 @@ div.comparison-details {
         th,
         td {
             text-align: left;
+            &[data-sort-by] {
+                padding-left: 1.5em;
+            }
 
             &.passage {
                 width: 15%;
@@ -210,6 +166,7 @@ div.comparison-details {
 
             &.direction {
                 text-align: center;
+                padding-left: 0;
                 width: 5%;
             }
 
@@ -218,10 +175,6 @@ div.comparison-details {
             }
         }
 
-        th[data-sort-by]::after {
-            left: auto;
-            right: ($spacer * 0.25);
-        }
     }
 }
 </style>

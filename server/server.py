@@ -1154,7 +1154,9 @@ if __name__ == "__main__":
             Rule ('/notes.txt/<passage_or_id>',                   endpoint = 'notes.txt', methods = ['GET', 'PUT']),
             Rule ('/stemma-edit/<passage_or_id>',                 endpoint = 'stemma-edit', methods = ['POST']),
             Rule ('/set-cover.json/<hs_hsnr_id>',                 endpoint = 'set-cover.json'),
-            Rule ('/exhaustive-search.json/<hs_hsnr_id>',         endpoint = 'exhaustive-search.json'),
+            Rule ('/optimal-substemma.json',                      endpoint = 'optimal-substemma.json'),
+            Rule ('/optimal-substemma.csv',                       endpoint = 'optimal-substemma.csv'),
+            Rule ('/optimal-substemma-detail.csv',                endpoint = 'optimal-substemma-detail.csv'),
         ])
 
         log (logging.INFO, "Mounted {name} at {path} from conf {conf}".format (

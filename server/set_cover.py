@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-"""An application server for CBGM.  Set cover module.
+"""An application server for CBGM.  Optimal substemma module.
 
 See: CBGM_Pres.pdf p. 490ff.
 
@@ -21,16 +21,23 @@ import sqlalchemy
 
 from ntg_common import tools
 from ntg_common import db_tools
-from ntg_common.db_tools import execute
+from ntg_common.db_tools import execute, to_csv
 from ntg_common.cbgm_common import CBGM_Params, create_labez_matrix, \
     calculate_mss_similarity_preco, calculate_mss_similarity_postco
 
-from .helpers import parameters, Passage, Manuscript, make_json_response, make_text_response
+from .helpers import parameters, Passage, Manuscript, \
+    make_json_response, make_csv_response, make_text_response
 
 
 MAX_COVER_SIZE = 12
 
 app = flask.Blueprint ('set_cover', __name__)
+
+def csvify (fields, rows):
+    """ Send a HTTP response in CSV format. """
+
+    return make_csv_response (to_csv (fields, rows))
+
 
 def get_ancestors (conn, rg_id, ms_id):
     """ Get all ancestors of ms. """
@@ -102,7 +109,7 @@ def init (db):
         create_labez_matrix (db, parameters, val)
 
         # build a mask of all readings of all mss.
-        # every labez_clique gets an id (in the range 0..63)
+        # every labez_clique gets an id (in the range 1..63)
 
         # Matrix mss x passages containing the bitmask of all manuscripts readings
         val.mask_matrix = np.zeros ((val.n_mss, val.n_passages), dtype = np.uint64)
@@ -132,7 +139,7 @@ def build_explain_matrix (conn, val, ms_id):
     would explain the reading in the manuscript under scrutiny.
 
     Bit 1 means: the reading stems from an unknown source.
-    Bit 2..64 are the bitmask.
+    Bit 2..64 are the bitmask of all cliques.
 
     """
 
@@ -146,7 +153,7 @@ def build_explain_matrix (conn, val, ms_id):
     lsrn AS (
       SELECT ls.pass_id, ls.labez, ls.clique,
         -- set 1 as flag for unknown derivation
-        CASE WHEN (ls.source_labez IS NULL) AND NOT ls.original THEN rn1.rn + 1 ELSE rn1.rn END AS rn1,
+        CASE WHEN (ls.source_labez IS NULL) AND NOT ls.original THEN rn1.rn | 1 ELSE rn1.rn END AS rn1,
         rn2.rn AS rn2
       FROM locstem ls
       JOIN rn as rn1
@@ -163,9 +170,9 @@ def build_explain_matrix (conn, val, ms_id):
       SELECT lsrn.pass_id, lsrn.rn1, lsrn.rn2
       FROM lsrec
       JOIN lsrn
-        ON (lsrn.pass_id = lsrec.pass_id AND lsrn.rn1 = lsrec.rn2)
+        ON (lsrn.pass_id = lsrec.pass_id AND (lsrn.rn1 & ~B'1'::integer) = lsrec.rn2)
     )
-    SELECT pass_id, SUM (rn1) AS rn
+    SELECT pass_id, BIT_OR (rn1) AS rn
     FROM lsrec
     GROUP BY pass_id
     ORDER BY pass_id;
@@ -267,8 +274,8 @@ def set_cover_json (hs_hsnr_id):
                 # use manuscript pre-selected by user
                 ms_id_most_similar = pre_selected[n].ms_id - 1
             else:
-                # find manuscript that explains the most passages
-                ms_id_most_similar = int (np.argmax (np.sum (b_post, axis = 1)))
+                # find manuscript that explains the most passages by agreement
+                ms_id_most_similar = int (np.argmax (np.sum (b_equal, axis = 1)))
 
             b_explained        = np.copy (b_post[ms_id_most_similar])
             b_explained_equal  = np.copy (b_equal[ms_id_most_similar])
@@ -305,11 +312,12 @@ def set_cover_json (hs_hsnr_id):
 
 
 class Combination (object):
-    def __init__ (self, iter):
+    def __init__ (self, iter, index):
         """ Init from an iterable of Manuscripts. """
-        self.mss = list (iter)
-        self.len = len (self.mss)
-        self.vec = np.array ([ ms.ms_id - 1 for ms in self.mss ])
+        self.mss   = list (iter)
+        self.index = index
+        self.len   = len (self.mss)
+        self.vec   = np.array ([ ms.ms_id - 1 for ms in self.mss ])
         self.n_explained_equal = 0
         self.n_explained_post  = 0
         self.n_unknown         = 0
@@ -324,6 +332,7 @@ class Combination (object):
 
     def to_json (self):
         return {
+            'index'  : self.index,
             'mss'    : [ms.to_json () for ms in self.mss],
             'count'  : self.len,
             'equal'  : self.n_explained_equal,
@@ -333,92 +342,200 @@ class Combination (object):
             'hint'   : self.hint
         }
 
+    def to_csv (self):
+        return [
+            ' '.join ([ms.hs for ms in self.mss]),
+            self.len,
+            self.n_explained_equal,
+            self.n_explained_post,
+            self.n_unknown,
+            self.n_open,
+            self.hint
+        ]
 
-@app.endpoint ('exhaustive-search.json')
-def exhaustive_search_json (hs_hsnr_id):
+
+def _optimal_substemma (ms_id, explain_matrix, combinations, mode):
     """Do an exhaustive search for the combination among a given set of ancestors
     that best explains a given manuscript.
 
     """
 
-    response = {}
+    ms_id = ms_id - 1  # numpy indices start at 0
+    val = current_app.config.val
 
-    with current_app.config.dba.engine.begin () as conn:
-        if current_app.config.val is None:
-            current_app.config.val = init (current_app.config.dba)
-        val = current_app.config.val
+    b_defined = val.def_matrix[ms_id]
+    n_defined = np.count_nonzero (b_defined)
+    # remove variants where the inspected ms is undefined
+    b_common = np.logical_and (val.def_matrix, b_defined)
 
-        cover = []
+    explain_equal_matrix = val.mask_matrix[ms_id]
 
-        ms = Manuscript (conn, hs_hsnr_id) # the manuscript to explain
-        response['ms'] = ms.to_json ()
-        ms_id = ms.ms_id - 1  # numpy indices start at 0
+    # The mss x passages boolean matrix that is TRUE whenever the inspected ms.
+    # agrees with the potential source ms.
+    b_equal = np.bitwise_and (val.mask_matrix, explain_equal_matrix) > 0
+    b_equal = np.logical_and (b_equal, b_common)
 
-        # get the selected set of ancestors
-        selected = [ Manuscript (conn, anc_id)
-                     for anc_id in (request.args.get ('selection') or '').split () ]
-        response['mss'] = [s.to_json () for s in selected]
+    # The mss x passages boolean matrix that is TRUE whenever the inspected ms.
+    # agrees with the potential source ms. or is posterior to it.
+    b_post = np.bitwise_and (val.mask_matrix, explain_matrix) > 0
+    b_post = np.logical_and (b_post, b_common)
 
-        np.set_printoptions (edgeitems = 8, linewidth = 100)
+    for comb in combinations:
+        # how many passages does this combination explain?
+        b_explained_equal = np.logical_or.reduce (b_equal[comb.vec])
+        b_explained_post  = np.logical_or.reduce (b_post[comb.vec])
+        b_explained_post  = np.logical_and (b_explained_post, np.logical_not (b_explained_equal))
+        b_explained       = np.logical_or (b_explained_equal, b_explained_post)
 
-        b_common = np.logical_and (val.def_matrix, val.def_matrix[ms_id])
-        b_common[ms_id] = False  # don't find original ms.
-        b_common[0]     = False  # don't find A
-        b_common[1]     = False  # don't find MT
+        comb.n_explained_equal = np.count_nonzero (b_explained_equal)
+        comb.n_explained_post  = np.count_nonzero (b_explained_post)
 
-        # eliminate descendants from the matrix
-        ancestors = get_ancestors (conn, current_app.config.set_cover_rg_id, ms.ms_id)
-        for i in range (0, val.n_mss):
-            if ((i + 1) not in ancestors) :
-                b_common[i] = 0
+        unexplained_matrix = np.copy (explain_matrix)
+        unexplained_matrix[np.logical_not (b_defined)] = 0
+        unexplained_matrix[b_explained] = 0
+        b_unknown = np.bitwise_and (unexplained_matrix, 0x1) > 0
+        unexplained_matrix[b_unknown] = 0
+        b_open = unexplained_matrix > 0
 
-        n_defined = np.count_nonzero (val.def_matrix[ms_id])
-        response['ms']['open'] = n_defined
+        comb.n_unknown = np.count_nonzero (b_unknown)
+        comb.n_open = np.count_nonzero (b_open)
+        # comb.n_open = n_defined - comb.n_explained_equal - comb.n_explained_post - comb.n_unknown
 
-        explain_matrix = build_explain_matrix (conn, val, ms.ms_id)
+        if mode == 'detail':
+            comb.open_indices    = tuple (int (n + 1) for n in np.nonzero (b_open)[0])
+            comb.unknown_indices = tuple (int (n + 1) for n in np.nonzero (b_unknown)[0])
 
-        explain_equal_matrix = val.mask_matrix[ms_id]
-
-        # The mss x passages boolean matrix that is TRUE whenever the inspected ms.
-        # agrees with the potential source ms.
-        b_equal = np.bitwise_and (val.mask_matrix, explain_equal_matrix) > 0
-        b_equal = np.logical_and (b_equal, b_common)
-
-        # The mss x passages boolean matrix that is TRUE whenever the inspected ms.
-        # agrees with the potential source ms. or is posterior to it.
-        b_post = np.bitwise_and (val.mask_matrix, explain_matrix) > 0
-        b_post = np.logical_and (b_post, b_common)
-
-        for l in range (len (selected)):
-            for c in itertools.combinations (selected, l + 1):
-                comb = Combination (c)
-
-                # how many passages does this combination explain?
-                b_explained_equal = np.logical_or.reduce (b_equal[comb.vec])
-                b_explained_post  = np.logical_or.reduce (b_post[comb.vec])
-                b_explained_post  = np.logical_and (b_explained_post, np.logical_not (b_explained_equal))
-
-                comb.n_explained_equal = np.count_nonzero (b_explained_equal)
-                comb.n_explained_post  = np.count_nonzero (b_explained_post)
-
-                unk_matrix = np.copy (explain_matrix)
-                unk_matrix[b_explained_equal] = 0
-                unk_matrix[b_explained_post] = 0
-                comb.n_unknown = np.count_nonzero (np.bitwise_and (unk_matrix, 0x1))
-
-                comb.n_open = n_defined - comb.n_explained_equal - comb.n_explained_post - comb.n_unknown
-
-                cover.append (comb)
-
+    if mode == 'search':
+        # add the 'hint' column
         def key_len (c):
             return c.len
 
         def key_explained (c):
             return -c.explained ()
 
-        # add the 'hint' column
-        for k, g in itertools.groupby (sorted (cover, key = key_len), key = key_len):
+        for k, g in itertools.groupby (sorted (combinations, key = key_len), key = key_len):
             sorted (g, key = key_explained)[0].hint = True
 
-        response['cover'] = [ c.to_json () for c in cover ]
+
+@app.endpoint ('optimal-substemma.json')
+def optimal_substemma_json ():
+    """Normalize parameters and add some general info.
+    """
+
+    if current_app.config.val is None:
+        current_app.config.val = init (current_app.config.dba)
+    val = current_app.config.val
+
+    with current_app.config.dba.engine.begin () as conn:
+        # the manuscript to explain
+        ms = Manuscript (conn, request.args.get ('ms'))
+
+        # get the selected set of ancestors and build all combinations of that set
+        selected = [ Manuscript (conn, anc_id)
+                     for anc_id in (request.args.get ('selection') or '').split () ]
+        response = {
+            'ms'  : ms.to_json (),
+            'mss' : [s.to_json () for s in selected],
+        }
+        n_defined = np.count_nonzero (val.def_matrix[ms.ms_id - 1])
+        response['ms']['open'] = n_defined
+
         return make_json_response (response)
+
+
+_OptimalSubstemmaRow = collections.namedtuple (
+    'OptimalSubstemmaRow',
+    'mss count equal post unknown open hint'
+)
+
+@app.endpoint ('optimal-substemma.csv')
+def optimal_substemma_csv ():
+    """Do an exhaustive search for the combination among a given set of ancestors
+    that best explains a given manuscript.
+
+    """
+
+    if current_app.config.val is None:
+        current_app.config.val = init (current_app.config.dba)
+    val = current_app.config.val
+
+    with current_app.config.dba.engine.begin () as conn:
+        # the manuscript to explain
+        ms = Manuscript (conn, request.args.get ('ms'))
+
+        # get the selected set of ancestors and build all combinations of that set
+        selected = [ Manuscript (conn, anc_id)
+                     for anc_id in (request.args.get ('selection') or '').split () ]
+        combinations = []
+        i = 0
+        for l in range (len (selected)):
+            for c in itertools.combinations (selected, l + 1):
+                combinations.append (Combination (c, i))
+                i += 1
+
+        explain_matrix = build_explain_matrix (conn, val, ms.ms_id)
+        _optimal_substemma (ms.ms_id, explain_matrix, combinations, mode = 'search')
+
+        res = [c.to_csv () for c in combinations]
+
+        return csvify (_OptimalSubstemmaRow._fields,
+                       list (map (_OptimalSubstemmaRow._make, res)))
+
+
+_OptimalSubstemmaDetailRow = collections.namedtuple (
+    'OptimalSubstemmaDetailRow',
+    'type pass_id begadr endadr labez_clique lesart'
+)
+
+class _OptimalSubstemmaDetailRowCalcFields (_OptimalSubstemmaDetailRow):
+    __slots__ = ()
+
+    _fields = _OptimalSubstemmaDetailRow._fields + ('pass_hr', )
+
+    @property
+    def pass_hr (self):
+        return Passage.static_to_hr (self.begadr, self.endadr)
+
+    def _asdict (self):
+        return collections.OrderedDict (zip (self._fields, self + (self.pass_hr, )))
+
+
+@app.endpoint ('optimal-substemma-detail.csv')
+def optimal_substemma_detail_csv ():
+    """Report details about one combination of ancestors.
+    """
+
+    if current_app.config.val is None:
+        current_app.config.val = init (current_app.config.dba)
+    val = current_app.config.val
+
+    with current_app.config.dba.engine.begin () as conn:
+        # the manuscript to explain
+        ms = Manuscript (conn, request.args.get ('ms'))
+
+        # get the selected set of ancestors
+        selected = [ Manuscript (conn, anc_id)
+                     for anc_id in (request.args.get ('selection') or '').split () ]
+
+        combinations   = [Combination (selected, 0)]
+        explain_matrix = build_explain_matrix (conn, val, ms.ms_id)
+        _optimal_substemma (ms.ms_id, explain_matrix, combinations, mode = 'detail')
+
+        res = execute (conn, """
+        SELECT 'unknown' as type, p.pass_id, p.begadr, p.endadr, v.labez_clique, v.lesart
+        FROM passages p
+          JOIN apparatus_cliques_view v USING (pass_id)
+        WHERE v.ms_id = :ms_id AND pass_id IN :unknown_pass_ids
+        UNION
+        SELECT 'open' as type, p.pass_id, p.begadr, p.endadr, v.labez_clique, v.lesart
+        FROM passages p
+          JOIN apparatus_cliques_view v USING (pass_id)
+        WHERE v.ms_id = :ms_id AND pass_id IN :open_pass_ids
+        """, dict (parameters,
+                   ms_id = ms.ms_id,
+                   unknown_pass_ids = combinations[0].unknown_indices,
+                   open_pass_ids    = combinations[0].open_indices)
+        )
+
+        return csvify (_OptimalSubstemmaDetailRowCalcFields._fields,
+                       list (map (_OptimalSubstemmaDetailRowCalcFields._make, res)))

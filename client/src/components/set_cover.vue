@@ -36,51 +36,39 @@
 
         <table class="table table-bordered table-sm table-hover table-set-cover" cellspacing="0">
           <thead>
-            <tr @click="on_sort">
-              <th class="details-control" />
-
-              <th class="n" data-sort-by="n"
+            <tr>
+              <th class="n"
                   title="Index No.">No.</th>
 
-              <th class="hs" data-sort-by="hs"
+              <th class="hs"
                   title="The ancestor">Ancestor</th>
 
-              <th class="equals" data-sort-by="equals"
+              <th class="equals"
                   title="Number of variants explained by agreement with the ancestor.">Equal</th>
 
-              <th class="post" data-sort-by="post"
+              <th class="post"
                   title="Number of variants not explained by agreement but by posteriority.">Post</th>
 
-              <th class="unknown" data-sort-by="unknown"
+              <th class="unknown"
                   title="Cases of unknown source variant.">Unknown</th>
 
-              <th class="open" data-sort-by="open"
+              <th class="open"
                   title="Number of variants not explained by any ancestor.">Total Open</th>
 
-              <th class="explained" data-sort-by="explained"
+              <th class="explained"
                   title="Number of variants explained by one of the ancestors.">Total Explained</th>
             </tr>
           </thead>
           <tbody>
             <template v-for="r in cover">
               <tr :data-ms-id="r.ms_id" :key="r.ms_id">
-                <td class="details-control" @click="toggle_details_table (r)" />
-
                 <td class="n">{{ r.n }}</td>
-
                 <td class="hs">{{ r.hs }}</td>
-
                 <td class="equal">{{ r.equal }}</td>
                 <td class="post">{{ r.post }}</td>
                 <td class="unknown">{{ r.unknown }}</td>
                 <td class="open">{{ r.open }}</td>
                 <td class="explained">{{ r.explained }}</td>
-              </tr>
-              <tr v-if="r.child" :data-range="r.range" :key="r.rg_id + '_child'" class="child" >
-                <td />
-                <td colspan="99">
-                  <set-cover-details-table :ms="ms" :range="r.range" />
-                </td>
               </tr>
             </template>
           </tbody>
@@ -104,8 +92,6 @@
 import $ from 'jquery';
 import Vue from 'vue';
 
-import { sort_mixin } from 'comparison_details_table.vue';
-
 import tools from 'tools';
 
 export default {
@@ -118,7 +104,6 @@ export default {
             'cover'   : [],
         };
     },
-    'mixins' : [sort_mixin],
     'computed' : {
         'caption' : function () { return `Minimum Set Cover for Witness ${this.ms.hs} (${this.ms.open})` ; }
     },
@@ -180,6 +165,7 @@ div.set_cover_vm {
         input[type=text] {
             width: 6em;
         }
+
         #pre {
             width: 12em;
         }
