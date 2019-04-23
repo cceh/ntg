@@ -86,7 +86,7 @@
       </card>
 
       <!-- Coherence at Variant Passages (GraphViz) -->
-￼
+
       <card cssclass="card-textflow card-variant-textflow"
             caption="Coherence at Variant Passages (GraphViz)">
         <div class="card-header card-slidable">
@@ -111,7 +111,7 @@
       </card>
 
       <!-- Coherence at Variant Passages (Chord) -->
-￼
+
       <card class="card-textflow card-variant-textflow-2"
             caption="Coherence at Variant Passages (Chord)" default_closed="true">
         <div class="card-header card-slidable">
@@ -164,7 +164,7 @@
       </card>
 
       <!-- General Textual Flow -->
-￼
+
       <card class="card-textflow card-global-textflow"
             caption="General Textual Flow">
 

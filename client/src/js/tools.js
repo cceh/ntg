@@ -163,18 +163,21 @@ export function bfs (edges, start) {
     return ids;
 }
 
-export function slide_from ($el, old_height) {
+export function slide_from ($el, old_height, set_auto = true) {
     // slide an element to its new height
+    $el.height (1);
     const new_height = $el.prop ('scrollHeight');
     $el.height (old_height);
     $el.animate ({ 'height' : new_height }, 300, () => {
-        $el.height ('auto');
+        if (set_auto) {
+            $el.height ('auto');
+        };
         $el.animate ({ 'opacity' : 1.0 }, 300);
     });
 }
 
 export function save_height ($el) {
-    return $el.prop ('scrollHeight');
+    return $el.height ();
 }
 
 export default {

@@ -56,7 +56,9 @@ export default {
             return Promise.all ([xhr, p1]).then (function (p) {
                 vm.current_text  = p[0].data;
                 vm.original_text = vm.current_text;
-                tools.slide_from ($ta, old_height);
+                vm.$nextTick (function () {
+                    tools.slide_from ($ta, old_height, false);
+                });
             });
         },
         can_save () {
