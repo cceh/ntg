@@ -18,8 +18,12 @@ from ntg_common.db_tools import execute
 
 from .helpers import parameters, Passage, make_json_response, make_text_response
 
-RE_VALID_LABEZ  = re.compile ('^([*]|[?]|[a-y]|z[u-z])$')
+# FIXME: this is too lax but we need to accomodate one spurious 'z' reading
+RE_VALID_LABEZ  = re.compile ('^([*]|[?]|[a-z]{1,2}|z[u-z])$')
 RE_VALID_CLIQUE = re.compile ('^[0-9]$')
+
+# FIXME: this is too lax but we need to accomodate one spurious 'z' reading
+RE_EXTRACT_LABEZ = re.compile ('^([*]|[?]|[a-z]{1,2})')
 
 app = flask.Blueprint ('the_editor', __name__)
 
@@ -129,7 +133,9 @@ def stemma_edit (passage_or_id):
                 raise EditError ('The graph is not connected anymore.')
             # test: x derived from x
             for e in graph.edges:
-                if e[0][0] == e[1][0]:
+                m0 = RE_EXTRACT_LABEZ.match (e[0])
+                m1 = RE_EXTRACT_LABEZ.match (e[1])
+                if m0 and m1 and m0.group (1) == m1.group (1):
                     raise EditError (
                         '''A reading cannot be derived from the same reading.
                         If you want to <b>merge</b> instead, use shift + drag.'''
