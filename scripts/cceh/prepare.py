@@ -98,7 +98,7 @@ HAVING count (DISTINCT hs) > 1
 LABEZ_TO_LESART_TEST = """
 SELECT begadr, endadr, lesart, array_agg (DISTINCT labez)
 FROM att
-WHERE labez !~ '^z' AND labezsuf = ''
+WHERE labez !~ '^z[u-z]' AND labezsuf = ''
 GROUP BY begadr, endadr, lesart
 HAVING COUNT (DISTINCT labez) > 1
 """
@@ -106,7 +106,7 @@ HAVING COUNT (DISTINCT labez) > 1
 LESART_TO_LABEZ_TEST = """
 SELECT begadr, endadr, labez, array_agg (DISTINCT lesart)
 FROM att
-WHERE labez !~ '^z' AND labezsuf = ''
+WHERE labez !~ '^z[u-z]' AND labezsuf = ''
 GROUP BY begadr, endadr, labez
 HAVING count (DISTINCT lesart) > 1
 """
@@ -134,13 +134,21 @@ def copy_att (dba, parameters):
     dest_columns_lac = set ([c.name.lower () for c in lac_model.columns])
 
     # these columns get special treatment
-    dest_columns_att -= set (('id', ))
-    dest_columns_lac -= set (('id', ))
+    # id is irrelevant, row gets a new id anyway
+    # fehler is varchar in CL, integer in Acta
+    dest_columns_att -= set (('id', 'fehler'))
+    dest_columns_lac -= set (('id', 'fehler'))
 
     dba_meta = sqlalchemy.schema.MetaData (bind = dba.engine)
     dba_meta.reflect ()
 
     with dba.engine.begin () as dest:
+
+        if book == 'Jc':
+            execute (dest, """
+            UPDATE original_att SET labezsuf = labezsuf || fehler WHERE fehler != ''
+            """, parameters)
+
         execute (dest, """
         TRUNCATE att, lac RESTART IDENTITY
         """, parameters)
@@ -227,6 +235,27 @@ def copy_att (dba, parameters):
             SET labez = 'a/ao1-4'
             WHERE labez = 'a/ao1-ao4';
             """, parameters)
+
+        if book == 'Jc':
+            for t in ('att', 'lac'):
+                fix (conn, "Misformed hs CL (%s)" % t, MISFORMED_HS_TEST, """
+                UPDATE {t} SET hs = '2718'  WHERE hs = ''  AND hsnr = 327180;
+                UPDATE {t} SET hs = '2718s' WHERE              hsnr = 327181;
+                """, dict (parameters, t = t))
+
+            execute (conn, """
+            UPDATE att SET labezsuf = '' WHERE labezsuf = '(Teil-) LŸcke';
+            """, parameters)
+
+            fix (conn, "More than one labez for lesart CL", LABEZ_TO_LESART_TEST, """
+            UPDATE att
+            SET labez = 'a'
+            WHERE (begadr, endadr, hs) =  (260105012, 260105020, '03');
+            """, parameters)
+
+            fix (conn, "More than one lesart for labez CL", LESART_TO_LABEZ_TEST, """
+            """, parameters)
+
 
         if book == 'Mark':
             # Rule: zv should be treated like zz. Meeting 28.06.2018
@@ -581,7 +610,7 @@ def process_sigla (dba, parameters):
 
     with dba.engine.begin () as conn:
 
-        if book == 'Acts':
+        if book in ('Acts', 'Jc'):
             fix (conn, "Duplicate readings", """
             SELECT hs, hsnr, begadr, endadr, labez, labezsuf, lesart FROM att
             WHERE (hsnr, begadr, endadr) IN (
@@ -595,6 +624,15 @@ def process_sigla (dba, parameters):
             """, """
             DELETE FROM att
             WHERE (hs, begadr, endadr) = ('P74', 50124030, 50125002)
+            """, parameters)
+
+        if book in ('Acts', 'Mark', 'John'):
+            warn (conn, "Hs with more than one hsnr", HS_TO_HSNR_TEST, parameters)
+
+        if book == 'Jc':
+            fix (conn, "Hs with more than one hsnr CL", HS_TO_HSNR_TEST, """
+            UPDATE att SET hs = '1831s' WHERE hsnr = 318311;
+            UPDATE att SET hs = '206s'  WHERE hsnr = 302061;
             """, parameters)
 
         if book == 'John':
@@ -618,9 +656,7 @@ def process_sigla (dba, parameters):
 
     with dba.engine.begin () as conn:
 
-        warn (conn, "Hs with more than one hsnr", HS_TO_HSNR_TEST, parameters)
-
-        if book == 'Acts':
+        if book in ('Acts', 'Jc'):
             fix (conn, "Hsnr with more than one hs Acts", HSNR_TO_HS_TEST, """
             UPDATE att AS t
             SET hs = g.minhs
@@ -1619,6 +1655,8 @@ def build_MT_text (dba, parameters):
 
         if book == 'Acts':
             byzlist = tools.BYZ_HSNR_ACTS
+        elif book == 'Jc':
+            byzlist = tools.BYZ_HSNR_CL
         elif book == 'Mark':
             byzlist = tools.BYZ_HSNR_MARK
         elif book == 'John':
@@ -1731,7 +1769,7 @@ if __name__ == '__main__':
 
     parameters = dict ()
     book = config['BOOK']
-    if book == 'Acts':
+    if book in ('Acts', 'Jc'):
         parameters['re_hs_t']  = '^(A|MT|([P0L]?[1-9][0-9]*)(s[1-9]?)?)'
         parameters['re_hs']    = '^(A|MT|([P0L]?[1-9][0-9]*)(s[1-9]?)?)'
         parameters['re_supp']  = 's[1-9]?'   # later supplements

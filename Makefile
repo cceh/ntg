@@ -71,6 +71,7 @@ psql:
 # CREATE DATABASE ntg_user OWNER ntg;
 # CREATE DATABASE acts_ph4 OWNER ntg;
 # \c acts_ph4
+# CREATE SCHEMA ntg AUTHORIZATION ntg;
 # CREATE EXTENSION mysql_fdw;
 # GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
 # \q
@@ -87,7 +88,7 @@ import_acts:
 import_cl:
 	-$(MYSQL) -e "DROP DATABASE ECM_CLPh2"
 	$(MYSQL) -e "CREATE DATABASE ECM_CLPh2"
-	cat ../dumps/CLBez.dump | $(MYSQL) -D ECM_CLPh2
+	cat ../dumps/CL_export.dump | $(MYSQL) -D ECM_CLPh2
 	python3 -m scripts.cceh.import -vvv server/instance/cl_ph2.conf
 
 import_john:

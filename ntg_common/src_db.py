@@ -144,7 +144,7 @@ class LocStemEdAct01 (Base):
 
        Optionally second source of reading.
 
-    .. attribute:: begadr, endar
+    .. attribute:: begadr, endadr
 
        The passage.
 

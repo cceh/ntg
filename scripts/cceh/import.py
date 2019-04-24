@@ -53,10 +53,17 @@ def copy_table_fdw (conn, dest_table, fdw, source_table):
     """, dict (parameters, fdw = fdw, dest_table = dest_table, source_table = source_table))
 
 
-def concat_tables_fdw (conn, meta, dest_table, fdw, source_tables):
+def concat_tables_fdw (conn, meta, dest_table, fdw, table_mask):
     """Concatenate multiple tables into one."""
 
-    source_table = source_tables.format (n = '01')
+    table_mask = re.compile ('^%s$' % table_mask)
+
+    # find the first source table
+    source_table = None
+    for t in sorted (meta.tables.keys ()):
+        if table_mask.match (t):
+            source_table = t
+            break
 
     execute (conn, """
     DROP TABLE IF EXISTS {dest_table}
@@ -74,7 +81,6 @@ def concat_tables_fdw (conn, meta, dest_table, fdw, source_tables):
             execute (conn, 'ALTER TABLE {dest_table} RENAME COLUMN "{source_column}" TO "{dest_column}"',
                      dict (parameters, dest_table = dest_table, source_column = column, dest_column = column.lower ()))
 
-    table_mask = re.compile ('^' + (source_tables.format (n = r'\d\d')) + '$')
     for source_table in sorted (meta.tables.keys ()):
         if not table_mask.match (source_table):
             continue
@@ -147,14 +153,17 @@ def import_genealogical_fdw (dbsrc, dbdest, parameters):
             log (logging.INFO, "  Importing mysql locstem tables ...")
             concat_tables_fdw (dest, dbsrc_meta, 'original_locstemed', 'var_fdw', config['MYSQL_LOCSTEM_TABLES'])
 
+    with dbdest.engine.begin () as dest:
         if config.get ('MYSQL_RDG_TABLES'):
             log (logging.INFO, "  Importing mysql rdg tables ...")
             concat_tables_fdw (dest, dbsrc_meta, 'original_rdg',       'var_fdw', config['MYSQL_RDG_TABLES'])
 
+    with dbdest.engine.begin () as dest:
         if config.get ('MYSQL_VAR_TABLES'):
             log (logging.INFO, "  Importing mysql var tables ...")
             concat_tables_fdw (dest, dbsrc_meta, 'original_var',       'var_fdw', config['MYSQL_VAR_TABLES'])
 
+    with dbdest.engine.begin () as dest:
         if config.get ('MYSQL_MEMO_TABLE'):
             log (logging.INFO, "  Importing mysql memo table ...")
             copy_table_fdw    (dest,             'original_memo',      'var_fdw', config['MYSQL_MEMO_TABLE'])
