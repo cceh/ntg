@@ -14,6 +14,7 @@ import sqlalchemy
 
 from ntg_common import tools
 from ntg_common import db_tools
+from ntg_common.exceptions import PrivilegeError
 from ntg_common.db_tools import execute
 
 from .helpers import parameters, Passage, make_json_response, make_text_response
@@ -26,41 +27,6 @@ RE_VALID_CLIQUE = re.compile ('^[0-9]$')
 RE_EXTRACT_LABEZ = re.compile ('^([*]|[?]|[a-z]{1,2})')
 
 app = flask.Blueprint ('the_editor', __name__)
-
-class EditException (Exception):
-    """ See: http://flask.pocoo.org/docs/0.12/patterns/apierrors/ """
-
-    default_status_code = 400
-
-    def __init__ (self, message, status_code=None, payload=None):
-        Exception.__init__ (self)
-        self.message     = 'Error: ' + message
-        self.status_code = status_code or self.default_status_code
-        self.payload     = payload
-
-    def to_dict (self):
-        rv = dict ()
-        rv['status']  = self.status_code
-        rv['message'] = self.message
-        if self.payload:
-            rv['payload'] = self.payload
-        return rv
-
-
-class EditError (EditException):
-    pass
-
-
-class PrivilegeError (EditException):
-    pass
-
-
-@app.app_errorhandler (EditException)
-def handle_invalid_edit (ex):
-    response = flask.jsonify (ex.to_dict ())
-    response.status_code = ex.status_code
-    return response
-
 
 @app.endpoint ('stemma-edit')
 def stemma_edit (passage_or_id):

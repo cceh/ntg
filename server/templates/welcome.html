@@ -1,0 +1,45 @@
+{% extends "site.html" %}
+
+{% block head %}
+  <title>Welcome</title>
+
+  <style>
+    hr { border-color: #cccccc; margin: 0; }
+    .no-margins { margin: 0px; }
+    .with-margins { margin: 10px; }
+    .col-centered { float: none; margin: 0 auto; }
+    ul.linklist   { margin-top: 2em }
+  </style>
+{% endblock %}
+
+{% block h1 %}
+  <h1>Welcome</h1>
+{% endblock %}
+
+{% block content %}
+<p>Proceed from here:</p>
+
+<ul class="linklist">
+  <li>
+    <a href="/mark/ph12/">Mark Phase 1.2</a>
+  </li>
+  <li>
+    <a href="/john/ph1/">John Phase 1</a>
+  </li>
+  <li>
+    <a href="/john_f1/ph1/">John Family 1 Phase 1</a>
+  </li>
+  <li>
+    <a href="/acts/ph3/">Acts Phase 3</a>
+  </li>
+  <li>
+    <a href="/acts/ph4/">Acts Phase 4</a>
+  </li>
+  <li>
+    <a href="/acts/ph5/">Acts Phase 5</a>
+  </li>
+  <li>
+    <a href="/cl/ph2/">Catholic Letters Phase 2</a>
+  </li>
+</ul>
+{% endblock %}

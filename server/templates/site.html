@@ -9,6 +9,8 @@
     <script src="/js/runtime.bundle.js?{{config['server_start_time']}}"></script>
     <script src="/js/vendor.bundle.js?{{config['server_start_time']}}"></script>
     <script src="/js/app.bundle.js?{{config['server_start_time']}}"></script>
+    {% block head %}
+    {% endblock %}
   </head>
 
   <body class="page_{% block page_class %}undefined{% endblock %}">
@@ -27,21 +29,18 @@
         {% endblock %}
         </div>
       </div>
-      <div class="container bs-docs-container">
-        <div class="clearfix">
-          <div class="pull-right">
-          {% if call_or_get(current_user.is_authenticated) %}
-            <a href="{{ url_for('user.profile') }}">{{ current_user.username }}</a>
-            &#xa0; | &#xa0;
-            <a class="user_logout_link" href="{{ url_for('user.logout') }}">Sign out</a>
-          {% endif %}
-          </div>
-        </div>
+      <div class="container bs-docs-container d-flex flex-row justify-content-end">
+        {% if call_or_get(current_user.is_authenticated) %}
+          <a href="{{ url_for('user.profile') }}">{{ current_user.username }}</a>
+          &#xa0; | &#xa0;
+          <a class="user_logout_link" href="{{ url_for('user.logout') }}">Sign out</a>
+          &#xa0; | &#xa0;
+        {% endif %}
         {% block menu %}
-        <div class="helpmenu">
           <a href="/static/pdf/GenQ4_Guide.pdf" target="_blank">Short Guide (PDF)</a>
-        </div>
-        {% endblock %}
+          {% endblock %}
+      </div>
+      <div class="container bs-docs-container">
         {% block flash_messages %}
            {%- set messages = get_flashed_messages (with_categories = True) -%}
            {% if messages %}
@@ -55,7 +54,9 @@
                  {{ message|safe }}</div>
               {% endfor %}
            {% endif %}
-        {% endblock %}
+           {% endblock %}
+      </div>
+      <div class="container bs-docs-container">
         {% block content %}
         {% endblock %}
       </div>

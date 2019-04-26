@@ -31,6 +31,11 @@
       <!-- container for eventual messages -->
     </div>
 
+    <div class="container bs-docs-container login_required_message"
+         v-if="!$store.state.current_user.roles.includes ($store.state.current_application.access)">
+      To use this section you must have the '{{ $store.state.current_application.access }}' privilege.
+    </div>
+
   </div>
 </template>
 
@@ -90,6 +95,10 @@ div.bs-docs-header {
 
 div.bs-docs-container {
     margin-bottom: ($spacer * 0.5);
+}
+
+div.login_required_message {
+    color: red;
 }
 
 div.login-nav {

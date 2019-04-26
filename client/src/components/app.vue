@@ -25,7 +25,8 @@ const store = new Vuex.Store ({
             'hr'      : '',
         },
         'current_application' : {
-            'name' : 'ntg',
+            'name'   : 'ntg',
+            'access' : 'none',
         },
         'current_user' : {
             'is_logged_in' : false,

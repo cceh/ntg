@@ -24,6 +24,7 @@ from ntg_common.config import init_cmdline
 from ntg_common.tools import log
 from ntg_common import tools
 from ntg_common import db_tools
+from ntg_common.exceptions import EditException, PrivilegeError
 
 from . import helpers
 from .helpers import parameters, Passage, Manuscript, \
@@ -106,17 +107,29 @@ def get_excluded_ms_ids (conn, include):
     return tuple ([ row[0] for row in res ] or [ -1 ])
 
 
-@app.endpoint ('application.json')
-def application_json ():
-    """Endpoint.  Serve information about the application."""
+def auth ():
+    """ Check if user is authorized to see what follows. """
 
     conf = current_app.config
+    access = conf.get ('ACCESS', 'jesus').lower ()
 
-    return make_json_response ({
-        'name'  : conf['APPLICATION_NAME'],
-        'root'  : conf['APPLICATION_ROOT'],
-        'start' : conf['server_start_time'],
-    })
+    if access != 'public':
+        if not flask_login.current_user.has_role (access):
+            raise PrivilegeError ('You don\'t have %s privilege.' % access)
+
+
+@app.app_errorhandler (EditException)
+def handle_invalid_edit (ex):
+    response = flask.jsonify (ex.to_dict ())
+    response.status_code = ex.status_code
+    return response
+
+
+@static_app.endpoint ('welcome')
+def welcome ():
+    """Endpoint.  Serve welcome page."""
+
+    return flask.render_template ('welcome.html')
 
 
 @app.endpoint ('messages.json')
@@ -126,17 +139,35 @@ def messages_json ():
     return make_json_response (flask.get_flashed_messages (with_categories = True) or [])
 
 
+@app.endpoint ('application.json')
+def application_json ():
+    """Endpoint.  Serve information about the application."""
+
+    conf = current_app.config
+
+    return make_json_response ({
+        'name'   : conf['APPLICATION_NAME'],
+        'root'   : conf['APPLICATION_ROOT'],
+        'access' : conf.get ('ACCESS', 'none'),
+        'start'  : conf['server_start_time'],
+    })
+
+
 @app.endpoint ('user.json')
 def user_json ():
     """Endpoint.  Serve information about the current user."""
 
     user = flask_login.current_user
     logged_in = user.is_authenticated
+    roles = ['public']
+    if logged_in:
+        roles += [r.name for r in user.roles]
 
     return make_json_response ({
         'is_logged_in' : logged_in,
         'is_editor' :    logged_in and user.has_role ('editor'),
         'username' :     user.username if logged_in else 'anonymous',
+        'roles' :        roles,
     })
 
 
@@ -154,6 +185,8 @@ def passage_json (passage_or_id = None):
     :param string button:        The button pressed.
 
     """
+
+    auth ()
 
     passage_or_id = request.args.get ('pass_id') or passage_or_id or '0'
 
@@ -187,6 +220,8 @@ def cliques_json (passage_or_id):
 
     """
 
+    auth ()
+
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
         return make_json_response (passage.cliques ())
@@ -195,6 +230,8 @@ def cliques_json (passage_or_id):
 @app.endpoint ('leitzeile.json')
 def leitzeile_json (passage_or_id = None):
     """Endpoint.  Serve the leitzeile for the verse containing passage_or_id. """
+
+    auth ()
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -234,6 +271,8 @@ def suggest_json ():
     the database.
 
     """
+
+    auth ()
 
     # the name of the current field
     field   = request.args.get ('currentfield')
@@ -314,6 +353,8 @@ def ranges_json (passage_or_id):
 
     """
 
+    auth ()
+
     passage_or_id = request.args.get ('pass_id') or passage_or_id or '0'
 
     with current_app.config.dba.engine.begin () as conn:
@@ -342,6 +383,8 @@ def manuscript_json (hs_hsnr_id):
 
     """
 
+    auth ()
+
     hs_hsnr_id = request.args.get ('ms_id') or hs_hsnr_id
 
     with current_app.config.dba.engine.begin () as conn:
@@ -356,6 +399,8 @@ def manuscript_full_json (hs_hsnr_id, passage_or_id):
     :param string hs_hsnr_id: The hs, hsnr or id of the manuscript.
 
     """
+
+    auth ()
 
     hs_hsnr_id = request.args.get ('ms_id') or hs_hsnr_id
     chapter    = request.args.get ('range') or 'All'
@@ -413,6 +458,8 @@ def relatives_csv (hs_hsnr_id, passage_or_id):
     manuscript and what they attest.
 
     """
+
+    auth ()
 
     type_     = request.args.get ('type') or 'rel'
     chapter   = request.args.get ('range') or 'All'
@@ -507,9 +554,11 @@ def relatives_csv (hs_hsnr_id, passage_or_id):
         return csvify (Relatives._fields, list (map (Relatives._make, res)))
 
 
-@app.endpoint ('attesting')
+@app.endpoint ('attesting.csv')
 def attesting (passage_or_id, labez):
     """ Serve all relatives of all mss. attesting labez at passage. """
+
+    auth ()
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -789,6 +838,8 @@ def textflow (passage_or_id):
 def textflow_dot (passage_or_id):
     """ Return a textflow diagram in .dot format. """
 
+    auth ()
+
     dot = textflow (passage_or_id)
     dot = tools.graphviz_layout (dot)
     return make_dot_response (dot)
@@ -797,6 +848,8 @@ def textflow_dot (passage_or_id):
 @app.endpoint ('textflow.png')
 def textflow_png (passage_or_id):
     """ Return a textflow diagram in .png format. """
+
+    auth ()
 
     dot = textflow (passage_or_id)
     png = tools.graphviz_layout (dot, format = 'png')
@@ -938,6 +991,8 @@ def comparison_detail ():
 def comparison_summary_csv ():
     """Endpoint. Serve a CSV table. (see also :func:`comparison_summary`)"""
 
+    auth ()
+
     return csvify (_ComparisonRowCalcFields._fields, comparison_summary ())
 
 
@@ -945,12 +1000,16 @@ def comparison_summary_csv ():
 def comparison_detail_csv ():
     """Endpoint. Serve a CSV table. (see also :func:`comparison_detail`)"""
 
+    auth ()
+
     return csvify (_ComparisonDetailRowCalcFields._fields, comparison_detail ())
 
 
 @app.endpoint ('apparatus.json')
 def apparatus_json (passage_or_id):
     """ The contents of the apparatus table. """
+
+    auth ()
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -990,6 +1049,8 @@ def apparatus_json (passage_or_id):
 
 @app.endpoint ('attestation.json')
 def attestation_json (passage_or_id):
+
+    auth ()
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -1048,6 +1109,8 @@ def stemma (passage_or_id):
 def stemma_dot (passage_or_id):
     """ Return a local stemma diagram in .dot format. """
 
+    auth ()
+
     dot = stemma (passage_or_id)
     dot = tools.graphviz_layout (dot)
     return make_dot_response (dot)
@@ -1056,6 +1119,8 @@ def stemma_dot (passage_or_id):
 @app.endpoint ('stemma.png')
 def stemma_png (passage_or_id):
     """ Return a local stemma diagram in .png format. """
+
+    auth ()
 
     dot = stemma (passage_or_id)
     png = tools.graphviz_layout (dot, format = 'png')
@@ -1105,7 +1170,8 @@ if __name__ == "__main__":
 
     static_app.config.from_pyfile (args.config_path.rstrip ('/') + '/_global.conf')
     static_app.config['server_start_time'] = str (int (args.start_time.timestamp ()))
-    static_app.url_map.add (Rule ('/', endpoint = 'index'))
+    static_app.url_map.add (Rule ('/',             endpoint = 'index'))
+    static_app.url_map.add (Rule ('/user/welcome', endpoint = 'welcome'))
 
     static_app.config.dba = db_tools.PostgreSQLEngine (**static_app.config)
     static_app.config['SQLALCHEMY_DATABASE_URI'] = static_app.config.dba.url
@@ -1123,6 +1189,7 @@ if __name__ == "__main__":
         sub_app.config.from_pyfile (args.config_path.rstrip ('/') + '/_global.conf')
         sub_app.config.from_pyfile (fn)
         sub_app.config['server_start_time'] = str (int (args.start_time.timestamp ()))
+        sub_app.config['USER_AFTER_LOGIN_ENDPOINT'] = 'welcome'
 
         sub_app.register_blueprint (app)
         sub_app.register_blueprint (editor.app)
@@ -1144,7 +1211,7 @@ if __name__ == "__main__":
             Rule ('/passage.json/<passage_or_id>',                endpoint = 'passage.json'),
             Rule ('/cliques.json/<passage_or_id>',                endpoint = 'cliques.json'),
             Rule ('/ranges.json/<passage_or_id>',                 endpoint = 'ranges.json'),
-            Rule ('/attesting/<passage_or_id>/<labez>',           endpoint = 'attesting'),
+            Rule ('/attesting.csv/<passage_or_id>/<labez>',       endpoint = 'attesting.csv'),
             Rule ('/apparatus.json/<passage_or_id>',              endpoint = 'apparatus.json'),
             Rule ('/attestation.json/<passage_or_id>',            endpoint = 'attestation.json'),
             Rule ('/stemma.dot/<passage_or_id>',                  endpoint = 'stemma.dot'),
