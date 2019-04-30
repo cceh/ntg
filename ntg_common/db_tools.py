@@ -321,7 +321,7 @@ class PostgreSQLEngine ():
     """ PostgreSQL Database Interface """
 
     @staticmethod
-    def receive_checkout (dbapi_connection, connection_record, connection_proxy):
+    def receive_checkout (dbapi_connection, _connection_record, _connection_proxy):
         """Set a default for the postgres variable ntg.user_id that is used by
         :ref:`tts` tables.
 

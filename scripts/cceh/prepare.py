@@ -135,16 +135,15 @@ def copy_att (dba, parameters):
 
     # these columns get special treatment
     # id is irrelevant, row gets a new id anyway
-    # fehler is varchar in CL, integer in Acta
-    dest_columns_att -= set (('id', 'fehler'))
-    dest_columns_lac -= set (('id', 'fehler'))
+    dest_columns_att -= set (('id', ))
+    dest_columns_lac -= set (('id', ))
 
     dba_meta = sqlalchemy.schema.MetaData (bind = dba.engine)
     dba_meta.reflect ()
 
     with dba.engine.begin () as dest:
 
-        if book == 'Jc':
+        if book == 'CL':
             execute (dest, """
             UPDATE original_att SET labezsuf = labezsuf || fehler WHERE fehler != ''
             """, parameters)
@@ -236,7 +235,7 @@ def copy_att (dba, parameters):
             WHERE labez = 'a/ao1-ao4';
             """, parameters)
 
-        if book == 'Jc':
+        if book == 'CL':
             for t in ('att', 'lac'):
                 fix (conn, "Misformed hs CL (%s)" % t, MISFORMED_HS_TEST, """
                 UPDATE {t} SET hs = '2718'  WHERE hs = ''  AND hsnr = 327180;
@@ -610,7 +609,7 @@ def process_sigla (dba, parameters):
 
     with dba.engine.begin () as conn:
 
-        if book in ('Acts', 'Jc'):
+        if book in ('Acts', 'CL'):
             fix (conn, "Duplicate readings", """
             SELECT hs, hsnr, begadr, endadr, labez, labezsuf, lesart FROM att
             WHERE (hsnr, begadr, endadr) IN (
@@ -629,7 +628,7 @@ def process_sigla (dba, parameters):
         if book in ('Acts', 'Mark', 'John'):
             warn (conn, "Hs with more than one hsnr", HS_TO_HSNR_TEST, parameters)
 
-        if book == 'Jc':
+        if book == 'CL':
             fix (conn, "Hs with more than one hsnr CL", HS_TO_HSNR_TEST, """
             UPDATE att SET hs = '1831s' WHERE hsnr = 318311;
             UPDATE att SET hs = '206s'  WHERE hsnr = 302061;
@@ -656,7 +655,7 @@ def process_sigla (dba, parameters):
 
     with dba.engine.begin () as conn:
 
-        if book in ('Acts', 'Jc'):
+        if book in ('Acts', 'CL'):
             fix (conn, "Hsnr with more than one hs Acts", HSNR_TO_HS_TEST, """
             UPDATE att AS t
             SET hs = g.minhs
@@ -1080,11 +1079,12 @@ def copy_genealogical (dbdest, parameters):
                     row['id'],
                 ])
 
-            executemany_raw (dest, """
-            UPDATE tmp_memo
-            SET remarks = %s
-            WHERE id = %s
-            """, parameters, params)
+            if params:
+                executemany_raw (dest, """
+                UPDATE tmp_memo
+                SET remarks = %s
+                WHERE id = %s
+                """, parameters, params)
 
             # fix it by keeping only the highest id
             fix (dest, "Multiple remarks for passage", """
@@ -1655,7 +1655,7 @@ def build_MT_text (dba, parameters):
 
         if book == 'Acts':
             byzlist = tools.BYZ_HSNR_ACTS
-        elif book == 'Jc':
+        elif book == 'CL':
             byzlist = tools.BYZ_HSNR_CL
         elif book == 'Mark':
             byzlist = tools.BYZ_HSNR_MARK
@@ -1769,7 +1769,7 @@ if __name__ == '__main__':
 
     parameters = dict ()
     book = config['BOOK']
-    if book in ('Acts', 'Jc'):
+    if book in ('Acts', 'CL'):
         parameters['re_hs_t']  = '^(A|MT|([P0L]?[1-9][0-9]*)(s[1-9]?)?)'
         parameters['re_hs']    = '^(A|MT|([P0L]?[1-9][0-9]*)(s[1-9]?)?)'
         parameters['re_supp']  = 's[1-9]?'   # later supplements

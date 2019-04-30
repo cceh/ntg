@@ -55,8 +55,42 @@ def config_from_pyfile (filename):
     return conf
 
 
+def init_logging (args):
+    """ Init the logging stuff. """
+
+    LOG_LEVELS = {
+        0: logging.CRITICAL,  #
+        1: logging.ERROR,     # -v
+        2: logging.WARN,      # -vv
+        3: logging.INFO,      # -vvv
+        4: logging.DEBUG      # -vvvv
+    }
+    args.log_level = LOG_LEVELS.get (args.verbose, logging.DEBUG)
+
+    logging.getLogger ().setLevel (args.log_level)
+    formatter = logging.Formatter (
+        fmt = '{esc0}{relativeCreated:6.0f} - {levelname:7} - {message}{esc1}',
+        style='{'
+    )
+
+    stderr_handler = logging.StreamHandler ()
+    stderr_handler.setFormatter (formatter)
+    logging.getLogger ().addHandler (stderr_handler)
+
+    file_handler = logging.FileHandler ('server.log')
+    file_handler.setFormatter (formatter)
+    logging.getLogger ().addHandler (file_handler)
+
+    if args.log_level == logging.INFO:
+        # sqlalchemy is way too verbose on level INFO
+        sqlalchemy_logger = logging.getLogger ('sqlalchemy.engine')
+        sqlalchemy_logger.setLevel (logging.WARN)
+
+    return args
+
+
 def init_cmdline (parser):
-    """ Init the commandline parameter stuff. """
+    """ Obsolete: Init the commandline parameter stuff. """
 
     parser.parse_args (namespace = args)
 

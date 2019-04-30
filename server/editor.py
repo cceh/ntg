@@ -14,10 +14,10 @@ import sqlalchemy
 
 from ntg_common import tools
 from ntg_common import db_tools
-from ntg_common.exceptions import PrivilegeError
+from ntg_common.exceptions import EditError, PrivilegeError
 from ntg_common.db_tools import execute
 
-from .helpers import parameters, Passage, make_json_response, make_text_response
+from helpers import parameters, Passage, make_json_response, make_text_response
 
 # FIXME: this is too lax but we need to accomodate one spurious 'z' reading
 RE_VALID_LABEZ  = re.compile ('^([*]|[?]|[a-z]{1,2}|z[u-z])$')
@@ -26,9 +26,13 @@ RE_VALID_CLIQUE = re.compile ('^[0-9]$')
 # FIXME: this is too lax but we need to accomodate one spurious 'z' reading
 RE_EXTRACT_LABEZ = re.compile ('^([*]|[?]|[a-z]{1,2})')
 
-app = flask.Blueprint ('the_editor', __name__)
+bp = flask.Blueprint ('editor', __name__)
 
-@app.endpoint ('stemma-edit')
+def init_app (_app):
+    """ Initialize the flask app. """
+
+
+@bp.route ('/stemma-edit/<passage_or_id>', methods = ['POST'])
 def stemma_edit (passage_or_id):
     """Edit a local stemma.
 
@@ -174,8 +178,8 @@ def stemma_edit (passage_or_id):
     raise EditError ('Could not edit local stemma.')
 
 
-@app.endpoint ('notes.txt')
-def notes (passage_or_id):
+@bp.route ('/notes.txt/<passage_or_id>', methods = ['GET', 'PUT'])
+def notes_txt (passage_or_id):
     """Get the editor notes for a passage
 
     """
@@ -214,7 +218,7 @@ def notes (passage_or_id):
         return make_text_response ('')
 
 
-@app.endpoint ('notes.json')
+@bp.route ('/notes.json')
 def notes_json ():
     """Endpoint.  Get a list of all editor notes."""
 

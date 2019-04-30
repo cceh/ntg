@@ -6,7 +6,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import matplotlib.pyplot as plt
-import matplotlib.colors
+from matplotlib import colors
 
 
 def mss_labels (mss):

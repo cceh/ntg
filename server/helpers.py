@@ -10,9 +10,11 @@ import os
 import os.path
 
 import flask
+import flask_login
 
-from ntg_common.db_tools import execute
 from ntg_common import tools
+from ntg_common.db_tools import execute, to_csv
+from ntg_common.exceptions import PrivilegeError
 
 
 parameters = dict ()
@@ -35,9 +37,39 @@ LABEZ_I18N = {
 }
 
 
+EXCLUDE_REGEX_MAP = {
+    'A'  : 'A',
+    'MT' : 'MT',
+    'F'  : 'F[1-9Π][0-9]*'
+}
+""" Regexes for the include/exclude toolbar buttons. """
+
+
+def get_excluded_ms_ids (conn, include):
+    """Get the ms_ids of manuscripts to exclude.
+
+    Helps to implement the buttons "A", "MT", and "F" in the toolbar.
+
+    """
+
+    exclude = set (EXCLUDE_REGEX_MAP.keys ()) - set (include)
+    if not exclude:
+        return tuple ([-1]) # a non-existing id to avoid an SQL syntax error
+    exclude = [ EXCLUDE_REGEX_MAP[x] for x in exclude]
+
+    # get ids of nodes to exclude
+    res = execute (conn, """
+    SELECT ms_id
+    FROM manuscripts
+    WHERE hs ~ '^({exclude})$'
+    ORDER BY ms_id
+    """, dict (parameters, exclude = '|'.join (exclude)))
+
+    return tuple ([ row[0] for row in res ] or [ -1 ])
+
+
 class Bag ():
     """ Class to stick values in. """
-    pass
 
 
 class Manuscript ():
@@ -261,8 +293,12 @@ class Passage ():
         return str (self.start) + '-' + str (self.end)[common:]
 
 
-    def readings (self, prefix = [], suffix = [], delete = []):
+    def readings (self, prefix = None, suffix = None, delete = None):
         # Get a list of all readings for this passage
+
+        prefix = prefix or []
+        suffix = suffix or []
+        delete = delete or []
 
         res = execute (self.conn, """
         SELECT labez
@@ -288,8 +324,12 @@ class Passage ():
         return [ Readings._make (r)._asdict () for r in d.items () ]
 
 
-    def cliques (self, prefix = [], suffix = [], delete = []):
+    def cliques (self, prefix = None, suffix = None, delete = None):
         # Get a list of all cliques for this passage
+
+        prefix = prefix or []
+        suffix = suffix or []
+        delete = delete or []
 
         res = execute (self.conn, """
         SELECT labez, clique, labez_clique (labez, clique) AS labez_clique
@@ -346,6 +386,23 @@ def make_text_response (text, status = 200):
         'content-type' : 'text/plain;charset=utf-8',
         'Access-Control-Allow-Origin' : '*',
     })
+
+
+def csvify (fields, rows):
+    """ Send a HTTP response in CSV format. """
+
+    return make_csv_response (to_csv (fields, rows))
+
+
+def auth ():
+    """ Check if user is authorized to see what follows. """
+
+    conf = flask.current_app.config
+    access = conf['ACCESS']
+
+    if access != 'public':
+        if not flask_login.current_user.has_role (access):
+            raise PrivilegeError ('You don\'t have %s privilege.' % access)
 
 
 DOT_SKELETON = """
@@ -439,7 +496,8 @@ def nx_to_dot_subgraphs (graph, field, width = 960.0, fontsize = 10.0):
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
     sorted_nodes = sorted (graph, key = lambda n: (graph.node[n][field], graph.node[n]['hsnr']))
-    for key, nodes_for_key in itertools.groupby (sorted_nodes, key = lambda n: graph.node[n][field]):
+    for key, nodes_for_key in itertools.groupby (sorted_nodes,
+                                                 key = lambda n: graph.node[n][field]):
         dot.append ("subgraph \"cluster_%s\" {" % key)
         dot.append ("style=rounded")
         dot.append ("labeljust=l")

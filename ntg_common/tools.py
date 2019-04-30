@@ -2,11 +2,8 @@
 
 """ This module contains some useful functions. """
 
-import datetime
 import logging
 import subprocess
-
-from .config import args
 
 BOOKS = [
     # id, siglum, name,            no. of chapters
@@ -88,7 +85,7 @@ def quote (s):
     return s
 
 
-def log (level, msg, *aargs, **kwargs):
+def log (level, msg, *aargs, **_kwargs):
     """
     Low level log function
     """

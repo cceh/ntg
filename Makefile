@@ -1,3 +1,6 @@
+PRJ_DIR     := prj/ntg/ntg
+ROOT        := $(UNI_DIR)/$(PRJ_DIR)
+
 NTG_HOST    := ntg.cceh.uni-koeln.de
 NTG_USER    := ntg
 
@@ -50,8 +53,8 @@ dev-server-production:
 	cd client; make dev-server-production; cd ..
 	cd server; make server; cd ..
 
-# cd server; make server; cd ..
 server:
+	export PYTHONPATH=$(ROOT)/server:$(ROOT); \
 	python3 -m server.server -vvv
 
 users:
@@ -60,18 +63,12 @@ users:
 clean: client-clean
 	find . -depth -name "*~" -delete
 
-psql:
-	ssh -f -L 1$(PSQL_PORT):localhost:$(PSQL_PORT) $(NTG) sleep 120
-	sleep 1
-	psql -h localhost -p 1$(PSQL_PORT) -U $(NTG_USER) acts_ph4
-
 # sudo -u postgres psql
 #
 # CREATE USER ntg CREATEDB PASSWORD '<password>';
 # CREATE DATABASE ntg_user OWNER ntg;
 # CREATE DATABASE acts_ph4 OWNER ntg;
 # \c acts_ph4
-# CREATE SCHEMA ntg AUTHORIZATION ntg;
 # CREATE EXTENSION mysql_fdw;
 # GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
 # \q
@@ -86,9 +83,12 @@ import_acts:
 	python3 -m scripts.cceh.import -vvv server/instance/acts_ph4.conf
 
 import_cl:
-	-$(MYSQL) -e "DROP DATABASE ECM_CLPh2"
-	$(MYSQL) -e "CREATE DATABASE ECM_CLPh2"
-	cat ../dumps/CL_export.dump | $(MYSQL) -D ECM_CLPh2
+	-$(MYSQL) -e "DROP DATABASE ECM_CL_Ph2"
+	$(MYSQL) -e "CREATE DATABASE ECM_CL_Ph2"
+	cat ../dumps/CL_export.dump | $(MYSQL) -D ECM_CL_Ph2
+	-$(MYSQL) -e "DROP DATABASE VG_CL_Ph2"
+	$(MYSQL) -e "CREATE DATABASE VG_CL_Ph2"
+	cat ../dumps/ECM_KB_2.dump | $(MYSQL) -D VG_CL_Ph2
 	python3 -m scripts.cceh.import -vvv server/instance/cl_ph2.conf
 
 import_john:
@@ -104,12 +104,6 @@ import_john_f1:
 	python3 -m scripts.cceh.import -vvv server/instance/john_f1_ph1.conf
 
 import_mark:
-	-$(MYSQL) -e "DROP DATABASE ECM_Mark_Ph1"
-	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph1"
-	cat ../dumps/ECM_Mk_CBGM.dump | $(MYSQL) -D ECM_Mark_Ph1
-	python3 -m scripts.cceh.import -vvv server/instance/mark_ph1.conf
-
-import_mark_2:
 	-$(MYSQL) -e "DROP DATABASE ECM_Mark_Ph12"
 	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph12"
 	cat ../dumps/ECM_Mk_CBGM_Milestone2.dump | $(MYSQL) -D ECM_Mark_Ph12
@@ -137,20 +131,12 @@ john_f1:
 	python3 -m scripts.cceh.cbgm    -vvv server/instance/john_f1_ph1.conf
 
 mark:
-	python3 -m scripts.cceh.prepare -vvv server/instance/mark_ph1.conf
-	python3 -m scripts.cceh.cbgm    -vvv server/instance/mark_ph1.conf
-
-mark_2:
 	python3 -m scripts.cceh.prepare -vvv server/instance/mark_ph12.conf
 	python3 -m scripts.cceh.cbgm    -vvv server/instance/mark_ph12.conf
 
 load_mark:
 	scp $(NTG_PRJ)/backups/* backups/
-	python3 -m scripts.cceh.load_edits -i backups/saved_edits_mark_ph1_`date -I`.xml -vvv server/instance/mark_ph1.conf
-
-load_mark_2:
-	scp $(NTG_PRJ)/backups/* backups/
-	python3 -m scripts.cceh.load_edits -i backups/saved_edits_mark_ph1_`date -I`.xml -vvv server/instance/mark_ph12.conf
+	python3 -m scripts.cceh.load_edits -i backups/saved_edits_mark_ph12_`date -I`.xml -vvv server/instance/mark_ph12.conf
 
 define UPLOAD_TEMPLATE =
 
@@ -171,7 +157,7 @@ upload_$(1)_from_home:
 
 endef
 
-DBS := acts_ph4 john_ph1 john_f1_ph1 mark_ph1 mark_ph12
+DBS := acts_ph4 john_ph1 john_f1_ph1 mark_ph12 cl_ph2
 
 $(foreach db,$(DBS),$(eval $(call UPLOAD_TEMPLATE,$(db))))
 
@@ -194,8 +180,7 @@ diff_affinity_john:
 lint: pylint eslint csslint
 
 pylint:
-	cd server; make pylint; cd ..
-	-pylint $(PY_SOURCES)
+	-pylint --rcfile=pylintrc server ntg_common
 
 csslint:
 	cd client ; make csslint ; cd ..

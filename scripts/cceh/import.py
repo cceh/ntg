@@ -29,6 +29,7 @@ After running this script should run the `prepare.py` script.
 """
 
 import argparse
+import collections
 import logging
 import re
 
@@ -58,13 +59,26 @@ def concat_tables_fdw (conn, meta, dest_table, fdw, table_mask):
 
     table_mask = re.compile ('^%s$' % table_mask)
 
-    # find the first source table
+    # find the set of fields common to all input tables.  check types also.  it
+    # is ridiculous that we have to do this but the table structures are highly
+    # inconsistent even between chapters of the same book.
     source_table = None
+    column_set = collections.OrderedDict ()
     for t in sorted (meta.tables.keys ()):
         if table_mask.match (t):
-            source_table = t
-            break
+            source_model = sqlalchemy.Table (t, meta, autoload = True)
+            if source_table is None:
+                source_table = t
+                for c in source_model.columns:
+                    column_set[c.name] = c.type.python_type
+            else:
+                col_set = { c.name : c.type.python_type for c in source_model.columns }
+                for name, type_ in list (column_set.items ()):
+                    if col_set.get (name, '') != type_:
+                        del column_set[name]
 
+    # create a table with those fields common to all input tables, lowercase the
+    # field names
     execute (conn, """
     DROP TABLE IF EXISTS {dest_table}
     """, dict (parameters, dest_table = dest_table))
@@ -74,24 +88,27 @@ def concat_tables_fdw (conn, meta, dest_table, fdw, table_mask):
     """, dict (parameters, dest_table = dest_table, source_table = source_table, fdw = fdw))
 
     source_model = sqlalchemy.Table (source_table, meta, autoload = True)
-    columns = [column.name for column in source_model.columns]
+    cols = [column.name for column in source_model.columns]
 
-    for column in columns:
-        if column != column.lower ():
-            execute (conn, 'ALTER TABLE {dest_table} RENAME COLUMN "{source_column}" TO "{dest_column}"',
+    for column in cols:
+        if column in column_set:
+            if column != column.lower ():
+                execute (conn, 'ALTER TABLE {dest_table} RENAME COLUMN "{source_column}" TO "{dest_column}"',
+                         dict (parameters, dest_table = dest_table, source_column = column, dest_column = column.lower ()))
+        else:
+            execute (conn, 'ALTER TABLE {dest_table} DROP COLUMN "{source_column}"',
                      dict (parameters, dest_table = dest_table, source_column = column, dest_column = column.lower ()))
 
+    execute (conn, """COMMIT""", parameters);
+
+    # concat the input tables
     for source_table in sorted (meta.tables.keys ()):
         if not table_mask.match (source_table):
             continue
         log (logging.DEBUG, "    Copying table %s" % source_table)
 
-        # some tables in att do not contain the field 'fehler'
-        source_model = sqlalchemy.Table (source_table, meta, autoload = True)
-        columns = [column.name for column in source_model.columns]
-
-        source_columns = ['"' + column + '"'          for column in columns]
-        dest_columns   = ['"' + column.lower () + '"' for column in columns]
+        source_columns = ['"' + column + '"'          for column in column_set.keys ()]
+        dest_columns   = ['"' + column.lower () + '"' for column in column_set.keys ()]
 
         execute (conn, """
         INSERT INTO {dest_table} ({dest_columns})

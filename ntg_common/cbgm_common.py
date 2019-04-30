@@ -10,13 +10,12 @@ import logging
 import networkx as nx
 import numpy as np
 
-from ntg_common import db
 from ntg_common import db_tools
-from ntg_common.db_tools import execute, executemany, executemany_raw, warn, debug
+from ntg_common.db_tools import execute, executemany, executemany_raw
 from ntg_common.tools import log
 
 
-class CBGM_Params (object):
+class CBGM_Params ():
     """ Structure that holds intermediate results of the CBGM. """
 
     n_mss = 0
@@ -185,7 +184,7 @@ def count_by_range (a, range_starts, range_ends):
     return cs_end - cs_start
 
 
-def calculate_mss_similarity_preco (dba, parameters, val):
+def calculate_mss_similarity_preco (_dba, _parameters, val):
     r"""Calculate pre-coherence mss similarity
 
     The pre-coherence similarity is defined as:
@@ -339,7 +338,7 @@ def calculate_mss_similarity_postco (dba, parameters, val, do_checks = True):
                 mask_matrix     [row.ms_id, row.pass_id] = attrs['mask']
                 parent_matrix   [row.ms_id, row.pass_id] = attrs['parents']
                 ancestor_matrix [row.ms_id, row.pass_id] = attrs['ancestors']
-            except KeyError as e:
+            except KeyError:
                 error_count += 1
                 # print (row.pass_id + 1)
                 # print (str (e))

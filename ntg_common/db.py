@@ -138,6 +138,10 @@ def generic (metadata, create_cmd, drop_cmd):
 # Input tables from the Nestle-Aland database
 
 Base = declarative_base ()
+
+CreateGeneric ('CREATE SCHEMA ntg').execute_at ('before-create', Base.metadata)
+DropGeneric ('DROP SCHEMA IF EXISTS ntg CASCADE').execute_at ('after-drop', Base.metadata)
+
 Base.metadata.schema = 'ntg'
 
 class Att (Base):
@@ -253,6 +257,11 @@ class Att (Base):
           wahrscheinliche Lesung.  Ist für die CBGM als sichere Lesart zu
           akzeptieren.
 
+    .. attribute:: fehler
+
+       Denotes an orthografical error in Catholic Letters.  This became part of
+       labezsuf in the other books.
+
     .. attribute:: base
 
        Basistext. Nur relevant bei :ref:`Fehlversen <fehlvers>`.
@@ -299,7 +308,7 @@ class Att (Base):
     labezsuforig = Column (String(64),    server_default = '')
     suffix2      = Column (String(32),    server_default = '')
     kontrolle    = Column (String(1),     server_default = '')
-    fehler       = Column (Integer,       server_default = '0')
+    fehler       = Column (String(2),     server_default = '')
     suff         = Column (String(32),    server_default = '')
     vid          = Column (String(32),    server_default = '')
     vl           = Column (String(32),    server_default = '')
@@ -357,7 +366,7 @@ class Lac (Base):
     lesart    = Column (String(1024),  server_default = '')
     suffix2   = Column (String(32),    server_default = '')
     kontrolle = Column (String(1),     server_default = '')
-    fehler    = Column (Integer,       server_default = '0')
+    fehler    = Column (String(2),     server_default = '')
     suff      = Column (String(32),    server_default = '')
     vid       = Column (String(32),    server_default = '')
     vl        = Column (String(32),    server_default = '')

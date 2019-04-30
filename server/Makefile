@@ -3,4 +3,4 @@
 PY_SOURCES := *.py
 
 pylint:
-	-pylint $(PY_SOURCES)
+	-pylint --rcfile=../pylintrc ../server ../ntg_common

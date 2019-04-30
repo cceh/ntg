@@ -8,35 +8,22 @@ See: CBGM_Pres.pdf p. 490ff.
 
 import collections
 import itertools
-import logging
-import re
 
 import flask
 from flask import request, current_app
-import flask_login
 
 import numpy as np
-import networkx as nx
-import sqlalchemy
 
-from ntg_common import tools
-from ntg_common import db_tools
-from ntg_common.db_tools import execute, to_csv
-from ntg_common.cbgm_common import CBGM_Params, create_labez_matrix, \
-    calculate_mss_similarity_preco, calculate_mss_similarity_postco
+from ntg_common.db_tools import execute
+from ntg_common.cbgm_common import CBGM_Params, create_labez_matrix
 
-from .helpers import parameters, Passage, Manuscript, \
-    make_json_response, make_csv_response, make_text_response
+from helpers import Passage, Manuscript, make_json_response, csvify
 
 
 MAX_COVER_SIZE = 12
 
-app = flask.Blueprint ('set_cover', __name__)
 
-def csvify (fields, rows):
-    """ Send a HTTP response in CSV format. """
-
-    return make_csv_response (to_csv (fields, rows))
+bp = flask.Blueprint ('set_cover', __name__)
 
 
 def get_ancestors (conn, rg_id, ms_id):
@@ -46,15 +33,7 @@ def get_ancestors (conn, rg_id, ms_id):
     view = 'affinity_view' if mode == 'rec' else 'affinity_p_view'
 
     res = execute (conn, """
-    SELECT aff.ms_id2 as ms_id,
-           aff.ms2_length,
-           aff.common,
-           aff.equal,
-           aff.older,
-           aff.newer,
-           aff.unclear,
-           aff.common - aff.equal - aff.older - aff.newer - aff.unclear as norel,
-           aff.affinity
+    SELECT aff.ms_id2 as ms_id
     FROM
       {view} aff
     WHERE aff.ms_id1 = :ms_id1 AND aff.rg_id = :rg_id
@@ -64,18 +43,14 @@ def get_ancestors (conn, rg_id, ms_id):
                rg_id   = rg_id,
                view    = view))
 
-    ancestors = collections.namedtuple (
-        'Ancestors',
-        'ms_id length common equal older newer unclear norel affinity'
-    )
-
     return frozenset ([r[0] for r in res])
 
 
 def powerset (iterable):
     """powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"""
     s = list (iterable)
-    return itertools.chain.from_iterable (itertools.combinations (s, r) for r in range (len (s) + 1))
+    return itertools.chain.from_iterable (
+        itertools.combinations (s, r) for r in range (len (s) + 1))
 
 
 WITH_SELECT = """
@@ -86,8 +61,9 @@ WITH_SELECT = """
 """
 
 def init (db):
+    """ Do some preparative calculations and cache the results. """
+
     val = CBGM_Params ()
-    parameters = {}
 
     with db.engine.begin () as conn:
         # get max number of different cliques in any one passage
@@ -106,7 +82,7 @@ def init (db):
         assert n_cliques < 64
 
         # load all attestations into one big numpy array
-        create_labez_matrix (db, parameters, val)
+        create_labez_matrix (db, {}, val)
 
         # build a mask of all readings of all mss.
         # every labez_clique gets an id (in the range 1..63)
@@ -187,6 +163,8 @@ def build_explain_matrix (conn, val, ms_id):
 
 
 def init_app (app):
+    """ Init the Flask app. """
+
     app.config.val = None
     app.config.set_cover_rg_id = None
 
@@ -211,7 +189,7 @@ def init_app (app):
             pass # FIXME
 
 
-@app.endpoint ('set-cover.json')
+@bp.route ('/set-cover.json/<hs_hsnr_id>')
 def set_cover_json (hs_hsnr_id):
     """ Approximate the minimum set cover for a manuscript.
 
@@ -225,7 +203,6 @@ def set_cover_json (hs_hsnr_id):
             current_app.config.val = init (current_app.config.dba)
         val = current_app.config.val
 
-        parameters = {}
         cover = []
 
         ms = Manuscript (conn, hs_hsnr_id)
@@ -234,7 +211,7 @@ def set_cover_json (hs_hsnr_id):
 
         # allow user to pre-select a set of manuscripts
         pre_selected = [ Manuscript (conn, anc_id)
-                      for anc_id in (request.args.get ('pre_select') or '').split () ]
+                         for anc_id in (request.args.get ('pre_select') or '').split () ]
         response['mss'] = [s.to_json () for s in pre_selected]
 
         np.set_printoptions (edgeitems = 8, linewidth = 100)
@@ -247,7 +224,7 @@ def set_cover_json (hs_hsnr_id):
         # eliminate descendants from the matrix
         ancestors = get_ancestors (conn, current_app.config.set_cover_rg_id, ms.ms_id)
         for i in range (0, val.n_mss):
-            if ((i + 1) not in ancestors) :
+            if (i + 1) not in ancestors:
                 b_common[i] = 0
 
         n_defined = np.count_nonzero (val.def_matrix[ms_id])
@@ -311,10 +288,13 @@ def set_cover_json (hs_hsnr_id):
         return make_json_response (response)
 
 
-class Combination (object):
-    def __init__ (self, iter, index):
+class Combination ():
+    """ Represents a combination of manuscripts. """
+
+    def __init__ (self, iterator, index):
         """ Init from an iterable of Manuscripts. """
-        self.mss   = list (iter)
+
+        self.mss   = list (iterator)
         self.index = index
         self.len   = len (self.mss)
         self.vec   = np.array ([ ms.ms_id - 1 for ms in self.mss ])
@@ -323,14 +303,23 @@ class Combination (object):
         self.n_unknown         = 0
         self.n_open            = 0
         self.hint              = False
+        self.unknown_indices   = tuple ([-1])
+        self.open_indices      = tuple ([-1])
+
 
     def score (self):
+        """ Calculate the score for the given combination. """
+
         return 10 * self.n_explained_equal + 5 * self.n_explained_post
 
     def explained (self):
+        """ Calculate how many variants are explained by this combination. """
+
         return self.n_explained_equal + self.n_explained_post
 
     def to_json (self):
+        """ Output the combination in JSON format. """
+
         return {
             'index'  : self.index,
             'mss'    : [ms.to_json () for ms in self.mss],
@@ -343,6 +332,8 @@ class Combination (object):
         }
 
     def to_csv (self):
+        """ Output the combination in CSV format. """
+
         return [
             ' '.join ([ms.hs for ms in self.mss]),
             self.len,
@@ -364,7 +355,6 @@ def _optimal_substemma (ms_id, explain_matrix, combinations, mode):
     val = current_app.config.val
 
     b_defined = val.def_matrix[ms_id]
-    n_defined = np.count_nonzero (b_defined)
     # remove variants where the inspected ms is undefined
     b_common = np.logical_and (val.def_matrix, b_defined)
 
@@ -382,6 +372,7 @@ def _optimal_substemma (ms_id, explain_matrix, combinations, mode):
 
     for comb in combinations:
         # how many passages does this combination explain?
+        # pylint: disable=no-member
         b_explained_equal = np.logical_or.reduce (b_equal[comb.vec])
         b_explained_post  = np.logical_or.reduce (b_post[comb.vec])
         b_explained_post  = np.logical_and (b_explained_post, np.logical_not (b_explained_equal))
@@ -399,7 +390,6 @@ def _optimal_substemma (ms_id, explain_matrix, combinations, mode):
 
         comb.n_unknown = np.count_nonzero (b_unknown)
         comb.n_open = np.count_nonzero (b_open)
-        # comb.n_open = n_defined - comb.n_explained_equal - comb.n_explained_post - comb.n_unknown
 
         if mode == 'detail':
             comb.open_indices    = tuple (int (n + 1) for n in np.nonzero (b_open)[0])
@@ -413,11 +403,11 @@ def _optimal_substemma (ms_id, explain_matrix, combinations, mode):
         def key_explained (c):
             return -c.explained ()
 
-        for k, g in itertools.groupby (sorted (combinations, key = key_len), key = key_len):
+        for _k, g in itertools.groupby (sorted (combinations, key = key_len), key = key_len):
             sorted (g, key = key_explained)[0].hint = True
 
 
-@app.endpoint ('optimal-substemma.json')
+@bp.route ('/optimal-substemma.json')
 def optimal_substemma_json ():
     """Normalize parameters and add some general info.
     """
@@ -448,7 +438,7 @@ _OptimalSubstemmaRow = collections.namedtuple (
     'mss count equal post unknown open hint'
 )
 
-@app.endpoint ('optimal-substemma.csv')
+@bp.route ('/optimal-substemma.csv')
 def optimal_substemma_csv ():
     """Do an exhaustive search for the combination among a given set of ancestors
     that best explains a given manuscript.
@@ -494,13 +484,14 @@ class _OptimalSubstemmaDetailRowCalcFields (_OptimalSubstemmaDetailRow):
 
     @property
     def pass_hr (self):
+        """ Add a field with a human-readable passage id. """
         return Passage.static_to_hr (self.begadr, self.endadr)
 
     def _asdict (self):
         return collections.OrderedDict (zip (self._fields, self + (self.pass_hr, )))
 
 
-@app.endpoint ('optimal-substemma-detail.csv')
+@bp.route ('/optimal-substemma-detail.csv')
 def optimal_substemma_detail_csv ():
     """Report details about one combination of ancestors.
     """
@@ -531,11 +522,11 @@ def optimal_substemma_detail_csv ():
         FROM passages p
           JOIN apparatus_cliques_view v USING (pass_id)
         WHERE v.ms_id = :ms_id AND pass_id IN :open_pass_ids
-        """, dict (parameters,
-                   ms_id = ms.ms_id,
-                   unknown_pass_ids = combinations[0].unknown_indices or tuple ([-1]),
-                   open_pass_ids    = combinations[0].open_indices    or tuple ([-1]))
-        )
+        """, dict (
+            ms_id = ms.ms_id,
+            unknown_pass_ids = combinations[0].unknown_indices,
+            open_pass_ids    = combinations[0].open_indices
+        ))
 
         return csvify (_OptimalSubstemmaDetailRowCalcFields._fields,
                        list (map (_OptimalSubstemmaDetailRowCalcFields._make, res)))
