@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-"""API server.  The textflow and stemma graphic functions."""
+"""The API server for CBGM.  The textflow and stemmata diagrams."""
 
 import collections
 

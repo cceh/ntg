@@ -161,7 +161,7 @@ export default {
             return this.$children[0];
         },
         on_contextmenu (event) {
-            if (this.$store.state.current_user.is_editor) {
+            if (this.$store.getters.can_write) {
                 open_contextmenu (event, this);
             }
         },

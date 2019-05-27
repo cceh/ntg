@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-"""An application server for CBGM.  Editor module.  """
+"""The API server for CBGM.  Stemma editing module. """
 
 import collections
 import logging
@@ -32,6 +32,17 @@ def init_app (_app):
     """ Initialize the flask app. """
 
 
+def edit_auth ():
+    """ Check if user is authorized to edit. """
+
+    conf = flask.current_app.config
+    write_access = conf['WRITE_ACCESS']
+
+    if write_access != 'public':
+        if not flask_login.current_user.has_role (write_access):
+            raise PrivilegeError ('You don\'t have %s privilege.' % write_access)
+
+
 @bp.route ('/stemma-edit/<passage_or_id>', methods = ['POST'])
 def stemma_edit (passage_or_id):
     """Edit a local stemma.
@@ -40,8 +51,7 @@ def stemma_edit (passage_or_id):
 
     """
 
-    if not flask_login.current_user.has_role ('editor'):
-        raise PrivilegeError ('You don\'t have editor privilege.')
+    edit_auth ()
 
     args = request.get_json ()
 
@@ -184,8 +194,7 @@ def notes_txt (passage_or_id):
 
     """
 
-    if not flask_login.current_user.has_role ('editor'):
-        raise PrivilegeError ('You don\'t have editor privilege.')
+    edit_auth ()
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -222,8 +231,7 @@ def notes_txt (passage_or_id):
 def notes_json ():
     """Endpoint.  Get a list of all editor notes."""
 
-    if not flask_login.current_user.has_role ('editor'):
-        raise PrivilegeError ('You don\'t have editor privilege.')
+    edit_auth ()
 
     with current_app.config.dba.engine.begin () as conn:
         res = execute (conn, """

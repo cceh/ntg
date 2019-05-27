@@ -285,7 +285,7 @@ function load_passage (vm, passage) {
     p1.then (() => {
         vm.$card.animate ({ 'width' : (graph_vm.bbox.width + 20) + 'px' });
 
-        if (vm.$store.state.current_user.is_editor) {
+        if (vm.$store.getters.can_write) {
             // Drag a node.
             d3.selectAll ('div.local-stemma-vm g.node.draggable')
                 .call (dragListener (vm));

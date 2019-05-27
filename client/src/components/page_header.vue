@@ -15,7 +15,7 @@
       <router-link v-else :to="{ name : 'index' }">Home</router-link>
       &#xa0; | &#xa0;
       <a href="/pdfs/GenQ4_Guide.pdf" target="_blank">Short Guide (PDF)</a>
-      <template v-if="this.$store.state.current_user.is_logged_in">
+      <template v-if="this.$store.getters.is_logged_in">
         &#xa0; | &#xa0;
         <a href="/user/profile" class="user_profile_link">
           <span class="fas fa-user" /> {{ this.$store.state.current_user.username }}
@@ -25,6 +25,12 @@
           <span class="fas fa-sign-out-alt" /> Sign out
         </a>
       </template>
+      <template v-else>
+        &#xa0; | &#xa0;
+        <a href="/user/sign-in" class="user_login_link">
+          <span class="fas fa-sign-in-alt" /> Sign in
+        </a>
+      </template>
     </div>
 
     <div class="container bs-docs-container flashed_messages">
@@ -32,8 +38,8 @@
     </div>
 
     <div class="container bs-docs-container login_required_message"
-         v-if="!$store.state.current_user.roles.includes ($store.state.current_application.access)">
-      To use this section you must have the '{{ $store.state.current_application.access }}' privilege.
+         v-if="!$store.getters.can_read">
+      Sorry.  You don't have read access to this section.
     </div>
 
   </div>

@@ -61,7 +61,7 @@
           </thead>
           <tbody>
             <template v-for="r in cover">
-              <tr :data-ms-id="r.ms_id" :key="r.ms_id">
+              <tr :data-ms-id="r.ms_id" :key="r.ms_id" @click="on_click (r.cumsum_hs)">
                 <td class="n">{{ r.n }}</td>
                 <td class="hs">{{ r.hs }}</td>
                 <td class="equal">{{ r.equal }}</td>
@@ -117,6 +117,16 @@ export default {
         on_caption (event) {
             // this.caption = event.detail.data;
         },
+        on_click (cumsum) {
+            const vm = this;
+            vm.$router.push ({
+                name : 'opt_stemma',
+                hash : '#' + $.param ({
+                    'ms'        : vm.ms.hs,
+                    'selection' : cumsum,
+                })
+            });
+        },
         on_hashchange () {
             const hash = window.location.hash ? window.location.hash.substring (1) : '';
             if (hash) {
@@ -131,7 +141,13 @@ export default {
                     vm.mss    = responses[0].data.data.mss;
                     vm.input1 = vm.ms.hs;
                     vm.input2 = vm.mss.map (d => d.hs).join (' ');
-                    vm.cover  = responses[0].data.data.cover;
+
+                    let cumsum = [];
+                    vm.cover = responses[0].data.data.cover.map (function (item) {
+                        cumsum.push (item.hs);
+                        item.cumsum_hs = cumsum.join (' ');
+                        return item;
+                    });
                 });
             } else {
                 // reset data

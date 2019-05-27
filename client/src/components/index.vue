@@ -3,16 +3,15 @@
     <page-header :caption="caption" home_url="http://intf.uni-muenster.de/cbgm/acts/" />
 
     <div class="container bs-docs-container">
-      <div v-if="$store.state.current_application.access == 'public' || $store.state.current_user.is_logged_in">
+      <div v-if="$store.getters.can_read">
         <router-link class="biglink" to="coherence">Coherence and Textual Flow</router-link>
         <router-link class="biglink" to="comparison">Comparison of Witnesses</router-link>
         <router-link class="biglink" to="attestation">Find Relatives</router-link>
-        <router-link v-if="$store.state.current_user.is_logged_in"
-                     class="biglink" to="notes">List of Notes</router-link>
-        <router-link v-if="$store.state.current_user.is_logged_in"
-                     class="biglink" to="opt_stemma">Optimal Substemma</router-link>
-        <router-link v-if="$store.state.current_user.is_logged_in"
-                     class="biglink" to="set_cover">Set Cover</router-link>
+        <div v-if="$store.getters.can_write">
+          <router-link class="biglink" to="notes">List of Notes</router-link>
+          <router-link class="biglink" to="opt_stemma">Optimal Substemma</router-link>
+          <router-link class="biglink" to="set_cover">Set Cover</router-link>
+        </div>
       </div>
 
       <a class="biglink" href="/pdfs/GenQ4_Guide.pdf" target="_blank">Short Guide (PDF)</a>

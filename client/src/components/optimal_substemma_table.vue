@@ -35,7 +35,7 @@
       </thead>
       <tbody>
         <template v-for="r in rows">
-          <tr :class="rowclass (r)" :key="r.index">
+          <tr :class="rowclass (r)" :key="r.index" @click="on_click (r.mss)">
             <td class="details-control" @click="toggle_details_table (r, $event)" />
 
             <td class="mss">{{ r.mss }}</td>
@@ -150,6 +150,16 @@ export default {
                 const rows = csv_parse (response.data, { 'columns' : true });
                 vm.rows = rows.map (row_conversion);
                 vm.sort ();
+            });
+        },
+        on_click (mss) {
+            const vm = this;
+            vm.$router.push ({
+                name : 'set_cover',
+                hash : '#' + $.param ({
+                    'ms'         : vm.ms.hs,
+                    'pre_select' : mss,
+                })
             });
         },
         build_url (page = 'optimal-substemma.csv') {

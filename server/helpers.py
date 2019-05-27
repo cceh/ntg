@@ -398,11 +398,11 @@ def auth ():
     """ Check if user is authorized to see what follows. """
 
     conf = flask.current_app.config
-    access = conf['ACCESS']
+    read_access = conf['READ_ACCESS']
 
-    if access != 'public':
-        if not flask_login.current_user.has_role (access):
-            raise PrivilegeError ('You don\'t have %s privilege.' % access)
+    if read_access != 'public':
+        if not flask_login.current_user.has_role (read_access):
+            raise PrivilegeError ('You don\'t have %s privilege.' % read_access)
 
 
 DOT_SKELETON = """

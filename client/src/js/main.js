@@ -34,8 +34,8 @@ const routes = [
             { 'path' : 'comparison',  'component' : comparison  },
             { 'path' : 'attestation', 'component' : attestation },
             { 'path' : 'notes',       'component' : notes_list  },
-            { 'path' : 'set_cover',   'component' : set_cover   },
-            { 'path' : 'opt_stemma',  'component' : opt_stemma  },
+            { 'path' : 'set_cover',   'component' : set_cover,  'name' : 'set_cover'  },
+            { 'path' : 'opt_stemma',  'component' : opt_stemma, 'name' : 'opt_stemma' },
         ],
     },
 

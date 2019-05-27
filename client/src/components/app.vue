@@ -25,13 +25,13 @@ const store = new Vuex.Store ({
             'hr'      : '',
         },
         'current_application' : {
-            'name'   : 'ntg',
-            'access' : 'none',
+            'name'         : 'ntg',
+            'read_access'  : 'none',
+            'write_access' : 'none',
         },
         'current_user' : {
-            'is_logged_in' : false,
-            'is_editor'    : false,
-            'username'     : 'anonymous',
+            'username' : 'anonymous',
+            'roles'    : ['public'],
         },
     },
     'mutations' : {
@@ -45,6 +45,15 @@ const store = new Vuex.Store ({
     },
     'getters' : {
         'passage' : state => state.passage,
+        'is_logged_in' : state => {
+            return state.current_user.username != 'anonymous';
+        },
+        'can_read' : state => {
+            return state.current_user.roles.includes (state.current_application.read_access);
+        },
+        'can_write' : state => {
+            return state.current_user.roles.includes (state.current_application.write_access);
+        },
     },
 });
 

@@ -37,9 +37,9 @@ import sqlalchemy
 
 from ntg_common import db
 from ntg_common import db_tools
+from ntg_common.config import init_logging, config_from_pyfile
 from ntg_common.db_tools import execute, warn, debug
 from ntg_common.tools import log
-from ntg_common.config import init_cmdline
 
 
 def copy_table_fdw (conn, dest_table, fdw, source_table):
@@ -210,7 +210,10 @@ def build_parser ():
 
 if __name__ == '__main__':
 
-    args, config = init_cmdline (build_parser ())
+    args = build_parser ().parse_args ()
+    args = init_logging (args)
+
+    config = config_from_pyfile (args.profile)
 
     parameters = dict ()
 

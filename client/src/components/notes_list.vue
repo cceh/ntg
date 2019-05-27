@@ -2,7 +2,7 @@
   <div class="notes_list_vm">
     <page-header :caption="caption" />
 
-    <div class="container bs-docs-container" v-if="$store.state.current_user.is_editor">
+    <div class="container bs-docs-container" v-if="$store.getters.can_write">
 
       <card>
         <table class="table">

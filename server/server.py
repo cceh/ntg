@@ -1,7 +1,12 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-"""API server for CBGM."""
+"""The API server for CBGM.  The main Flask driver.
+
+This module sets up the main Flask application for user authentication and the
+sub-apps for each book.
+
+"""
 
 import argparse
 import collections
@@ -16,6 +21,7 @@ import flask_sqlalchemy
 import flask_user
 import flask_login
 import flask_mail
+from werkzeug.wsgi import DispatcherMiddleware
 
 from ntg_common.config import init_logging
 from ntg_common import db_tools
@@ -46,7 +52,8 @@ class Config ():
     USE_RELOADER      = False
     USE_DEBUGGER      = False
     SERVER_START_TIME = str (int (time.time ())) # for cache busting
-    ACCESS            = 'none'
+    READ_ACCESS       = 'none'
+    WRITE_ACCESS      = 'none'
     CORS_ALLOW_ORIGIN = '*'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -115,7 +122,7 @@ def create_app (Config):
 
     app.config.dba = db_tools.PostgreSQLEngine (**app.config)
     user_db_url = app.config.dba.url
-    # tell flask_sqlalchemy where the user database is
+    # tell flask_sqlalchemy where the user authentication database is
     app.config['SQLALCHEMY_DATABASE_URI'] = user_db_url
 
     do_init_app (app)
@@ -146,18 +153,20 @@ def create_app (Config):
 
         do_init_app (sub_app)
         main.init_app (sub_app)
-        textflow.init_app (app)
-        comparison.init_app (app)
+        textflow.init_app (sub_app)
+        comparison.init_app (sub_app)
         editor.init_app (sub_app)
         set_cover.init_app (sub_app)
 
         instances[sub_app.config['APPLICATION_ROOT']] = sub_app
 
-    return app, instances, extra_files
+    d = DispatcherMiddleware (app, instances)
+    d.config = app.config
+    d.config['EXTRA_FILES'] = extra_files
+    return d
 
 
 if __name__ == "__main__":
-    from werkzeug.wsgi import DispatcherMiddleware
     from werkzeug.serving import run_simple
 
     args = build_parser (Config.CONFIG_FILE).parse_args ()
@@ -165,15 +174,14 @@ if __name__ == "__main__":
 
     Config.LOG_LEVEL   = args.log_level
     Config.CONFIG_FILE = args.config_file
-    Config.ACCESS      = Config.ACCESS.lower ()
 
-    app, instances, extra_files = create_app (Config)
+    app = create_app (Config)
 
     run_simple (
         app.config['APPLICATION_HOST'],
         app.config['APPLICATION_PORT'],
-        DispatcherMiddleware (app, instances),
+        app,
         use_reloader = app.config['USE_RELOADER'],
         use_debugger = app.config['USE_DEBUGGER'],
-        extra_files=extra_files
+        extra_files  = app.config['EXTRA_FILES']
     )

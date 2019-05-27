@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-"""An application server for CBGM.  Optimal substemma module.
+"""The API server for CBGM.  The optimal substemma and set cover module.
 
 See: CBGM_Pres.pdf p. 490ff.
 
@@ -216,22 +216,26 @@ def set_cover_json (hs_hsnr_id):
 
         np.set_printoptions (edgeitems = 8, linewidth = 100)
 
+        # The mss x passages boolean matrix that is TRUE whenever the inspected
+        # ms. and the source ms. are both defined.
         b_common = np.logical_and (val.def_matrix, val.def_matrix[ms_id])
+
+        # Remove mss. we don't want to compare
         b_common[ms_id] = False  # don't find original ms.
         b_common[0]     = False  # don't find A
         b_common[1]     = False  # don't find MT
-
-        # eliminate descendants from the matrix
+        # also eliminate all descendants
         ancestors = get_ancestors (conn, current_app.config.set_cover_rg_id, ms.ms_id)
         for i in range (0, val.n_mss):
             if (i + 1) not in ancestors:
-                b_common[i] = 0
+                b_common[i] = False
 
         n_defined = np.count_nonzero (val.def_matrix[ms_id])
         response['ms']['open'] = n_defined
 
-        explain_matrix = build_explain_matrix (conn, val, ms.ms_id)
-
+        # mask_matrix ist the mss x passages matrix containing the bitmask of
+        # all readings
+        explain_matrix       = build_explain_matrix (conn, val, ms.ms_id)
         explain_equal_matrix = val.mask_matrix[ms_id]
 
         # The mss x passages boolean matrix that is TRUE whenever the inspected ms.
@@ -244,6 +248,15 @@ def set_cover_json (hs_hsnr_id):
         b_post = np.bitwise_and (val.mask_matrix, explain_matrix) > 0
         b_post = np.logical_and (b_post, b_common)
 
+        # The 1 x passages boolean matrix that is TRUE whenever the passage is
+        # still unexplained.
+        b_open = np.copy (val.def_matrix[ms_id])
+
+        # The 1 x passages boolean matrix that is TRUE whenever the source of
+        # the reading in the inspected ms. is unknown
+        b_unknown = np.bitwise_and (explain_matrix, 0x1)
+        b_unknown = np.logical_and (b_unknown, b_open)
+
         n_explained = 0
 
         for n in range (0, MAX_COVER_SIZE):
@@ -254,32 +267,33 @@ def set_cover_json (hs_hsnr_id):
                 # find manuscript that explains the most passages by agreement
                 ms_id_most_similar = int (np.argmax (np.sum (b_equal, axis = 1)))
 
-            b_explained        = np.copy (b_post[ms_id_most_similar])
-            b_explained_equal  = np.copy (b_equal[ms_id_most_similar])
-            ms_most_similar    = Manuscript (conn, 'id' + str (ms_id_most_similar + 1))
+            ms_most_similar = Manuscript (conn, 'id' + str (ms_id_most_similar + 1))
             d = ms_most_similar.to_json ()
 
-            # exit if no passages could be explained
+            b_explained = np.copy (b_post[ms_id_most_similar])
             n_explains = int (np.count_nonzero (b_explained))
-            n_equal    = int (np.count_nonzero (b_explained_equal))
+            # exit if no passages could be explained
             if n_explains == 0:
                 break
-            n_explained += n_explains
+
+            n_equal = int (np.count_nonzero (b_equal[ms_id_most_similar]))
 
             # remove "explained" readings, so they will not be matched again
             b_post[:,b_explained] = False
             b_equal[:,b_explained] = False
-            explain_matrix[b_explained] = 0
-            # explain_equal_matrix[b_explained] = 0
+            b_unknown[b_explained] = False
+            b_open[b_explained]    = False
 
-            n_unknown = np.count_nonzero (np.bitwise_and (explain_matrix, 0x1))
+            n_explained += n_explains
+            n_unknown = int (np.count_nonzero (b_unknown))
+            n_open    = int (np.count_nonzero (b_open))
 
             d['explains']  = n_explains
+            d['explained'] = n_explained
             d['equal']     = n_equal
             d['post']      = n_explains - n_equal
-            d['explained'] = n_explained
             d['unknown']   = n_unknown
-            d['open']      = n_defined - n_explained - n_unknown
+            d['open']      = n_open - n_unknown
             d['n']         = n + 1
             cover.append (d)
 

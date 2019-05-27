@@ -1,7 +1,6 @@
-#!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-"""The main functions (coherence etc.) of the API server for CBGM."""
+"""The API server for CBGM.  The main functions."""
 
 import collections
 import re
@@ -54,10 +53,11 @@ def application_json ():
     conf = current_app.config
 
     return make_json_response ({
-        'name'   : conf['APPLICATION_NAME'],
-        'root'   : conf['APPLICATION_ROOT'],
-        'access' : conf['ACCESS'],
-        'start'  : conf['SERVER_START_TIME'],
+        'name'         : conf['APPLICATION_NAME'],
+        'root'         : conf['APPLICATION_ROOT'],
+        'read_access'  : conf['READ_ACCESS'],
+        'write_access' : conf['WRITE_ACCESS'],
+        'start'        : conf['SERVER_START_TIME'],
     })
 
 
@@ -72,10 +72,8 @@ def user_json ():
         roles += [r.name for r in user.roles]
 
     return make_json_response ({
-        'is_logged_in' : logged_in,
-        'is_editor' :    logged_in and user.has_role ('editor'),
-        'username' :     user.username if logged_in else 'anonymous',
-        'roles' :        roles,
+        'username' : user.username if logged_in else 'anonymous',
+        'roles'    : roles,
     })
 
 
@@ -507,6 +505,8 @@ def apparatus_json (passage_or_id):
 
 @bp.route ('/attestation.json/<passage_or_id>')
 def attestation_json (passage_or_id):
+    """Answer with a list of the attestations of all manuscripts at one specified
+    passage."""
 
     auth ()
 
