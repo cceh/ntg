@@ -538,8 +538,8 @@ def optimal_substemma_detail_csv ():
         WHERE v.ms_id = :ms_id AND pass_id IN :open_pass_ids
         """, dict (
             ms_id = ms.ms_id,
-            unknown_pass_ids = combinations[0].unknown_indices,
-            open_pass_ids    = combinations[0].open_indices
+            unknown_pass_ids = combinations[0].unknown_indices or (-1, ),
+            open_pass_ids    = combinations[0].open_indices    or (-1, )
         ))
 
         return csvify (_OptimalSubstemmaDetailRowCalcFields._fields,

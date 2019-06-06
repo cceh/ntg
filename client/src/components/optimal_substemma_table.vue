@@ -35,10 +35,10 @@
       </thead>
       <tbody>
         <template v-for="r in rows">
-          <tr :class="rowclass (r)" :key="r.index" @click="on_click (r.mss)">
+          <tr :class="rowclass (r)" :key="r.index">
             <td class="details-control" @click="toggle_details_table (r, $event)" />
 
-            <td class="mss">{{ r.mss }}</td>
+            <td class="mss" @click="on_click (r.mss)">{{ r.mss }}</td>
 
             <td class="n">{{ r.count }}</td>
 
