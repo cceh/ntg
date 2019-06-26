@@ -144,7 +144,7 @@ export default {
                 vm.$refs.navigator.set_passage (params.pass_id);
 
                 const requests = [
-                    vm.get ('attesting/' + params.pass_id + '/' + params.labez),
+                    vm.get ('attesting.csv/' + params.pass_id + '/' + params.labez),
                 ];
 
                 Promise.all (requests).then ((responses) => {
