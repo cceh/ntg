@@ -1372,12 +1372,17 @@ view ('apparatus_cliques_view', Base2.metadata, '''
     ''')
 
 view ('apparatus_view_agg', Base2.metadata, '''
-   SELECT pass_id, ms_id,
-          labez_agg (labez ORDER BY labez) as labez,
-          labez_agg (clique ORDER BY clique) as clique,
-          labez_agg (labez_clique ORDER BY labez_clique) as labez_clique
+   SELECT pass_id, ms_id, hs, hsnr,
+          MODE () WITHIN GROUP (ORDER BY lesart) AS lesart,
+          labez_agg (labez    ORDER BY labez)    AS labez,
+          labez_agg (clique   ORDER BY clique)   AS clique,
+          labez_agg (labezsuf ORDER BY labezsuf) AS labezsuf,
+          labez_agg (labez_clique                ORDER BY labez_clique)            AS labez_clique,
+          labez_agg (labez || labezsuf           ORDER BY labez, labezsuf)         AS labez_labezsuf,
+          labez_agg (labez || labezsuf || clique ORDER BY labez, labezsuf, clique) AS labez_labezsuf_clique,
+          MAX (certainty) AS certainty
    FROM apparatus_cliques_view
-   GROUP BY pass_id, ms_id
+   GROUP BY pass_id, ms_id, hs, hsnr
    ''')
 
 view ('affinity_view', Base2.metadata, '''

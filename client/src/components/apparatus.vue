@@ -3,12 +3,14 @@
     <ul class="list-group list-group-flush wrapper apparatus-wrapper">
       <li v-for="(items, group) in groups" :key="group" class="list-group-item">
         <h3 class="list-group-item-heading">
-          <a :data-labez="items[0].labez" class="apparatus-labez fg_labez"
+          <a v-if="items[0].labez[0] !== 'z'" :data-labez="items[0].labez" class="apparatus-labez fg_labez"
              @click="goto_attestation (items[0].labez)">{{ items[0].caption }}</a>
+          <span v-else="" :data-labez="items[0].labez"
+                class="apparatus-labez fg_labez">{{ items[0].caption }}</span>
         </h3>
         <ul class="list-group-item-text attesting-mss list-inline">
           <li v-for="item in items" :key="item.ms_id">
-            <a :data-ms-id="item.ms_id" class="ms">{{ item.hs }}{{ (item.certainty === 1.0) ? '' : '?' }}.</a>
+            <a :data-ms-id="item.ms_id" class="ms">{{ item.hs }}.</a>
             <span> </span>
           </li>
         </ul>
@@ -52,32 +54,38 @@ function load_passage (vm, passage) {
         const show_cliques = vm.toolbar.cliques.includes ('cliques');
         const show_ortho   = vm.toolbar.ortho.includes ('ortho');
 
-        let grouper = item => item.labez;
-        let caption = item => `${item.labez} ${item.reading}`;
-
-        if (!show_cliques && show_ortho) {
-            grouper = item => item.labez + item.suf + item.lesart;
-            caption = item => `${item.labez}${item.labezsuf} ${item.lesart}`;
-        } else if (show_cliques && !show_ortho) {
-            grouper = item => item.labez + item.clique;
-            caption = item => `${item.labez}${item.clique} ${item.reading}`;
-        } else if (show_cliques && show_ortho) {
-            grouper = item => item.labez + item.clique + item.suf + item.lesart;
-            caption = item => `${item.labez}${item.labezsuf}${item.clique} ${item.lesart}`;
+        /* zip ('a/b/c', '1/2/3') => 'a1/b2/c3' */
+        function zip (... args) {
+            return _.zip (... args.map (e => e.split ('/'))).map (e => e.join ('')).join ('/');
         }
 
-        const readings = [];
-        responses[0].data.data.readings.map (reading => {
-            readings[reading.labez] = reading.lesart;
-            return false;
-        });
+        let grouper = item => item.labez;
+        let caption = item => item.labez + ' ' + item.reading;
 
-        const mss = responses[0].data.data.manuscripts.map ((ms) => {
-            ms.reading  = readings[ms.labez];
-            ms.lesart   = ms.lesart || '';
-            ms.suf      = (ms.labezsuf === '') ? ' ' : ms.labezsuf;
-            ms.group    = grouper (ms);
-            ms.caption  = caption (ms);
+        if (!show_cliques && show_ortho) {
+            grouper = item => item.labez + item.labezsuf + item.lesart;
+            caption = item => zip (item.labez, item.labezsuf) + ' ' + item.lesart;
+        } else if (show_cliques && !show_ortho) {
+            grouper = item => item.labez + item.clique;
+            caption = item => zip (item.labez, item.clique) + ' ' + item.reading;
+        } else if (show_cliques && show_ortho) {
+            grouper = item => item.labez + item.clique + item.labezsuf + item.lesart;
+            caption = item => zip (item.labez, item.labezsuf, item.clique) + ' ' + item.lesart;
+        }
+
+        const manuscripts = responses[0].data.data.manuscripts;
+
+        const readings = new Map (responses[0].data.data.readings.map (
+            r => [ r.labez, r.lesart ]
+        ));
+
+        const mss = manuscripts.map (ms => {
+            ms.zw      = (ms.certainty < 1.0) ? 'zw ' : '';
+            ms.reading = ms.lesart || readings.get (ms.labez);
+            ms.lesart  = ms.lesart || '';
+            ms.group   = ms.zw + grouper (ms);
+            ms.caption = ms.zw + caption (ms);
+            ms.labez   = ms.zw + ms.labez;
             return ms;
         });
 

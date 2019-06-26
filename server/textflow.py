@@ -175,7 +175,7 @@ def textflow (passage_or_id):
         src_nodes  = { r.ms_id2 for r in ranks }
 
         res = execute (conn, """
-        SELECT ms.ms_id, ms.hs, ms.hsnr, a.labez, a.clique, a.labez_clique
+        SELECT ms.ms_id, ms.hs, ms.hsnr, a.labez, a.clique, a.labez_clique, a.certainty
         FROM apparatus_view_agg a
         JOIN manuscripts ms USING (ms_id)
         WHERE pass_id = :pass_id AND ms_id IN :ms_ids
@@ -183,18 +183,19 @@ def textflow (passage_or_id):
                    ms_ids = tuple (src_nodes | dest_nodes | nodes),
                    pass_id = passage.pass_id))
 
-        Mss = collections.namedtuple ('Mss', 'ms_id hs hsnr labez clique labez_clique')
+        Mss = collections.namedtuple ('Mss', 'ms_id hs hsnr labez clique labez_clique certainty')
         mss = list (map (Mss._make, res))
 
         for ms in mss:
             attrs = {}
             attrs['hs']           = ms.hs
             attrs['hsnr']         = ms.hsnr
-            attrs['labez']        = ms.labez
+            attrs['labez']        = ms.labez if ms.certainty == 1.0 else 'zw ' + ms.labez
             attrs['clique']       = ms.clique
-            attrs['labez_clique'] = ms.labez_clique
+            attrs['labez_clique'] = ms.labez_clique if ms.certainty == 1.0 else 'zw ' + ms.labez_clique
             attrs['ms_id']        = ms.ms_id
             attrs['label']        = ms.hs
+            attrs['certainty']    = ms.certainty
             attrs['clickable']    = '1'
             if ms.ms_id == 1 and hyp_a != 'A':
                 attrs['labez']        = hyp_a[0]
@@ -215,15 +216,18 @@ def textflow (passage_or_id):
 
         def is_z_node (n):
             labez = n['labez']
-            return (labez[0] == 'z') or ('/' in labez)
+            cert  = n['certainty']
+            return (labez == 'zz') or (cert < 1.0)
 
         tags = set ()
         for step in (1, 2):
             for r in ranks:
                 a1 = graph.node[r.ms_id1]
+                if not r.ms_id2 in graph.node:
+                    continue
                 a2 = graph.node[r.ms_id2]
                 if not (global_textflow) and is_z_node (a2):
-                    # disregard lacunae
+                    # disregard zz / zw
                     continue
                 if step == 1 and a1[group_field] != a2[group_field]:
                     # differing attestations are handled in step 2

@@ -126,6 +126,9 @@ export default {
 
             vm.get (`manuscript-full.json/${this.passage.pass_id}/id${this.ms_id}`).then ((response) => {
                 vm.ms = response.data.data;
+                if (vm.ms.certainty < 1.0) {
+                    vm.ms.labez = 'zw ' + vm.ms.labez;
+                }
             });
 
             vm.get (this.build_url ('relatives.csv')).then ((response) => {
@@ -145,7 +148,7 @@ export default {
                         'norel'     : +d.norel,
                         'direction' : d.direction,
                         'affinity'  : +d.affinity,
-                        'labez'     : d.labez,
+                        'labez'     : d.certainty == 1.0 ? d.labez : 'zw ' + d.labez,
                         'perc'      : (100.0 * d.equal / d.common).toFixed (2),
                     };
                 });

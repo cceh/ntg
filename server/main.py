@@ -322,11 +322,11 @@ def manuscript_full_json (passage_or_id, hs_hsnr_id):
 
         # Get the attestation(s) of the manuscript (may be uncertain eg. a/b/c)
         res = execute (conn, """
-        SELECT labez, clique, labez_clique
+        SELECT labez, clique, labez_clique, certainty
         FROM apparatus_view_agg
         WHERE ms_id = :ms_id AND pass_id = :pass_id
         """, dict (parameters, ms_id = ms.ms_id, pass_id = passage.pass_id))
-        json['labez'], json['clique'], json['labez_clique'] = res.fetchone ()
+        json['labez'], json['clique'], json['labez_clique'], json['certainty'] = res.fetchone ()
 
         # Get the affinity of the manuscript to all manuscripts
         res = execute (conn, """
@@ -435,7 +435,8 @@ def relatives_csv (passage_or_id, hs_hsnr_id):
                     ELSE '>'
                END as direction,
                aff.affinity,
-               a.labez
+               a.labez,
+               a.certainty
         FROM
           {view} aff
         JOIN apparatus_view_agg a
@@ -456,7 +457,7 @@ def relatives_csv (passage_or_id, hs_hsnr_id):
 
         Relatives = collections.namedtuple (
             'Relatives',
-            'rank ms_id hs hsnr length common equal older newer unclear norel direction affinity labez'
+            'rank ms_id hs hsnr length common equal older newer unclear norel direction affinity labez certainty'
         )
         return csvify (Relatives._fields, list (map (Relatives._make, res)))
 
@@ -484,7 +485,7 @@ def apparatus_json (passage_or_id):
         # list of labez_clique => manuscripts
         res = execute (conn, """
         SELECT labez, clique, labez_clique, labezsuf, reading (labez, lesart), ms_id, hs, hsnr, certainty
-        FROM apparatus_cliques_view
+        FROM apparatus_view_agg
         WHERE pass_id = :pass_id
         ORDER BY hsnr, labez, clique
         """, dict (parameters, pass_id = passage.pass_id))
