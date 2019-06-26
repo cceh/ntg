@@ -1,7 +1,7 @@
 <template>
   <form class="navigator-vm form-inline" @submit.prevent="on_nav">
 
-    <div class="btn-group btn-group-sm mr-2">
+    <div class="btn-group btn-group-sm">
       <button type="button" data="-1" class="btn btn-primary"
               aria-label="Previous Passage" title="Previous Passage" @click="on_nav">
         <span class="fas fa-chevron-left" />
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <div class="btn-group btn-group-sm ml-2">
+    <div class="btn-group btn-group-sm">
       <button type="button" data="1" class="btn btn-primary"
               aria-label="Next Passage" title="Next Passage" @click="on_nav">
         <span class="fas fa-chevron-right" />
@@ -233,7 +233,7 @@ export default {
     }
 
     /* make buttons the same height as inputs */
-    align-items: stretch;
+    /* align-items: stretch; */
 
     input.form-control {
         text-align: right;

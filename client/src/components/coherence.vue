@@ -38,7 +38,9 @@
         </card>
       </div>
 
-      <navigator ref="nav" class="mb-3" />
+      <div class="btn-toolbar">
+        <navigator ref="nav" class="mb-3" />
+      </div>
 
       <leitzeile />
 
@@ -184,7 +186,10 @@
         </textflow>
       </card>
 
-      <navigator />
+      <div class="btn-toolbar">
+        <navigator />
+      </div>
+
     </div>
   </div>
 </template>

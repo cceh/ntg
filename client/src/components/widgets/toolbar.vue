@@ -53,7 +53,8 @@ div.btn-toolbar {
     margin-bottom: $spacer * -0.5;
     margin-right: $spacer * -0.5;
 
-    div.btn-group {
+    div.btn-group,
+    div.input-group {
         margin-right: $spacer * 0.5;
         margin-bottom: $spacer * 0.5;
     }

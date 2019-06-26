@@ -10,10 +10,10 @@
       <div class="card">
 
         <div class="card-header">
-          <toolbar>
+          <div class="btn-toolbar">
             <navigator ref="navigator" />
             <labezator ref="labezator" v-model="labez" class="ml-2" :options="options.labez" />
-          </toolbar>
+          </div>
         </div>
 
         <div class="card-header">{{ msg }}
