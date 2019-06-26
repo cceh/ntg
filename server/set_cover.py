@@ -196,7 +196,9 @@ def set_cover_json (hs_hsnr_id):
     See: https://en.wikipedia.org/wiki/Set_cover_problem
     """
 
-    response = {}
+    include    = request.args.getlist ('include[]') or []
+    pre_select = (request.args.get ('pre_select') or '').split ()
+    response   = {}
 
     with current_app.config.dba.engine.begin () as conn:
         if current_app.config.val is None:
@@ -210,8 +212,7 @@ def set_cover_json (hs_hsnr_id):
         ms_id = ms.ms_id - 1  # numpy indices start at 0
 
         # allow user to pre-select a set of manuscripts
-        pre_selected = [ Manuscript (conn, anc_id)
-                         for anc_id in (request.args.get ('pre_select') or '').split () ]
+        pre_selected = [ Manuscript (conn, anc_id) for anc_id in pre_select ]
         response['mss'] = [s.to_json () for s in pre_selected]
 
         np.set_printoptions (edgeitems = 8, linewidth = 100)
@@ -222,8 +223,10 @@ def set_cover_json (hs_hsnr_id):
 
         # Remove mss. we don't want to compare
         b_common[ms_id] = False  # don't find original ms.
-        b_common[0]     = False  # don't find A
-        b_common[1]     = False  # don't find MT
+        if 'A' not in include and 'A' not in pre_select:
+            b_common[0] = False
+        if 'MT' not in include and 'MT' not in pre_select:
+            b_common[1] = False
         # also eliminate all descendants
         ancestors = get_ancestors (conn, current_app.config.set_cover_rg_id, ms.ms_id)
         for i in range (0, val.n_mss):

@@ -33,6 +33,12 @@
       </div>
 
       <card :caption="caption" cssclass="card-set-cover">
+        <div class="card-header">
+          <toolbar :toolbar="toolbar">
+            <button-group type="checkbox" v-model="toolbar.include"
+                          :options="options.include" />
+          </toolbar>
+        </div>
 
         <table class="table table-bordered table-sm table-hover table-set-cover" cellspacing="0">
           <thead>
@@ -93,6 +99,7 @@ import $ from 'jquery';
 import Vue from 'vue';
 
 import tools from 'tools';
+import { options } from 'widgets/options';
 
 export default {
     data () {
@@ -102,10 +109,22 @@ export default {
             'input1'  : '',
             'input2'  : '',
             'cover'   : [],
+            'options'      : options,
+            'toolbar' : {
+                'include' : [],
+            }
         };
     },
     'computed' : {
         'caption' : function () { return `Minimum Set Cover for Witness ${this.ms.hs} (${this.ms.open})` ; }
+    },
+    'watch' : {
+        'toolbar' : {
+            handler () {
+                this.load_set_cover ();
+            },
+            'deep' : true,
+        },
     },
     'methods' : {
         submit (dummy_event) {
@@ -127,28 +146,38 @@ export default {
                 })
             });
         },
+        load_set_cover () {
+            const vm = this;
+            const params = {
+                'ms'         : vm.input1,
+                'pre_select' : vm.input2,
+                'include'    : vm.toolbar.include,
+            };
+            const requests = [
+                vm.get ('set-cover.json/' + params.ms + '?' + $.param (params)),
+            ];
+
+            Promise.all (requests).then ((responses) => {
+                vm.ms     = responses[0].data.data.ms;
+                vm.mss    = responses[0].data.data.mss;
+                vm.input1 = vm.ms.hs;
+                vm.input2 = vm.mss.map (d => d.hs).join (' ');
+
+                let cumsum = [];
+                vm.cover = responses[0].data.data.cover.map (function (item) {
+                    cumsum.push (item.hs);
+                    item.cumsum_hs = cumsum.join (' ');
+                    return item;
+                });
+            });
+        },
         on_hashchange () {
             const hash = window.location.hash ? window.location.hash.substring (1) : '';
             if (hash) {
-                const vm = this;
-                const params = tools.deparam (hash);
-                const requests = [
-                    vm.get ('set-cover.json/' + params.ms + '?' + $.param (params)),
-                ];
-
-                Promise.all (requests).then ((responses) => {
-                    vm.ms     = responses[0].data.data.ms;
-                    vm.mss    = responses[0].data.data.mss;
-                    vm.input1 = vm.ms.hs;
-                    vm.input2 = vm.mss.map (d => d.hs).join (' ');
-
-                    let cumsum = [];
-                    vm.cover = responses[0].data.data.cover.map (function (item) {
-                        cumsum.push (item.hs);
-                        item.cumsum_hs = cumsum.join (' ');
-                        return item;
-                    });
-                });
+                const data = tools.deparam (hash);
+                this.input1 = data.ms;
+                this.input2 = data.pre_select;
+                this.load_set_cover ();
             } else {
                 // reset data
                 Object.assign (this.$data, this.$options.data.call (this));
