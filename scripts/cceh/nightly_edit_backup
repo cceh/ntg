@@ -2,4 +2,11 @@
 
 DATE=`date -I`
 
-python3 -m scripts.cceh.save_edits -vvv -o backups/saved_edits_mark_ph1_$DATE.xml server/instance/mark_ph1.conf
+echo "mark_ph12"
+python3 -m scripts.cceh.save_edits -vvv -o backups/saved_edits_mark_ph12_$DATE.xml instance/mark_ph12.conf
+
+echo "acts_ph4"
+python3 -m scripts.cceh.save_edits -vvv -o backups/saved_edits_acts_ph4_$DATE.xml  instance/acts_ph4.conf
+
+echo "acts_ph6"
+python3 -m scripts.cceh.save_edits -vvv -o backups/saved_edits_acts_ph6_$DATE.xml  instance/acts_ph6.conf
