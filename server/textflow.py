@@ -217,7 +217,7 @@ def textflow (passage_or_id):
         def is_z_node (n):
             labez = n['labez']
             cert  = n['certainty']
-            return (labez == 'zz') or (cert < 1.0)
+            return (labez[0] == 'z') or (cert < 1.0)
 
         tags = set ()
         for step in (1, 2):
