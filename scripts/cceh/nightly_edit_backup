@@ -1,12 +1,11 @@
 #!/bin/bash
 
+. `dirname "$0"`/active_databases
+
 DATE=`date -I`
 
-echo "mark_ph12"
-python3 -m scripts.cceh.save_edits -vvv -o backups/saved_edits_mark_ph12_$DATE.xml instance/mark_ph12.conf
-
-echo "acts_ph4"
-python3 -m scripts.cceh.save_edits -vvv -o backups/saved_edits_acts_ph4_$DATE.xml  instance/acts_ph4.conf
-
-echo "acts_ph6"
-python3 -m scripts.cceh.save_edits -vvv -o backups/saved_edits_acts_ph6_$DATE.xml  instance/acts_ph6.conf
+for i in $ACTIVE_DATABASES
+do
+    echo "Saving edits of $i ..."
+    python3 -m scripts.cceh.save_edits -vvv -o - "instance/$i.conf" | gzip > "backups/saved_edits_${i}_${DATE}.xml.gz"
+done
