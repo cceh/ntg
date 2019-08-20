@@ -8,7 +8,6 @@
 
 import $      from 'jquery';
 import _      from 'lodash';
-import Popper from 'popper.js';
 
 /**
  * Format a string in python fashion.  "{count} items found"
@@ -63,38 +62,6 @@ export function deparam (query_string) {
         }
     });
     return params;
-}
-
-/**
- * Position a context menu aside an svg element.
- *
- * Since jQuery doesn't grok the SVG DOM, we have to calculate the
- * position of the menu manually.
- *
- * @function svg_contextmenu
- *
- * @param {Object} menu   - The menu
- * @param {Object} target - The DOM object to attach the menu to
- */
-
-export function svg_contextmenu (menu, target) {
-    const $card = $ (target).closest ('div.card');
-    $card.append (menu);
-
-    var popper = new Popper (target, menu, {
-        'placement' : 'right-start',
-        'modifiers' : {
-            'offset' : {
-                'offset' : '0,3',
-            },
-            'flip' : {
-                'behavior' : ['right', 'bottom', 'top']
-            },
-            'preventOverflow' : {
-                'boundariesElement' : $card,
-            },
-        },
-    });
 }
 
 /**
@@ -190,7 +157,6 @@ export default {
     format,
     natural_sort,
     deparam,
-    svg_contextmenu,
     xhr_alert,
     bfs,
     slide_from,

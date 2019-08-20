@@ -4,14 +4,7 @@
          @contextmenu.prevent="on_contextmenu" @click="on_click">
       <slot />
     </div>
-    <table class="dropdown-menu" role="menu" ref="menu">
-      <tbody v-for="grp of actions">
-        <tr v-for="a in grp" :class="a.class" @click="on_menu_click (a.data, $event)">
-          <td class="bg_labez" :data-labez="a.bg"></td>
-          <td>{{ a.msg }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <context-menu ref="menu" @menu-click="on_menu_click" />
   </div>
 </template>
 
@@ -24,10 +17,13 @@
  */
 
 import { mapGetters } from 'vuex';
-import $ from 'jquery';
-import _ from 'lodash';
-import tools from 'tools';
+import $       from 'jquery';
+import _       from 'lodash';
+import tools   from 'tools';
 import * as d3 from 'd3';
+import context_menu from 'widgets/context_menu.vue';
+import { mkmsg }    from 'widgets/context_menu.vue';
+
 
 /** @var {D3selector} dragged_node - The node being dragged or null */
 let dragged_node = null;
@@ -157,33 +153,17 @@ function dragListener (vm) {
 }
 
 /**
- * Format message
- *
- * @function mkmsg
- *
- * @param {String} msg    - Message prefix
- * @param {String} labez  - The labez
- * @param {String} clique - The clique
- *
- * @returns {String} The formatted message.
- */
-
-function mkmsg (msg, labez, clique) {
-    return msg + ' ' + labez + (Number (clique) > 1 ? clique : '');
-}
-
-/**
  * Implements the context menu.
  *
  * The context menu can be used to split the attestation, reassign source
  * nodes or to merge a split.
  *
- * @function open_contextmenu
+ * @function build_contextmenu
  *
  * @param {Object} event - The event
  */
 
-function open_contextmenu (event, vm) {
+function build_contextmenu (event, vm) {
     const $target = $ (event.target);
     if ($target.closest ('.node.draggable').length === 0) {
         return;
@@ -201,9 +181,9 @@ function open_contextmenu (event, vm) {
               { 'labez' : '?', 'clique' : '1', 'labez_clique' : '?' },
           ]);
 
-    // Menu Header
     const actions = [];
 
+    // Menu Header
     actions.push ({
         'msg'   : mkmsg ('Reading', data.labez_old, data.clique_old),
         'bg'    : data.labez_old,
@@ -305,12 +285,7 @@ function open_contextmenu (event, vm) {
         }
     });
 
-    vm.actions = _.groupBy (actions, a => a.data.action);
-
-    // Display the menu
-
-    $ (vm.$refs.menu).show ();
-    tools.svg_contextmenu ($ (vm.$refs.menu), event.target);
+    return _.groupBy (actions, a => a.data.action);
 }
 
 /**
@@ -355,10 +330,12 @@ function load_passage (vm, passage) {
 }
 
 export default {
+    'components' : {
+        'context-menu' : context_menu,
+    },
     'props' : ['toolbar', 'cssclass', 'global', 'var_only'],
     'data'  : function () {
         return {
-            'actions' : [],
         };
     },
     'computed' : {
@@ -395,16 +372,16 @@ export default {
             return page + '/' + vm.passage.pass_id + '?' + $.param (data);
         },
         on_contextmenu (event) {
-            open_contextmenu (event, this);
+            if (this.$store.getters.can_write) {
+                this.$refs.menu.open (build_contextmenu (event, this), event.target);
+            }
         },
         on_click (event) {
-            const vm = this;
-            const menu = vm.$refs.menu;
-            $ (menu).fadeOut (function () { vm.actions = []; });
+            // close the menu on outside click
+            this.$refs.menu.close ();
         },
         on_menu_click (data, event) {
             const vm = this;
-            const menu = vm.$refs.menu;
 
             const xhr2 = vm.post ('stemma-edit/' + vm.passage.pass_id, data);
             xhr2.then (() => {
@@ -413,7 +390,6 @@ export default {
             xhr2.catch ((reason) => {
                 tools.xhr_alert (reason, vm.$wrapper);
             });
-            $ (menu).fadeOut (function () { vm.actions = []; });
         },
         download (page) {
             window.open (this.build_full_api_url (this.build_url (page), '_blank'));
@@ -434,44 +410,4 @@ export default {
 /* local_stemma.vue */
 @import "bootstrap-custom";
 
-div.card table.dropdown-menu {
-    font-size: $font-size-base;
-    text-align: left;
-
-    tbody + tbody {
-        border-top: $dropdown-border-width solid $dropdown-border-color;
-    }
-
-    tr {
-        &:hover {
-            color: $dropdown-link-active-color;
-            background: $dropdown-link-active-bg;
-        }
-        &.disabled,
-        &:disabled {
-            color: $dropdown-link-disabled-color;
-            pointer-events: none;
-            background-color: transparent;
-        }
-    }
-
-    td {
-        padding: 3px 5px;
-        &.bg_labez {
-            padding: 3px 10px;
-        }
-    }
-
-    td.ui-menu-item-wrapper {
-        /* padding: 3px 20px; */
-        &.ui-state-active {
-            margin: 0;
-            border-width: 0;
-            color: $dropdown-link-active-color;
-            background: $dropdown-link-active-bg;
-        }
-        &.menu-label { text-align: right; }
-        &.menu-description { padding-left: 0; }
-    }
-}
 </style>

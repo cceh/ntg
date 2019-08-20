@@ -1,9 +1,10 @@
 <template>
   <div class="textflow-vm card-slidable">
     <div :class="'wrapper svg-wrapper ' + cssclass"
-         @contextmenu.prevent="on_contextmenu">
+         @contextmenu.prevent="on_contextmenu" @click="on_click">
       <slot />
     </div>
+    <context-menu ref="menu" @menu-click="on_menu_click" />
   </div>
 </template>
 
@@ -18,29 +19,25 @@
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import _ from 'lodash';
 import { mapGetters } from 'vuex';
-import 'jquery-ui/menu.js';
-
-import 'jquery-ui-css/core.css';
-import 'jquery-ui-css/theme.css';
-import 'jquery-ui-css/menu.css';
-
+import $     from 'jquery';
+import _     from 'lodash';
 import tools from 'tools';
+import context_menu from 'widgets/context_menu.vue';
+import { mkmsg }    from 'widgets/context_menu.vue';
 
 /**
  * Open a context menu when right clicked on a node.
  *
- * The context menu can be used to reassign the node to a different split.
+ * The context menu can be used to reassign the node to a different clique.
  *
- * @function open_contextmenu
+ * @function build_contextmenu
  *
  * @param {Object} event - The event
  * @param {Object} vm    - The Vue instance
  */
 
-function open_contextmenu (event, vm) {
+function build_contextmenu (event, vm) {
     const passage = vm.passage;
 
     const msid    = event.target.parentNode.dataset.msId;
@@ -48,58 +45,42 @@ function open_contextmenu (event, vm) {
     const data = {
         'labez_old'  : dataset.labez,
         'clique_old' : dataset.clique,
+        'ms_ids'     : tools.bfs (vm.get_graph_vm ().graph.edges, msid),
     };
 
-    // build the context menu
-    const menu  = $ ('<table class="contextmenu"></table>');
-    menu.append ($ (tools.format (
-        '<tr class="ui-state-disabled">'
-            + '<td class="bg_labez" data-labez="{labez_old}"></td>'
-            + '<td>{labez_old}{clique_old}</td>'
-            + '</tr>',
-        data
-    )));
-    menu.append ($ ('<tr><td>-</td><td>-</td></tr>'));
-
     const cliques = _.filter (vm.$store.state.passage.cliques, (o) => (o.labez[0] !== 'z'));
-    _.forEach (cliques, (value) => {
-        data.labez_new  = value.labez;
-        data.clique_new = value.clique;
+    const actions = [];
 
-        if (data.labez_new === data.labez_old && data.clique_new !== data.clique_old) {
-            menu.append ($ (tools.format (
-                '<tr data-action="move-manuscripts" '
-                    + 'data-labez_old="{labez_old}" data-clique_old="{clique_old}" '
-                    + 'data-labez_new="{labez_new}" data-clique_new="{clique_new}">'
-                    + '<td class="bg_labez" data-labez="{labez_old}"></td>'
-                    + '<td>Move subtree to {labez_new}{clique_new}</td>'
-                    + '</tr>',
-                data
-            )));
+    // Menu Header
+    actions.push ({
+        'msg'   : mkmsg ('Clique', data.labez_old, data.clique_old),
+        'bg'    : data.labez_old,
+        'class' : 'disabled',
+        'data' : {
+            ... data,
+            'action'   : '',
+            'disabled' : true,
         }
     });
 
-    menu.menu ({
-        'select' : (ev, ui) => {
-            const tr = ui.item[0];
-
-            // console.log ('Selected: ' + $ (tr).text ());
-
-            const xhr2 = vm.post ('stemma-edit/' + passage.pass_id, $.extend ({}, tr.dataset, {
-                // do not extend the dataset itself, because arrays cannot
-                // be part of datasets
-                'ms_ids' : tools.bfs (vm.get_graph_vm ().graph.edges, msid),
-            }));
-            xhr2.then (() => {
-                $ (window).trigger ('hashchange');
+    // cliques
+    _.forEach (cliques, function (c) {
+        if ((c.labez === data.labez_old) && (c.clique !== data.clique_old)) {
+            actions.push ({
+                'msg'   : mkmsg ('Move subtree to', c.labez, c.clique),
+                'bg'    : data.labez_old,
+                'class' : '',
+                'data'  : {
+                    ... data,
+                    'action'     : 'move-manuscripts',
+                    'labez_new'  : c.labez,
+                    'clique_new' : c.clique,
+                },
             });
-            xhr2.catch ((reason) => {
-                tools.xhr_alert (reason, event.data.$wrapper);
-            });
-            menu.fadeOut (() => { menu.remove (); });
-        },
+        }
     });
-    tools.svg_contextmenu (menu, event.target);
+
+    return _.groupBy (actions, a => a.data.action);
 }
 
 /*
@@ -113,6 +94,9 @@ function open_contextmenu (event, vm) {
  */
 
 export default {
+    'components' : {
+        'context-menu' : context_menu,
+    },
     'props' : ['cssclass', 'global', 'var_only', 'toolbar'],
     data () {
         return {
@@ -162,8 +146,23 @@ export default {
         },
         on_contextmenu (event) {
             if (this.$store.getters.can_write) {
-                open_contextmenu (event, this);
+                this.$refs.menu.open (build_contextmenu (event, this), event.target);
             }
+        },
+        on_click (event) {
+            // close the menu on outside click
+            this.$refs.menu.close ();
+        },
+        on_menu_click (data, event) {
+            const vm = this;
+
+            const xhr2 = vm.post ('stemma-edit/' + vm.passage.pass_id, data);
+            xhr2.then (() => {
+                $ (window).trigger ('hashchange');
+            });
+            xhr2.catch ((reason) => {
+                tools.xhr_alert (reason, vm.$wrapper);
+            });
         },
         build_url (page) {
             const vm = this;
@@ -196,39 +195,4 @@ export default {
 /* textflow.vue */
 @import "bootstrap-custom";
 
-div.card table.contextmenu {
-    position: absolute;
-    z-index: $zindex-dropdown;
-    margin: 0;
-    padding: 5px 0;
-    font-size: $font-size-base;
-    text-align: left;
-    background-color: $dropdown-bg;
-    border: $dropdown-border-width solid $dropdown-border-color;
-    background-clip: padding-box;
-
-    /* stylelint-disable at-rule-no-unknown */
-    @include border-radius($dropdown-border-radius);
-    @include box-shadow($dropdown-box-shadow);
-
-    tr.ui-menu-item {
-        &.ui-state-active {
-            margin: 0;
-            border-width: 0;
-            background: #ccc;
-        }
-    }
-
-    td.ui-menu-item-wrapper {
-        /* padding: 3px 20px; */
-        &.ui-state-active {
-            margin: 0;
-            border-width: 0;
-            color: $dropdown-link-active-color;
-            background: $dropdown-link-active-bg;
-        }
-        &.menu-label { text-align: right; }
-        &.menu-description { padding-left: 0; }
-    }
-}
 </style>
