@@ -75,8 +75,8 @@ def textflow (passage_or_id):
     cliques      = request.args.getlist ('cliques[]')   or []
 
     fragments = 'fragments' in fragments
-    var_only  = 'var_only'  in var_only
-    cliques   = 'cliques'   in cliques
+    var_only  = 'var_only'  in var_only   # Panel: Coherence at Variant Passages (GraphViz)
+    cliques   = 'cliques'   in cliques    # consider or ignore cliques
     leaf_z    = 'Z'         in include    # show leaf z nodes in global textflow?
 
     view = 'affinity_view' if mode == 'rec' else 'affinity_p_view'
@@ -262,6 +262,8 @@ def textflow (passage_or_id):
                                   if graph.node[n]['labez'] != labez])
 
         if var_only:
+            # Panel: Coherence at Variant Passages (GraphViz)
+            #
             # if one predecessor is within the same attestation then remove all
             # other predecessors that are not within the same attestation
             for n in graph:
@@ -284,7 +286,7 @@ def textflow (passage_or_id):
             # remove now isolated nodes
             graph.remove_nodes_from (list (nx.isolates (graph)))
 
-            # unconstrain backward edges
+            # unconstrain backward edges (yields a better GraphViz layout)
             for u, v in graph.edges ():
                 if graph.node[u][group_field] > graph.node[v][group_field]:
                     graph.adj[u][v]['constraint'] = 'false'
