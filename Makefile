@@ -97,7 +97,7 @@ import_cl:
 import_john:
 	-$(MYSQL) -e "DROP DATABASE DCPJohnWithFam"
 	$(MYSQL) -e "CREATE DATABASE DCPJohnWithFam"
-	gunzip -c ../dumps/DCPJohnWithFam-9.sql | $(MYSQL) -D DCPJohnWithFam
+	zcat ../dumps/DCPJohnWithFam-9.sql | $(MYSQL) -D DCPJohnWithFam
 	python3 -m scripts.cceh.import -vvv instance/john_ph1.conf
 
 import_john_f1:
@@ -137,10 +137,6 @@ mark:
 	python3 -m scripts.cceh.prepare -vvv instance/mark_ph12.conf
 	python3 -m scripts.cceh.cbgm    -vvv instance/mark_ph12.conf
 
-load_mark:
-	scp $(NTG_PRJ)/backups/* backups/
-	python3 -m scripts.cceh.load_edits -i backups/saved_edits_mark_ph12_`date -I`.xml -vvv instance/mark_ph12.conf
-
 acts_ph5:
 	$(PSQL) -d template1 -c "DROP DATABASE IF EXISTS acts_ph5"
 	$(PSQL) -d template1 -c "CREATE DATABASE acts_ph5 WITH TEMPLATE acts_ph4 OWNER ntg"
@@ -165,9 +161,19 @@ upload_$(1)_from_home:
 
 endef
 
-DBS := acts_ph4 john_ph1 john_f1_ph1 mark_ph12 cl_ph2
+DBS := acts_ph4 acts_ph5 john_ph1 john_f1_ph1 mark_ph12 cl_ph2
 
 $(foreach db,$(DBS),$(eval $(call UPLOAD_TEMPLATE,$(db))))
+
+define LOAD_TEMPLATE =
+
+load_$(1):
+	scp $(NTG_PRJ)/backups/saved_edits_$(1)_`date -I`.xml.gz backups/
+	zcat backups/saved_edits_$(1)_`date -I`.xml.gz | python3 -m scripts.cceh.load_edits -vvv -i - instance/$(1).conf
+
+endef
+
+$(foreach db,$(DBS),$(eval $(call LOAD_TEMPLATE,$(db))))
 
 upload_client: client
 	$(RSYNC) --exclude "api.conf.js" $(CLIENT)/build/* $(NTG_CLIENT)/
