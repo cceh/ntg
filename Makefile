@@ -141,13 +141,10 @@ load_mark:
 	scp $(NTG_PRJ)/backups/* backups/
 	python3 -m scripts.cceh.load_edits -i backups/saved_edits_mark_ph12_`date -I`.xml -vvv instance/mark_ph12.conf
 
-acts_ph5_ph6:
+acts_ph5:
 	$(PSQL) -d template1 -c "DROP DATABASE IF EXISTS acts_ph5"
 	$(PSQL) -d template1 -c "CREATE DATABASE acts_ph5 WITH TEMPLATE acts_ph4 OWNER ntg"
 	python3 -m scripts.cceh.cbgm    -vvv instance/acts_ph5.conf
-	$(PSQL) -d template1 -c "DROP DATABASE IF EXISTS acts_ph6"
-	$(PSQL) -d template1 -c "CREATE DATABASE acts_ph6 WITH TEMPLATE acts_ph5 OWNER ntg"
-
 
 define UPLOAD_TEMPLATE =
 
