@@ -61,7 +61,7 @@ def build_A_text (dba, parameters):
         INSERT INTO apparatus_cliques_view (ms_id, pass_id, labez, clique, cbgm, origin, lesart)
           SELECT :ms_id, p.pass_id, COALESCE (l.labez, 'zz'), COALESCE (l.clique, '1'), true, 'LOC', NULL
           FROM passages p
-          LEFT JOIN locstem l ON (l.pass_id, l.original) = (p.pass_id, true)
+          LEFT JOIN locstem l ON (l.pass_id, l.source_labez) = (p.pass_id, '*')
           WHERE NOT p.fehlvers
         """, dict (parameters, ms_id = MS_ID_A))
 

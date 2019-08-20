@@ -6,8 +6,9 @@
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import _ from 'lodash';
+import $      from 'jquery';
+import _      from 'lodash';
+import Popper from 'popper.js';
 
 /**
  * Format a string in python fashion.  "{count} items found"
@@ -77,17 +78,22 @@ export function deparam (query_string) {
  */
 
 export function svg_contextmenu (menu, target) {
-    $ (target).closest ('div.card').append (menu);
+    const $card = $ (target).closest ('div.card');
+    $card.append (menu);
 
-    var rect = target.getBoundingClientRect ();
-    var bodyRect = document.body.getBoundingClientRect (); // account for scrolling
-    var ev = new $.Event ('click');
-    ev.pageY = rect.top   - bodyRect.top;
-    ev.pageX = rect.right - bodyRect.left;
-    menu.position ({
-        'my'        : 'left top',
-        'collision' : 'flipfit flip',
-        'of'        : ev,
+    var popper = new Popper (target, menu, {
+        'placement' : 'right-start',
+        'modifiers' : {
+            'offset' : {
+                'offset' : '0,3',
+            },
+            'flip' : {
+                'behavior' : ['right', 'bottom', 'top']
+            },
+            'preventOverflow' : {
+                'boundariesElement' : $card,
+            },
+        },
     });
 }
 

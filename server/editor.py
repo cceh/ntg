@@ -57,22 +57,37 @@ def stemma_edit (passage_or_id):
 
     action = args.get ('action')
 
-    if action not in ('split', 'merge', 'move', 'move-manuscripts'):
+    if action not in ('add', 'del', 'split', 'merge', 'move', 'move-manuscripts'):
         raise EditError ('Bad request')
 
-    params = { 'original_new' : args.get ('labez_new') == '*' }
-    for n in 'labez_old labez_new'.split ():
-        params[n] = args.get (n)
-        if not RE_VALID_LABEZ.match (params[n]):
-            raise EditError ('Bad request')
-        if params[n] in ('*', '?'):
-            params[n] = None
-    for n in 'clique_old clique_new'.split ():
-        params[n] = args.get (n)
-        if not RE_VALID_CLIQUE.match (params[n]):
-            raise EditError ('Bad request')
-        if params[n] == '0':
-            params[n] = None
+    params = { }
+    for n in 'labez_old labez_new source_labez'.split ():
+        if n in args:
+            params[n] = args.get (n)
+            if not RE_VALID_LABEZ.match (params[n]):
+                raise EditError ('Bad request')
+    for n in 'clique_old clique_new source_clique'.split ():
+        if n in args:
+            params[n] = args.get (n)
+            if not RE_VALID_CLIQUE.match (params[n]):
+                raise EditError ('Bad request')
+
+    def integrity_error (e):
+        if 'ix_locstem_unique_original' in str (e):
+            raise EditError (
+                '''Only one original reading allowed. If you want to change the original
+                reading, first remove the old original reading.<br/><br/>''' + str (e)
+            )
+        if 'locstem_pkey' in str (e):
+            raise EditError (
+                '''This readings already dependes on that reading.<br/><br/>''' + str (e)
+            )
+        if 'same_source' in str (e):
+            raise EditError (
+                '''A reading cannot be derived from the same reading.
+                If you want to <b>merge two readings</b>, use shift + drag.'''
+            )
+        raise EditError (str (e))
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
@@ -84,42 +99,75 @@ def stemma_edit (passage_or_id):
         """, dict (parameters, **params))
 
         if action == 'move':
+            # reassign a source reading
+            # there may be multiple existent assignments, there'll be only one left
             try:
                 res = execute (conn, """
-                UPDATE locstem
-                SET source_labez = :labez_new, source_clique = :clique_new, original = :original_new
-                WHERE pass_id = :pass_id AND labez = :labez_old AND clique = :clique_old
+                DELETE FROM locstem
+                WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old);
+                INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique)
+                VALUES (:pass_id, :labez_old, :clique_old, :labez_new, :clique_new)
                 """, dict (parameters, **params))
             except sqlalchemy.exc.IntegrityError as e:
-                if 'unique constraint' in str (e):
-                    raise EditError (
-                        '''Only one original reading allowed. If you want to change the original
-                        reading, first remove the old original reading.<br/><br/>''' + str (e)
-                    )
-                raise EditError (str (e))
+                integrity_error (e)
             except sqlalchemy.exc.DatabaseError as e:
                 raise EditError (str (e))
 
-            # test the still uncommited changes
+        if action == 'del':
+            # remove a source reading
+            try:
+                # check if we are asked to remove the only link,
+                # in that case reassign to 'unknown'
+                res = execute (conn, """
+                SELECT pass_id
+                FROM locstem
+                WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old);
+                """, dict (parameters, **params))
+
+                tools.log (logging.INFO, 'Deleting: ' + str (params))
+
+                if res.rowcount > 1:
+                    res = execute (conn, """
+                    DELETE FROM locstem
+                    WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old)
+                      AND (source_labez, source_clique) = (:source_labez, :source_clique)
+                    """, dict (parameters, **params))
+                else:
+                    res = execute (conn, """
+                    UPDATE locstem
+                    SET (source_labez, source_clique) = ('?', '1')
+                    WHERE (pass_id, labez, clique) = (:pass_id, :labez_old, :clique_old);
+                    """, dict (parameters, **params))
+            except sqlalchemy.exc.IntegrityError as e:
+                integrity_error (e)
+            except sqlalchemy.exc.DatabaseError as e:
+                raise EditError (str (e))
+
+        if action == 'add':
+            # add a source reading
+            try:
+                res = execute (conn, """
+                INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique)
+                VALUES (:pass_id, :labez_old, :clique_old, :labez_new, :clique_new)
+                """, dict (parameters, **params))
+            except sqlalchemy.exc.IntegrityError as e:
+                integrity_error (e)
+            except sqlalchemy.exc.DatabaseError as e:
+                raise EditError (str (e))
+
+        if action in ('add', 'del', 'move'):
+            # test the still uncommitted changes
 
             graph = db_tools.local_stemma_to_nx (conn, passage.pass_id)
 
             # test: not a DAG
             if not nx.is_directed_acyclic_graph (graph):
-                raise EditError ('The graph is not a DAG anymore.')
+                raise EditError ('The new graph contains cycles.')
             # test: not connected
             graph.add_edge ('*', '?')
             if not nx.is_weakly_connected (graph):
-                raise EditError ('The graph is not connected anymore.')
-            # test: x derived from x
-            for e in graph.edges:
-                m0 = RE_EXTRACT_LABEZ.match (e[0])
-                m1 = RE_EXTRACT_LABEZ.match (e[1])
-                if m0 and m1 and m0.group (1) == m1.group (1):
-                    raise EditError (
-                        '''A reading cannot be derived from the same reading.
-                        If you want to <b>merge</b> instead, use shift + drag.'''
-                    )
+                raise EditError ('The new graph is not connected.')
+
         elif action == 'split':
             # get the next free clique
             res = execute (conn, """
@@ -137,11 +185,13 @@ def stemma_edit (passage_or_id):
 
             # insert into locstem table with source = '?'
             res = execute (conn, """
-            INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original)
-            VALUES (:pass_id, :labez_old, :clique_next, NULL, NULL, false)
+            INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique)
+            VALUES (:pass_id, :labez_old, :clique_next, '?', '1')
             """, dict (parameters, **params))
 
         elif action == 'merge':
+            # merge two cliques (eg. b1, b2) into one clique (eg. b1)
+            #
             # reassign manuscripts to merged clique
             res = execute (conn, """
             UPDATE ms_cliques
@@ -169,9 +219,9 @@ def stemma_edit (passage_or_id):
             """, dict (parameters, **params))
 
         elif action == 'move-manuscripts':
+            # reassign a set of manuscripts to a new clique
             ms_ids = set (args.get ('ms_ids') or [])
 
-            # reassign manuscripts to new clique
             res = execute (conn, """
             UPDATE apparatus_cliques_view
             SET clique = :clique_new

@@ -176,6 +176,7 @@ def copy_att (dba, parameters):
                        dest_columns = ', '.join (dest_columns)))
 
     with dba.engine.begin () as conn:
+        log (logging.INFO, '          Tweaking tables')
         if book == 'John':
             # we cannot delete 'A' even if he have a positive apparatus because
             # 'A' holds one reading not found in any collated ms.
@@ -206,7 +207,7 @@ def copy_att (dba, parameters):
             SET lemma    = TRIM (COALESCE (lemma,    '')),
                 lesart   = TRIM (COALESCE (lesart,   '')),
                 labez    = TRIM (COALESCE (labez,    '')),
-                labezsuf = trim (COALESCE (labezsuf, ''))
+                labezsuf = TRIM (COALESCE (labezsuf, ''))
             """, dict (parameters, t = t))
 
     # Fix data entry errors.
@@ -1383,7 +1384,7 @@ def fill_locstem_table (db, parameters):
               AND NOT EXISTS (
                 SELECT 1 FROM cliques_view q
                 WHERE (q.begadr, q.endadr, q.labez, q.clique) =
-                      (l.begadr, l.endadr, source2labez (l.s1), source2clique (l.s1))
+                      (l.begadr, l.endadr, varnew2labez (l.s1), varnew2clique (l.s1))
               )
             """, """
             DELETE FROM tmp_locstemed l
@@ -1391,7 +1392,7 @@ def fill_locstem_table (db, parameters):
               AND NOT EXISTS (
                 SELECT 1 FROM cliques_view q
                 WHERE (q.begadr, q.endadr, q.labez, q.clique) =
-                      (l.begadr, l.endadr, source2labez (l.s1), source2clique (l.s1))
+                      (l.begadr, l.endadr, varnew2labez (l.s1), varnew2clique (l.s1))
             )
             """, parameters)
 
@@ -1406,12 +1407,13 @@ def fill_locstem_table (db, parameters):
             """, parameters)
 
             # copy cliques into locstem and get source readings from tmp_locstemed
-            # s1 = '*'   =>   s1 = NULL AND original = True
-            # s1 = '?'   =>   s1 = NULL AND original = False
 
             execute (conn, """
-            INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original, user_id_start)
-            SELECT c.pass_id, c.labez, c.clique, source2labez (l.s1), source2clique (l.s1), source2original (l.s1), 0
+            INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, user_id_start)
+            SELECT c.pass_id, c.labez, c.clique,
+                   COALESCE (varnew2labez  (l.s1), '?'),
+                   varnew2clique (l.s1),
+                   0
             FROM cliques_view c
             LEFT JOIN tmp_locstemed l
               ON (c.begadr, c.endadr, c.labez, c.clique) =

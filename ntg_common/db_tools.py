@@ -222,27 +222,27 @@ def init_default_locstem (conn):
 
     # insert 'a' as original reading (or 'b' as unknown if Fehlvers)
     execute (conn, """
-    INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original, user_id_start)
-    SELECT pass_id, 'a', '1', NULL, NULL, true, 0
+    INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, user_id_start)
+    SELECT pass_id, 'a', '1', '*', '1', 0
     FROM passages p
     WHERE NOT fehlvers;
 
-    INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original, user_id_start)
-    SELECT pass_id, 'b', '1', NULL, NULL, false, 0
+    INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, user_id_start)
+    SELECT pass_id, 'b', '1', '?', '1', 0
     FROM passages p
     WHERE fehlvers;
     """, {})
 
     # make other readings dependent on 'a' (or 'b' in Fehlvers)
     execute (conn, """
-    INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original, user_id_start)
-    SELECT c.pass_id, c.labez, c.clique, 'a', '1', false, 0
+    INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, user_id_start)
+    SELECT c.pass_id, c.labez, c.clique, 'a', '1', 0
     FROM cliques_view c
       JOIN passages p USING (pass_id)
     WHERE NOT p.fehlvers AND c.labez != 'a' AND c.labez !~ '^z[u-z]';
 
-    INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, original, user_id_start)
-    SELECT c.pass_id, c.labez, c.clique, 'b', '1', false, 0
+    INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, user_id_start)
+    SELECT c.pass_id, c.labez, c.clique, 'b', '1', 0
     FROM cliques_view c
       JOIN passages p USING (pass_id)
     WHERE p.fehlvers AND c.labez != 'b' AND c.labez !~ '^z[u-z]'
@@ -407,15 +407,14 @@ def local_stemma_to_nx (conn, pass_id, add_isolated_roots = False):
            labez_clique (labez, clique) AS labez_clique,
            source_labez,
            source_clique,
-           labez_clique (source_labez, source_clique) AS source_labez_clique,
-           original
+           labez_clique (source_labez, source_clique) AS source_labez_clique
     FROM locstem l
     WHERE labez !~ '^z[u-z]' AND pass_id = :pass_id
     ORDER BY labez, clique
     """, dict (pass_id = pass_id))
 
     Variant = collections.namedtuple ('stemma_json_variant',
-                                      'labez clique labez_clique source_labez source_clique source_labez_clique original')
+                                      'labez clique labez_clique source_labez source_clique source_labez_clique')
 
     rows = list (map (Variant._make, res))
 
@@ -430,14 +429,7 @@ def local_stemma_to_nx (conn, pass_id, add_isolated_roots = False):
         graph.add_node (row.labez_clique, label = row.labez_clique,
                     labez = row.labez, clique = row.clique, labez_clique = row.labez_clique,
                     **more_params)
-
-        if row.source_labez_clique is None:
-            if row.original:
-                graph.add_edge ('*', row.labez_clique)
-            else:
-                graph.add_edge ('?', row.labez_clique)
-        else:
-            graph.add_edge (row.source_labez_clique, row.labez_clique)
+        graph.add_edge (row.source_labez_clique, row.labez_clique)
 
     more_params = dict ()
     if add_isolated_roots:
@@ -447,8 +439,8 @@ def local_stemma_to_nx (conn, pass_id, add_isolated_roots = False):
         more_params['droptarget'] = '1'
 
     if '*' in graph:
-        graph.node['*'].update (label = '*', labez='*', clique='0', labez_clique='*', **more_params)
+        graph.node['*'].update (label = '*', labez='*', clique='1', labez_clique='*', **more_params)
     if '?' in graph:
-        graph.node['?'].update (label = '?', labez='?', clique='0', labez_clique='?', **more_params)
+        graph.node['?'].update (label = '?', labez='?', clique='1', labez_clique='?', **more_params)
 
     return graph

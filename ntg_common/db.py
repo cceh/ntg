@@ -5,7 +5,7 @@ we need for doing the CBGM and running the application server.
 
 """
 
-from sqlalchemy import String, Integer, Float, Boolean, DateTime, Column, Index, ForeignKey
+from sqlalchemy import String, Integer, Float, Boolean, DateTime, Table, Column, Index, ForeignKey
 from sqlalchemy import UniqueConstraint, CheckConstraint, ForeignKeyConstraint, PrimaryKeyConstraint
 from sqlalchemy.dialects.postgresql import TSTZRANGE
 from sqlalchemy.ext import compiler
@@ -416,7 +416,6 @@ function ('adr2word', Base.metadata, 'adr INTEGER', 'INTEGER', '''
     SELECT (adr %% 1000)
     ''', volatility = 'IMMUTABLE')
 
-
 # Tables for the CBGM / App Server
 
 Base2 = declarative_base ()
@@ -446,7 +445,7 @@ class Manuscripts (Base2):
         manuscript: 1 = papyrus, 2 = uncial, 3 = minuscule, 4 = lectionary, 5 =
         patristic citations and versions.  The next 4 digits are taken from the
         digits of the Gregory-Aland number, eg. P45 would yield 0045.  The last
-        digit encodes supplements: 0 = original, 1 = first supplement, 2 =
+        digit encodes supplements: 0 = original ms., 1 = first supplement, 2 =
         second supplement.
 
         N.B. Patristic citations and versions are not used in the CBGM, and thus
@@ -917,88 +916,87 @@ class MsCliques_TTS (MsCliques_Mixin, Base2):
     )
 
 
-class LocStem_Mixin (TTS_Mixin):
-    pass_id       = Column (Integer,    nullable = False)
-    labez         = Column (String (3), nullable = False)
-    clique        = Column (String (2), nullable = False, server_default = '1')
-
-    source_labez  = Column (String (3), nullable = True)
-    source_clique = Column (String (2), nullable = True)
-
-    original      = Column (Boolean,    nullable = False, server_default = 'false')
-
-
-class LocStem (LocStem_Mixin, Base2):
-    """A table that contains the priority of the cliques at each passage
-
-    This table records the editorial decisions regarding which manuscripts
-    represent each clique.  The editors decide which reading is derived from
-    which other reading(s) at each passage.
-
-    This is the current table of a transaction state table pair.
-    :class:`LocStem_TTS` is the table that contains the past rows.  See
-    :ref:`transaction-time state tables<tts>`.
-
-
-    .. sauml::
-       :include: locstem
-
-    .. attribute:: labez, clique
-
-        The younger reading which was derived from the older reading.
-
-    .. attribute:: source_labez, source_clique
-
-        The older reading that was the source of the younger reading or NULL if
-        no source reading could be established.
-
-    .. attribute:: original
-
-        This reading was established as the original.  Must also have a
-        source_labez of NULL.
-
-    .. attribute:: sys_period
-
-       The time period in which this row is valid.  In this table all rows are
-       still valid, so the end of the period is not set.
-
-    .. attribute:: user_id_start
-
-       The id of the user making the change at the start of the validity period.
-       See: :class:`.User`.
-
-    .. attribute:: user_id_stop
-
-       The id of the user making the change at the end of the validity period.
-       See: :class:`.User`.
-
-    """
-
-    __tablename__ = 'locstem'
-
-    __table_args__ = (
-        PrimaryKeyConstraint ('pass_id', 'labez', 'clique'),
-        Index ('ix_locstem_pass_id', 'pass_id', unique = True, postgresql_where = text ('original')),
-        ForeignKeyConstraint (['pass_id', 'labez', 'clique'], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
-        ForeignKeyConstraint (['pass_id', 'source_labez', 'source_clique'], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
-        CheckConstraint ('original <= (source_labez is null)'), # original implies source is null
+def tts_fields_mixin ():
+    """ Return a list of columns common to all TTS tables. """
+    return (
+        Column ('sys_period',    TSTZRANGE, nullable = False, server_default = text ('tstzrange (now (), NULL)')),
+        Column ('user_id_start', Integer,   nullable = False),
+        Column ('user_id_stop',  Integer,   nullable = True)
     )
 
 
-class LocStem_TTS (LocStem_Mixin, Base2):
-    """A table that contains the priority of the cliques at each passage
-
-    This is the past table of a transaction state table pair.  :class:`LocStem`
-    is the table that contains the current rows.  The structure of the two
-    tables is the same.  See :ref:`transaction-time state tables<tts>`.
-
-    """
-
-    __tablename__ = 'locstem_tts'
-
-    __table_args__ = (
-        PrimaryKeyConstraint ('pass_id', 'labez', 'clique', 'sys_period'),
+def locstem_fields_mixin ():
+    """ Return a list of columns common to all locstem tables. """
+    return (
+        Column ('pass_id',       Integer,    nullable = False),
+        Column ('labez',         String (3), nullable = False),
+        Column ('clique',        String (2), nullable = False, server_default = '1'),
+        Column ('source_labez',  String (3), nullable = False),
+        Column ('source_clique', String (2), nullable = False, server_default = '1'),
     )
+
+
+locstem_table = Table (
+    'locstem', Base2.metadata, *locstem_fields_mixin (), *tts_fields_mixin (),
+    PrimaryKeyConstraint ('pass_id', 'labez', 'clique', 'source_labez', 'source_clique'),
+    Index ('ix_locstem_unique_original', 'pass_id', unique = True,
+           postgresql_where = text ("source_labez = '*'")),
+    ForeignKeyConstraint (['pass_id', 'labez', 'clique'],
+                          ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
+    CheckConstraint ('labez != source_labez', name='check_same_source'),
+)
+"""A table that contains the priority of the cliques at each passage
+
+This table records the editorial decisions regarding which manuscripts
+represent each clique.  The editors decide which reading is derived from
+which other reading(s) at each passage.
+
+This is the current table of a transaction state table pair.
+:class:`LocStem_TTS` is the table that contains the past rows.  See
+:ref:`transaction-time state tables<tts>`.
+
+
+.. sauml::
+   :include: locstem
+
+.. attribute:: labez, clique
+
+    The younger reading which was derived from the older reading.
+
+.. attribute:: source_labez, source_clique
+
+    The older reading that was the source of the younger reading or '?' if no
+    source reading could be established or '*' if the reading is considered
+    to be the original reading.
+
+.. attribute:: sys_period
+
+   The time period in which this row is valid.  In this table all rows are
+   still valid, so the end of the period is not set.
+
+.. attribute:: user_id_start
+
+   The id of the user making the change at the start of the validity period.
+   See: :class:`.User`.
+
+.. attribute:: user_id_stop
+
+   The id of the user making the change at the end of the validity period.
+   See: :class:`.User`.
+
+"""
+
+locstem_tts_table = Table (
+    'locstem_tts', Base2.metadata, *locstem_fields_mixin (), *tts_fields_mixin (),
+    PrimaryKeyConstraint ('pass_id', 'labez', 'clique', 'source_labez', 'source_clique', 'sys_period'),
+)
+"""A table that contains the priority of the cliques at each passage
+
+This is the past table of a transaction state table pair.  `locstem_table` is
+the table that contains the current rows.  The structure of the two tables is
+the same.  See :ref:`transaction-time state tables<tts>`.
+
+"""
 
 
 class Notes_Mixin (TTS_Mixin):
@@ -1073,22 +1071,17 @@ class Import_MsCliques (MsCliques_Mixin, Base2):
     )
 
 
-class Import_LocStem (LocStem_Mixin, Base2):
-    """A table to help importing of saved state.
+import_locstem = Table (
+    'import_locstem', Base2.metadata, *locstem_fields_mixin (), *tts_fields_mixin (),
+    Column ('pass_id', Integer),
+    Column ('passage', IntRangeType, nullable = False),
+    PrimaryKeyConstraint ('passage', 'labez', 'clique', 'sys_period'),
+)
+"""A table to help importing of saved state.
 
-    This table is only used by the import_cbgm.py script.
+This table is only used by the import_cbgm.py script.
 
-    """
-
-    __tablename__ = 'import_locstem'
-
-    pass_id = Column (Integer)
-    passage = Column (IntRangeType, nullable = False)
-
-    __table_args__ = (
-        PrimaryKeyConstraint ('passage', 'labez', 'clique', 'sys_period'),
-    )
-
+"""
 
 class Import_Notes (Notes_Mixin, Base2):
     """A table to help importing of saved state.
@@ -1255,18 +1248,6 @@ function ('varnew2clique', Base2.metadata, 'varnew CHAR (2)', 'CHAR', '''
 SELECT COALESCE (NULLIF (REGEXP_REPLACE (varnew, '^[^0-9]+', ''), ''), '1')
 ''', volatility = 'IMMUTABLE')
 
-function ('source2labez', Base2.metadata, 'source CHAR (2)', 'CHAR', '''
-SELECT CASE WHEN source IN ('*', '?', '') THEN NULL ELSE varnew2labez (source) END
-''', volatility = 'IMMUTABLE')
-
-function ('source2clique', Base2.metadata, 'source CHAR (2)', 'CHAR', '''
-SELECT CASE WHEN source IN ('*', '?', '') THEN NULL ELSE varnew2clique (source) END
-''', volatility = 'IMMUTABLE')
-
-function ('source2original', Base2.metadata, 'source CHAR (2)', 'BOOLEAN', '''
-SELECT CASE WHEN source = '*' THEN true ELSE false END
-''', volatility = 'IMMUTABLE')
-
 function ('labez_clique', Base2.metadata, 'labez CHAR, clique CHAR', 'CHAR', '''
 SELECT labez || COALESCE (NULLIF (clique, '1'), '')
 ''', volatility = 'IMMUTABLE')
@@ -1319,7 +1300,7 @@ view ('passages_view_lemma', Base2.metadata, '''
     LEFT JOIN (
       SELECT r.pass_id, r.lesart
       FROM readings r
-      JOIN locstem l ON (l.pass_id, l.labez, l.original) = (r.pass_id, r.labez, true)
+      JOIN locstem l ON (l.pass_id, l.labez, l.source_labez) = (r.pass_id, r.labez, '*')
     ) rl ON (p.pass_id = rl.pass_id)
     ORDER by p.pass_id;
     ''')
@@ -1432,15 +1413,12 @@ view ('export_ms_cliques', Base2.metadata, '''
     ORDER BY passage, sys_period, hsnr, labez, clique
     ''')
 
-# CREATE OR REPLACE VIEW export_locstem AS
-
 view ('export_locstem', Base2.metadata, '''
-    SELECT passage, labez, clique, source_labez, source_clique, original,
+    SELECT passage, labez, clique, source_labez, source_clique,
            sys_period, user_id_start, user_id_stop
     FROM locstem_view
-    WHERE user_id_start != 0
     UNION
-    SELECT p.passage, labez, clique, source_labez, source_clique, original,
+    SELECT p.passage, labez, clique, source_labez, source_clique,
            sys_period, user_id_start, user_id_stop
     FROM locstem_tts lt
     JOIN passages p USING (pass_id)
@@ -1450,7 +1428,6 @@ view ('export_locstem', Base2.metadata, '''
 view ('export_notes', Base2.metadata, '''
     SELECT passage, note, sys_period, user_id_start, user_id_stop
     FROM notes_view
-    WHERE user_id_start != 0
     UNION
     SELECT p.passage, note, sys_period, user_id_start, user_id_stop
     FROM notes_tts
@@ -1467,12 +1444,12 @@ DROP INDEX IF EXISTS readings_unique_pass_id_lesart
 
 
 LOCSTEM_REC = '''
-WITH RECURSIVE locstem_rec (pass_id, labez, clique, source_labez, source_clique, original) AS (
-  SELECT pass_id, labez, clique, source_labez, source_clique, original
+WITH RECURSIVE locstem_rec (pass_id, labez, clique, source_labez, source_clique) AS (
+  SELECT pass_id, labez, clique, source_labez, source_clique
   FROM locstem i
   WHERE i.pass_id = passage_id AND i.labez = labez1 AND i.clique = clique1
   UNION
-  SELECT l.pass_id, l.labez, l.clique, l.source_labez, l.source_clique, l.original
+  SELECT l.pass_id, l.labez, l.clique, l.source_labez, l.source_clique
   FROM locstem l, locstem_rec r
   WHERE l.pass_id = r.pass_id AND l.labez = r.source_labez AND l.clique = r.source_clique
   )
@@ -1483,7 +1460,7 @@ SELECT EXISTS (SELECT * FROM locstem_rec WHERE source_labez = labez2 AND source_
 ''', volatility = 'STABLE')
 
 function ('is_unclear', Base2.metadata, 'passage_id INTEGER, labez1 CHAR, clique1 CHAR', 'BOOLEAN', LOCSTEM_REC + '''
-SELECT EXISTS (SELECT * FROM locstem_rec WHERE source_labez IS NULL AND original = false);
+SELECT EXISTS (SELECT * FROM locstem_rec WHERE source_labez = '?');
 ''', volatility = 'STABLE')
 
 function ('is_p_older', Base2.metadata, 'passage_id INTEGER, labez2 CHAR, clique2 CHAR, labez1 CHAR, clique1 CHAR', 'BOOLEAN', '''
@@ -1497,7 +1474,7 @@ function ('is_p_unclear', Base2.metadata, 'passage_id INTEGER, labez1 CHAR, cliq
 SELECT EXISTS (SELECT * FROM locstem
                WHERE pass_id = passage_id AND
                      labez = labez1 AND clique = clique1 AND
-                     source_labez IS NULL AND original = false);
+                     source_labez = '?');
 ''', volatility = 'STABLE')
 
 function ('user_id', Base2.metadata, '', 'INTEGER', '''
@@ -1528,9 +1505,9 @@ function ('locstem_trigger_f', Base2.metadata, '', 'TRIGGER', '''
    BEGIN
       IF TG_OP IN ('UPDATE', 'DELETE') THEN
         -- transfer data to tts table
-        INSERT INTO locstem_tts (pass_id, labez, clique, source_labez, source_clique, original,
+        INSERT INTO locstem_tts (pass_id, labez, clique, source_labez, source_clique,
                                  sys_period, user_id_start, user_id_stop)
-        VALUES (OLD.pass_id, OLD.labez, OLD.clique, OLD.source_labez, OLD.source_clique, OLD.original,
+        VALUES (OLD.pass_id, OLD.labez, OLD.clique, OLD.source_labez, OLD.source_clique,
                 close_period (OLD.sys_period), OLD.user_id_start, user_id ());
       END IF;
       IF TG_OP IN ('UPDATE', 'INSERT') THEN
@@ -1697,7 +1674,7 @@ class Nestle (Base4):
 # Tables for flask_login / flask_user / flask_security / whatever
 
 Base3 = declarative_base ()
-Base4.metadata.schema = 'ntg'
+Base3.metadata.schema = 'ntg'
 
 class _User ():
     __tablename__ = 'user'

@@ -129,7 +129,7 @@ def build_explain_matrix (conn, val, ms_id):
     lsrn AS (
       SELECT ls.pass_id, ls.labez, ls.clique,
         -- set 1 as flag for unknown derivation
-        CASE WHEN (ls.source_labez IS NULL) AND NOT ls.original THEN rn1.rn | 1 ELSE rn1.rn END AS rn1,
+        CASE WHEN ls.source_labez = '?' THEN rn1.rn | 1 ELSE rn1.rn END AS rn1,
         rn2.rn AS rn2
       FROM locstem ls
       JOIN rn as rn1

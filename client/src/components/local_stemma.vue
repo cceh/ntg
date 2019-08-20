@@ -1,9 +1,17 @@
 <template>
   <div class="local-stemma-vm card-slidable">
     <div :class="'wrapper svg-wrapper ' + cssclass"
-         @contextmenu.prevent="on_contextmenu">
+         @contextmenu.prevent="on_contextmenu" @click="on_click">
       <slot />
     </div>
+    <table class="dropdown-menu" role="menu" ref="menu">
+      <tbody v-for="grp of actions">
+        <tr v-for="a in grp" :class="a.class" @click="on_menu_click (a.data, $event)">
+          <td class="bg_labez" :data-labez="a.bg"></td>
+          <td>{{ a.msg }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -41,15 +49,15 @@ let target_node  = null;
 
 function return_to_base (node) {
     if (node !== null) {
-        let t = d3.transition ().duration (500).ease (d3.easeLinear);
+        const t = d3.transition ().duration (500).ease (d3.easeLinear);
         node.transition (t).attrTween ('transform', function (d, dummy_i, dummy_a)  {
-            let delta_x = d.pos.x - d.pos.orig_x;
-            let delta_y = d.pos.y - d.pos.orig_y;
+            const delta_x = d.pos.x - d.pos.orig_x;
+            const delta_y = d.pos.y - d.pos.orig_y;
             d.pos.x = d.pos.orig_x;
             d.pos.y = d.pos.orig_y;
             return function (tt) {
-                let x = d.pos.x + ((1.0 - tt) * delta_x);
-                let y = d.pos.y + ((1.0 - tt) * delta_y);
+                const x = d.pos.x + ((1.0 - tt) * delta_x);
+                const y = d.pos.y + ((1.0 - tt) * delta_y);
                 return 'translate(' + x + ',' + y + ')';
             };
         });
@@ -83,7 +91,7 @@ function highlight (node, b) {
  */
 
 function dragListener (vm) {
-    let passage = vm.$store.state.passage;
+    const passage = vm.$store.state.passage;
 
     return d3.drag ()
         .on ('start', function (dummy_d) {
@@ -108,17 +116,20 @@ function dragListener (vm) {
             // console.log (d3.event.shiftKey ? 'shift' : 'unshift');
         })
         .on ('end', function (dummy_d) {
-            let dragged_node_ref = dragged_node;
+            const dragged_node_ref = dragged_node;
             if (target_node) {
                 // if dropped on another node, the default action is to
                 // move, but if the shift key was held down, the action will
                 // be to merge or to split
                 let action = 'move';
+                if (d3.event.sourceEvent.ctrlKey) {
+                    action = 'add';
+                }
                 if (d3.event.sourceEvent.shiftKey) {
                     action = (dragged_node.datum ().labez === target_node.datum ().labez)
                         ? 'merge' : 'split';
                 }
-                let xhr = vm.post ('stemma-edit/' + passage.pass_id, {
+                const xhr = vm.post ('stemma-edit/' + passage.pass_id, {
                     'action'     : action,
                     'labez_old'  : dragged_node.datum ().labez,
                     'clique_old' : dragged_node.datum ().clique,
@@ -146,24 +157,19 @@ function dragListener (vm) {
 }
 
 /**
- * Output one menu item
+ * Format message
  *
- * @function trow
+ * @function mkmsg
  *
- * @param {Object} data - A dictionary
+ * @param {String} msg    - Message prefix
+ * @param {String} labez  - The labez
+ * @param {String} clique - The clique
  *
- * @returns {jQuery} The table row object.
+ * @returns {String} The formatted message.
  */
 
-function trow (data) {
-    return $ (tools.format (
-        '<tr data-action="{action}" data-labez_old="{labez_old}" data-clique_old="{clique_old}" '
-            + 'data-labez_new="{labez_new}" data-clique_new="{clique_new}">'
-            + '<td class="bg_labez" data-labez="{labez_bg}"></td>'
-            + '<td>{msg}</td>'
-            + '</tr>',
-        data
-    ));
+function mkmsg (msg, labez, clique) {
+    return msg + ' ' + labez + (Number (clique) > 1 ? clique : '');
 }
 
 /**
@@ -189,81 +195,122 @@ function open_contextmenu (event, vm) {
         'labez_old'  : dataset.labez,
         'clique_old' : dataset.clique,
     };
+    const cliques = _.filter (vm.$store.state.passage.cliques, o => o.labez[0] !== 'z')
+          .concat ([
+              { 'labez' : '*', 'clique' : '1', 'labez_clique' : '*' },
+              { 'labez' : '?', 'clique' : '1', 'labez_clique' : '?' },
+          ]);
 
-    // build the context menu
-    let menu = $ ('<table class="contextmenu"></table>');
-    menu.append ($ (tools.format (
-        '<tr class="ui-state-disabled">'
-            + '<td class="bg_labez" data-labez="{labez_old}"></td>'
-            + '<td>{labez_old}{clique_old}</td>'
-            + '</tr>',
-        data
-    )));
-    menu.append ($ ('<tr><td>-</td><td>-</td></tr>'));
+    // Menu Header
+    const actions = [];
 
-    // Split a clique
+    actions.push ({
+        'msg'   : mkmsg ('Reading', data.labez_old, data.clique_old),
+        'bg'    : data.labez_old,
+        'class' : 'disabled',
+        'data' : {
+            ... data,
+            'action'   : '',
+            'disabled' : true,
+        }
+    });
 
-    data.action = 'split';
-    data.msg = 'Split ' + data.labez_old + data.clique_old;
-    data.labez_new  = '?';
-    data.clique_new = '0';
-    data.labez_bg   = dataset.labez;
-    menu.append (trow (data));
-    menu.append ($ ('<tr><td>-</td><td>-</td></tr>'));
+    // Split one clique
+
+    actions.push ({
+        'msg'   : mkmsg ('Split', data.labez_old, data.clique_old),
+        'bg'    : data.labez_old,
+        'class' : '',
+        'data' : {
+            ... data,
+            'action'     : 'split',
+            'labez_new'  : '?',
+            'clique_new' : '1',
+        }
+    });
 
     // Merge two cliques
 
-    let cliques = _.filter (vm.$store.state.passage.cliques, function (o) { return o.labez[0] !== 'z'; });
-    cliques = cliques.concat ([
-        { 'labez' : '*', 'clique' : '0', 'labez_clique' : '*' },
-        { 'labez' : '?', 'clique' : '0', 'labez_clique' : '?' },
-    ]);
-    _.forEach (cliques, function (value) {
-        data.labez_new  = value.labez;
-        data.clique_new = value.clique;
-        data.labez_bg   = value.labez;
-
-        if ((data.labez_new === data.labez_old) && (data.clique_old !== data.clique_new)) {
-            data.action = 'merge';
-            data.msg    = 'Merge into ' + data.labez_new + data.clique_new;
-            menu.append (trow (data));
+    _.forEach (cliques, function (c) {
+        if ((c.labez === data.labez_old) && (c.clique !== data.clique_old)) {
+            actions.push ({
+                'msg'   : mkmsg ('Merge into', c.labez, c.clique),
+                'bg'    : data.labez_old,
+                'class' : '',
+                'data'  : {
+                    ... data,
+                    'action'     : 'merge',
+                    'labez_new'  : c.labez,
+                    'clique_new' : c.clique,
+                },
+            });
         }
     });
-    menu.append ($ ('<tr><td>-</td><td>-</td></tr>'));
 
     // Reassign Source of clique
 
-    _.forEach (cliques, function (value) {
-        data.labez_new  = value.labez;
-        data.clique_new = value.clique;
-        data.labez_bg   = value.labez;
-
-        if (data.labez_new !== data.labez_old) {
-            data.action = 'move';
-            data.msg    = 'Set Source to ' + data.labez_new + data.clique_new;
-            menu.append (trow (data));
+    _.forEach (cliques, function (c) {
+        if (c.labez !== data.labez_old || c.clique !== data.clique_old) {
+            actions.push ({
+                'msg'   : mkmsg ('Set Source to', c.labez, c.clique),
+                'bg'    : c.labez,
+                'class' : '',
+                'data'  : {
+                    ... data,
+                    'action'     : 'move',
+                    'labez_new'  : c.labez,
+                    'clique_new' : c.clique,
+                },
+            });
         }
     });
 
+    // Add another source
+
+    _.forEach (cliques, function (c) {
+        if (c.labez !== data.labez_old || c.clique !== data.clique_old) {
+            actions.push ({
+                'msg'   : mkmsg ('Add Source', c.labez, c.clique),
+                'bg'    : c.labez,
+                'class' : '',
+                'data'  : {
+                    ... data,
+                    'action'     : 'add',
+                    'labez_new'  : c.labez,
+                    'clique_new' : c.clique,
+                },
+            });
+        }
+    });
+
+    // Delete a source
+
+    const graph_vm = vm.get_graph_vm ();
+    const g = graph_vm.graph;
+    _.forEach (g.edges, (edge, i) => {
+        const t_labez = g.nodes[edge.elems[1].id].attrs.labez;
+        if (t_labez === dataset.labez) {
+            const s_attr = g.nodes[edge.elems[0].id].attrs;
+            actions.push ({
+                'msg'   : mkmsg ('Remove Source', s_attr.labez, s_attr.clique),
+                'bg'    : s_attr.labez,
+                'class' : '',
+                'data'  : {
+                    ... data,
+                    'action'        : 'del',
+                    'source_labez'  : s_attr.labez,
+                    'source_clique' : s_attr.clique,
+                },
+            });
+        }
+    });
+
+    vm.actions = _.groupBy (actions, a => a.data.action);
+
     // Display the menu
 
-    menu.menu ({
-        'select' : function (event2, ui) {
-            let tr = ui.item[0];
-
-            // console.log ('Selected: ' + $ (tr).text ());
-
-            let xhr2 = vm.post ('stemma-edit/' + passage.pass_id, tr.dataset);
-            xhr2.then (() => {
-                $ (window).trigger ('hashchange');
-            });
-            xhr2.catch ((reason) => {
-                tools.xhr_alert (reason, event.data.$wrapper);
-            });
-            menu.fadeOut (function () { menu.remove (); });
-        },
-    });
-    tools.svg_contextmenu (menu, event.target);
+    $ (vm.$refs.menu).show ();
+    tools.svg_contextmenu ($ (vm.$refs.menu), event.target);
 }
 
 /**
@@ -310,7 +357,9 @@ function load_passage (vm, passage) {
 export default {
     'props' : ['toolbar', 'cssclass', 'global', 'var_only'],
     'data'  : function () {
-        return {};
+        return {
+            'actions' : [],
+        };
     },
     'computed' : {
         ...mapGetters ([
@@ -348,6 +397,24 @@ export default {
         on_contextmenu (event) {
             open_contextmenu (event, this);
         },
+        on_click (event) {
+            const vm = this;
+            const menu = vm.$refs.menu;
+            $ (menu).fadeOut (function () { vm.actions = []; });
+        },
+        on_menu_click (data, event) {
+            const vm = this;
+            const menu = vm.$refs.menu;
+
+            const xhr2 = vm.post ('stemma-edit/' + vm.passage.pass_id, data);
+            xhr2.then (() => {
+                $ (window).trigger ('hashchange');
+            });
+            xhr2.catch ((reason) => {
+                tools.xhr_alert (reason, vm.$wrapper);
+            });
+            $ (menu).fadeOut (function () { vm.actions = []; });
+        },
         download (page) {
             window.open (this.build_full_api_url (this.build_url (page), '_blank'));
         },
@@ -361,3 +428,50 @@ export default {
     },
 };
 </script>
+
+
+<style lang="scss">
+/* local_stemma.vue */
+@import "bootstrap-custom";
+
+div.card table.dropdown-menu {
+    font-size: $font-size-base;
+    text-align: left;
+
+    tbody + tbody {
+        border-top: $dropdown-border-width solid $dropdown-border-color;
+    }
+
+    tr {
+        &:hover {
+            color: $dropdown-link-active-color;
+            background: $dropdown-link-active-bg;
+        }
+        &.disabled,
+        &:disabled {
+            color: $dropdown-link-disabled-color;
+            pointer-events: none;
+            background-color: transparent;
+        }
+    }
+
+    td {
+        padding: 3px 5px;
+        &.bg_labez {
+            padding: 3px 10px;
+        }
+    }
+
+    td.ui-menu-item-wrapper {
+        /* padding: 3px 20px; */
+        &.ui-state-active {
+            margin: 0;
+            border-width: 0;
+            color: $dropdown-link-active-color;
+            background: $dropdown-link-active-bg;
+        }
+        &.menu-label { text-align: right; }
+        &.menu-description { padding-left: 0; }
+    }
+}
+</style>

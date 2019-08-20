@@ -187,6 +187,12 @@ if __name__ == '__main__':
         for row in tree.xpath ('/sql/export_locstem/row'):
             values.append ({ e.tag : e.text for e in row })
 
+        # fix schema changed in #79
+        for v in values:
+            if v['source_labez'] is None:
+                v['source_labez']  = '*' if v['original'] == 'true' else '?'
+                v['source_clique'] = '1'
+
         execute (conn, """
         TRUNCATE import_locstem;
         """, parameters)
@@ -198,7 +204,6 @@ if __name__ == '__main__':
                 :sys_period, :user_id_start, :user_id_stop)
         """, parameters, values)
 
-        # get the pass_id
         # do not refer to cliques_view as that could kill entries in the history
         execute (conn, """
         UPDATE import_locstem u
@@ -219,23 +224,30 @@ if __name__ == '__main__':
         WHERE pass_id IS NULL
         """, parameters)
 
+        execute (conn, """
+        UPDATE locstem
+        SET source_labez = '?'
+        WHERE pass_id = 1477
+        """, parameters)
+
     with db.engine.begin () as conn:
         execute (conn, """
         ALTER TABLE locstem DISABLE TRIGGER locstem_trigger;
-
-        -- remove the default entries of all passages to be imported
-        DELETE FROM locstem
-        WHERE pass_id IN (
-          SELECT DISTINCT pass_id
-          FROM import_locstem
-        );
+        CREATE UNIQUE INDEX ix_locstem_import ON locstem (pass_id, labez, clique);
 
         INSERT INTO locstem AS u (pass_id, labez, clique, source_labez, source_clique,
                                   sys_period, user_id_start, user_id_stop)
         SELECT pass_id, labez, clique, source_labez, source_clique,
                sys_period, user_id_start, user_id_stop
         FROM import_locstem
-        WHERE UPPER_INF (sys_period);
+        WHERE UPPER_INF (sys_period)
+        ORDER BY source_labez DESC
+        ON CONFLICT (pass_id, labez, clique) DO
+        UPDATE
+        SET (source_labez, source_clique, sys_period, user_id_start, user_id_stop) =
+            (EXCLUDED.source_labez, EXCLUDED.source_clique,
+             EXCLUDED.sys_period, EXCLUDED.user_id_start, EXCLUDED.user_id_stop)
+        WHERE (u.pass_id, u.labez, u.clique) = (EXCLUDED.pass_id, EXCLUDED.labez, EXCLUDED.clique);
 
         INSERT INTO locstem_tts AS u (pass_id, labez, clique, source_labez, source_clique,
                                      sys_period, user_id_start, user_id_stop)
@@ -244,6 +256,7 @@ if __name__ == '__main__':
         FROM import_locstem
         WHERE NOT UPPER_INF (sys_period);
 
+        DROP INDEX ix_locstem_import;
         ALTER TABLE locstem ENABLE TRIGGER locstem_trigger;
         """, parameters)
 

@@ -9,6 +9,7 @@ save the apparatus tables.
 
 import argparse
 import logging
+import sys
 
 from ntg_common import db
 from ntg_common import db_tools
@@ -38,38 +39,45 @@ if __name__ == '__main__':
 
     log (logging.INFO, "Saving changes ...")
 
-    with open (args.output, 'w', encoding='utf-8') as fp:
-        with db.engine.begin () as conn:
-            fp.write ('<?xml version="1.0" encoding="utf-8" ?>\n\n')
+    if args.output == '-':
+        fp = sys.stdout
+    else:
+        fp = open (args.output, 'w', encoding='utf-8')
 
-            fp.write ('<sql profile="%s">\n' % args.profile)
+    with db.engine.begin () as conn:
+        fp.write ('<?xml version="1.0" encoding="utf-8" ?>\n\n')
 
-            res = execute (conn, """
-            SELECT (table_to_xml ('export_cliques', true, false, ''))
-            """, parameters)
+        fp.write ('<sql profile="%s">\n' % args.profile)
 
-            fp.write (res.fetchone ()[0])
-            fp.write ('\n')
+        res = execute (conn, """
+        SELECT (table_to_xml ('export_cliques', true, false, ''))
+        """, parameters)
 
-            res = execute (conn, """
-            SELECT (table_to_xml ('export_ms_cliques', true, false, ''))
-            """, parameters)
+        fp.write (res.fetchone ()[0])
+        fp.write ('\n')
 
-            fp.write (res.fetchone ()[0])
-            fp.write ('\n')
+        res = execute (conn, """
+        SELECT (table_to_xml ('export_ms_cliques', true, false, ''))
+        """, parameters)
 
-            res = execute (conn, """
-            SELECT (table_to_xml ('export_locstem', true, false, ''))
-            """, parameters)
+        fp.write (res.fetchone ()[0])
+        fp.write ('\n')
 
-            fp.write (res.fetchone ()[0])
-            fp.write ('\n')
+        res = execute (conn, """
+        SELECT (table_to_xml ('export_locstem', true, false, ''))
+        """, parameters)
 
-            res = execute (conn, """
-            SELECT (table_to_xml ('export_notes', true, false, ''))
-            """, parameters)
+        fp.write (res.fetchone ()[0])
+        fp.write ('\n')
 
-            fp.write (res.fetchone ()[0])
-            fp.write ('</sql>\n')
+        res = execute (conn, """
+        SELECT (table_to_xml ('export_notes', true, false, ''))
+        """, parameters)
+
+        fp.write (res.fetchone ()[0])
+        fp.write ('</sql>\n')
+
+    if fp != sys.stdout:
+        fp.close ()
 
     log (logging.INFO, "Done")
