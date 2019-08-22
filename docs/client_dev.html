@@ -155,9 +155,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">sever.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">server.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.main">server.main</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.textflow">server.textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.comparison">server.comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.set_cover">server.set_cover</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.security">server.security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.login">server.login</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
 </ul>
 </li>
@@ -623,26 +627,6 @@ the length of the run prepended, eg. 123 =&gt; 3123, 123456 =&gt;
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – { p : 1, q : 2 }</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="tools.module:tools.svg_contextmenu">
-<code class="descclassname">module:tools.</code><code class="descname">svg_contextmenu</code><span class="sig-paren">(</span><em>menu</em>, <em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.svg_contextmenu" title="Permalink to this definition">¶</a></dt>
-<dd><p>Position a context menu aside an svg element.</p>
-<p>Since jQuery doesn’t grok the SVG DOM, we have to calculate the
-position of the menu manually.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>menu</strong> (<em>Object</em>) – The menu</li>
-<li><strong>target</strong> (<em>Object</em>) – The DOM object to attach the menu to</li>
-</ul>
 </td>
 </tr>
 </tbody>

@@ -154,9 +154,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">sever.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">server.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.main">server.main</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.textflow">server.textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.comparison">server.comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.set_cover">server.set_cover</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.security">server.security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.login">server.login</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
 </ul>
 </li>
@@ -280,7 +284,7 @@ the file <code class="file docutils literal notranslate"><span class="pre">~/.pg
 
 <dl class="staticmethod">
 <dt id="ntg_common.db_tools.PostgreSQLEngine.receive_checkout">
-<em class="property">static </em><code class="descname">receive_checkout</code><span class="sig-paren">(</span><em>dbapi_connection</em>, <em>connection_record</em>, <em>connection_proxy</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.receive_checkout" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">receive_checkout</code><span class="sig-paren">(</span><em>dbapi_connection</em>, <em>_connection_record</em>, <em>_connection_proxy</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.receive_checkout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set a default for the postgres variable ntg.user_id that is used by
 <a class="reference internal" href="database.html#tts"><span class="std std-ref">Transaction-Time State Tables</span></a> tables.</p>
 </dd></dl>
@@ -400,7 +404,7 @@ the graph layout.</p>
 
 <dl class="function">
 <dt id="ntg_common.tools.log">
-<code class="descname">log</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>*aargs</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.log" title="Permalink to this definition">¶</a></dt>
+<code class="descname">log</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>*aargs</em>, <em>**_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.log" title="Permalink to this definition">¶</a></dt>
 <dd><p>Low level log function</p>
 </dd></dl>
 

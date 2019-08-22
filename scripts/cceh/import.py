@@ -7,8 +7,7 @@ more mysql databases.
 
 .. note::
 
-   Make sure to follow the steps in :ref:`docs/install.html#database-access`
-   first.
+   Make sure to follow the steps in `database-access` first.
 
 The source databases are:
 

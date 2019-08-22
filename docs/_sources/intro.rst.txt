@@ -96,8 +96,11 @@ Applying the CBGM
 =================
 
 The `cbgm.py` script recalculates the CBGM.  Whenever a local stemma changes,
-the CBGM coefficients have to be recalculated.  This process is started once
-every night because it takes a few minutes to complete.
+the CBGM coefficients have to be recalculated.  This process must be run
+immediately after the `prepare.py` script.
+
+To take the project from one phase to the next, make a copy of the database and
+run this process on the new database.
 
 .. uml::
    :align: center
@@ -115,16 +118,16 @@ every night because it takes a few minutes to complete.
 Updating the Apparatus
 ======================
 
-If the apparatus needs an update the whole database must be rebuilt from
-scratch, and the editorial decisions have to be saved from the old database and
-reloaded into the new database.
+If the apparatus needs an update the whole CBGM database must be rebuilt from
+scratch, the CBGM process must be run and the editorial decisions have to be
+transferred to the new database:
 
 1. the `save_edits.py` script is used to save the editorial decisions,
 2. the `import.py` and `prepare.py` scripts are used to import and prepare a new
    apparatus, and
-3. the `load_edits.py` script is used to restore the editorial decisions into
-   the new database, and finally
-4. the `cbgm.py` script is run to apply the CBGM to the new data.
+3. the `cbgm.py` script is run to apply the CBGM to the new data, and finally
+4. the `load_edits.py` script is used to restore the editorial decisions into
+   the new database.
 
 
 Links

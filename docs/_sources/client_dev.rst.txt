@@ -171,6 +171,5 @@ Useful functions that don't fit anywhere else.
 .. autofunction:: module:tools~format
 .. autofunction:: module:tools~natural_sort
 .. autofunction:: module:tools~deparam
-.. autofunction:: module:tools~svg_contextmenu
 .. autofunction:: module:tools~xhr_alert
 .. autofunction:: module:tools~bfs

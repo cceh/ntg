@@ -1437,12 +1437,11 @@ def fill_apparatus_table (dba, parameters):
     .. _transform-positive:
 
     The :class:`~ntg_common.db.Att` table contains a negative apparatus.  A
-    :term:`negative apparatus` contains the text of the archetypus (manuscript
-    'A'), but other manuscripts only when they offer a different reading.
+    negative apparatus contains the text of the archetypus (manuscript 'A'), but
+    other manuscripts only when they offer a different reading.
 
-    The :class:`~ntg_common.db.Apparatus` table contains a positive apparatus.  A
-    :term:`positive apparatus` contains the text of all manuscripts at all
-    passages.
+    The :class:`~ntg_common.db.Apparatus` table contains a positive apparatus.
+    A positive apparatus contains the text of all manuscripts at all passages.
 
     Steps to transform the negative apparatus into a positive apparatus
 

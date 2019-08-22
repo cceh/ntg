@@ -154,9 +154,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">sever.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">server.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.main">server.main</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.textflow">server.textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.comparison">server.comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.set_cover">server.set_cover</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.security">server.security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.login">server.login</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
 </ul>
 </li>
@@ -275,7 +279,7 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    -c &lt;config_path&gt;, --config-path &lt;config_path&gt;
+    -c &lt;config_file&gt;, --config-file &lt;config_file&gt;
 
       <ul>
         <li><a href="server_user.html#cmdoption-server-server-py-c">server/server.py command line option</a>
@@ -377,7 +381,7 @@
 </li>
       <li><a href="database.html#ntg_common.db.Affinity">Affinity (class in ntg_common.db)</a>
 </li>
-      <li><a href="server_dev.html#server.security.AnonymousUserMixin">AnonymousUserMixin (class in server.security)</a>
+      <li><a href="server_dev.html#server.login.AnonymousUserMixin">AnonymousUserMixin (class in server.login)</a>
 </li>
       <li><a href="client_dev.html#module-app">app (module)</a>
 </li>
@@ -399,13 +403,13 @@
 </li>
       <li><a href="database.html#ntg_common.db.Apparatus.o">Apparatus.o (in module ntg_common.db)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Apparatus.ZW">Apparatus.ZW (in module ntg_common.db)</a>
 </li>
-      <li><a href="server_dev.html#server.server.apparatus_json">apparatus_json() (in module server.server)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="server_dev.html#server.main.apparatus_json">apparatus_json() (in module server.main)</a>
 </li>
-      <li><a href="server_dev.html#server.server.application_json">application_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.main.application_json">application_json() (in module server.main)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Att">Att (class in ntg_common.db)</a>
 </li>
@@ -431,7 +435,11 @@
 </li>
       <li><a href="database.html#ntg_common.db.Att.x">Att.x (in module ntg_common.db)</a>
 </li>
-      <li><a href="server_dev.html#server.server.attesting">attesting() (in module server.server)</a>
+      <li><a href="server_dev.html#server.main.attestation_json">attestation_json() (in module server.main)</a>
+</li>
+      <li><a href="server_dev.html#server.main.attesting_csv">attesting_csv() (in module server.main)</a>
+</li>
+      <li><a href="server_dev.html#server.helpers.auth">auth() (in module server.helpers)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -454,6 +462,8 @@
       <li><a href="ntg_common.html#ntg_common.tools.BOOKS">BOOKS (in module ntg_common.tools)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.cbgm.build_A_text">build_A_text() (in module scripts.cceh.cbgm)</a>
+</li>
+      <li><a href="server_dev.html#server.set_cover.build_explain_matrix">build_explain_matrix() (in module server.set_cover)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.build_MT_text">build_MT_text() (in module scripts.cceh.prepare)</a>
 </li>
@@ -481,11 +491,13 @@
 </li>
       <li><a href="database.html#ntg_common.db.Cliques">Cliques (class in ntg_common.db)</a>
 </li>
-      <li><a href="server_dev.html#server.server.cliques_json">cliques_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.main.cliques_json">cliques_json() (in module server.main)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Cliques_TTS">Cliques_TTS (class in ntg_common.db)</a>
 </li>
       <li><a href="client_dev.html#module-coherence">coherence (module)</a>
+</li>
+      <li><a href="server_dev.html#server.set_cover.Combination">Combination (class in server.set_cover)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Affinity.common">common (Affinity attribute)</a>
 </li>
@@ -493,21 +505,23 @@
 </li>
       <li><a href="client_dev.html#module-comparison">comparison (module)</a>
 </li>
-      <li><a href="server_dev.html#server.server.comparison_detail">comparison_detail() (in module server.server)</a>
+      <li><a href="server_dev.html#server.comparison.comparison_detail">comparison_detail() (in module server.comparison)</a>
+</li>
+      <li><a href="server_dev.html#server.comparison.comparison_detail_csv">comparison_detail_csv() (in module server.comparison)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="server_dev.html#server.server.comparison_detail_csv">comparison_detail_csv() (in module server.server)</a>
-</li>
       <li><a href="client_dev.html#module-comparison_details_table">comparison_details_table (module)</a>
 </li>
-      <li><a href="server_dev.html#server.server.comparison_summary">comparison_summary() (in module server.server)</a>
+      <li><a href="server_dev.html#server.comparison.comparison_summary">comparison_summary() (in module server.comparison)</a>
 </li>
-      <li><a href="server_dev.html#server.server.comparison_summary_csv">comparison_summary_csv() (in module server.server)</a>
+      <li><a href="server_dev.html#server.comparison.comparison_summary_csv">comparison_summary_csv() (in module server.comparison)</a>
 </li>
       <li><a href="client_dev.html#module-comparison_table">comparison_table (module)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.import.concat_tables_fdw">concat_tables_fdw() (in module scripts.cceh.import)</a>
+</li>
+      <li><a href="server_dev.html#server.server.Config">Config (class in server.server)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.copy_genealogical">copy_genealogical() (in module scripts.cceh.prepare)</a>
 </li>
@@ -517,6 +531,8 @@
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.import.copy_table_fdw">copy_table_fdw() (in module scripts.cceh.import)</a>
 </li>
+      <li><a href="server_dev.html#server.server.create_app">create_app() (in module server.server)</a>
+</li>
       <li><a href="database.html#ntg_common.db.CreateFDW">CreateFDW (class in ntg_common.db)</a>
 </li>
       <li><a href="database.html#ntg_common.db.CreateFunction">CreateFunction (class in ntg_common.db)</a>
@@ -525,7 +541,7 @@
 </li>
       <li><a href="database.html#ntg_common.db.CreateView">CreateView (class in ntg_common.db)</a>
 </li>
-      <li><a href="server_dev.html#server.server.csvify">csvify() (in module server.server)</a>
+      <li><a href="server_dev.html#server.helpers.csvify">csvify() (in module server.helpers)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -539,6 +555,8 @@
 </li>
       <li><a href="client_dev.html#module-d3_stemma_layout">d3_stemma_layout (module)</a>
 </li>
+      <li><a href="server_dev.html#server.login.declare_user_model_on">declare_user_model_on() (in module server.login)</a>
+</li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.delete_corrector_hands">delete_corrector_hands() (in module scripts.cceh.prepare)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.delete_invariant_passages">delete_invariant_passages() (in module scripts.cceh.prepare)</a>
@@ -546,6 +564,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.delete_lectionaries">delete_lectionaries() (in module scripts.cceh.prepare)</a>
+</li>
+      <li><a href="server_dev.html#server.server.do_init_app">do_init_app() (in module server.server)</a>
 </li>
       <li><a href="database.html#ntg_common.db.DropFDW">DropFDW (class in ntg_common.db)</a>
 </li>
@@ -561,15 +581,15 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="server_dev.html#server.editor.EditError">EditError</a>
+      <li><a href="server_dev.html#server.editor.edit_auth">edit_auth() (in module server.editor)</a>
 </li>
-      <li><a href="server_dev.html#server.editor.EditException">EditException</a>
+      <li><a href="database.html#ntg_common.db.Affinity.equal">equal (Affinity attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="database.html#ntg_common.db.Affinity.equal">equal (Affinity attribute)</a>
+      <li><a href="server_dev.html#server.helpers.EXCLUDE_REGEX_MAP">EXCLUDE_REGEX_MAP (in module server.helpers)</a>
 </li>
-      <li><a href="server_dev.html#server.server.EXCLUDE_REGEX_MAP">EXCLUDE_REGEX_MAP (in module server.server)</a>
+      <li><a href="server_dev.html#server.set_cover.Combination.explained">explained() (Combination method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -577,16 +597,18 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="database.html#ntg_common.db.Att.fehler">fehler (Att attribute)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Passages.fehlvers">fehlvers (Passages attribute)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.FEHLVERSE">FEHLVERSE (in module ntg_common.tools)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.fill_apparatus_table">fill_apparatus_table() (in module scripts.cceh.prepare)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare.fill_manuscripts_table">fill_manuscripts_table() (in module scripts.cceh.prepare)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.fill_manuscripts_table">fill_manuscripts_table() (in module scripts.cceh.prepare)</a>
+</li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.fill_ms_cliques_table">fill_ms_cliques_table() (in module scripts.cceh.prepare)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.fill_passages_table">fill_passages_table() (in module scripts.cceh.prepare)</a>
@@ -601,10 +623,14 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="server_dev.html#server.set_cover.get_ancestors">get_ancestors() (in module server.set_cover)</a>
+</li>
       <li><a href="ntg_common.html#ntg_common.db_tools.PostgreSQLEngine.get_connection_params">get_connection_params() (PostgreSQLEngine method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="server_dev.html#server.helpers.get_excluded_ms_ids">get_excluded_ms_ids() (in module server.helpers)</a>
+</li>
       <li><a href="ntg_common.html#ntg_common.tools.graphviz_layout">graphviz_layout() (in module ntg_common.tools)</a>
 </li>
   </ul></td>
@@ -643,14 +669,30 @@
 </li>
       <li><a href="database.html#ntg_common.db.Import_LocStem">Import_LocStem (class in ntg_common.db)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Import_MsCliques">Import_MsCliques (class in ntg_common.db)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.import.import_nestle_fdw">import_nestle_fdw() (in module scripts.cceh.import)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Import_Notes">Import_Notes (class in ntg_common.db)</a>
 </li>
+      <li><a href="server_dev.html#server.set_cover.init">init() (in module server.set_cover)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="server_dev.html#server.comparison.init_app">init_app() (in module server.comparison)</a>
+
+      <ul>
+        <li><a href="server_dev.html#server.editor.init_app">(in module server.editor)</a>
+</li>
+        <li><a href="server_dev.html#server.login.init_app">(in module server.login)</a>
+</li>
+        <li><a href="server_dev.html#server.main.init_app">(in module server.main)</a>
+</li>
+        <li><a href="server_dev.html#server.set_cover.init_app">(in module server.set_cover)</a>
+</li>
+        <li><a href="server_dev.html#server.textflow.init_app">(in module server.textflow)</a>
+</li>
+      </ul></li>
       <li><a href="ntg_common.html#ntg_common.db_tools.init_default_cliques">init_default_cliques() (in module ntg_common.db_tools)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.db_tools.init_default_locstem">init_default_locstem() (in module ntg_common.db_tools)</a>
@@ -677,7 +719,7 @@
       </ul></li>
       <li><a href="database.html#ntg_common.db.Lac">Lac (class in ntg_common.db)</a>
 </li>
-      <li><a href="server_dev.html#server.server.leitzeile_json">leitzeile_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.main.leitzeile_json">leitzeile_json() (in module server.main)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Att.lekt">lekt (Att attribute)</a>
 </li>
@@ -713,19 +755,19 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="client_dev.html#module-main">main (module)</a>
 </li>
-      <li><a href="server_dev.html#server.server.make_safe_url">make_safe_url() (in module server.server)</a>
+      <li><a href="server_dev.html#server.login.make_safe_url">make_safe_url() (in module server.login)</a>
 </li>
       <li><a href="server_dev.html#server.helpers.Manuscript">Manuscript (class in server.helpers)</a>
 </li>
-      <li><a href="server_dev.html#server.server.manuscript_full_json">manuscript_full_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.main.manuscript_full_json">manuscript_full_json() (in module server.main)</a>
 </li>
-      <li><a href="server_dev.html#server.server.manuscript_json">manuscript_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.main.manuscript_json">manuscript_json() (in module server.main)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Manuscripts">Manuscripts (class in ntg_common.db)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.mark_invariant_passages">mark_invariant_passages() (in module scripts.cceh.prepare)</a>
 </li>
-      <li><a href="server_dev.html#server.server.messages_json">messages_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.main.messages_json">messages_json() (in module server.main)</a>
 </li>
       <li><a href="client_dev.html#d3_common.module:d3_common.append_marker">module:d3_common.append_marker() (module:d3_common method)</a>
 </li>
@@ -761,8 +803,6 @@
 </li>
       <li><a href="client_dev.html#tools.module:tools.natural_sort">module:tools.natural_sort() (module:tools method)</a>
 </li>
-      <li><a href="client_dev.html#tools.module:tools.svg_contextmenu">module:tools.svg_contextmenu() (module:tools method)</a>
-</li>
       <li><a href="client_dev.html#tools.module:tools.xhr_alert">module:tools.xhr_alert() (module:tools method)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Manuscripts.ms_id">ms_id (Manuscripts attribute)</a>
@@ -791,13 +831,13 @@
 </li>
       <li><a href="client_dev.html#module-notes">notes (module)</a>
 </li>
-      <li><a href="server_dev.html#server.editor.notes">notes() (in module server.editor)</a>
-</li>
       <li><a href="server_dev.html#server.editor.notes_json">notes_json() (in module server.editor)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.Notes_TTS">Notes_TTS (class in ntg_common.db)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="database.html#ntg_common.db.Notes_TTS">Notes_TTS (class in ntg_common.db)</a>
+      <li><a href="server_dev.html#server.editor.notes_txt">notes_txt() (in module server.editor)</a>
 </li>
       <li><a href="ntg_common.html#module-ntg_common">ntg_common (module)</a>
 </li>
@@ -819,11 +859,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.db.Affinity.older">older (Affinity attribute)</a>
 </li>
+      <li><a href="server_dev.html#server.set_cover.optimal_substemma_csv">optimal_substemma_csv() (in module server.set_cover)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="database.html#ntg_common.db.Apparatus.origin">origin (Apparatus attribute)</a>
+      <li><a href="server_dev.html#server.set_cover.optimal_substemma_detail_csv">optimal_substemma_detail_csv() (in module server.set_cover)</a>
 </li>
-      <li><a href="database.html#ntg_common.db.LocStem.original">original (LocStem attribute)</a>
+      <li><a href="server_dev.html#server.set_cover.optimal_substemma_json">optimal_substemma_json() (in module server.set_cover)</a>
+</li>
+      <li><a href="database.html#ntg_common.db.Apparatus.origin">origin (Apparatus attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -845,7 +889,7 @@
         <li><a href="database.html#ntg_common.db.Ranges.passage">(Ranges attribute)</a>
 </li>
       </ul></li>
-      <li><a href="server_dev.html#server.server.passage_json">passage_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.main.passage_json">passage_json() (in module server.main)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Passages">Passages (class in ntg_common.db)</a>
 </li>
@@ -875,7 +919,7 @@
       </ul></li>
       <li><a href="ntg_common.html#ntg_common.db_tools.PostgreSQLEngine">PostgreSQLEngine (class in ntg_common.db_tools)</a>
 </li>
-      <li><a href="server_dev.html#server.editor.PrivilegeError">PrivilegeError</a>
+      <li><a href="server_dev.html#server.set_cover.powerset">powerset() (in module server.set_cover)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.process_commentaries">process_commentaries() (in module scripts.cceh.prepare)</a>
 </li>
@@ -893,7 +937,7 @@
 </li>
       <li><a href="database.html#ntg_common.db.Ranges">Ranges (class in ntg_common.db)</a>
 </li>
-      <li><a href="server_dev.html#server.server.ranges_json">ranges_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.main.ranges_json">ranges_json() (in module server.main)</a>
 </li>
       <li><a href="database.html#ntg_common.src_db.RdgAct01">RdgAct01 (class in ntg_common.src_db)</a>
 </li>
@@ -905,10 +949,10 @@
 </li>
       <li><a href="database.html#ntg_common.db.Readings.zu">Readings.zu (in module ntg_common.db)</a>
 </li>
-      <li><a href="database.html#ntg_common.db.Readings.zv">Readings.zv (in module ntg_common.db)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="database.html#ntg_common.db.Readings.zv">Readings.zv (in module ntg_common.db)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Readings.zw">Readings.zw (in module ntg_common.db)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Readings.zz">Readings.zz (in module ntg_common.db)</a>
@@ -917,24 +961,16 @@
 </li>
       <li><a href="client_dev.html#module-relatives">relatives (module)</a>
 </li>
-      <li><a href="server_dev.html#server.server.relatives_csv">relatives_csv() (in module server.server)</a>
+      <li><a href="server_dev.html#server.main.relatives_csv">relatives_csv() (in module server.main)</a>
 </li>
       <li><a href="client_dev.html#module-relatives_metrics">relatives_metrics (module)</a>
 </li>
-      <li><a href="server_dev.html#server.server.remove_z_leaves">remove_z_leaves() (in module server.server)</a>
+      <li><a href="server_dev.html#server.textflow.remove_z_leaves">remove_z_leaves() (in module server.textflow)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Role">Role (class in ntg_common.db)</a>
-
-      <ul>
-        <li><a href="server_dev.html#server.security.Role">(class in server.security)</a>
 </li>
-      </ul></li>
       <li><a href="database.html#ntg_common.db.Roles_Users">Roles_Users (class in ntg_common.db)</a>
-
-      <ul>
-        <li><a href="server_dev.html#server.security.Roles_Users">(class in server.security)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -944,6 +980,8 @@
       <li><a href="database.html#ntg_common.src_db.LocStemEdAct01.s1">s1 (LocStemEdAct01 attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.src_db.LocStemEdAct01.s2">s2 (LocStemEdAct01 attribute)</a>
+</li>
+      <li><a href="server_dev.html#server.set_cover.Combination.score">score() (Combination method)</a>
 </li>
       <li><a href="scripts_dev.html#module-scripts">scripts (module)</a>
 </li>
@@ -1041,42 +1079,52 @@
       </ul></li>
       <li><a href="server_dev.html#module-server">server (module)</a>
 </li>
+      <li><a href="server_dev.html#module-server.comparison">server.comparison (module)</a>
+</li>
       <li><a href="server_dev.html#module-server.editor">server.editor (module)</a>
 </li>
       <li><a href="server_dev.html#module-server.helpers">server.helpers (module)</a>
 </li>
-      <li><a href="server_dev.html#module-server.security">server.security (module)</a>
+      <li><a href="server_dev.html#module-server.login">server.login (module)</a>
+</li>
+      <li><a href="server_dev.html#module-server.main">server.main (module)</a>
 </li>
       <li><a href="server_dev.html#module-server.server">server.server (module)</a>
+</li>
+      <li><a href="server_dev.html#module-server.set_cover">server.set_cover (module)</a>
+</li>
+      <li><a href="server_dev.html#module-server.textflow">server.textflow (module)</a>
 </li>
       <li>
     server/server.py command line option
 
       <ul>
-        <li><a href="server_user.html#cmdoption-server-server-py-c">-c &lt;config_path&gt;, --config-path &lt;config_path&gt;</a>
+        <li><a href="server_user.html#cmdoption-server-server-py-c">-c &lt;config_file&gt;, --config-file &lt;config_file&gt;</a>
 </li>
         <li><a href="server_user.html#cmdoption-server-server-py-h">-h, --help</a>
 </li>
         <li><a href="server_user.html#cmdoption-server-server-py-v">-v, --verbose</a>
 </li>
       </ul></li>
+      <li><a href="server_dev.html#server.set_cover.set_cover_json">set_cover_json() (in module server.set_cover)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Books.siglum">siglum (Books attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Passages.spanned">spanned (Passages attribute)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Passages.spanning">spanning (Passages attribute)</a>
 </li>
-      <li><a href="server_dev.html#server.server.stemma">stemma() (in module server.server)</a>
+      <li><a href="server_dev.html#server.textflow.stemma">stemma() (in module server.textflow)</a>
 </li>
-      <li><a href="server_dev.html#server.server.stemma_dot">stemma_dot() (in module server.server)</a>
+      <li><a href="server_dev.html#server.textflow.stemma_dot">stemma_dot() (in module server.textflow)</a>
 </li>
       <li><a href="server_dev.html#server.editor.stemma_edit">stemma_edit() (in module server.editor)</a>
 </li>
-      <li><a href="server_dev.html#server.server.stemma_png">stemma_png() (in module server.server)</a>
+      <li><a href="server_dev.html#server.textflow.stemma_png">stemma_png() (in module server.textflow)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Att.suffix">suffix (Att attribute)</a>
 </li>
-      <li><a href="server_dev.html#server.server.suggest_json">suggest_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.main.suggest_json">suggest_json() (in module server.main)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Cliques.sys_period">sys_period (Cliques attribute)</a>
 
@@ -1096,13 +1144,17 @@
 </li>
       <li><a href="client_dev.html#module-textflow">textflow (module)</a>
 </li>
-      <li><a href="server_dev.html#server.server.textflow">textflow() (in module server.server)</a>
+      <li><a href="server_dev.html#server.textflow.textflow">textflow() (in module server.textflow)</a>
+</li>
+      <li><a href="server_dev.html#server.textflow.textflow_dot">textflow_dot() (in module server.textflow)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="server_dev.html#server.server.textflow_dot">textflow_dot() (in module server.server)</a>
+      <li><a href="server_dev.html#server.textflow.textflow_png">textflow_png() (in module server.textflow)</a>
 </li>
-      <li><a href="server_dev.html#server.server.textflow_png">textflow_png() (in module server.server)</a>
+      <li><a href="server_dev.html#server.set_cover.Combination.to_csv">to_csv() (Combination method)</a>
+</li>
+      <li><a href="server_dev.html#server.set_cover.Combination.to_json">to_json() (Combination method)</a>
 </li>
       <li><a href="client_dev.html#module-toolbar">toolbar (module)</a>
 </li>
@@ -1119,11 +1171,7 @@
       <li><a href="scripts_dev.html#scripts.cceh.prepare.unroll_zw">unroll_zw() (in module scripts.cceh.prepare)</a>
 </li>
       <li><a href="database.html#ntg_common.db.User">User (class in ntg_common.db)</a>
-
-      <ul>
-        <li><a href="server_dev.html#server.security.User">(class in server.security)</a>
 </li>
-      </ul></li>
       <li><a href="database.html#ntg_common.db.Cliques.user_id_start">user_id_start (Cliques attribute)</a>
 
       <ul>
@@ -1142,7 +1190,7 @@
         <li><a href="database.html#ntg_common.db.MsCliques.user_id_stop">(MsCliques attribute)</a>
 </li>
       </ul></li>
-      <li><a href="server_dev.html#server.server.user_json">user_json() (in module server.server)</a>
+      <li><a href="server_dev.html#server.main.user_json">user_json() (in module server.main)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1172,6 +1220,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="server_dev.html#server.login.welcome">welcome() (in module server.login)</a>
+</li>
       <li><a href="server_dev.html#server.helpers.Word">Word (class in server.helpers)</a>
 </li>
   </ul></td>

@@ -7,11 +7,43 @@
 
 The API server is written in Python using the Flask framework.
 
-sever.server
-============
+server.server
+=============
 
 .. automodule:: server.server
-   :synopsis: Main Module
+   :synopsis: Flask Driver Module
+   :members:
+
+
+server.main
+===========
+
+.. automodule:: server.main
+   :synopsis: Module for general functions
+   :members:
+
+
+server.textflow
+===============
+
+.. automodule:: server.textflow
+   :synopsis: Module for textflow functions
+   :members:
+
+
+server.comparison
+=================
+
+.. automodule:: server.comparison
+   :synopsis: Module for comparison functions
+   :members:
+
+
+server.set_cover
+================
+
+.. automodule:: server.set_cover
+   :synopsis: Module for set cover and optimal substemma
    :members:
 
 
@@ -23,10 +55,10 @@ server.editor
    :members:
 
 
-server.security
-===============
+server.login
+============
 
-.. automodule:: server.security
+.. automodule:: server.login
    :synopsis: User Management Module
    :members:
 

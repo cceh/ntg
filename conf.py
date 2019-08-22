@@ -20,7 +20,12 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-sys.path.insert (0, os.path.abspath ('.'))
+root = os.path.abspath ('.')
+sys.path.append (root)
+sys.path.append (os.path.join (root, 'server'))
+sys.path.append (os.path.join (root, 'client'))
+sys.path.append (os.path.join (root, 'scripts/cceh'))
+
 
 # -- General configuration ------------------------------------------------
 

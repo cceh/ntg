@@ -155,9 +155,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">sever.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">server.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.main">server.main</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.textflow">server.textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.comparison">server.comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.set_cover">server.set_cover</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.security">server.security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.login">server.login</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
 </ul>
 </li>
@@ -254,15 +258,23 @@
 <div class="section" id="scripts-cceh-import-py">
 <span id="import-py"></span><h2>scripts/cceh/import.py<a class="headerlink" href="#scripts-cceh-import-py" title="Permalink to this headline">¶</a></h2>
 <p>Import databases from mysql.</p>
-<p>This script creates the postgres database and then imports the data from one or
-more mysql databases into it.</p>
-<p>The first mysql database contains the apparatus of the <em>Editio Critica Maior</em>
-publication.  Another database contains the editorial decisions (VarGen)
-regarding the priority of the readings.  The third database (Nestle) contains
-the “Leitzeile”.</p>
-<p>The mysql databases for Acts contain sets of 28 tables, one for each respective
-chapter of Acts.  This is a historical incident: The software used when the CBGM
-was first implemented could not handle big tables.</p>
+<p>This script initializes the postgres database and then imports data from one or
+more mysql databases.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Make sure to follow the steps in <a class="reference internal" href="install.html#database-access"><span class="std std-ref">Database Access</span></a> first.</p>
+</div>
+<p>The source databases are:</p>
+<ol class="arabic simple">
+<li>a database containing the apparatus of the <em>Editio Critica Maior</em>
+publication (ECM).</li>
+<li>a database containing the editorial decisions regarding the priority of the
+readings (VarGen).</li>
+<li>a database containing the “Leitzeile” (Nestle).</li>
+</ol>
+<p>The source tables for Acts are partitioned into 28 chapters.  This is a
+historical incident: The software used when the CBGM was first implemented could
+not handle big tables.  The import script is able to join partitioned tables.</p>
 <p>After running this script should run the <a class="reference internal" href="#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> script.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/import.py [-h] [-v] path/to/file.conf</span>
 </pre></div>

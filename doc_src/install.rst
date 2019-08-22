@@ -41,6 +41,8 @@ As a user with admin privileges do:
       make install-prerequisites
 
 
+.. _database-access:
+
 Database Access
 ===============
 

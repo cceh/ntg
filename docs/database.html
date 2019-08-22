@@ -155,9 +155,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">sever.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">server.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.main">server.main</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.textflow">server.textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.comparison">server.comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.set_cover">server.set_cover</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.security">server.security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.login">server.login</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
 </ul>
 </li>
@@ -264,7 +268,7 @@ tables are <a class="reference internal" href="#tts"><span class="std std-ref">j
 manuscript ‘A’ is concerned.</p>
 <p>The <a class="reference internal" href="server_dev.html#module-server" title="server: API Server"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">server</span></code></a> uses all these tables.</p>
 <div class="figure align-center" id="id4">
-<div class="graphviz"><img src="_images/graphviz-15d8a244a9a50064f723879a608669ad2a76ff24.png" alt="UML Database Graph" class="sauml graphviz" /></div>
+<div class="graphviz"><img src="_images/graphviz-df8a6d2ea3f1286e5c40efa802fefaa6972485b5.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <p class="caption"><span class="caption-text">Work database structure</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
 </div>
 <div class="section" id="transaction-time-state-tables">
@@ -445,7 +449,7 @@ table, this one.</p>
 <p>This table contains a <a class="reference internal" href="scripts_dev.html#transform-positive"><span class="std std-ref">negative apparatus</span></a> of all
 manuscripts.  For the CBGM the data in this table has to be normalised into
 our database structure and converted into a positive apparatus.</p>
-<div class="graphviz"><img src="_images/graphviz-6be7453126c82d0e877b4871222a3b4224fbe1e8.png" alt="UML Database Graph" class="sauml graphviz" /></div>
+<div class="graphviz"><img src="_images/graphviz-adc337fe43462c876a47872a05f07ed80746a241.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <span class="target" id="att"></span><dl class="attribute">
 <dt id="ntg_common.db.Att.hsnr">
 <code class="descname">hsnr</code><a class="headerlink" href="#ntg_common.db.Att.hsnr" title="Permalink to this definition">¶</a></dt>
@@ -577,6 +581,13 @@ wahrscheinliche Lesung.  Ist für die CBGM als sichere Lesart zu
 akzeptieren.</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ntg_common.db.Att.fehler">
+<code class="descname">fehler</code><a class="headerlink" href="#ntg_common.db.Att.fehler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Denotes an orthografical error in Catholic Letters.  This became part of
+labezsuf in the other books.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -745,28 +756,28 @@ tables is the same.  See <a class="reference internal" href="#tts"><span class="
 <dt id="ntg_common.db.Import_Cliques">
 <em class="property">class </em><code class="descname">Import_Cliques</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Import_Cliques" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table to help importing of saved state.</p>
-<p>This table is used only by the import_cbgm.py script.</p>
+<p>This table is used only by the load_edits.py script.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="ntg_common.db.Import_LocStem">
 <em class="property">class </em><code class="descname">Import_LocStem</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Import_LocStem" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table to help importing of saved state.</p>
-<p>This table is only used by the import_cbgm.py script.</p>
+<p>This table is only used by the load_edits.py script.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="ntg_common.db.Import_MsCliques">
 <em class="property">class </em><code class="descname">Import_MsCliques</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Import_MsCliques" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table to help importing of saved state.</p>
-<p>This table is used only by the import_cbgm.py script.</p>
+<p>This table is used only by the load_edits.py script.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="ntg_common.db.Import_Notes">
 <em class="property">class </em><code class="descname">Import_Notes</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Import_Notes" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table to help importing of saved state.</p>
-<p>This table is only used by the import_cbgm.py script.</p>
+<p>This table is only used by the load_edits.py script.</p>
 </dd></dl>
 
 <dl class="class">
@@ -781,38 +792,35 @@ the start and end of each lacuna.  A lacuna entry generally spans many
 passages in the Att table.</p>
 <p>This table has the same structure as table Att.  For the description of the
 columns see <a class="reference internal" href="#att"><span class="std std-ref">table Att</span></a>.</p>
-<div class="graphviz"><img src="_images/graphviz-14e66efec6c01ed40ef13c30a9bae79b42b3f0c6.png" alt="UML Database Graph" class="sauml graphviz" /></div>
+<div class="graphviz"><img src="_images/graphviz-b45cbf5e48234a61e7d9c0c23a2c3ffd81250251.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 </dd></dl>
 
 <dl class="class">
 <dt id="ntg_common.db.LocStem">
 <em class="property">class </em><code class="descname">LocStem</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.LocStem" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains the priority of the cliques at each passage</p>
-<p>This table records the editorial decisions regarding which manuscripts
-represent each clique.  The editors decide which reading is derived from
-which other reading(s) at each passage.</p>
+<p>This table contains one DAG (directed acyclic graph) of cliques for each
+passage.  The editors decide from which other clique(s) each clique is
+derived, or if it is original.</p>
 <p>This is the current table of a transaction state table pair.
 <a class="reference internal" href="#ntg_common.db.LocStem_TTS" title="ntg_common.db.LocStem_TTS"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocStem_TTS</span></code></a> is the table that contains the past rows.  See
 <a class="reference internal" href="#tts"><span class="std std-ref">transaction-time state tables</span></a>.</p>
-<div class="graphviz"><img src="_images/graphviz-4fdf05954f5f72c3eb80c0a92ac3eb2c828622f9.png" alt="UML Database Graph" class="sauml graphviz" /></div>
+<div class="graphviz"><img src="_images/graphviz-883d94c2c9a32d0f5a490b3f53c1df2779d46893.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <dl class="attribute">
 <dt>
 <code class="descname">labez, clique</code></dt>
-<dd><p>The younger reading which was derived from the older reading.</p>
+<dd><p>The younger clique which was derived from the older clique.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
 <code class="descname">source_labez, source_clique</code></dt>
-<dd><p>The older reading that was the source of the younger reading or NULL if
-no source reading could be established.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="ntg_common.db.LocStem.original">
-<code class="descname">original</code><a class="headerlink" href="#ntg_common.db.LocStem.original" title="Permalink to this definition">¶</a></dt>
-<dd><p>This reading was established as the original.  Must also have a
-source_labez of NULL.</p>
+<dd><p>The older clique that was the source of the younger clique, or ‘*’ if
+the reading is original, or ‘?’ if the source is unknown.</p>
+<p>Note: These columns should have a foreign key constraint into the
+cliques table but do not, because postgres doesn’t support partial
+foreign keys and the cliques table does not contain the ‘*’ and ‘?’
+pseudo-cliques.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -871,7 +879,7 @@ key.</p>
 manuscript: 1 = papyrus, 2 = uncial, 3 = minuscule, 4 = lectionary, 5 =
 patristic citations and versions.  The next 4 digits are taken from the
 digits of the Gregory-Aland number, eg. P45 would yield 0045.  The last
-digit encodes supplements: 0 = original, 1 = first supplement, 2 =
+digit encodes supplements: 0 = original ms., 1 = first supplement, 2 =
 second supplement.</p>
 <p>N.B. Patristic citations and versions are not used in the CBGM, and thus
 purged from the database.</p>
@@ -1238,7 +1246,7 @@ which reading is derived from which other reading(s) at each passage.</p>
 
 <dl class="attribute">
 <dt>
-<code class="descname">begadr, endar</code></dt>
+<code class="descname">begadr, endadr</code></dt>
 <dd><p>The passage.</p>
 </dd></dl>
 

@@ -155,9 +155,13 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">sever.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">server.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.main">server.main</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.textflow">server.textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.comparison">server.comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.set_cover">server.set_cover</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.security">server.security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.login">server.login</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
 </ul>
 </li>
@@ -253,8 +257,10 @@
 <h1>Server<a class="headerlink" href="#server" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="server-server-py">
 <span id="server-py"></span><h2>server/server.py<a class="headerlink" href="#server-server-py" title="Permalink to this headline">¶</a></h2>
-<p>API server for CBGM.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: server/server.py [-h] [-v] [-c CONFIG_PATH]</span>
+<p>The API server for CBGM.  The main Flask driver.</p>
+<p>This module sets up the main Flask application for user authentication and the
+sub-apps for each book.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: server/server.py [-h] [-v] [-c CONFIG_FILE]</span>
 </pre></div>
 </div>
 <dl class="option">
@@ -271,8 +277,8 @@
 
 <dl class="option">
 <dt id="cmdoption-server-server-py-c">
-<code class="descname">-c</code><code class="descclassname"> &lt;config_path&gt;</code><code class="descclassname">, </code><code class="descname">--config-path</code><code class="descclassname"> &lt;config_path&gt;</code><a class="headerlink" href="#cmdoption-server-server-py-c" title="Permalink to this definition">¶</a></dt>
-<dd><p>the directory where the config files reside (default=’./instance/’)</p>
+<code class="descname">-c</code><code class="descclassname"> &lt;config_file&gt;</code><code class="descclassname">, </code><code class="descname">--config-file</code><code class="descclassname"> &lt;config_file&gt;</code><a class="headerlink" href="#cmdoption-server-server-py-c" title="Permalink to this definition">¶</a></dt>
+<dd><p>the config file (default=’server.conf’)</p>
 </dd></dl>
 
 </div>

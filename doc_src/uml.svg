@@ -5,7 +5,7 @@
   <g id="Background">
     <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="510" y="710" width="20" height="20" rx="0" ry="0"/>
     <rect style="fill: #b2df8a; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1030" y="150" width="160" height="110" rx="0" ry="0"/>
-    <rect style="fill: #b2df8a; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1030" y="370" width="160" height="140" rx="0" ry="0"/>
+    <rect style="fill: #b2df8a; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1030" y="370" width="160" height="120" rx="0" ry="0"/>
     <rect style="fill: #b2df8a; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1030" y="30" width="160" height="70" rx="0" ry="0"/>
     <rect style="fill: #b2df8a; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="770" y="370" width="160" height="90" rx="0" ry="0"/>
     <g>
@@ -61,14 +61,13 @@
     <g>
       <rect style="fill: #b2df8a; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="360" width="160" height="28"/>
       <text font-size="16" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="1100" y="379">locstem</text>
-      <rect style="fill: #b2df8a; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="388" width="160" height="100"/>
+      <rect style="fill: #b2df8a; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="388" width="160" height="84"/>
       <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1023" y="402">+pass_id</text>
       <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1023" y="418">+labez</text>
       <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1023" y="434">+clique</text>
       <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1023" y="450">+source_labez</text>
       <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1023" y="466">+source_clique</text>
-      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="1023" y="482">+original: boolean</text>
-      <rect style="fill: #b2df8a; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="488" width="160" height="8"/>
+      <rect style="fill: #b2df8a; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="472" width="160" height="8"/>
     </g>
     <g>
       <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x1="1020" y1="398" x2="970" y2="398"/>
@@ -217,22 +216,6 @@
       <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" d="M 240,181.657 A 3.65685,3.65685 0 0 0 236.343,178"/>
       <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x1="236.343" y1="178" x2="189.736" y2="178"/>
       <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="182.236,178 192.236,173 189.736,178 192.236,183 "/>
-    </g>
-    <g>
-      <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x1="1020" y1="446" x2="971.314" y2="446"/>
-      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" d="M 971.314,446 A 11.3137,11.3137 0 0 1 960,434.686"/>
-      <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x1="960" y1="434.686" x2="960" y2="421.314"/>
-      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" d="M 960,421.314 A 7.31371,7.31371 0 0 0 952.686,414"/>
-      <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x1="952.686" y1="414" x2="929.736" y2="414"/>
-      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="922.236,414 932.236,409 929.736,414 932.236,419 "/>
-    </g>
-    <g>
-      <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x1="1020" y1="462" x2="961.314" y2="462"/>
-      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" d="M 961.314,462 A 11.3137,11.3137 0 0 1 950,450.686"/>
-      <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x1="950" y1="450.686" x2="950" y2="437.164"/>
-      <path style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" d="M 950,437.164 A 7.16438,7.16438 0 0 0 942.836,430"/>
-      <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x1="942.836" y1="430" x2="929.736" y2="430"/>
-      <polygon style="fill: #000000; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" points="922.236,430 932.236,425 929.736,430 932.236,435 "/>
     </g>
     <g>
       <rect style="fill: #b2df8a; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="1020" y="140" width="160" height="28"/>
