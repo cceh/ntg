@@ -5,7 +5,7 @@ we need for doing the CBGM and running the application server.
 
 """
 
-from sqlalchemy import String, Integer, Float, Boolean, DateTime, Table, Column, Index, ForeignKey
+from sqlalchemy import String, Integer, Float, Boolean, DateTime, Column, Index, ForeignKey
 from sqlalchemy import UniqueConstraint, CheckConstraint, ForeignKeyConstraint, PrimaryKeyConstraint
 from sqlalchemy.dialects.postgresql import TSTZRANGE
 from sqlalchemy.ext import compiler
@@ -415,6 +415,7 @@ function ('adr2verse', Base.metadata, 'adr INTEGER', 'INTEGER', '''
 function ('adr2word', Base.metadata, 'adr INTEGER', 'INTEGER', '''
     SELECT (adr %% 1000)
     ''', volatility = 'IMMUTABLE')
+
 
 # Tables for the CBGM / App Server
 
@@ -916,87 +917,86 @@ class MsCliques_TTS (MsCliques_Mixin, Base2):
     )
 
 
-def tts_fields_mixin ():
-    """ Return a list of columns common to all TTS tables. """
-    return (
-        Column ('sys_period',    TSTZRANGE, nullable = False, server_default = text ('tstzrange (now (), NULL)')),
-        Column ('user_id_start', Integer,   nullable = False),
-        Column ('user_id_stop',  Integer,   nullable = True)
+class LocStem_Mixin (TTS_Mixin):
+    pass_id       = Column (Integer,    nullable = False)
+    labez         = Column (String (3), nullable = False)
+    clique        = Column (String (2), nullable = False, server_default = '1')
+    source_labez  = Column (String (3), nullable = False)
+    source_clique = Column (String (2), nullable = False, server_default = '1')
+
+
+class LocStem (LocStem_Mixin, Base2):
+    """A table that contains the priority of the cliques at each passage
+
+    This table contains one DAG (directed acyclic graph) of cliques for each
+    passage.  The editors decide from which other clique(s) each clique is
+    derived, or if it is original.
+
+    This is the current table of a transaction state table pair.
+    :class:`LocStem_TTS` is the table that contains the past rows.  See
+    :ref:`transaction-time state tables<tts>`.
+
+
+    .. sauml::
+       :include: locstem
+
+    .. attribute:: labez, clique
+
+        The younger clique which was derived from the older clique.
+
+    .. attribute:: source_labez, source_clique
+
+        The older clique that was the source of the younger clique, or '*' if
+        the reading is original, or '?' if the source is unknown.
+
+        Note: These columns should have a foreign key constraint into the
+        cliques table but do not, because postgres doesn't support partial
+        foreign keys and the cliques table does not contain the '*' and '?'
+        pseudo-cliques.
+
+    .. attribute:: sys_period
+
+       The time period in which this row is valid.  In this table all rows are
+       still valid, so the end of the period is not set.
+
+    .. attribute:: user_id_start
+
+       The id of the user making the change at the start of the validity period.
+       See: :class:`.User`.
+
+    .. attribute:: user_id_stop
+
+       The id of the user making the change at the end of the validity period.
+       See: :class:`.User`.
+
+    """
+
+    __tablename__ = 'locstem'
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('pass_id', 'labez', 'clique', 'source_labez', 'source_clique'),
+        Index ('ix_locstem_unique_original', 'pass_id', unique = True,
+               postgresql_where = text ("source_labez = '*'")),
+        ForeignKeyConstraint (['pass_id', 'labez', 'clique'],
+                              ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
+        CheckConstraint ('labez != source_labez', name='check_same_source'),
     )
 
 
-def locstem_fields_mixin ():
-    """ Return a list of columns common to all locstem tables. """
-    return (
-        Column ('pass_id',       Integer,    nullable = False),
-        Column ('labez',         String (3), nullable = False),
-        Column ('clique',        String (2), nullable = False, server_default = '1'),
-        Column ('source_labez',  String (3), nullable = False),
-        Column ('source_clique', String (2), nullable = False, server_default = '1'),
+class LocStem_TTS (LocStem_Mixin, Base2):
+    """A table that contains the priority of the cliques at each passage
+
+    This is the past table of a transaction state table pair.  :class:`LocStem`
+    is the table that contains the current rows.  The structure of the two
+    tables is the same.  See :ref:`transaction-time state tables<tts>`.
+
+    """
+
+    __tablename__ = 'locstem_tts'
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('pass_id', 'labez', 'clique', 'source_labez', 'source_clique', 'sys_period'),
     )
-
-
-locstem_table = Table (
-    'locstem', Base2.metadata, *locstem_fields_mixin (), *tts_fields_mixin (),
-    PrimaryKeyConstraint ('pass_id', 'labez', 'clique', 'source_labez', 'source_clique'),
-    Index ('ix_locstem_unique_original', 'pass_id', unique = True,
-           postgresql_where = text ("source_labez = '*'")),
-    ForeignKeyConstraint (['pass_id', 'labez', 'clique'],
-                          ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
-    CheckConstraint ('labez != source_labez', name='check_same_source'),
-)
-"""A table that contains the priority of the cliques at each passage
-
-This table records the editorial decisions regarding which manuscripts
-represent each clique.  The editors decide which reading is derived from
-which other reading(s) at each passage.
-
-This is the current table of a transaction state table pair.
-:class:`LocStem_TTS` is the table that contains the past rows.  See
-:ref:`transaction-time state tables<tts>`.
-
-
-.. sauml::
-   :include: locstem
-
-.. attribute:: labez, clique
-
-    The younger reading which was derived from the older reading.
-
-.. attribute:: source_labez, source_clique
-
-    The older reading that was the source of the younger reading or '?' if no
-    source reading could be established or '*' if the reading is considered
-    to be the original reading.
-
-.. attribute:: sys_period
-
-   The time period in which this row is valid.  In this table all rows are
-   still valid, so the end of the period is not set.
-
-.. attribute:: user_id_start
-
-   The id of the user making the change at the start of the validity period.
-   See: :class:`.User`.
-
-.. attribute:: user_id_stop
-
-   The id of the user making the change at the end of the validity period.
-   See: :class:`.User`.
-
-"""
-
-locstem_tts_table = Table (
-    'locstem_tts', Base2.metadata, *locstem_fields_mixin (), *tts_fields_mixin (),
-    PrimaryKeyConstraint ('pass_id', 'labez', 'clique', 'source_labez', 'source_clique', 'sys_period'),
-)
-"""A table that contains the priority of the cliques at each passage
-
-This is the past table of a transaction state table pair.  `locstem_table` is
-the table that contains the current rows.  The structure of the two tables is
-the same.  See :ref:`transaction-time state tables<tts>`.
-
-"""
 
 
 class Notes_Mixin (TTS_Mixin):
@@ -1040,7 +1040,7 @@ class Notes_TTS (Notes_Mixin, Base2):
 class Import_Cliques (Cliques_Mixin, Base2):
     """A table to help importing of saved state.
 
-    This table is used only by the import_cbgm.py script.
+    This table is used only by the load_edits.py script.
     """
 
     __tablename__ = 'import_cliques'
@@ -1056,7 +1056,7 @@ class Import_Cliques (Cliques_Mixin, Base2):
 class Import_MsCliques (MsCliques_Mixin, Base2):
     """A table to help importing of saved state.
 
-    This table is used only by the import_cbgm.py script.
+    This table is used only by the load_edits.py script.
     """
 
     __tablename__ = 'import_ms_cliques'
@@ -1071,22 +1071,27 @@ class Import_MsCliques (MsCliques_Mixin, Base2):
     )
 
 
-import_locstem = Table (
-    'import_locstem', Base2.metadata, *locstem_fields_mixin (), *tts_fields_mixin (),
-    Column ('pass_id', Integer),
-    Column ('passage', IntRangeType, nullable = False),
-    PrimaryKeyConstraint ('passage', 'labez', 'clique', 'sys_period'),
-)
-"""A table to help importing of saved state.
+class Import_LocStem (LocStem_Mixin, Base2):
+    """A table to help importing of saved state.
 
-This table is only used by the import_cbgm.py script.
+    This table is only used by the load_edits.py script.
 
-"""
+    """
+
+    __tablename__ = 'import_locstem'
+
+    pass_id = Column (Integer)
+    passage = Column (IntRangeType, nullable = False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint ('passage', 'labez', 'clique', 'source_labez', 'source_clique', 'sys_period'),
+    )
+
 
 class Import_Notes (Notes_Mixin, Base2):
     """A table to help importing of saved state.
 
-    This table is only used by the import_cbgm.py script.
+    This table is only used by the load_edits.py script.
 
     """
 
