@@ -164,11 +164,6 @@ function dragListener (vm) {
  */
 
 function build_contextmenu (event, vm) {
-    const $target = $ (event.target);
-    if ($target.closest ('.node.draggable').length === 0) {
-        return;
-    }
-
     const passage = vm.passage;
     const dataset = event.target.dataset;
     const data = {
@@ -373,7 +368,10 @@ export default {
         },
         on_contextmenu (event) {
             if (this.$store.getters.can_write) {
-                this.$refs.menu.open (build_contextmenu (event, this), event.target);
+                const $target = $ (event.target);
+                if ($target.closest ('.node.draggable').length) {
+                    this.$refs.menu.open (build_contextmenu (event, this), event.target);
+                }
             }
         },
         on_click (event) {
