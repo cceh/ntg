@@ -942,17 +942,16 @@ class LocStem (LocStem_Mixin, Base2):
 
     .. attribute:: labez, clique
 
-        The younger clique which was derived from the older clique.
+       The younger clique which was derived from the older clique.
 
     .. attribute:: source_labez, source_clique
 
-        The older clique that was the source of the younger clique, or '*' if
-        the reading is original, or '?' if the source is unknown.
+       The older clique that was the source of the younger clique, or '*' if
+       the reading is original, or '?' if the source is unknown.
 
-        Note: These columns should have a foreign key constraint into the
-        cliques table but do not, because postgres doesn't support partial
-        foreign keys and the cliques table does not contain the '*' and '?'
-        pseudo-cliques.
+       Note: These columns should have a foreign key constraint into the cliques
+       table but do not, because postgres doesn't support partial foreign keys
+       and the cliques table does not contain the '*' and '?'  pseudo-cliques.
 
     .. attribute:: sys_period
 
