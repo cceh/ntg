@@ -58,7 +58,7 @@ class Config ():
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
-def build_parser (default_config_file):
+def build_parser (default_config_file = 'server.conf'):
     """ Build the commandline parser. """
 
     parser = argparse.ArgumentParser (description = __doc__)
