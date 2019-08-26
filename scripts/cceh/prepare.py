@@ -25,7 +25,7 @@ all passages.
 
 Finally the script reconstructs the `mt`.
 
-After running this script should run the `cbgm.py` script.
+After running this script you should run the `cbgm.py` script.
 
    Ausgangspunkt ist der Apparat mit allen für die Druckfassung notwendigen
    Informationen.  Diese Datenbasis muss für die CBGM bearbeitet werden.  Die
