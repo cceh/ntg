@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-"""The API server for CBGM.  The main Flask driver.
+"""This package implememts the API server for CBGM.
+
+The main Flask driver.
 
 This module sets up the main Flask application for user authentication and the
 sub-apps for each book.
@@ -21,7 +23,7 @@ import flask_sqlalchemy
 import flask_user
 import flask_login
 import flask_mail
-from werkzeug.wsgi import DispatcherMiddleware
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from ntg_common.config import init_logging
 from ntg_common import db_tools
@@ -29,6 +31,7 @@ from ntg_common.exceptions import EditException
 
 import login
 import main
+import static
 import textflow
 import comparison
 import editor
@@ -49,6 +52,8 @@ class Config ():
     APPLICATION_HOST  = 'localhost'
     APPLICATION_PORT  = 5000
     CONFIG_FILE       = '_global.conf' # default relative to /instance
+    STATIC_FOLDER     = 'static'
+    STATIC_URL_PATH   = 'static'
     USE_RELOADER      = False
     USE_DEBUGGER      = False
     SERVER_START_TIME = str (int (time.time ())) # for cache busting
@@ -58,7 +63,7 @@ class Config ():
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
-def build_parser (default_config_file = 'server.conf'):
+def build_parser (default_config_file = Config.CONFIG_FILE):
     """ Build the commandline parser. """
 
     parser = argparse.ArgumentParser (description = __doc__)
@@ -70,7 +75,7 @@ def build_parser (default_config_file = 'server.conf'):
     parser.add_argument (
         '-c', '--config-file', dest='config_file',
         default=default_config_file, metavar='CONFIG_FILE',
-        help="the config file (default='%s')" % default_config_file
+        help="the config file (default='./instance/%s')" % default_config_file
     )
     return parser
 
@@ -109,15 +114,20 @@ def do_init_app (app):
 def create_app (Config):
     """ App creation function """
 
-    app = flask.Flask (__name__, instance_relative_config=True)
+    app = flask.Flask (
+        __name__,
+        instance_path = os.path.abspath ('instance')
+    )
 
+    global_config = os.path.join (app.instance_path, Config.CONFIG_FILE)
     app.config.from_object (Config)
-    app.config.from_pyfile (Config.CONFIG_FILE)
+    app.config.from_pyfile (global_config)
 
     # pylint: disable=no-member
     app.logger.setLevel (Config.LOG_LEVEL)
     app.logger.info ("Instance path: {ip}".format (ip = app.instance_path))
 
+    app.register_blueprint (static.bp)
     app.register_blueprint (login.bp)
 
     app.config.dba = db_tools.PostgreSQLEngine (**app.config)
@@ -125,6 +135,7 @@ def create_app (Config):
     # tell flask_sqlalchemy where the user authentication database is
     app.config['SQLALCHEMY_DATABASE_URI'] = user_db_url
 
+    static.init_app (app)
     do_init_app (app)
 
     instances = collections.OrderedDict ()
@@ -136,10 +147,10 @@ def create_app (Config):
         if fn == Config.CONFIG_FILE:
             continue
 
-        sub_app = flask.Flask (__name__, instance_relative_config=True)
+        sub_app = flask.Flask (__name__)
         sub_app.config.from_object (Config)
-        sub_app.config.from_pyfile (Config.CONFIG_FILE)
-        sub_app.config.from_pyfile (fn)
+        sub_app.config.from_pyfile (global_config)
+        sub_app.config.from_pyfile (os.path.join (app.instance_path, fn))
         sub_app.config['CONFIG_FILE'] = fn
 
         sub_app.register_blueprint (main.bp)
@@ -169,7 +180,7 @@ def create_app (Config):
 if __name__ == "__main__":
     from werkzeug.serving import run_simple
 
-    args = build_parser (Config.CONFIG_FILE).parse_args ()
+    args = build_parser ().parse_args ()
     args = init_logging (args)
 
     Config.LOG_LEVEL   = args.log_level

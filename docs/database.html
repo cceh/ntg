@@ -90,22 +90,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-linux.html">Installation on Linux</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#database-access">Database Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#application-server">Application server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#run-server">Run Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#build-and-run-client">Build and run client</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html#running-the-docker-service">Running the Docker service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html#cbgm">CBGM</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="client_user.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="server_user.html">Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-server-py">server/server.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-main-py">server/__main__.py</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
@@ -155,7 +157,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">server.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server">server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.main">server.main</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.textflow">server.textflow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.comparison">server.comparison</a></li>
@@ -257,7 +259,7 @@
 <h1>Database Structure<a class="headerlink" href="#database-structure" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="cbgm-database">
 <span id="cbgm-db"></span><h2>CBGM Database<a class="headerlink" href="#cbgm-database" title="Permalink to this headline">¶</a></h2>
-<p>The CBGM database is built from the <a class="reference internal" href="#source-db"><span class="std std-ref">Source Database</span></a> by the <a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import" title="scripts.cceh.import: Import mysql databases"><code class="xref py py-mod docutils literal notranslate"><span class="pre">import</span></code></a> script.  The <a class="reference internal" href="server_dev.html#module-server" title="server: API Server"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span> <span class="pre">server</span></code></a> uses this
+<p>The CBGM database is built from the <a class="reference internal" href="#source-db"><span class="std std-ref">Source Database</span></a> by the <a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import" title="scripts.cceh.import: Import mysql databases"><code class="xref py py-mod docutils literal notranslate"><span class="pre">import</span></code></a> script.  The <a class="reference internal" href="server_dev.html#module-server" title="server: Flask Driver Module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span> <span class="pre">server</span></code></a> uses this
 database.</p>
 <div class="figure align-center" id="id3">
 <span id="db-overwiew"></span><img alt="_images/uml.svg" src="_images/uml.svg" /><p class="caption"><span class="caption-text">Overview of the CBGM database (some columns omitted)</span></p>
@@ -266,7 +268,7 @@ database.</p>
 tables are <a class="reference internal" href="#tts"><span class="std std-ref">journalled</span></a> to provide undo functionality.</p>
 <p>The CBGM process updates the tables shown in red and the Apparatus table where
 manuscript ‘A’ is concerned.</p>
-<p>The <a class="reference internal" href="server_dev.html#module-server" title="server: API Server"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">server</span></code></a> uses all these tables.</p>
+<p>The <a class="reference internal" href="server_dev.html#module-server" title="server: Flask Driver Module"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">server</span></code></a> uses all these tables.</p>
 <div class="figure align-center" id="id4">
 <div class="graphviz"><img src="_images/graphviz-df8a6d2ea3f1286e5c40efa802fefaa6972485b5.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 <p class="caption"><span class="caption-text">Work database structure</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
@@ -817,10 +819,9 @@ derived, or if it is original.</p>
 <code class="descname">source_labez, source_clique</code></dt>
 <dd><p>The older clique that was the source of the younger clique, or ‘*’ if
 the reading is original, or ‘?’ if the source is unknown.</p>
-<p>Note: These columns should have a foreign key constraint into the
-cliques table but do not, because postgres doesn’t support partial
-foreign keys and the cliques table does not contain the ‘*’ and ‘?’
-pseudo-cliques.</p>
+<p>Note: These columns should have a foreign key constraint into the cliques
+table but do not, because postgres doesn’t support partial foreign keys
+and the cliques table does not contain the ‘*’ and ‘?’  pseudo-cliques.</p>
 </dd></dl>
 
 <dl class="attribute">

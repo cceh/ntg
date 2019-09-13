@@ -7,10 +7,10 @@
 
 The API server is written in Python using the Flask framework.
 
-server.server
-=============
+server
+======
 
-.. automodule:: server.server
+.. automodule:: server
    :synopsis: Flask Driver Module
    :members:
 

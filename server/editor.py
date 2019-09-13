@@ -17,6 +17,7 @@ from ntg_common import db_tools
 from ntg_common.exceptions import EditError, PrivilegeError
 from ntg_common.db_tools import execute
 
+from login import auth, edit_auth
 from helpers import parameters, Passage, make_json_response, make_text_response
 
 # FIXME: this is too lax but we need to accomodate one spurious 'z' reading
@@ -30,17 +31,6 @@ bp = flask.Blueprint ('editor', __name__)
 
 def init_app (_app):
     """ Initialize the flask app. """
-
-
-def edit_auth ():
-    """ Check if user is authorized to edit. """
-
-    conf = flask.current_app.config
-    write_access = conf['WRITE_ACCESS']
-
-    if write_access != 'public':
-        if not flask_login.current_user.has_role (write_access):
-            raise PrivilegeError ('You don\'t have %s privilege.' % write_access)
 
 
 @bp.route ('/stemma-edit/<passage_or_id>', methods = ['POST'])

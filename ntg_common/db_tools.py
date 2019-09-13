@@ -10,6 +10,7 @@ import io
 import logging
 import os
 import os.path
+import time
 
 import networkx as nx
 import sqlalchemy
@@ -336,7 +337,12 @@ class PostgreSQLEngine ():
 
         args = self.get_connection_params (kwargs)
 
-        self.url = 'postgresql+psycopg2://{user}@{host}:{port}/{database}?sslmode=disable&server_side_cursors'.format (**args)
+        # if host is None use the socket in /var/lib/postgresql
+        args['host_port'] = ''
+        if args['host'] is not None:
+            args['host_port'] = '{host}:{port}'.format (**args)
+
+        self.url = 'postgresql+psycopg2://{user}@{host_port}/{database}?sslmode=disable&server_side_cursors'.format (**args)
 
         log (logging.DEBUG, "PostgreSQLEngine: Connecting to URL: {url}".format (url = self.url))
 
@@ -348,6 +354,8 @@ class PostgreSQLEngine ():
         self.params = args
 
         sqlalchemy.event.listen (self.engine, 'checkout', self.receive_checkout)
+
+        self.wait_for_server ()
 
 
     def connect (self):
@@ -383,6 +391,7 @@ class PostgreSQLEngine ():
 
         return res
 
+
     def vacuum (self):
         """Vacuum the database."""
 
@@ -391,6 +400,21 @@ class PostgreSQLEngine ():
         connection.set_isolation_level (0)
         connection.cursor ().execute ("VACUUM FULL ANALYZE")
         log (logging.INFO, ''.join (connection.notices))
+
+
+    def wait_for_server (self, retries = 60):
+        """ Wait for the Postgres server to come up. """
+
+        while retries > 0:
+            try:
+                self.connect ()
+                return
+            except sqlalchemy.exc.OperationalError as e:
+                if retries <= 0:
+                    raise # give up
+                log (logging.INFO, "Waiting for Postgres server to come up.  Retrying (%d) ..." % retries)
+                retries -= 1
+                time.sleep (1.0)
 
 
 def local_stemma_to_nx (conn, pass_id, add_isolated_roots = False):

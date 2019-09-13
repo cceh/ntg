@@ -90,22 +90,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-linux.html">Installation on Linux</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#database-access">Database Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#application-server">Application server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#run-server">Run Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#build-and-run-client">Build and run client</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html#running-the-docker-service">Running the Docker service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html#cbgm">CBGM</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="user.html">User Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="client_user.html">Client</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#server-server-py">server/server.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#server-main-py">server/__main__.py</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
@@ -155,7 +157,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">server.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server">server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.main">server.main</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.textflow">server.textflow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.comparison">server.comparison</a></li>
@@ -255,30 +257,31 @@
             
   <div class="section" id="server">
 <h1>Server<a class="headerlink" href="#server" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="server-server-py">
-<span id="server-py"></span><h2>server/server.py<a class="headerlink" href="#server-server-py" title="Permalink to this headline">¶</a></h2>
-<p>The API server for CBGM.  The main Flask driver.</p>
+<div class="section" id="server-main-py">
+<span id="server-py"></span><h2>server/__main__.py<a class="headerlink" href="#server-main-py" title="Permalink to this headline">¶</a></h2>
+<p>This package implememts the API server for CBGM.</p>
+<p>The main Flask driver.</p>
 <p>This module sets up the main Flask application for user authentication and the
 sub-apps for each book.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: server/server.py [-h] [-v] [-c CONFIG_FILE]</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: server/__main__.py [-h] [-v] [-c CONFIG_FILE]</span>
 </pre></div>
 </div>
 <dl class="option">
-<dt id="cmdoption-server-server-py-h">
-<code class="descname">-h</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--help</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-server-server-py-h" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-server-main-py-h">
+<code class="descname">-h</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--help</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-server-main-py-h" title="Permalink to this definition">¶</a></dt>
 <dd><p>show this help message and exit</p>
 </dd></dl>
 
 <dl class="option">
-<dt id="cmdoption-server-server-py-v">
-<code class="descname">-v</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--verbose</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-server-server-py-v" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-server-main-py-v">
+<code class="descname">-v</code><code class="descclassname"></code><code class="descclassname">, </code><code class="descname">--verbose</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-server-main-py-v" title="Permalink to this definition">¶</a></dt>
 <dd><p>increase output verbosity</p>
 </dd></dl>
 
 <dl class="option">
-<dt id="cmdoption-server-server-py-c">
-<code class="descname">-c</code><code class="descclassname"> &lt;config_file&gt;</code><code class="descclassname">, </code><code class="descname">--config-file</code><code class="descclassname"> &lt;config_file&gt;</code><a class="headerlink" href="#cmdoption-server-server-py-c" title="Permalink to this definition">¶</a></dt>
-<dd><p>the config file (default=’server.conf’)</p>
+<dt id="cmdoption-server-main-py-c">
+<code class="descname">-c</code><code class="descclassname"> &lt;config_file&gt;</code><code class="descclassname">, </code><code class="descname">--config-file</code><code class="descclassname"> &lt;config_file&gt;</code><a class="headerlink" href="#cmdoption-server-main-py-c" title="Permalink to this definition">¶</a></dt>
+<dd><p>the config file (default=’./instance/_global.conf’)</p>
 </dd></dl>
 
 </div>

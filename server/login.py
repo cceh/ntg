@@ -9,6 +9,7 @@ from flask_user import UserMixin
 import flask_login
 
 from ntg_common import db as dbx
+from ntg_common.exceptions import PrivilegeError
 
 
 bp = flask.Blueprint ('login', __name__)
@@ -18,6 +19,44 @@ def init_app (app):
     """ Initialize the flask app. """
 
     app.config['USER_AFTER_LOGIN_ENDPOINT'] = 'login.welcome'
+
+
+def user_can_read ():
+    """ Return True if user has read access. """
+
+    conf = flask.current_app.config
+    read_access = conf['READ_ACCESS']
+
+    if read_access == 'public':
+        return True
+
+    return flask_login.current_user.has_role (read_access)
+
+
+def user_can_write ():
+    """ Return True if user has write access. """
+
+    conf = flask.current_app.config
+    write_access = conf['WRITE_ACCESS']
+
+    if write_access == 'public':
+        return True
+
+    return flask_login.current_user.has_role (write_access)
+
+
+def auth ():
+    """ Check if user is authorized to see what follows. """
+
+    if not user_can_read ():
+        raise PrivilegeError ('You don\'t have %s privilege.' % read_access)
+
+
+def edit_auth ():
+    """ Check if user is authorized to edit. """
+
+    if not user_can_write ():
+        raise PrivilegeError ('You don\'t have %s privilege.' % write_access)
 
 
 @bp.route ('/user/welcome')
@@ -69,6 +108,9 @@ class AnonymousUserMixin (flask_login.AnonymousUserMixin):
     '''
     This is the default object for representing an anonymous user.
     '''
+
+    def __init__ (self):
+        self.id = 666
 
     def has_role (self, *_specified_role_names):
         return False

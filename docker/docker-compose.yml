@@ -1,0 +1,22 @@
+version: "3"
+services:
+  ntg-db-server:
+    image: cceh/ntg-db-server
+    volumes:
+      - pgdata:/var/lib/postgresql
+    environment:
+      POSTGRES_PASSWORD: topsecret
+      DEBUG: 'true'
+      DEBUG_LEVEL: 3
+
+  ntg-app-server:
+    image: cceh/ntg-app-server
+    expose:
+      - 5000
+    ports:
+      - 5000:5000
+    depends_on:
+      - ntg-db-server
+
+volumes:
+  pgdata:

@@ -4,5 +4,5 @@
 
 .. _server.py:
 
-.. autoprogram:: server.server:build_parser()
-   :prog: server/server.py
+.. autoprogram:: server.__main__:build_parser()
+   :prog: server/__main__.py

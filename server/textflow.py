@@ -14,8 +14,9 @@ from ntg_common.db_tools import execute
 from ntg_common import tools
 from ntg_common import db_tools
 
+from login import auth, user_can_write
 import helpers
-from helpers import parameters, Passage, auth, get_excluded_ms_ids, \
+from helpers import parameters, Passage, get_excluded_ms_ids, \
      make_dot_response, make_png_response
 
 
@@ -360,7 +361,7 @@ def stemma (passage_or_id):
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
         graph = db_tools.local_stemma_to_nx (
-            conn, passage.pass_id, flask_login.current_user.has_role ('editor')
+            conn, passage.pass_id, user_can_write ()
         )
         dot = helpers.nx_to_dot (graph, width, fontsize, nodesep = 0.2)
         return dot

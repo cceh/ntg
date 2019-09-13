@@ -89,22 +89,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-linux.html">Installation on Linux</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#database-access">Database Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#application-server">Application server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#run-server">Run Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#build-and-run-client">Build and run client</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html#running-the-docker-service">Running the Docker service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html#cbgm">CBGM</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="client_user.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="server_user.html">Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-server-py">server/server.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-main-py">server/__main__.py</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
@@ -154,7 +156,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">server.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server">server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.main">server.main</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.textflow">server.textflow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.comparison">server.comparison</a></li>
@@ -282,7 +284,7 @@
     -c &lt;config_file&gt;, --config-file &lt;config_file&gt;
 
       <ul>
-        <li><a href="server_user.html#cmdoption-server-server-py-c">server/server.py command line option</a>
+        <li><a href="server_user.html#cmdoption-server-main-py-c">server/__main__.py command line option</a>
 </li>
       </ul></li>
       <li>
@@ -308,7 +310,7 @@
 </li>
         <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-h">scripts/cceh/save_edits.py command line option</a>
 </li>
-        <li><a href="server_user.html#cmdoption-server-server-py-h">server/server.py command line option</a>
+        <li><a href="server_user.html#cmdoption-server-main-py-h">server/__main__.py command line option</a>
 </li>
       </ul></li>
       <li>
@@ -364,7 +366,7 @@
 </li>
         <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-v">scripts/cceh/save_edits.py command line option</a>
 </li>
-        <li><a href="server_user.html#cmdoption-server-server-py-v">server/server.py command line option</a>
+        <li><a href="server_user.html#cmdoption-server-main-py-v">server/__main__.py command line option</a>
 </li>
       </ul></li>
   </ul></td>
@@ -439,7 +441,7 @@
 </li>
       <li><a href="server_dev.html#server.main.attesting_csv">attesting_csv() (in module server.main)</a>
 </li>
-      <li><a href="server_dev.html#server.helpers.auth">auth() (in module server.helpers)</a>
+      <li><a href="server_dev.html#server.login.auth">auth() (in module server.login)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -466,8 +468,6 @@
       <li><a href="server_dev.html#server.set_cover.build_explain_matrix">build_explain_matrix() (in module server.set_cover)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.build_MT_text">build_MT_text() (in module scripts.cceh.prepare)</a>
-</li>
-      <li><a href="server_dev.html#server.server.build_parser">build_parser() (in module server.server)</a>
 </li>
       <li><a href="ntg_common.html#ntg_common.tools.BYZ_HSNR_ACTS">BYZ_HSNR_ACTS (in module ntg_common.tools)</a>
 </li>
@@ -507,10 +507,10 @@
 </li>
       <li><a href="server_dev.html#server.comparison.comparison_detail">comparison_detail() (in module server.comparison)</a>
 </li>
-      <li><a href="server_dev.html#server.comparison.comparison_detail_csv">comparison_detail_csv() (in module server.comparison)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="server_dev.html#server.comparison.comparison_detail_csv">comparison_detail_csv() (in module server.comparison)</a>
+</li>
       <li><a href="client_dev.html#module-comparison_details_table">comparison_details_table (module)</a>
 </li>
       <li><a href="server_dev.html#server.comparison.comparison_summary">comparison_summary() (in module server.comparison)</a>
@@ -521,8 +521,6 @@
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.import.concat_tables_fdw">concat_tables_fdw() (in module scripts.cceh.import)</a>
 </li>
-      <li><a href="server_dev.html#server.server.Config">Config (class in server.server)</a>
-</li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.copy_genealogical">copy_genealogical() (in module scripts.cceh.prepare)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.copy_nestle">copy_nestle() (in module scripts.cceh.prepare)</a>
@@ -530,8 +528,6 @@
       <li><a href="scripts_dev.html#scripts.cceh.prepare.copy_table">copy_table() (in module scripts.cceh.prepare)</a>
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.import.copy_table_fdw">copy_table_fdw() (in module scripts.cceh.import)</a>
-</li>
-      <li><a href="server_dev.html#server.server.create_app">create_app() (in module server.server)</a>
 </li>
       <li><a href="database.html#ntg_common.db.CreateFDW">CreateFDW (class in ntg_common.db)</a>
 </li>
@@ -559,13 +555,11 @@
 </li>
       <li><a href="scripts_dev.html#scripts.cceh.prepare.delete_corrector_hands">delete_corrector_hands() (in module scripts.cceh.prepare)</a>
 </li>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare.delete_invariant_passages">delete_invariant_passages() (in module scripts.cceh.prepare)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="scripts_dev.html#scripts.cceh.prepare.delete_lectionaries">delete_lectionaries() (in module scripts.cceh.prepare)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.delete_invariant_passages">delete_invariant_passages() (in module scripts.cceh.prepare)</a>
 </li>
-      <li><a href="server_dev.html#server.server.do_init_app">do_init_app() (in module server.server)</a>
+      <li><a href="scripts_dev.html#scripts.cceh.prepare.delete_lectionaries">delete_lectionaries() (in module scripts.cceh.prepare)</a>
 </li>
       <li><a href="database.html#ntg_common.db.DropFDW">DropFDW (class in ntg_common.db)</a>
 </li>
@@ -581,7 +575,7 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="server_dev.html#server.editor.edit_auth">edit_auth() (in module server.editor)</a>
+      <li><a href="server_dev.html#server.login.edit_auth">edit_auth() (in module server.login)</a>
 </li>
       <li><a href="database.html#ntg_common.db.Affinity.equal">equal (Affinity attribute)</a>
 </li>
@@ -1077,7 +1071,7 @@
         <li><a href="scripts_user.html#cmdoption-scripts-cceh-save-edits-py-arg-path">path/to/file.conf</a>
 </li>
       </ul></li>
-      <li><a href="server_dev.html#module-server">server (module)</a>
+      <li><a href="server_dev.html#module-server">server (module)</a>, <a href="server_dev.html#module-server">[1]</a>
 </li>
       <li><a href="server_dev.html#module-server.comparison">server.comparison (module)</a>
 </li>
@@ -1089,21 +1083,19 @@
 </li>
       <li><a href="server_dev.html#module-server.main">server.main (module)</a>
 </li>
-      <li><a href="server_dev.html#module-server.server">server.server (module)</a>
-</li>
       <li><a href="server_dev.html#module-server.set_cover">server.set_cover (module)</a>
 </li>
       <li><a href="server_dev.html#module-server.textflow">server.textflow (module)</a>
 </li>
       <li>
-    server/server.py command line option
+    server/__main__.py command line option
 
       <ul>
-        <li><a href="server_user.html#cmdoption-server-server-py-c">-c &lt;config_file&gt;, --config-file &lt;config_file&gt;</a>
+        <li><a href="server_user.html#cmdoption-server-main-py-c">-c &lt;config_file&gt;, --config-file &lt;config_file&gt;</a>
 </li>
-        <li><a href="server_user.html#cmdoption-server-server-py-h">-h, --help</a>
+        <li><a href="server_user.html#cmdoption-server-main-py-h">-h, --help</a>
 </li>
-        <li><a href="server_user.html#cmdoption-server-server-py-v">-v, --verbose</a>
+        <li><a href="server_user.html#cmdoption-server-main-py-v">-v, --verbose</a>
 </li>
       </ul></li>
       <li><a href="server_dev.html#server.set_cover.set_cover_json">set_cover_json() (in module server.set_cover)</a>
@@ -1172,6 +1164,10 @@
 </li>
       <li><a href="database.html#ntg_common.db.User">User (class in ntg_common.db)</a>
 </li>
+      <li><a href="server_dev.html#server.login.user_can_read">user_can_read() (in module server.login)</a>
+</li>
+      <li><a href="server_dev.html#server.login.user_can_write">user_can_write() (in module server.login)</a>
+</li>
       <li><a href="database.html#ntg_common.db.Cliques.user_id_start">user_id_start (Cliques attribute)</a>
 
       <ul>
@@ -1217,6 +1213,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="database.html#ntg_common.src_db.LocStemEdAct01.w">w (LocStemEdAct01 attribute)</a>
+</li>
+      <li><a href="ntg_common.html#ntg_common.db_tools.PostgreSQLEngine.wait_for_server">wait_for_server() (PostgreSQLEngine method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>

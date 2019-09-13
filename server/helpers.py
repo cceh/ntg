@@ -14,7 +14,6 @@ import flask_login
 
 from ntg_common import tools
 from ntg_common.db_tools import execute, to_csv
-from ntg_common.exceptions import PrivilegeError
 
 
 parameters = dict ()
@@ -392,17 +391,6 @@ def csvify (fields, rows):
     """ Send a HTTP response in CSV format. """
 
     return make_csv_response (to_csv (fields, rows))
-
-
-def auth ():
-    """ Check if user is authorized to see what follows. """
-
-    conf = flask.current_app.config
-    read_access = conf['READ_ACCESS']
-
-    if read_access != 'public':
-        if not flask_login.current_user.has_role (read_access):
-            raise PrivilegeError ('You don\'t have %s privilege.' % read_access)
 
 
 DOT_SKELETON = """

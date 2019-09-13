@@ -90,22 +90,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-linux.html">Installation on Linux</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#database-access">Database Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#application-server">Application server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#run-server">Run Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#build-and-run-client">Build and run client</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html#running-the-docker-service">Running the Docker service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html#cbgm">CBGM</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="client_user.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="server_user.html">Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-server-py">server/server.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-main-py">server/__main__.py</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
@@ -155,7 +157,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">server.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server">server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.main">server.main</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.textflow">server.textflow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.comparison">server.comparison</a></li>
@@ -262,7 +264,7 @@
 more mysql databases.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Make sure to follow the steps in <a class="reference internal" href="install.html#database-access"><span class="std std-ref">Database Access</span></a> first.</p>
+<p class="last">Make sure to follow the steps in <a class="reference internal" href="install-linux.html#database-access"><span class="std std-ref">Database Access</span></a> first.</p>
 </div>
 <p>The source databases are:</p>
 <ol class="arabic simple">
@@ -331,7 +333,7 @@ differing only by orthgographic convention.</p>
 positive apparatus, that is, an apparatus that is defined for all manuscripts at
 all passages.</p>
 <p>Finally the script reconstructs the <a class="reference internal" href="domain.html#mt"><span class="std std-ref">Majority Text</span></a>.</p>
-<p>After running this script should run the <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script.</p>
+<p>After running this script you should run the <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script.</p>
 <blockquote>
 <div><p>Ausgangspunkt ist der Apparat mit allen für die Druckfassung notwendigen
 Informationen.  Diese Datenbasis muss für die CBGM bearbeitet werden.  Die

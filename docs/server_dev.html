@@ -90,22 +90,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-linux.html">Installation on Linux</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#database-access">Database Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#application-server">Application server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#run-server">Run Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#build-and-run-client">Build and run client</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html#running-the-docker-service">Running the Docker service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html#cbgm">CBGM</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="client_user.html">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="server_user.html">Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-server-py">server/server.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-main-py">server/__main__.py</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
@@ -155,7 +157,7 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">API Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-server.server">server.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-server">server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-server.main">server.main</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-server.textflow">server.textflow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-server.comparison">server.comparison</a></li>
@@ -256,35 +258,9 @@
   <span class="target" id="module-server"></span><div class="section" id="api-server">
 <h1>API Server<a class="headerlink" href="#api-server" title="Permalink to this headline">¶</a></h1>
 <p>The API server is written in Python using the Flask framework.</p>
-<div class="section" id="module-server.server">
-<span id="server-server"></span><h2>server.server<a class="headerlink" href="#module-server.server" title="Permalink to this headline">¶</a></h2>
-<p>The API server for CBGM.  The main Flask driver.</p>
-<p>This module sets up the main Flask application for user authentication and the
-sub-apps for each book.</p>
-<dl class="class">
-<dt id="server.server.Config">
-<em class="property">class </em><code class="descname">Config</code><a class="headerlink" href="#server.server.Config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default configuration object.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="server.server.build_parser">
-<code class="descname">build_parser</code><span class="sig-paren">(</span><em>default_config_file='server.conf'</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.build_parser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build the commandline parser.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="server.server.create_app">
-<code class="descname">create_app</code><span class="sig-paren">(</span><em>Config</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.create_app" title="Permalink to this definition">¶</a></dt>
-<dd><p>App creation function</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="server.server.do_init_app">
-<code class="descname">do_init_app</code><span class="sig-paren">(</span><em>app</em><span class="sig-paren">)</span><a class="headerlink" href="#server.server.do_init_app" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializations to do on main and sub apps.</p>
-</dd></dl>
-
+<div class="section" id="module-server">
+<span id="server"></span><h2>server<a class="headerlink" href="#module-server" title="Permalink to this headline">¶</a></h2>
+<p>This package implements the application server for CBGM.</p>
 </div>
 <div class="section" id="module-server.main">
 <span id="server-main"></span><h2>server.main<a class="headerlink" href="#module-server.main" title="Permalink to this headline">¶</a></h2>
@@ -508,7 +484,7 @@ the layout on the server.</p>
 </div>
 <div class="section" id="module-server.comparison">
 <span id="server-comparison"></span><h2>server.comparison<a class="headerlink" href="#module-server.comparison" title="Permalink to this headline">¶</a></h2>
-<p>The main functions (coherence etc.) of the API server for CBGM.</p>
+<p>The comparison function of the API server for CBGM.</p>
 <dl class="function">
 <dt id="server.comparison.comparison_detail">
 <code class="descname">comparison_detail</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.comparison.comparison_detail" title="Permalink to this definition">¶</a></dt>
@@ -641,12 +617,6 @@ that best explains a given manuscript.</p>
 <span id="server-editor"></span><h2>server.editor<a class="headerlink" href="#module-server.editor" title="Permalink to this headline">¶</a></h2>
 <p>The API server for CBGM.  Stemma editing module.</p>
 <dl class="function">
-<dt id="server.editor.edit_auth">
-<code class="descname">edit_auth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.edit_auth" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check if user is authorized to edit.</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="server.editor.init_app">
 <code class="descname">init_app</code><span class="sig-paren">(</span><em>_app</em><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.init_app" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the flask app.</p>
@@ -682,9 +652,21 @@ that best explains a given manuscript.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="server.login.auth">
+<code class="descname">auth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.login.auth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if user is authorized to see what follows.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="server.login.declare_user_model_on">
 <code class="descname">declare_user_model_on</code><span class="sig-paren">(</span><em>db</em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.declare_user_model_on" title="Permalink to this definition">¶</a></dt>
 <dd><p>Declare the user model on flask_sqlalchemy.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.login.edit_auth">
+<code class="descname">edit_auth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.login.edit_auth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if user is authorized to edit.</p>
 </dd></dl>
 
 <dl class="function">
@@ -703,6 +685,18 @@ by removing the scheme and the hostname</p>
 <dd>returns: ‘/path1/path2?q1=v1&amp;q2=v2#fragment</dd>
 </dl>
 <p>Copied from flask_user/views.py because it was defective.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.login.user_can_read">
+<code class="descname">user_can_read</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.login.user_can_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if user has read access.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="server.login.user_can_write">
+<code class="descname">user_can_write</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.login.user_can_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if user has write access.</p>
 </dd></dl>
 
 <dl class="function">
@@ -749,12 +743,6 @@ by removing the scheme and the hostname</p>
 <dt id="server.helpers.Word">
 <em class="property">class </em><code class="descname">Word</code><span class="sig-paren">(</span><em>w=0</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.Word" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents one word address.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="server.helpers.auth">
-<code class="descname">auth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.auth" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check if user is authorized to see what follows.</p>
 </dd></dl>
 
 <dl class="function">

@@ -11,9 +11,9 @@ import flask_login
 
 from ntg_common.db_tools import execute
 
-from helpers import parameters, Passage, Manuscript, csvify, auth, get_excluded_ms_ids, \
+from login import auth
+from helpers import parameters, Passage, Manuscript, csvify, get_excluded_ms_ids, \
      make_json_response
-
 
 bp = flask.Blueprint ('main', __name__)
 

@@ -1,0 +1,10 @@
+version: "3"
+services:
+  ntg-db-server:
+    environment:
+      PRODUCTION: true
+      DEBUG_LEVEL: 0
+
+  ntg-app-server:
+    ports:
+      - 80:5000

@@ -55,7 +55,19 @@ dev-server-production:
 
 server:
 	export PYTHONPATH=$(ROOT)/server:$(ROOT); \
-	python3 -m server.server -vvv
+	python3 -m server -vvv
+
+common-clean:
+	cd ntg_common ; make clean; cd ..
+
+server-clean:
+	cd server ; make clean; cd ..
+
+docker-build: server-clean common-clean
+	cd docker; make build; cd ..
+
+docker-run:
+	cd docker; make run; cd ..
 
 users:
 	scripts/cceh/mk_users.py -vvv instance/_global.conf
@@ -245,11 +257,10 @@ install-prerequisites:
 		python3 python3-pip \
 	    git make npm graphviz plantuml
 	sudo pip3 install --upgrade pip
+	sudo pip3 install --upgrade -r server/requirements.txt
+	sudo pip3 install --upgrade -r scripts/cceh/requirements.txt
 	sudo pip3 install --upgrade \
-		numpy networkx matplotlib pillow \
-		psycopg2 mysqlclient sqlalchemy sqlalchemy-utils intervals \
-		flask babel flask-babel flask-sqlalchemy jinja2 flask-user \
-		sphinx sphinx_rtd_theme sphinx_js sphinxcontrib-plantuml \
+		sphinx sphinx_rtd_theme sphinx_js sphinxcontrib-plantuml
 
 #	yum install python34-pip python34-pylint mysql-devel python34-devel node mysql_fdw_10 postgresql10-server
 #	pip3 install -U setuptools

@@ -1,7 +1,6 @@
-#!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-"""The main functions (coherence etc.) of the API server for CBGM."""
+"""The comparison function of the API server for CBGM."""
 
 import collections
 
@@ -10,7 +9,8 @@ from flask import request, current_app
 
 from ntg_common.db_tools import execute
 
-from helpers import auth, csvify, parameters, Passage, Manuscript
+from login import auth
+from helpers import csvify, parameters, Passage, Manuscript
 
 
 bp = flask.Blueprint ('comparison', __name__)

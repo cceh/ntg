@@ -90,22 +90,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#database-access">Database Access</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="install.html#mysql-database">MySQL database</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install.html#postgres-database">Postgres database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-linux.html">Installation on Linux</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#database-access">Database Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#application-server">Application server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#run-server">Run Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#build-and-run-client">Build and run client</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#application-server">Application server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#cbgm">CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#run-server">Run Server</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#build-and-run-client">Build and run client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html#running-the-docker-service">Running the Docker service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html#cbgm">CBGM</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="user.html">User Manual</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="server_user.html">Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-server-py">server/server.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-main-py">server/__main__.py</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
@@ -155,7 +157,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.server">server.server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server">server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.main">server.main</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.textflow">server.textflow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.comparison">server.comparison</a></li>
@@ -256,7 +258,7 @@
   <div class="section" id="client">
 <h1>Client<a class="headerlink" href="#client" title="Permalink to this headline">¶</a></h1>
 <p>The client is just a bunch of javascript files that run in your browser.  Start
-the <a class="reference internal" href="server_user.html#server-py"><span class="std std-ref">server/server.py</span></a> and then point your browser to the client’s <code class="file docutils literal notranslate"><span class="pre">index.html</span></code>.</p>
+the <a class="reference internal" href="server_user.html#server-py"><span class="std std-ref">server/__main__.py</span></a> and then point your browser to the client’s <code class="file docutils literal notranslate"><span class="pre">index.html</span></code>.</p>
 <p>The only thing the client needs to know is where to find the API.  That is
 configured in <code class="file docutils literal notranslate"><span class="pre">api.conf.js</span></code>:</p>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">api_base_url</span> <span class="o">=</span> <span class="s1">&#39;http://localhost:5000/&#39;</span><span class="p">;</span>

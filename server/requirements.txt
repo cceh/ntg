@@ -1,0 +1,12 @@
+babel
+flask
+flask-babel
+flask-sqlalchemy
+Flask-User<0.7
+intervals
+jinja2
+networkx
+numpy
+psycopg2-binary
+sqlalchemy
+sqlalchemy-utils
