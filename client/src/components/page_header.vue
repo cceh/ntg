@@ -12,7 +12,7 @@
 
     <div class="login-nav container d-flex flex-row justify-content-end bs-docs-container">
       <a v-if="home_url" :href="home_url">Home</a>
-      <router-link v-else :to="{ name : 'index' }">Home</router-link>
+      <router-link v-else :to="{ name : 'index' }">Up</router-link>
       &#xa0; | &#xa0;
       <a href="/pdfs/GenQ4_Guide.pdf" target="_blank">Short Guide (PDF)</a>
       <template v-if="this.$store.getters.is_logged_in">
