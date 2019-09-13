@@ -74,7 +74,7 @@
 
       <!-- Notes -->
 
-      <card v-if="this.$store.getters.can_write"
+      <card v-if="$store.getters.can_write"
             cssclass="card-notes" caption="Notes" default_closed="true">
         <div class="card-header card-slidable">
           <toolbar :toolbar="tb_notes">
