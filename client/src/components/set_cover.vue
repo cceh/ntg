@@ -1,7 +1,5 @@
 <template>
-  <div class="set_cover_vm want_hashchange"
-       @hashchange="on_hashchange" @caption="on_caption">
-    <page-header :caption="caption" />
+  <div class="set_cover_vm want_hashchange" @hashchange="on_hashchange">
 
     <div class="container bs-docs-container">
 
@@ -132,9 +130,6 @@ export default {
                 'ms'         : this.input1,
                 'pre_select' : this.input2,
             });
-        },
-        on_caption (event) {
-            // this.caption = event.detail.data;
         },
         on_click (cumsum) {
             const vm = this;

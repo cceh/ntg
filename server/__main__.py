@@ -31,6 +31,7 @@ from ntg_common.exceptions import EditException
 
 import login
 import main
+import info
 import static
 import textflow
 import comparison
@@ -51,9 +52,11 @@ class Config ():
 
     APPLICATION_HOST  = 'localhost'
     APPLICATION_PORT  = 5000
+    APPLICATION_DESCRIPTION = ''
     CONFIG_FILE       = '_global.conf' # default relative to /instance
     STATIC_FOLDER     = 'static'
     STATIC_URL_PATH   = 'static'
+    AFTER_LOGIN_URL   = None
     USE_RELOADER      = False
     USE_DEBUGGER      = False
     SERVER_START_TIME = str (int (time.time ())) # for cache busting
@@ -83,6 +86,8 @@ def build_parser (default_config_file = Config.CONFIG_FILE):
 def do_init_app (app):
     """ Initializations to do on main and sub apps. """
 
+    app.config['APPLICATION_ROOT'] = app.config['APPLICATION_ROOT'].rstrip ('/')
+
     dba.init_app (app)
     mail.init_app (app)
     login.init_app (app)
@@ -99,6 +104,7 @@ def do_init_app (app):
     def add_headers (response):
         response.headers['Access-Control-Allow-Origin'] = current_app.config['CORS_ALLOW_ORIGIN']
         response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Content-Security-Policy'] = "worker-src blob:"
         response.headers['Server'] = 'Jetty 0.8.15'
         return response
 
@@ -114,18 +120,17 @@ def do_init_app (app):
 def create_app (Config):
     """ App creation function """
 
-    app = flask.Flask (
-        __name__,
-        instance_path = os.path.abspath ('instance')
-    )
+    instance_path = os.path.abspath ('instance')
 
-    global_config = os.path.join (app.instance_path, Config.CONFIG_FILE)
+    app = flask.Flask (__name__)
+
+    global_config = os.path.join (instance_path, Config.CONFIG_FILE)
     app.config.from_object (Config)
     app.config.from_pyfile (global_config)
 
     # pylint: disable=no-member
     app.logger.setLevel (Config.LOG_LEVEL)
-    app.logger.info ("Instance path: {ip}".format (ip = app.instance_path))
+    app.logger.info ("Instance path: {ip}".format (ip = instance_path))
 
     app.register_blueprint (static.bp)
     app.register_blueprint (login.bp)
@@ -139,9 +144,9 @@ def create_app (Config):
     do_init_app (app)
 
     instances = collections.OrderedDict ()
-    extra_files = [app.instance_path + '/' + Config.CONFIG_FILE]
+    extra_files = [instance_path + '/' + Config.CONFIG_FILE]
 
-    for fn in glob.glob (app.instance_path + '/*.conf'):
+    for fn in glob.glob (instance_path + '/*.conf'):
         extra_files.append (fn)
         fn = os.path.basename (fn)
         if fn == Config.CONFIG_FILE:
@@ -150,9 +155,12 @@ def create_app (Config):
         sub_app = flask.Flask (__name__)
         sub_app.config.from_object (Config)
         sub_app.config.from_pyfile (global_config)
-        sub_app.config.from_pyfile (os.path.join (app.instance_path, fn))
+        sub_app.config.from_pyfile (os.path.join (instance_path, fn))
         sub_app.config['CONFIG_FILE'] = fn
-
+        sub_app.config['APPLICATION_DIR'] = sub_app.config['APPLICATION_ROOT']
+        sub_app.config['APPLICATION_ROOT'] = os.path.join (
+            app.config['APPLICATION_ROOT'], sub_app.config['APPLICATION_ROOT']
+        )
         sub_app.register_blueprint (main.bp)
         sub_app.register_blueprint (textflow.bp)
         sub_app.register_blueprint (comparison.bp)
@@ -170,6 +178,14 @@ def create_app (Config):
         set_cover.init_app (sub_app)
 
         instances[sub_app.config['APPLICATION_ROOT']] = sub_app
+
+    info_app = flask.Flask (__name__)
+    info_app.config.update (app.config)
+    info_app.register_blueprint (info.bp)
+    do_init_app (info_app)
+    info.init_app (app, instances)
+
+    instances[app.config['APPLICATION_ROOT']] = info_app
 
     d = DispatcherMiddleware (app, instances)
     d.config = app.config

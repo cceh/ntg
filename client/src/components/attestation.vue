@@ -3,7 +3,6 @@
        @hashchange="on_hashchange"
        @navigator="on_navigator"
        >
-    <page-header :caption="caption" />
 
     <div class="container bs-docs-container">
 
@@ -113,7 +112,7 @@ export default {
             this.set_hash ();
         },
         caption () {
-            this.$trigger ('caption', this.caption);
+            this.$store.commit ('caption', this.caption);
         },
     },
     'methods' : {

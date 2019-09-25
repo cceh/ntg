@@ -1,6 +1,5 @@
 <template>
   <div class="notes_list_vm">
-    <page-header :caption="caption" />
 
     <div class="container bs-docs-container" v-if="$store.getters.can_write">
 

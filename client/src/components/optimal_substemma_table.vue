@@ -139,8 +139,7 @@ export default {
             this.sort ();
         },
         caption () {
-            // vue.js `events´ do not bubble, so they are pretty useless
-            this.$trigger ('caption', this.caption);
+            this.$store.commit ('caption', this.caption);
         },
     },
     'methods' : {

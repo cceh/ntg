@@ -4,7 +4,6 @@
        @navigator="on_navigator"
        @goto_attestation="on_goto_attestation"
        @destroy_relatives_popup="on_destroy_relatives_popup ($event, $event.detail.data)">
-    <page-header :caption="caption" />
 
     <div class="container bs-docs-container">
 
@@ -211,7 +210,6 @@ import d3common    from 'd3_common';
 import tools       from 'tools';
 import { options } from 'widgets/options';
 
-import page_header      from 'page_header.vue';
 import leitzeile        from 'leitzeile.vue';
 import card             from 'card.vue';
 import card_caption     from 'card_caption.vue';
@@ -230,7 +228,6 @@ import textflow         from 'textflow.vue';
 import relatives        from 'relatives.vue';
 import relmetrics       from 'relatives_metrics.vue';
 
-Vue.component ('page-header',  page_header);
 Vue.component ('navigator',    navigator);
 Vue.component ('labezator',    labezator);
 Vue.component ('range',        range);
@@ -312,12 +309,14 @@ export default {
         };
     },
     'computed' : {
-        'caption' : function () {
-            return this.$store.state.passage.hr;
-        },
         ...mapGetters ([
             'passage',
         ]),
+    },
+    'watch' : {
+        passage () {
+            this.update_caption ();
+        },
     },
     'methods' : {
         set_hash (param, data) {
@@ -338,6 +337,9 @@ export default {
             } else {
                 nav.set_passage (1);
             }
+        },
+        update_caption () {
+            this.$store.commit ('caption', this.$store.state.passage.hr);
         },
         /**
          * Create a new popup managed by the relatives module.
@@ -435,6 +437,10 @@ export default {
     mounted () {
         // On first page load simulate user navigation to hash.
         this.on_hashchange ();
+    },
+    beforeRouteUpdate (to, from, next) {
+        this.update_caption ();
+        next ();
     },
 };
 </script>

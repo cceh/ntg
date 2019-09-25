@@ -39,13 +39,6 @@ def _f_map_word (t):
     return [t2, t2, t.lemma]
 
 
-@bp.route ('/messages.json')
-def messages_json ():
-    """Endpoint.  Serve the flashed messages."""
-
-    return make_json_response (flask.get_flashed_messages (with_categories = True) or [])
-
-
 @bp.route ('/application.json')
 def application_json ():
     """Endpoint.  Serve information about the application."""
@@ -58,22 +51,6 @@ def application_json ():
         'read_access'  : conf['READ_ACCESS'],
         'write_access' : conf['WRITE_ACCESS'],
         'start'        : conf['SERVER_START_TIME'],
-    })
-
-
-@bp.route ('/user.json')
-def user_json ():
-    """Endpoint.  Serve information about the current user."""
-
-    user = flask_login.current_user
-    logged_in = user.is_authenticated
-    roles = ['public']
-    if logged_in:
-        roles += [r.name for r in user.roles]
-
-    return make_json_response ({
-        'username' : user.username if logged_in else 'anonymous',
-        'roles'    : roles,
     })
 
 

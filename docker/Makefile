@@ -3,8 +3,8 @@
 build: Makefile
 	rm -rf server ntg_common
 	cp -a ../server ../ntg_common .
-	cp -a ../client/build ./client
-	cp -a ../scripts/cceh ./scripts
+	cp -a ../client/build/* ./client
+	cp -a ../scripts/cceh/* ./scripts
 	docker build -f Dockerfile.db --tag=cceh/ntg-db-server  .
 	docker build -f Dockerfile    --tag=cceh/ntg-app-server .
 

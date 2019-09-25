@@ -26,6 +26,7 @@ def static_folder (path = None):
     return send_from_directory (current_app.static_folder, request.path[1:])
 
 
+@bp.route ('/')
 @bp.route ('/<path:path>')
 def index_html (path = None):
     """Endpoint.  Serve the index."""

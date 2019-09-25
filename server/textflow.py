@@ -361,7 +361,7 @@ def stemma (passage_or_id):
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
         graph = db_tools.local_stemma_to_nx (
-            conn, passage.pass_id, user_can_write ()
+            conn, passage.pass_id, user_can_write (current_app)
         )
         dot = helpers.nx_to_dot (graph, width, fontsize, nodesep = 0.2)
         return dot

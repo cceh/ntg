@@ -1,8 +1,12 @@
+.. _linux-install:
+
 =======================
  Installation on Linux
 =======================
 
-This chapter describes how to install the software on a linux system.
+This chapter describes how to install the CBGM application on a linux server.
+If you want to run the application on a desktop machine an
+:ref:`installation with Docker <docker-install>` might be the easier way to go.
 
 
 Install Prerequisites

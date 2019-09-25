@@ -5,11 +5,13 @@
 import urllib
 
 import flask
+from flask import make_response, current_app
 from flask_user import UserMixin
 import flask_login
 
 from ntg_common import db as dbx
 from ntg_common.exceptions import PrivilegeError
+from helpers import make_json_response
 
 
 bp = flask.Blueprint ('login', __name__)
@@ -18,14 +20,14 @@ bp = flask.Blueprint ('login', __name__)
 def init_app (app):
     """ Initialize the flask app. """
 
-    app.config['USER_AFTER_LOGIN_ENDPOINT'] = 'login.welcome'
+    app.config['USER_AFTER_LOGIN_ENDPOINT']  = 'login.after_login'
+    app.config['USER_AFTER_LOGOUT_ENDPOINT'] = 'login.after_login'
 
 
-def user_can_read ():
+def user_can_read (app):
     """ Return True if user has read access. """
 
-    conf = flask.current_app.config
-    read_access = conf['READ_ACCESS']
+    read_access = app.config['READ_ACCESS']
 
     if read_access == 'public':
         return True
@@ -33,11 +35,10 @@ def user_can_read ():
     return flask_login.current_user.has_role (read_access)
 
 
-def user_can_write ():
+def user_can_write (app):
     """ Return True if user has write access. """
 
-    conf = flask.current_app.config
-    write_access = conf['WRITE_ACCESS']
+    write_access = app.config['WRITE_ACCESS']
 
     if write_access == 'public':
         return True
@@ -48,22 +49,15 @@ def user_can_write ():
 def auth ():
     """ Check if user is authorized to see what follows. """
 
-    if not user_can_read ():
+    if not user_can_read (current_app):
         raise PrivilegeError ('You don\'t have %s privilege.' % read_access)
 
 
 def edit_auth ():
     """ Check if user is authorized to edit. """
 
-    if not user_can_write ():
+    if not user_can_write (current_app):
         raise PrivilegeError ('You don\'t have %s privilege.' % write_access)
-
-
-@bp.route ('/user/welcome')
-def welcome ():
-    """Endpoint.  Serve welcome page."""
-
-    return flask.render_template ('welcome.html')
 
 
 def make_safe_url (url):
@@ -114,3 +108,8 @@ class AnonymousUserMixin (flask_login.AnonymousUserMixin):
 
     def has_role (self, *_specified_role_names):
         return False
+
+
+@bp.route ('/user/after_login')
+def after_login ():
+    return flask.redirect (current_app.config['AFTER_LOGIN_URL'])

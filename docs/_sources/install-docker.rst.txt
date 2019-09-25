@@ -1,21 +1,42 @@
+.. _docker-install:
+
 ==========================
  Installation with Docker
 ==========================
 
-This chapter describes how to install the software on a Desktop computer with
-Docker.
+This chapter describes how to install the CBGM installation on your own PC with
+the help of Docker.  `Docker <https://www.docker.com/>`_ can run our
+application on Linux, Mac, and Windows.
 
-.. note::
 
-   These instructions are tested only on Linux.   Feedback for Windows and Mac is welcome.
+We plan to offer various Docker images for scholars who want to run the CBGM
+application on their own machines.
 
-1. Install Docker.
+Our images are preloaded with data and the data are editable.
 
-   - For Windows see: https://docs.docker.com/docker-for-windows/install/
+.. warning::
 
-   - For Mac see: https://docs.docker.com/docker-for-mac/install/
+   As of now (September 2019) this is a technology preview.
+   More functionality will be added and bugs will be fixed later.
+   Feedback is welcome at: https://github.com/cceh/ntg/issues
 
-   - For Debian Linux see: https://docs.docker.com/compose/install/
+.. warning::
+
+   These instructions are tested only on Linux.
+   Feedback from Windows and Mac users is welcome:
+   https://github.com/cceh/ntg/issues
+
+
+Install
+=======
+
+1. Install the free community version of Docker:
+
+   - for Windows see: https://docs.docker.com/docker-for-windows/install/
+
+   - for Mac see: https://docs.docker.com/docker-for-mac/install/
+
+   - for Debian Linux see: https://docs.docker.com/compose/install/
 
 2. Create a new directory and change into it.
 
@@ -27,44 +48,39 @@ Docker.
 
       $ docker-compose up
 
-   This will download the docker containers and initialize the database.  This
-   make take some time depending on your internet connection speed and your PC.
+   This will download the Docker containers and initialize the database.  It
+   will take some time depending on your internet connection speed and your PC.
 
-5. Test the installation.
-   Point your browser to the url: http://localhost:5000/acts/ph4/
+5. Test the installation: Point your browser to the url:
+   http://localhost:5000/acts/ph4/ and use the application.
 
-   Use the application.
-
-6. When satisfied, hit :kbd:`Ctrl+C` to stop the docker service.
+6. When satisfied, hit :kbd:`Ctrl+C` to stop the Docker service.
 
 The Docker service is now installed.
 
 
-============================
- Running the Docker service
-============================
+Running the Docker service
+==========================
 
-Any time you want to run the docker service say:
+To use the application point your browser to http://localhost:5000/acts/ph4/
+while the Docker service is running.  To run the Docker service change into the
+directory and say:
 
 .. code-block:: shell
 
    $ docker-compose start
 
-and to stop it say:
+and to stop it again say:
 
 .. code-block:: shell
 
    $ docker-compose stop
 
-To use the application point your browser to http://localhost:5000/acts/ph4/
-while the service is running.
 
+CBGM
+====
 
-======
- CBGM
-======
-
-To run the CBGM:
+To run the CBGM say:
 
 .. code-block:: shell
 

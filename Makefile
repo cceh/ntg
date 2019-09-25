@@ -63,7 +63,7 @@ common-clean:
 server-clean:
 	cd server ; make clean; cd ..
 
-docker-build: server-clean common-clean
+docker-build: server-clean common-clean client
 	cd docker; make build; cd ..
 
 docker-run:

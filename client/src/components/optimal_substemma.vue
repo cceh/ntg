@@ -1,7 +1,5 @@
 <template>
-  <div class="optimal_substemma_vm want_hashchange"
-       @hashchange="on_hashchange" @caption="on_caption">
-    <page-header :caption="caption" />
+  <div class="optimal_substemma_vm want_hashchange" @hashchange="on_hashchange">
 
     <div class="container bs-docs-container">
 
@@ -78,9 +76,6 @@ export default {
                 'ms'        : this.input1,
                 'selection' : this.input2,
             });
-        },
-        on_caption (event) {
-            this.caption = event.detail.data;
         },
         on_hashchange () {
             const hash = window.location.hash ? window.location.hash.substring (1) : '';

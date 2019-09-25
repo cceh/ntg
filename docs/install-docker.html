@@ -99,9 +99,12 @@
 <li class="toctree-l3"><a class="reference internal" href="install-linux.html#build-and-run-client">Build and run client</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Installation with Docker</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#running-the-docker-service">Running the Docker service</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#cbgm">CBGM</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Installation with Docker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#install">Install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-the-docker-service">Running the Docker service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cbgm">CBGM</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
@@ -256,19 +259,33 @@
            <div itemprop="articleBody">
             
   <div class="section" id="installation-with-docker">
-<h1>Installation with Docker<a class="headerlink" href="#installation-with-docker" title="Permalink to this headline">¶</a></h1>
-<p>This chapter describes how to install the software on a Desktop computer with
-Docker.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">These instructions are tested only on Linux.   Feedback for Windows and Mac is welcome.</p>
+<span id="docker-install"></span><h1>Installation with Docker<a class="headerlink" href="#installation-with-docker" title="Permalink to this headline">¶</a></h1>
+<p>This chapter describes how to install the CBGM installation on your own PC with
+the help of Docker.  <a class="reference external" href="https://www.docker.com/">Docker</a> can run our
+application on Linux, Mac, and Windows.</p>
+<p>We plan to offer various Docker images for scholars who want to run the CBGM
+application on their own machines.</p>
+<p>Our images are preloaded with data and the data are editable.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">As of now (September 2019) this is a technology preview.
+More functionality will be added and bugs will be fixed later.
+Feedback is welcome at: <a class="reference external" href="https://github.com/cceh/ntg/issues">https://github.com/cceh/ntg/issues</a></p>
 </div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">These instructions are tested only on Linux.
+Feedback from Windows and Mac users is welcome:
+<a class="reference external" href="https://github.com/cceh/ntg/issues">https://github.com/cceh/ntg/issues</a></p>
+</div>
+<div class="section" id="install">
+<h2>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p class="first">Install Docker.</p>
+<li><p class="first">Install the free community version of Docker:</p>
 <ul class="simple">
-<li>For Windows see: <a class="reference external" href="https://docs.docker.com/docker-for-windows/install/">https://docs.docker.com/docker-for-windows/install/</a></li>
-<li>For Mac see: <a class="reference external" href="https://docs.docker.com/docker-for-mac/install/">https://docs.docker.com/docker-for-mac/install/</a></li>
-<li>For Debian Linux see: <a class="reference external" href="https://docs.docker.com/compose/install/">https://docs.docker.com/compose/install/</a></li>
+<li>for Windows see: <a class="reference external" href="https://docs.docker.com/docker-for-windows/install/">https://docs.docker.com/docker-for-windows/install/</a></li>
+<li>for Mac see: <a class="reference external" href="https://docs.docker.com/docker-for-mac/install/">https://docs.docker.com/docker-for-mac/install/</a></li>
+<li>for Debian Linux see: <a class="reference external" href="https://docs.docker.com/compose/install/">https://docs.docker.com/compose/install/</a></li>
 </ul>
 </li>
 <li><p class="first">Create a new directory and change into it.</p>
@@ -279,36 +296,36 @@ Docker.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose up
 </pre></div>
 </div>
-<p>This will download the docker containers and initialize the database.  This
-make take some time depending on your internet connection speed and your PC.</p>
+<p>This will download the Docker containers and initialize the database.  It
+will take some time depending on your internet connection speed and your PC.</p>
 </li>
-<li><p class="first">Test the installation.
-Point your browser to the url: <a class="reference external" href="http://localhost:5000/acts/ph4/">http://localhost:5000/acts/ph4/</a></p>
-<p>Use the application.</p>
+<li><p class="first">Test the installation: Point your browser to the url:
+<a class="reference external" href="http://localhost:5000/acts/ph4/">http://localhost:5000/acts/ph4/</a> and use the application.</p>
 </li>
-<li><p class="first">When satisfied, hit <kbd class="kbd docutils literal notranslate">Ctrl+C</kbd> to stop the docker service.</p>
+<li><p class="first">When satisfied, hit <kbd class="kbd docutils literal notranslate">Ctrl+C</kbd> to stop the Docker service.</p>
 </li>
 </ol>
 <p>The Docker service is now installed.</p>
 </div>
 <div class="section" id="running-the-docker-service">
-<h1>Running the Docker service<a class="headerlink" href="#running-the-docker-service" title="Permalink to this headline">¶</a></h1>
-<p>Any time you want to run the docker service say:</p>
+<h2>Running the Docker service<a class="headerlink" href="#running-the-docker-service" title="Permalink to this headline">¶</a></h2>
+<p>To use the application point your browser to <a class="reference external" href="http://localhost:5000/acts/ph4/">http://localhost:5000/acts/ph4/</a>
+while the Docker service is running.  To run the Docker service change into the
+directory and say:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose start
 </pre></div>
 </div>
-<p>and to stop it say:</p>
+<p>and to stop it again say:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose stop
 </pre></div>
 </div>
-<p>To use the application point your browser to <a class="reference external" href="http://localhost:5000/acts/ph4/">http://localhost:5000/acts/ph4/</a>
-while the service is running.</p>
 </div>
 <div class="section" id="cbgm">
-<h1>CBGM<a class="headerlink" href="#cbgm" title="Permalink to this headline">¶</a></h1>
-<p>To run the CBGM:</p>
+<h2>CBGM<a class="headerlink" href="#cbgm" title="Permalink to this headline">¶</a></h2>
+<p>To run the CBGM say:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose run ntg-app-server cbgm
 </pre></div>
+</div>
 </div>
 </div>
 

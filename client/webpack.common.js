@@ -5,7 +5,7 @@ const autoprefixer    = require ('autoprefixer');
 
 module.exports = {
     entry : {
-        app : 'js/main.js', // in app.bundle.js
+        app : 'js/app.js', // in app.bundle.js
     },
     output : {
         filename : 'js/[name].bundle.js',
@@ -92,6 +92,11 @@ module.exports = {
         port: 8080,
         contentBase: './build',
         public: 'ntg.fritz.box:8080',
+        headers: {
+            "Access-Control-Allow-Origin"      : "*",
+            "Access-Control-Allow-Credentials" : "true",
+            "Content-Security-Policy"          : "worker-src blob:",
+        },
     },
     optimization: {
         splitChunks: {
