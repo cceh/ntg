@@ -8,10 +8,15 @@ import subprocess
 BOOKS = [
     # id, siglum, name,            no. of chapters
     ( 1, "Mt",   "Matthew",        28),
+
     ( 2, "Mc",   "Mark",           16),
+
     ( 3, "L",    "Luke",           24),
+
     ( 4, "J",    "John",           21),
+
     ( 5, "Acts", "Acts",           28),
+
     ( 6, "R",    "Romans",         16),
     ( 7, "1K",   "1 Corinthians",  16),
     ( 8, "2K",   "2 Corinthians",  13),
@@ -21,11 +26,14 @@ BOOKS = [
     (12, "Kol",  "Colossians",      4),
     (13, "1Th",  "1 Thessalonians", 5),
     (14, "2Th",  "2 Thessalonians", 3),
+
     (15, "1T",   "1 Timothy",       6),
     (16, "2T",   "2 Timothy",       4),
     (17, "Tt",   "Titus",           3),
     (18, "Phm",  "Philemon",        1),
+
     (19, "H",    "Hebrews",        13),
+
     (20, "Jc",   "James",           5),
     (21, "1P",   "1 Peter",         5),
     (22, "2P",   "2 Peter",         3),
@@ -33,6 +41,7 @@ BOOKS = [
     (24, "2J",   "2 John",          1),
     (25, "3J",   "3 John",          1),
     (26, "Jd",   "Jude",            1),
+
     (27, "Ap",   "Revelation",     22),
 ]
 """ Titles of the NT books """

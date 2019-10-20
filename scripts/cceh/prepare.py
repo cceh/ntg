@@ -68,35 +68,37 @@ MS_ID_MT = 2
 book = None
 
 MISFORMED_LABEZ_TEST = """
-SELECT labez, labezsuf, adr2chapter (begadr) as chapter, count (*) AS anzahl
+SELECT labez, labezsuf, adr2chapter (begadr) AS chapter, count (*) AS count
 FROM att
 WHERE labez !~ :re_labez
 GROUP BY labez, labezsuf, adr2chapter (begadr)
+ORDER BY labez, labezsuf, adr2chapter (begadr)
 """
 
 MISFORMED_HS_TEST = """
-SELECT hs, hsnr, adr2chapter (begadr), count (*) AS anzahl
+SELECT hs, hsnr, adr2chapter (begadr) AS chapter, count (*) AS count
 FROM {t}
 WHERE hs !~ :re_hs_t
-GROUP BY hs, hsnr, adr2chapter (begadr)
+GROUP BY hsnr, hs, adr2chapter (begadr)
+ORDER BY hsnr, hs, adr2chapter (begadr)
 """
 
 HS_TO_HSNR_TEST = """
-SELECT hs, array_agg (DISTINCT hsnr)
+SELECT hs, array_agg (DISTINCT hsnr) AS hsnr
 FROM att
 GROUP BY hs
 HAVING count (DISTINCT hsnr) > 1
 """
 
 HSNR_TO_HS_TEST = """
-SELECT hsnr, array_agg (DISTINCT hs)
+SELECT hsnr, array_agg (DISTINCT hs) AS hs
 FROM att
 GROUP BY hsnr
 HAVING count (DISTINCT hs) > 1
 """
 
 LABEZ_TO_LESART_TEST = """
-SELECT begadr, endadr, lesart, array_agg (DISTINCT labez)
+SELECT begadr, endadr, lesart, array_agg (DISTINCT labez) AS labez
 FROM att
 WHERE labez !~ '^z[u-z]' AND labezsuf = ''
 GROUP BY begadr, endadr, lesart
@@ -104,11 +106,19 @@ HAVING COUNT (DISTINCT labez) > 1
 """
 
 LESART_TO_LABEZ_TEST = """
-SELECT begadr, endadr, labez, array_agg (DISTINCT lesart)
+SELECT begadr, endadr, labez, array_agg (DISTINCT lesart) AS lesart
 FROM att
 WHERE labez !~ '^z[u-z]' AND labezsuf = ''
 GROUP BY begadr, endadr, labez
 HAVING count (DISTINCT lesart) > 1
+"""
+
+MULTIPLE_HS_CANDIDATES_TEST = """
+SELECT begadr, endadr, array_agg (hs order by hs) as hs, array_agg (labez order by hs) as labez
+FROM att
+GROUP BY hsnr, begadr, endadr
+HAVING count(*) > 1
+ORDER BY begadr;
 """
 
 def copy_table (conn, source_table, dest_table, where = ''):
@@ -258,7 +268,13 @@ def copy_att (dba, parameters):
 
 
         if book == 'Mark':
-            # Rule: zv should be treated like zz. Meeting 28.06.2018
+            # Delete Inscriptio. -- Meeting 28.06.2018
+            execute (conn, """
+            DELETE FROM att
+            WHERE (begadr, endadr) = (20000002, 20000004)
+            """, parameters)
+
+            # Rule: zv should be treated like zz. -- Meeting 28.06.2018
             execute (conn, """
             UPDATE att
             SET labez = 'zz', labezsuf = ''
@@ -266,18 +282,24 @@ def copy_att (dba, parameters):
             """, parameters)
 
             for t in ('att', 'lac'):
-                fix (conn, "Misformed hs Mark", MISFORMED_HS_TEST, """
-                DELETE FROM {t}
-                WHERE hs ~ 'C';
+                fix (conn, "Misformed hs Mark (%s)" % t, MISFORMED_HS_TEST, r"""
                 UPDATE {t}
                 SET hs = REPLACE (hs, 'S', 's')
                 WHERE hs ~ 'S';
-                UPDATE {t}
-                SET hs = REPLACE (hs, 'r-1', '-1r')
-                WHERE hs ~ 'r-1';
                 """, dict (parameters, t = t))
 
-            warn (conn, "Misformed labez Mark", MISFORMED_LABEZ_TEST, parameters)
+            fix (conn, "Misformed labez Mark", MISFORMED_LABEZ_TEST, r"""
+            UPDATE att
+            SET labezsuf = REGEXP_REPLACE (labezsuf, '^(\d)_f$', '_f\1')
+            WHERE labezsuf ~ '^\d_f$';
+            UPDATE att
+            SET labez = SUBSTRING (labez, 1, 1), labezsuf = SUBSTRING (labez, 2)
+            WHERE labez ~ '^[a-y][of][1-9]?$';
+            UPDATE att
+            SET labez = 'zw', labezsuf = SUBSTRING (labez, 3) || labezsuf
+            WHERE labez ~ '^zw[a-y]';
+            """, parameters)
+
 
         if book == 'John':
             for t in ('att', 'lac'):
@@ -319,8 +341,8 @@ def copy_att (dba, parameters):
             fix (conn, "Wrong hsnr Acts", """
             SELECT DISTINCT hs, hsnr, adr2chapter (begadr) AS chapter
             FROM att
-            WHERE hsnr = 411881 AND hs !~ :re_supp
-               OR hsnr = 411880 AND hs ~ :re_supp
+            WHERE hsnr = 411881 AND hs !~ 's[1-9]?'
+               OR hsnr = 411880 AND hs  ~ 's[1-9]?'
             """, """
             UPDATE att SET hsnr = 411881 WHERE hsnr = 411880 AND hs ~ '[Ss]';
             DELETE FROM lac WHERE hsnr = 411882;
@@ -343,37 +365,6 @@ def copy_att (dba, parameters):
             UPDATE att
             SET labez = 'p'
             WHERE (begadr, endadr, hs) =  (52621006, 52621010, '431');
-            """, parameters)
-
-
-        if book == 'Mark':
-            # Delete Inscriptio. Meeting 28.06.2018
-            execute (conn, """
-            DELETE FROM att
-            WHERE (begadr, endadr) = (20000002, 20000004)
-            """, parameters)
-
-            fix (conn, "More than one labez for lesart Mark", LABEZ_TO_LESART_TEST, """
-            -- mail KW 27.08.2018
-            UPDATE att
-            SET lesart = 'εισελθητε (cf. 8–14a)'
-            WHERE (begadr, endadr, hs) = (21015032, 21015032, '1082');
-            -- mail KW 27.08.2018
-            UPDATE att
-            SET lesart = 'ο'
-            WHERE (begadr, endadr, hs) = (21421007, 21421007, '349');
-            """, parameters)
-
-            fix (conn, "More than one lesart for labez Mark", LESART_TO_LABEZ_TEST, """
-            -- mail KW 24.08.2018
-            UPDATE att
-            SET labez = 'g'
-            WHERE (begadr, endadr, hs) =  (21017022, 21017024, '544');
-            -- mail KW 24.08.2018
-            UPDATE att
-            SET labez = 'zw',
-                labezsuf = 'b/c'
-            WHERE (begadr, endadr, hs) =  (21314018, 21314022, '427');
             """, parameters)
 
 
@@ -560,7 +551,7 @@ def delete_corrector_hands (dba, parameters):
             WHERE (hsnr, begadr, endadr) IN (
               SELECT DISTINCT hsnr, begadr, endadr
               FROM {t}
-              WHERE hs ~  :re_corr_keep
+              WHERE hs ~  :re_corr_keep AND labez != 'zz'
             ) AND   hs !~ :re_corr_keep
             """, dict (parameters, t = t))
 
@@ -576,14 +567,14 @@ def delete_lectionaries (dba, parameters):
 
     """
 
-    if 're_lekt' not in parameters:
+    if 're_suppress' not in parameters:
         return
 
     with dba.engine.begin () as conn:
         for t in ('att', 'lac'):
             execute (conn, """
             DELETE FROM {t}
-            WHERE hs ~ :re_lekt
+            WHERE hs ~ :re_suppress
             """, dict (parameters, t = t))
 
 
@@ -629,15 +620,8 @@ def process_sigla (dba, parameters):
         if book in ('Acts', 'Mark', 'John'):
             warn (conn, "Hs with more than one hsnr", HS_TO_HSNR_TEST, parameters)
 
-        if book == 'CL':
-            fix (conn, "Hs with more than one hsnr CL", HS_TO_HSNR_TEST, """
-            UPDATE att SET hs = '1831s' WHERE hsnr = 318311;
-            UPDATE att SET hs = '206s'  WHERE hsnr = 302061;
-            """, parameters)
-
-        if book == 'John':
             # fix duplicate readings by keeping only the alphabetically lowest labez
-            execute (conn, """
+            fix (conn, "More that one candidate Hs", MULTIPLE_HS_CANDIDATES_TEST, """
             DELETE FROM att
             WHERE id IN (
               SELECT id
@@ -647,7 +631,14 @@ def process_sigla (dba, parameters):
             )
             """, parameters)
 
-        for t in ('att', 'lac'):
+        if book == 'CL':
+            fix (conn, "Hs with more than one hsnr CL", HS_TO_HSNR_TEST, """
+            UPDATE att SET hs = '1831s' WHERE hsnr = 318311;
+            UPDATE att SET hs = '206s'  WHERE hsnr = 302061;
+            """, parameters)
+
+    for t in ('att', 'lac'):
+        with dba.engine.begin () as conn:
             execute (conn, """
             UPDATE {t}
             SET hs = SUBSTRING (hs, :re_hs)
@@ -662,18 +653,6 @@ def process_sigla (dba, parameters):
             SET hs = g.minhs
             FROM (SELECT min (hs) AS minhs, hsnr FROM att GROUP BY hsnr) AS g
             WHERE t.hsnr = g.hsnr
-            """, parameters)
-
-        if book == 'Mark':
-            fix (conn, "Hsnr with more than one hs Mark", HSNR_TO_HS_TEST, """
-            -- mail KW 24.08.2018
-            UPDATE att
-            SET hs = '61'
-            WHERE hs = '6122';
-            -- mail KW 24.08.2018
-            UPDATE att
-            SET hs = '732'
-            WHERE hs = '73211';
             """, parameters)
 
         if book == 'John':
@@ -1771,32 +1750,29 @@ if __name__ == '__main__':
     parameters = dict ()
     book = config['BOOK']
     if book in ('Acts', 'CL'):
-        parameters['re_hs_t']  = '^(A|MT|([P0L]?[1-9][0-9]*)(s[1-9]?)?)'
+        parameters['re_hs_t']  = '^(A|MT|([P0L]?[1-9][0-9]*)(s[1-9]?)?)'  # hs test
         parameters['re_hs']    = '^(A|MT|([P0L]?[1-9][0-9]*)(s[1-9]?)?)'
-        parameters['re_supp']  = 's[1-9]?'   # later supplements
         parameters['re_corr']  = 'C[*1-9]?'  # correctors
         parameters['re_corr_keep'] = 'C[*]'
-        parameters['re_lekt']  = '.[AK]|L2$' # suppress these mss. (eg. secondary readings of lectionaries)
+        parameters['re_suppress']  = '.[AK]|L2$' # suppress these mss. (eg. secondary readings of lectionaries)
                                              # do not match 'A' and 'L2010' !!!
         parameters['re_comm']  = 'T[1-9]'    # commentaries
-        parameters['re_vid']   = 'V'         # videtur (visual guesswork)
         parameters['re_labez'] = '^([a-y]|z[u-z])$'
     if book == 'Mark':
-        parameters['re_hs_t']  = '^(A|MT|([P0L]?[1-9][0-9]*[*]?s?(-[1-9])?r?))$'
-        parameters['re_hs']    = '^(A|MT|([P0L]?[1-9][0-9]*s?))'
-        parameters['re_supp']  = 's[1-9]?'   # later supplements
-        parameters['re_lekt']  = '-[2-9]|.[ABDEFHJKL]'   # suppress these mss. (eg. secondary readings of lectionaries)
-        parameters['re_comm']  = 'T[1-9]'    # commentaries
-        parameters['re_vid']   = 'V'         # videtur (visual guesswork)
-        parameters['re_labez'] = '^([a-z]|y[a-t]|z[u-z])$'
+        parameters['re_hs_t']      = '^(A|([P0L]?[1-9][0-9]*s?(-[1-9])?(C([1-9][a-z]?)?)?[*]?([AKL][1-9]?)?[Vr]*))$'
+        parameters['re_hs']        = '^(A|MT|([P0L]?[1-9][0-9]*s?))'
+        parameters['re_corr']      = 'C([*]|([1-9][a-z]?))?'  # correctors
+        parameters['re_corr_keep'] = 'C[*]'                   # correctors to keep
+        parameters['re_suppress']  = '-[2-9]|.[ABDEFHJK]|.L2' # suppress these mss. (eg. secondary readings of lectionaries)
+        parameters['re_comm']      = 'T[1-9]'    # commentaries (there are none)
+        parameters['re_labez']     = '^([a-z]|y[a-t]|z[u-z])$'
     if book == 'John':
-        parameters['re_hs_t']  = '^(A|MT|FΠ|([P0LF]?[1-9][0-9]*)S?(C[*]?)?)'
-        parameters['re_hs']    = '^(A|MT|FΠ|([P0LF]?[1-9][0-9]*)S?(C[*]?)?)'
-        parameters['re_supp']  = 'S[*]?'
-        parameters['re_lekt']  = '-[2-9]'    # lectionaries
-        parameters['re_corr']  = '(C[*1-9]?A?([a-z]+2?)?)'
+        parameters['re_hs_t']      = '^(A|MT|FΠ|([P0LF]?[1-9][0-9]*)S?(C[*]?)?)'
+        parameters['re_hs']        = '^(A|MT|FΠ|([P0LF]?[1-9][0-9]*)S?(C[*]?)?)'
+        parameters['re_suppress']  = '-[2-9]'    # lectionaries
+        parameters['re_corr']      = '(C[*1-9]?A?([a-z]+2?)?)'
         parameters['re_corr_keep'] = 'C[*]'
-        parameters['re_labez'] = '^([a-z]+(/[a-z]+)*|z[u-z])$'
+        parameters['re_labez']     = '^([a-z]+(/[a-z]+)*|z[u-z])$'
 
     dbdest = db_tools.PostgreSQLEngine (**config)
 

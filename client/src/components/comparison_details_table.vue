@@ -1,10 +1,12 @@
 <template>
-  <div class="comparison-details slider"> <!-- table cannot animate height -->
+  <div class="vm-comparison-details slider"> <!-- table cannot animate height -->
     <table ref="table" cellspacing="0" width="100%"
            class="table table-bordered table-condensed table-hover table-sortable table-comparison-details">
       <caption>
         <div class="d-flex justify-content-between">
-          <div class="caption">Comparison of {{ ms1.hs }} and {{ ms2.hs }} in Chapter {{ range }}</div>
+          <div class="caption">
+            Detailed Comparison of {{ ms1.hs }} and {{ ms2.hs }} in Chapter {{ range }}
+          </div>
           <toolbar :toolbar="toolbar">
             <button-group slot="right" :options="options.csv" />
           </toolbar>
@@ -21,7 +23,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="r in rows" :class="(r.newer ? 'newer' : '') + (r.older ? 'older' : '')" :key="r.pass_id">
+        <tr v-for="r in rows" :key="r.pass_id" :class="(r.newer ? 'newer' : '') + (r.older ? 'older' : '')">
           <td class="passage"><a :href="'coherence#pass_id=' + r.pass_id">{{ r.pass_hr }}</a></td>
           <td class="lesart lesart1">{{ r.lesart1 }}</td>
           <td class="ms ms1">{{ r.labez_clique1 }}</td>
@@ -43,13 +45,14 @@
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import _ from 'lodash';
-import csv_parse from 'csv-parse/lib/sync';
-
-import { options }  from 'widgets/options';
+import csv_parse    from 'csv-parse/lib/sync';
 
 import sort_mixin   from 'table_sort_mixin.vue';
+import tools        from 'tools';
+import button_group from 'widgets/button_group.vue';
+import toolbar      from 'widgets/toolbar.vue';
+import { options }  from 'widgets/options';
+
 
 /**
  * Return a direction marker: <, >, NoRel or Uncl.
@@ -101,8 +104,12 @@ function row_conversion (d) {
 }
 
 export default {
-    'mixins' : [sort_mixin],
-    'props'  : ['ms1', 'ms2', 'range'],
+    'props'      : ['ms1', 'ms2', 'range'],
+    'mixins'     : [sort_mixin],
+    'components' : {
+        'button-group' : button_group,
+        'toolbar'      : toolbar,
+    },
     data () {
         return {
             'rows'      : [],
@@ -116,16 +123,17 @@ export default {
     'methods' : {
         load_data () {
             const vm = this;
-            vm.get (this.build_url ()).then ((response) => {
-                const rows = csv_parse (response.data, { 'columns' : true });
-                vm.rows = rows.map (row_conversion);
-                this.sort ();
-                const $el = $ (vm.$el);
-                $el.slideDown ();
+            vm.get (vm.build_url ()).then ((response) => {
+                vm.rows = csv_parse (response.data, { 'columns' : true })
+                    .map (row_conversion);
+                vm.sort ();
+                vm.$nextTick (() => {
+                    tools.slide_fade_in (vm.$el);
+                });
             });
         },
         build_url (page = 'comparison-detail.csv') {
-            return page + '?' + $.param ({
+            return page + '?' + tools.param ({
                 'ms1'   : 'id' + this.ms1.ms_id,
                 'ms2'   : 'id' + this.ms2.ms_id,
                 'range' : this.range,
@@ -145,17 +153,22 @@ export default {
 /* comparison_table_details.vue */
 @import "bootstrap-custom";
 
-div.comparison-details {
-    &.slider {
-        display: none;
-    }
+div.vm-comparison-details {
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
 
     table.table-comparison-details {
         border-width: 0;
 
+        caption {
+            border-bottom: $table-border-width solid $table-border-color;
+        }
+
         th,
         td {
             text-align: left;
+
             &[data-sort-by] {
                 padding-left: 1.5em;
             }
@@ -174,7 +187,6 @@ div.comparison-details {
                 width: 35%;
             }
         }
-
     }
 }
 </style>

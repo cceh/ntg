@@ -166,27 +166,6 @@ def init_app (app):
     """ Init the Flask app. """
 
     app.config.val = None
-    app.config.set_cover_rg_id = None
-
-    with app.config.dba.engine.begin () as conn:
-        try:
-            res = execute (conn, """
-            SELECT bk_id
-            FROM books
-            WHERE book = :book
-            """, { 'book' : app.config['BOOK'] })
-            bk_id = res.fetchone ()[0]
-
-            res = execute (conn, """
-            SELECT rg_id
-            FROM ranges
-            WHERE bk_id = :bk_id AND range = 'All'
-            """, { 'bk_id' : bk_id })
-            rg_id = res.fetchone ()[0]
-
-            app.config.set_cover_rg_id = rg_id
-        except:
-            pass # FIXME
 
 
 @bp.route ('/set-cover.json/<hs_hsnr_id>')
@@ -228,7 +207,7 @@ def set_cover_json (hs_hsnr_id):
         if 'MT' not in include and 'MT' not in pre_select:
             b_common[1] = False
         # also eliminate all descendants
-        ancestors = get_ancestors (conn, current_app.config.set_cover_rg_id, ms.ms_id)
+        ancestors = get_ancestors (conn, current_app.config.rg_id_all, ms.ms_id)
         for i in range (0, val.n_mss):
             if (i + 1) not in ancestors:
                 b_common[i] = False
@@ -426,7 +405,7 @@ def _optimal_substemma (ms_id, explain_matrix, combinations, mode):
 
 @bp.route ('/optimal-substemma.json')
 def optimal_substemma_json ():
-    """Normalize parameters and add some general info.
+    """Normalize parameters only and add some general info.
     """
 
     if current_app.config.val is None:

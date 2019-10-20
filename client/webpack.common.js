@@ -93,9 +93,9 @@ module.exports = {
         contentBase: './build',
         public: 'ntg.fritz.box:8080',
         headers: {
-            "Access-Control-Allow-Origin"      : "*",
-            "Access-Control-Allow-Credentials" : "true",
-            "Content-Security-Policy"          : "worker-src blob:",
+            'Access-Control-Allow-Origin'      : '*',
+            'Access-Control-Allow-Credentials' : 'true',
+            'Content-Security-Policy'          : 'worker-src blob:',
         },
     },
     optimization: {
@@ -125,15 +125,12 @@ module.exports = {
             path.resolve (__dirname, 'src/js'),
             'node_modules',
         ],
+        mainFields: ['module', 'main'],
         alias: {
             /* See: https://webpack.js.org/configuration/resolve/#resolve-alias */
-            'vue$' : path.resolve (__dirname, 'node_modules/vue/dist/vue.esm.js'),
             'bootstrap-custom' : path.resolve (
                 __dirname, 'src/css/bootstrap-custom.scss'
             ),
-            'jquery-ui'      : path.resolve (__dirname, 'node_modules/jquery-ui/ui/widgets'),
-            'jquery-ui-css'  : path.resolve (__dirname, 'node_modules/jquery-ui/themes/base'),
-            'd3'             : path.resolve (__dirname, 'node_modules/d3/dist/d3.js'),
         },
     },
 };

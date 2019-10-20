@@ -1,24 +1,24 @@
 <template>
-  <div class="optimal-substemma-details-vm slider"> <!-- table cannot animate height -->
+  <div class="vm-optimal-substemma-details slider"> <!-- table cannot animate height -->
     <table ref="table" cellspacing="0" width="100%"
            class="table table-bordered table-condensed table-hover table-sortable table-optimal-substemma-details">
       <caption>
         <div class="d-flex justify-content-between">
-          <div class="caption">Details of Combination {{ mss }}</div>
-          <toolbar :toolbar="toolbar">
+          <div class="caption">Details of Combination {{ selection }}</div>
+          <toolbar :toolbar="toolbar" class="d-print-none">
             <button-group slot="right" :options="options.csv" />
           </toolbar>
         </div>
       </caption>
       <thead>
         <tr @click="on_sort">
-          <th class="type"    data-sort-by="type">Type</th>
+          <th class="type" data-sort-by="type">Type</th>
           <th class="pass_hr" data-sort-by="pass_id">Passage</th>
-          <th class="lesart"  data-sort-by="lesart">Lesart</th>
+          <th class="lesart" data-sort-by="lesart">Lesart</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="r in rows" :class="(r.newer ? 'newer' : '') + (r.older ? 'older' : '')" :key="r.pass_id">
+        <tr v-for="r in rows" :key="r.pass_id" :class="(r.newer ? 'newer' : '') + (r.older ? 'older' : '')">
           <td class="type">{{ r.type }}</td>
           <td class="pass_hr"><a :href="'coherence#pass_id=' + r.pass_id">{{ r.pass_hr }}</a></td>
           <td class="lesart">{{ r.lesart }}</td>
@@ -37,13 +37,13 @@
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import _ from 'lodash';
 import csv_parse from 'csv-parse/lib/sync';
 
-import { options }  from 'widgets/options';
-
+import tools        from 'tools';
 import sort_mixin   from 'table_sort_mixin.vue';
+import button_group from 'widgets/button_group.vue';
+import toolbar      from 'widgets/toolbar.vue';
+import { options }  from 'widgets/options';
 
 /**
  * Detail row conversion function.  Convert numeric values to numeric types
@@ -64,8 +64,15 @@ function row_conversion (d) {
 }
 
 export default {
-    'mixins' : [sort_mixin],
-    'props'  : ['ms', 'mss'],
+    'props' : {
+        'ms'        : String,
+        'selection' : String,
+    },
+    'mixins'     : [sort_mixin],
+    'components' : {
+        'button-group' : button_group,
+        'toolbar'      : toolbar,
+    },
     data () {
         return {
             'rows'      : [],
@@ -79,19 +86,17 @@ export default {
     'methods' : {
         load_data () {
             const vm = this;
-            vm.get (this.build_url ()).then ((response) => {
+            vm.get (vm.build_url ()).then ((response) => {
                 const rows = csv_parse (response.data, { 'columns' : true });
                 vm.rows = rows.map (row_conversion);
-                this.sort ();
-                const $el = $ (vm.$el);
-                $el.slideDown ();
+                vm.sort ();
+                vm.$nextTick (() => {
+                    tools.slide_fade_in (vm.$el);
+                });
             });
         },
-        build_url (page = 'optimal-substemma-detail.csv?') {
-            return page + $.param ({
-                'ms'        : 'id' + this.ms.ms_id,
-                'selection' : this.mss.split ('.').join (' '),
-            });
+        build_url () {
+            return 'optimal-substemma-detail.csv?' + tools.param (this, ['ms', 'selection']);
         },
         download () {
             window.open (this.build_full_api_url (this.build_url (), '_blank'));
@@ -107,10 +112,10 @@ export default {
 /* optimal_substemma_details.vue */
 @import "bootstrap-custom";
 
-div.optimal-substemma-details-vm {
-    &.slider {
-        display: none;
-    }
+div.vm-optimal-substemma-details {
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
 
     table.table-optimal-substemma-details {
         margin-top: 0 !important;
@@ -134,6 +139,7 @@ div.optimal-substemma-details-vm {
         > thead > tr > th,
         > tbody > tr > td {
             text-align: left;
+
             &[data-sort-by] {
                 padding-left: 1.5em;
             }
@@ -146,7 +152,6 @@ div.optimal-substemma-details-vm {
                 width: 15%;
             }
         }
-
     }
 }
 </style>

@@ -105,14 +105,14 @@ class Manuscript ():
         self.ms_id, self.hs, self.hsnr = res.first ()
 
 
-    def get_length (self, passage, range_ = '0'):
+    def get_length (self, rg_id):
         # Get the length of the manuscript, ie. the no. of existing passages
 
         res = execute (self.conn, """
         SELECT length
-        FROM ms_ranges_view
-        WHERE ms_id = :ms_id AND bk_id = :bk_id AND range = :range_
-        """, dict (parameters, ms_id = self.ms_id, bk_id = passage.bk_id, range_ = range_))
+        FROM ms_ranges
+        WHERE ms_id = :ms_id AND rg_id = :rg_id
+        """, dict (parameters, ms_id = self.ms_id, rg_id = rg_id))
 
         return res.fetchone ()[0]
 
@@ -233,13 +233,12 @@ class Passage ():
             'end'      : str (self.end),
             'passage'  : self.to_passage (),
             'bk_id'    : self.bk_id,
+            'rg_id'    : self.range_id (),
             'siglum'   : bk[1],
             'book'     : bk[2],
             'chapter'  : str (self.chapter),
             'verse'    : s.verse,
             'word'     : hr.split ('/', 1)[1],
-            'readings' : self.readings (),
-            'cliques'  : self.cliques (),
         }
 
 
@@ -273,7 +272,7 @@ class Passage ():
     def range_id (self, range_ = None):
         """ Return the id of the range containing this passage. """
 
-        range_ = range_ or self.chapter
+        range_ = range_ or str (self.chapter)
 
         res = execute (self.conn, """
         SELECT rg_id
@@ -281,7 +280,12 @@ class Passage ():
         WHERE bk_id = :bk_id AND range = :range_
         """, dict (parameters, bk_id = self.bk_id, range_ = range_))
 
-        return res.fetchone ()[0]
+        res = res.first ()
+        return res[0] if res is not None else None
+
+
+    def request_rg_id (self, request):
+        return int (request.args.get ('rg_id', 0)) or self.range_id ('All')
 
 
     def to_passage (self):
@@ -345,6 +349,11 @@ class Passage ():
 def get_locale ():
     return flask.request.accept_languages.best_match ('en')
     # return flask.request.accept_languages.best_match (LANGUAGES.keys ())
+
+
+def cache (response):
+    response.headers['Cache-Control'] = 'private, max-age=3600'
+    return response
 
 
 def make_json_response (json = None, status = 200, message = None):

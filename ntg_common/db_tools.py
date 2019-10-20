@@ -7,9 +7,11 @@ import csv
 import configparser
 import datetime
 import io
+import itertools
 import logging
 import os
 import os.path
+import textwrap
 import time
 
 import networkx as nx
@@ -70,6 +72,9 @@ def _debug (conn, msg, sql, parameters, level):
 
 def debug (conn, msg, sql, parameters):
     _debug (conn, msg, sql, parameters, logging.DEBUG)
+
+def info (conn, msg, sql, parameters):
+    _debug (conn, msg, sql, parameters, logging.INFO)
 
 def warn (conn, msg, sql, parameters):
     _debug (conn, msg, sql, parameters, logging.WARNING)
@@ -149,6 +154,9 @@ def tabulate (res):
         for i in cols:
             rowlen[i] = max (rowlen[i], len (row[i]))
 
+    for i in cols:
+        rowlen[i] = min (80, rowlen[i])
+
     # output header
     line ()
     for i in cols:
@@ -158,8 +166,13 @@ def tabulate (res):
 
     # output rows
     for row in rows:
+        offset = 0
         for i in cols:
-            a.append ('| {:<{align}} '.format (row[i], align = rowlen[i]))
+            lines  = itertools.chain (* [textwrap.wrap (line, width = 78) for line in row[i].splitlines ()])
+            prefix = '|\n' + ' ' * offset
+            for n, l in enumerate (lines):
+                a.append ('{:}| {:<{align}} '.format (prefix if n > 0 else '', l, align = rowlen[i]))
+            offset += rowlen[i] + 3
         a.append ('|\n')
     line ()
     a.append ('%d rows\n' % len (rows))

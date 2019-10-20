@@ -255,7 +255,7 @@ def notes_txt (passage_or_id):
                        pass_id = passage.pass_id,
                        note = request.get_json ()['remarks']))
 
-            return make_json_response (message = 'Notes saved.')
+            return make_json_response (message = 'Note saved.')
         res = execute (conn, """
         SELECT note
         FROM notes
@@ -267,8 +267,8 @@ def notes_txt (passage_or_id):
         return make_text_response ('')
 
 
-@bp.route ('/notes.json')
-def notes_json ():
+@bp.route ('/notes.json/<range_id>')
+def notes_json (range_id):
     """Endpoint.  Get a list of all editor notes."""
 
     edit_auth ()
@@ -276,10 +276,14 @@ def notes_json ():
     with current_app.config.dba.engine.begin () as conn:
         res = execute (conn, """
         SELECT pass_id, begadr, endadr, note
-        FROM passages_view
+        FROM passages_view p
+        JOIN ranges rg
+          ON (rg.passage @> p.passage)
         JOIN notes
           USING (pass_id)
-        """, dict (parameters))
+        WHERE rg.rg_id = :range_id
+        ORDER BY pass_id
+        """, dict (parameters, range_id = range_id))
 
         Notes = collections.namedtuple ('Notes', 'pass_id, begadr, endadr, note')
         notes = []

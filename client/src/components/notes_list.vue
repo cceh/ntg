@@ -1,20 +1,35 @@
 <template>
-  <div class="notes_list_vm">
+  <div class="vm-notes-list want_hashchange" @hashchange="on_hashchange">
 
-    <div class="container bs-docs-container" v-if="$store.getters.can_write">
+    <div v-if="$store.getters.can_write" class="container bs-docs-container">
 
       <card>
+        <card-caption :slidable="false">
+          {{ caption }}
+        </card-caption>
+
+        <div class="card-header d-print-none">
+          <toolbar :toolbar="toolbar">
+            <range v-model="toolbar.rg_id" :pass_id="0">
+              Chapter:
+            </range>
+          </toolbar>
+        </div>
+
         <table class="table">
-          <tr>
-            <th>Passage</th><th>Note</th>
-          </tr>
-          <tr v-for="note in notes" :key="note.pass_id">
-            <th><a :href="'coherence#pass_id=' + note.pass_id">{{ note.hr }}</a></th>
-            <td class="prewrap">{{ note.note }}</td>
-          </tr>
+          <thead>
+            <tr>
+              <th>Passage</th><th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="note in notes" :key="note.pass_id">
+              <th><a :href="'coherence#pass_id=' + note.pass_id">{{ note.hr }}</a></th>
+              <td class="prewrap">{{ note.note }}</td>
+            </tr>
+          </tbody>
         </table>
       </card>
-
     </div>
   </div>
 </template>
@@ -23,38 +38,67 @@
 /**
  * Show a list of all notes.
  *
- * Internally uses a list of <notes>.
- *
  * @component notes_list
  * @author Marcello Perathoner
  */
 
-import $   from 'jquery';
-import Vue from 'vue';
+import tools        from 'tools';
 
-import toolbar from 'widgets/toolbar.vue';
-import notes   from 'notes.vue';
-
-Vue.component ('toolbar', toolbar);
-Vue.component ('notes',   notes);
+import card         from 'widgets/card.vue';
+import card_caption from 'widgets/card_caption.vue';
+import toolbar      from 'widgets/toolbar.vue';
+import range        from 'widgets/range.vue';
 
 export default {
     data () {
         return {
-            'notes'    : [],
+            'notes'   : [],
+            'toolbar' : {
+                'rg_id' : 0,
+            },
         };
+    },
+    'components' : {
+        'card'         : card,
+        'card-caption' : card_caption,
+        'toolbar'      : toolbar,
+        'range'        : range,
     },
     'computed' : {
         'caption' : function () {
-            return `Notes`;
+            const f = this.$store.state.ranges.filter (d => d.rg_id === this.toolbar.rg_id);
+            const rg = f.length ? f[0].range : 'All';
+            const msg = rg !== 'All' ? ` for Chapter ${rg}` : '';
+            return `${this.$route.meta.caption}${msg}`;
         },
     },
-    'mounted' : function () {
-        const vm = this;
-        const xhr1 = vm.get ('notes.json');
-        Promise.all ([xhr1]).then ((responses) => {
-            vm.notes = responses[0].data.data;
-        });
+    'watch' : {
+        'toolbar.rg_id' : function () {
+            tools.set_hash (this.toolbar);
+        },
+    },
+    'methods' : {
+        on_hashchange () {
+            const vm = this;
+            const params = tools.get_hash ();
+
+            vm.toolbar.rg_id = parseInt (params.rg_id, 10) || 0;
+
+            if (vm.toolbar.rg_id > 0) {
+                const requests = [
+                    vm.get ('notes.json/' + vm.toolbar.rg_id),
+                ];
+                Promise.all (requests).then ((responses) => {
+                    vm.notes = responses[0].data.data;
+                });
+            } else {
+                vm.notes = [];
+            }
+        },
+    },
+    mounted () {
+        // On first page load simulate user navigation to hash.
+        this.on_hashchange ();
     },
 };
 </script>
@@ -63,9 +107,13 @@ export default {
 /* notes_list.vue */
 @import "bootstrap-custom";
 
-div.notes_list_vm {
+div.vm-notes-list {
     .prewrap {
         white-space: pre-wrap;
+    }
+
+    table.table {
+        margin: 1rem 0;
     }
 }
 </style>

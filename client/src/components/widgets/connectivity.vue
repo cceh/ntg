@@ -1,16 +1,18 @@
 <template>
-  <div class="connectivity-vm btn-group btn-group-sm" role="group" data-toggle="buttons">
-
+  <div class="vm-connectivity btn-group btn-group-sm">
     <label class="btn btn-primary d-flex align-items-center" :title="title"> <!-- moz needs align-center -->
       <slot></slot>
-      <span class="connectivity-label">{{ connectivity_formatter (value) }}</span>
-      <input v-model="value" type="range" class="custom-range" min="1" max="21"
-             @change="on_change" />
-      <datalist id="ticks" style="display: none;">
+      <span class="connectivity-label">{{ connectivity_formatter (val) }}</span>
+      <input v-model="val" type="range" class="custom-range"
+             min="1" max="21" list="ticks"
+             @mouseup="on_mouseup" />
+
+      <!-- ticks are disabled by appearance: none in class custom-range -->
+      <datalist id="ticks">
         <option value="1" label="1" />
         <option value="5" label="5" />
         <option value="10" label="10" />
-        <option value="20" label="20" />
+        <option value="15" label="15" />
         <option value="21" label="All" />
       </datalist>
     </label>
@@ -21,61 +23,33 @@
 /**
  * The connectivity slider.
  *
- * It triggers a 'connectivity' custom event with the selected connectivity as a
- * parameter.
- *
  * @component connectivity
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import 'bootstrap';
-
 export default {
     'props' : {
-        'default' : { // the default reading
-            'type'    : Number,
-            'default' : 5,
-        },
-        'eventname' : {
-            'type'    : String,
-            'default' : 'connectivity',
+        'value' : {  // v-model
+            'type'     : Number,
+            'required' : true,
         },
         'title' : {
             'type'    : String,
             'default' : 'Select a connectivity.',
         },
-        'value' : {
-            'type'     : Number,
-            'required' : true,
-        },
     },
     'data' : function () {
         return {
+            'val' : this.value,
         };
-    },
-    'watch' : {
-        value (newVal, oldVal) {
-            if (newVal !== oldVal || newVal !== this.value) {
-                this.$forceUpdate ();
-            }
-        },
     },
     'methods' : {
         connectivity_formatter (s) {
             return (s === '21') ? 'All' : s;
         },
-        change (value) {
-            this.$trigger (this.eventname, value);
-            this.$emit ('input', value);  // makes it work with v-model
+        on_mouseup () {
+            this.$emit ('input', Number (this.val));
         },
-        on_change (event) {
-            this.change (event.target.value);
-        },
-        on_submit () {
-        },
-    },
-    mounted () {
     },
 };
 </script>
@@ -84,7 +58,7 @@ export default {
 /* connectivity.vue */
 @import "bootstrap-custom";
 
-.connectivity-vm {
+.vm-connectivity {
     @media print {
         display: none;
     }

@@ -1,5 +1,5 @@
 <script>
-import $ from 'jquery';
+import tools from 'tools';
 
 export default {
     data () {
@@ -8,14 +8,15 @@ export default {
     },
     'methods' : {
         /**
-         * Opens a table containing a detailed view of one range.
+         * Opens/closes the drill-down table.
          *
          * @function toggle_details_table
          */
         toggle_details_table (row, event) {
             if (row.child) {
-                const $child_row = $ (event.target).closest ('tr').next ();
-                $child_row.find ('div.slider').slideUp (() => { row.child = false; });
+                const child_row = event.target.closest ('tr').nextElementSibling;
+                tools.slide_fade_out (child_row.querySelector ('div.slider'))
+                    .then (() => { row.child = false; });
             } else {
                 row.child = true;
             }

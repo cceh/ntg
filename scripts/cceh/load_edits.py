@@ -20,7 +20,7 @@ import lxml
 
 from ntg_common import db
 from ntg_common import db_tools
-from ntg_common.db_tools import execute, executemany, warn
+from ntg_common.db_tools import execute, executemany, warn, info, fix
 from ntg_common.tools import log
 from ntg_common.config import init_cmdline
 
@@ -48,14 +48,6 @@ if __name__ == '__main__':
     with db.engine.begin () as conn:
         db_tools.truncate_editor_tables (conn)
 
-        log (logging.INFO, "Build default cliques ...")
-        db_tools.init_default_cliques (conn)
-        log (logging.INFO, "Build default ms_cliques ...")
-        db_tools.init_default_ms_cliques (conn)
-        log (logging.INFO, "Build default locstem ...")
-        db_tools.init_default_locstem (conn)
-        # default notes is an empty table
-
     log (logging.INFO, "Loading cliques ...")
 
     with db.engine.begin () as conn:
@@ -81,11 +73,12 @@ if __name__ == '__main__':
         WHERE (u.passage, u.labez) = (r.passage, r.labez)
         """, parameters)
 
-        warn (conn, "Discarded cliques", """
-        SELECT passage, labez, clique
+        info (conn, "Discarded cliques", """
+        SELECT passage, ARRAY_AGG (labez_clique (labez, clique) ORDER BY labez, clique) AS old_clique
         FROM import_cliques
-        WHERE pass_id IS NULL
-        ORDER BY passage, labez, clique
+        WHERE pass_id IS NULL AND UPPER_INF (sys_period)
+        GROUP BY passage
+        ORDER BY passage
         """, parameters)
 
         execute (conn, """
@@ -111,6 +104,12 @@ if __name__ == '__main__':
         FROM import_cliques
         WHERE NOT UPPER_INF (sys_period);
 
+        -- default entries
+        INSERT INTO cliques (pass_id, labez, clique, user_id_start)
+        SELECT pass_id, labez, '1', 0
+        FROM readings r
+        ON CONFLICT (pass_id, labez, clique) DO NOTHING;
+
         ALTER TABLE cliques ENABLE TRIGGER cliques_trigger;
         """, parameters)
 
@@ -133,7 +132,7 @@ if __name__ == '__main__':
                 :sys_period, :user_id_start, :user_id_stop)
         """, parameters, values)
 
-        # do not refer to cliques_view as that could kill entries in the history
+        # do not refer to cliques_view as it may not contain cliques in the history table
         execute (conn, """
         UPDATE import_ms_cliques u
         SET ms_id = a.ms_id, pass_id = a.pass_id
@@ -141,11 +140,12 @@ if __name__ == '__main__':
         WHERE (u.passage, u.labez, u.hsnr) = (a.passage, a.labez, a.hsnr)
         """, parameters)
 
-        warn (conn, "Discarded ms_cliques", """
-        SELECT hsnr, passage, labez, clique
+        info (conn, "Discarded ms_cliques", """
+        SELECT passage, labez_clique (labez, clique) AS old_clique, ARRAY_AGG (hsnr ORDER BY hsnr) AS hsnr
         FROM import_ms_cliques
-        WHERE pass_id IS NULL OR ms_id IS NULL
-        ORDER BY hsnr, passage, labez, clique
+        WHERE (pass_id IS NULL OR ms_id IS NULL) AND UPPER_INF (sys_period)
+        GROUP BY passage, labez, clique
+        ORDER BY passage, labez, clique
         """, parameters)
 
         execute (conn, """
@@ -162,12 +162,7 @@ if __name__ == '__main__':
         SELECT ms_id, pass_id, labez, clique,
                sys_period, user_id_start, user_id_stop
         FROM import_ms_cliques
-        WHERE UPPER_INF (sys_period)
-        ON CONFLICT (ms_id, pass_id, labez) DO
-        UPDATE
-        SET (clique, sys_period, user_id_start, user_id_stop) =
-            (EXCLUDED.clique, EXCLUDED.sys_period, EXCLUDED.user_id_start, EXCLUDED.user_id_stop)
-        WHERE (u.ms_id, u.pass_id, u.labez) = (EXCLUDED.ms_id, EXCLUDED.pass_id, EXCLUDED.labez);
+        WHERE UPPER_INF (sys_period);
 
         INSERT INTO ms_cliques_tts AS u (ms_id, pass_id, labez, clique,
                                          sys_period, user_id_start, user_id_stop)
@@ -176,17 +171,23 @@ if __name__ == '__main__':
         FROM import_ms_cliques
         WHERE NOT UPPER_INF (sys_period);
 
+        -- default entries
+        INSERT INTO ms_cliques AS u (ms_id, pass_id, labez, clique, user_id_start)
+        SELECT a.ms_id, a.pass_id, a.labez, '1', 0
+        FROM apparatus a
+        ON CONFLICT (ms_id, pass_id, labez) DO NOTHING;
+
         ALTER TABLE ms_cliques ENABLE TRIGGER ms_cliques_trigger;
         """, parameters)
 
 
     log (logging.INFO, "Loading locstem ...")
 
-    with db.engine.begin () as conn:
-        values = []
-        for row in tree.xpath ('/sql/export_locstem/row'):
-            values.append ({ e.tag : e.text for e in row })
+    values = []
+    for row in tree.xpath ('/sql/export_locstem/row'):
+        values.append ({ e.tag : e.text for e in row })
 
+    with db.engine.begin () as conn:
         execute (conn, """
         TRUNCATE import_locstem;
         """, parameters)
@@ -198,51 +199,117 @@ if __name__ == '__main__':
                 :sys_period, :user_id_start, :user_id_stop)
         """, parameters, values)
 
-        # get the pass_id
-        # do not refer to cliques_view as that could kill entries in the history
+        # set the pass_id
         execute (conn, """
         UPDATE import_locstem u
-        SET pass_id = r.pass_id
-        FROM readings_view r
-        WHERE (u.passage, u.labez) = (r.passage, r.labez)
+        SET pass_id = p.pass_id
+        FROM passages p
+        WHERE u.passage = p.passage;
         """, parameters)
 
-        warn (conn, "Discarded LocStem", """
-        SELECT passage, labez, clique
+        warn (conn, "Discarded Passages", """
+        SELECT passage AS old_passage,
+               ARRAY_AGG (labez_clique (labez, clique) ORDER BY labez, clique) AS old_clique
         FROM import_locstem
-        WHERE pass_id IS NULL
-        ORDER BY passage, labez, clique
+        WHERE pass_id IS NULL AND UPPER_INF (sys_period)
+        GROUP BY passage
+        ORDER BY passage
         """, parameters)
 
         execute (conn, """
         DELETE FROM import_locstem
-        WHERE pass_id IS NULL
+        WHERE pass_id IS NULL;
         """, parameters)
+
+        # list all new passages
+        warn (conn, "New Passages", """
+        SELECT passage AS new_passage,
+               ARRAY_AGG (DISTINCT labez ORDER BY labez) AS new_labez
+        FROM readings_view
+        WHERE pass_id NOT IN (
+          SELECT pass_id
+          FROM import_locstem
+        )
+        AND labez !~ '^zz'
+        GROUP BY passage
+        ORDER BY passage
+        """, parameters)
+
+        # list all new readings (except where already listed as passage before)
+        warn (conn, "New Readings", """
+        SELECT passage AS old_passage,
+               ARRAY_AGG (DISTINCT labez ORDER BY labez) AS new_labez
+        FROM readings_view
+        WHERE pass_id IN (
+          SELECT pass_id
+          FROM import_locstem
+        )
+        AND (pass_id, labez) NOT IN (
+          SELECT pass_id, labez
+          FROM import_locstem
+        )
+        AND labez !~ '^z[u-z]'
+        GROUP BY passage
+        ORDER BY passage
+        """, parameters)
+
+        # delete obsolete stuff
+        execute (conn, """
+        DELETE FROM import_locstem
+        WHERE (pass_id, labez, clique) NOT IN (
+          SELECT pass_id, labez, clique
+          FROM cliques
+        );
+
+        DELETE FROM import_locstem
+        WHERE source_labez NOT IN ('*', '?')
+        AND (pass_id, source_labez, source_clique) NOT IN (
+          SELECT pass_id, labez, clique
+          FROM cliques
+        );
+        """, parameters)
+
 
     with db.engine.begin () as conn:
         execute (conn, """
         ALTER TABLE locstem DISABLE TRIGGER locstem_trigger;
 
-        -- remove the default entries of all passages to be imported
-        DELETE FROM locstem
-        WHERE pass_id IN (
-          SELECT DISTINCT pass_id
-          FROM import_locstem
-        );
-
         INSERT INTO locstem AS u (pass_id, labez, clique, source_labez, source_clique,
                                   sys_period, user_id_start, user_id_stop)
-        SELECT pass_id, labez, clique, source_labez, source_clique,
-               sys_period, user_id_start, user_id_stop
-        FROM import_locstem
-        WHERE UPPER_INF (sys_period);
+        SELECT i.pass_id, i.labez, i.clique, i.source_labez, i.source_clique,
+               i.sys_period, i.user_id_start, i.user_id_stop
+        FROM import_locstem i
+        WHERE UPPER_INF (i.sys_period);
 
         INSERT INTO locstem_tts AS u (pass_id, labez, clique, source_labez, source_clique,
                                      sys_period, user_id_start, user_id_stop)
-        SELECT pass_id, labez, clique, source_labez, source_clique,
-               sys_period, user_id_start, user_id_stop
-        FROM import_locstem
-        WHERE NOT UPPER_INF (sys_period);
+        SELECT i.pass_id, i.labez, i.clique, i.source_labez, i.source_clique,
+               i.sys_period, i.user_id_start, i.user_id_stop
+        FROM import_locstem i
+        WHERE NOT UPPER_INF (i.sys_period);
+
+        -- insert default dependency: 'a1' is original
+        INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, user_id_start)
+        SELECT pass_id, 'a', '1', '*', '1', 0
+        FROM cliques q
+        WHERE labez = 'a' AND clique = '1'
+        AND (pass_id, labez, clique) NOT IN (
+          SELECT pass_id, labez, clique
+          FROM locstem
+        );
+
+        -- insert default dependency: not 'a1' depends on 'a1'
+        INSERT INTO locstem (pass_id, labez, clique, source_labez, source_clique, user_id_start)
+        SELECT pass_id, labez, clique, '?', '1', 0
+        FROM cliques q
+        WHERE NOT (labez = 'a' AND clique = '1') AND labez !~ '^z[u-z]'
+        -- on conflict do nothing would not work here because
+        -- one reading may depend on arbitrary many readings
+        -- and we'd just make everybody also depend on 'a'
+        AND (pass_id, labez, clique) NOT IN (
+          SELECT pass_id, labez, clique
+          FROM locstem
+        );
 
         ALTER TABLE locstem ENABLE TRIGGER locstem_trigger;
         """, parameters)
@@ -274,9 +341,9 @@ if __name__ == '__main__':
         """, parameters)
 
         warn (conn, "Discarded Notes", """
-        SELECT passage
+        SELECT passage, note
         FROM import_notes
-        WHERE pass_id IS NULL
+        WHERE pass_id IS NULL AND UPPER_INF (sys_period)
         ORDER BY passage
         """, parameters)
 

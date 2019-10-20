@@ -1,9 +1,9 @@
 <template>
-  <form class="navigator-vm form-inline" @submit.prevent="on_nav">
+  <form class="vm-navigator form-inline" @submit.prevent="on_submit">
 
-    <div class="btn-group btn-group-sm">
+    <div class="btn-group btn-group-sm mr-2">
       <button type="button" data="-1" class="btn btn-primary"
-              aria-label="Previous Passage" title="Previous Passage" @click="on_nav">
+              aria-label="Previous Passage" title="Previous Passage" @click="on_submit">
         <span class="fas fa-chevron-left" />
       </button>
     </div>
@@ -13,24 +13,24 @@
         <span class="input-group-text">Nav:</span>
       </div>
 
-      <input type="text" class="form-control" name="siglum" data-autocomplete="siglum"
-             aria-label="Book" title="Book" />
-      <input type="text" class="form-control" name="chapter" data-autocomplete="chapter"
-             aria-label="Chapter" title="Chapter" />
+      <autocomplete v-model="ac.siglum" name="siglum" :more_params="ac" aria-label="Book" title="Book"
+                    @input="ac.chapter = ''; ac.verse = ''; ac.word = ''" />
+      <autocomplete v-model="ac.chapter" name="chapter" :more_params="ac" aria-label="Chapter" title="Chapter"
+                    @input="ac.verse = ''; ac.word = ''" />
 
       <div class="input-group-prepend input-group-append">
         <span class="input-group-text">:</span>
       </div>
 
-      <input type="text" class="form-control" name="verse" data-autocomplete="verse"
-             aria-label="Verse" title="Verse" />
+      <autocomplete v-model="ac.verse" name="verse" :more_params="ac" aria-label="Verse" title="Verse"
+                    @input="ac.word = ''" />
 
       <div class="input-group-prepend input-group-append">
         <span class="input-group-text">/</span>
       </div>
 
-      <input type="text" class="form-control" name="word" data-autocomplete="word"
-             aria-label="Word" title="Word" />
+      <autocomplete v-model="ac.word" name="word" :more_params="ac" aria-label="Word" title="Word"
+                    @input="on_submit" />
 
       <div class="input-group-btn input-group-append">
         <button type="submit" data="Go" class="btn btn-primary"
@@ -40,14 +40,14 @@
       </div>
     </div>
 
-    <div class="btn-group btn-group-sm">
+    <div class="btn-group btn-group-sm ml-2">
       <button type="button" data="1" class="btn btn-primary"
-              aria-label="Next Passage" title="Next Passage" @click="on_nav">
+              aria-label="Next Passage" title="Next Passage" @click="on_submit">
         <span class="fas fa-chevron-right" />
       </button>
     </div>
 
-    <input :value="this.$store.state.passage.pass_id" name="pass_id" type="hidden" />
+    <input :value="value" name="pass_id" type="hidden" />
   </form>
 </template>
 
@@ -55,137 +55,71 @@
 /**
  * This module implements the tape-recorder-controls navigator.
  *
- * It triggers a 'navigator' custom event with the passage id as parameter.
- *
  * @component navigator
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import _ from 'lodash';
-import 'jquery-ui/autocomplete.js';
-
-import 'jquery-ui-css/core.css';
-import 'jquery-ui-css/autocomplete.css';
-
-/*
- * 1. Extend the stock autocomplete to use a <table> instead of a <ul> and give
- * it the bootstrap look.  Using a table we can display the passage id alongside
- * the passage lemma.  2. Give the source function a vm parameter.
- */
-
-$.widget ('custom.tableautocomplete', $.ui.autocomplete, {
-    '_renderMenu' : function (ul, items) {
-        this._super (ul, items);
-        ul.addClass ('custom-dropdown-menu-table'); // give it the bootstrap look
-    },
-    '_renderItem' : (table, item) => {
-        let tr = $ ('<tr></tr>').data ('item.autocomplete', item);
-        tr.append ($ ('<td class="menu-label">' + item.label + '</td>'));
-        if (_.has (item, 'description')) {
-            tr.append ($ ('<td class="menu-description">' + item.description + '</td>'));
-        }
-        tr.appendTo (table);
-        return tr;
-    },
-    '_search' : function (value) {
-        this.pending += 1;
-        this._addClass ('ui-autocomplete-loading');
-        this.cancelSearch = false;
-
-        this.source ({ 'term' : value }, this._response (), this.options.vm);
-    },
-});
-
-/**
- * Get a list of suggestions from the server
- *
- * @function suggest
- *
- * @param {Object} data - Request object with 'term' property, which refers
- *                        to the value currently in the text input.
- *
- * @param {function} complete - The callback
- *
- * @see https://api.jqueryui.com/autocomplete/#option-source
- */
-function suggest (data, complete, vm) {
-    let $elem = $ (this.element);
-
-    // collect values from all <input>s
-    let $inputs = $elem.closest ('form').find ('input[data-autocomplete]');
-    $inputs.each ((i, e) => {
-        let $e = $ (e);
-        data[$e.attr ('data-autocomplete')] = $e.val ();
-    });
-    // get the name of the current field
-    data.currentfield = $elem.attr ('data-autocomplete');
-
-    vm.get ('suggest.json', { 'params' : data }).then ((response) => complete (response.data));
-}
+import autocomplete from 'widgets/autocomplete.vue';
 
 export default {
+    'props' : {
+        'value' : { // the pass_id, set by v-model
+            'type'     : Number,
+            'required' : true,
+        },
+    },
+    'components' : {
+        'autocomplete' : autocomplete,
+    },
     'data' : function () {
         return {
+            'ac' : {
+                'siglum'  : '',
+                'chapter' : '',
+                'verse'   : '',
+                'word'    : '',
+            },
         };
     },
-    'computed' : {
-        passage () {
-            return this.$store.state.passage;
-        },
+    'watch' : {
+        value (new_pass_id) { this.load (new_pass_id); },
     },
     'methods' : {
         /**
-         * Set a new passage.  Programmatically set a new passage, eg. at page load.
-         *
-         * @function set_passage
-         *
-         * @param {int} pass_id - The new passage id
-         */
-        set_passage (pass_id) {
-            const vm = this;
-            const requests = [
-                vm.get ('passage.json/'   + pass_id),
-                vm.get ('ranges.json/'    + pass_id),
-                vm.get ('leitzeile.json/' + pass_id),
-            ];
-            Promise.all (requests).then ((responses) => {
-                vm.$store.commit ('passage', {
-                    'passage'   : responses[0].data.data,
-                    'ranges'    : responses[1].data.data,
-                    'leitzeile' : responses[2].data.data,
-                });
-            });
-        },
-        /**
          * Answer the user input on the navigator buttons.
-         *
-         * @function on_nav
          *
          * @param {Object} event - The event
          */
-        on_nav (event) {
-            const $target = $ (event.currentTarget);
-            const $form   = $target.closest ('form');
-            const data    = { 'button' : $target.attr ('data') || 'Go' };
-
-            _.forEach ($form.serializeArray (), (value) => {
-                data[value.name] = value.value;
-            });
-
+        on_submit (event) {
+            const vm = this;
+            const target = event.currentTarget;
+            const params = {
+                'button' : (target && target.getAttribute ('data')) || 'Go',
+                ... vm.ac,
+            };
             // transform user input into pass_id
-            this.get ('passage.json/', { 'params' : data }).then ((response) => {
-                this.$trigger ('navigator', response.data.data.passage);
+            vm.get ('passage.json/' + vm.value, { 'params' : params }).then ((response) => {
+                const passage = response.data.data;
+                vm.$emit ('input', passage.pass_id);  // makes it work with v-model, sets value
             });
         },
-    },
-    'watch' : {
-        passage () {
+        load (new_pass_id) {
             const vm = this;
-            $ ('form input[data-autocomplete]').each ((i, e) => {
-                const $e = $ (e);
-                $e.val (vm.passage[$e.attr ('data-autocomplete')]);
-            });
+            const ac = vm.ac;
+            if (new_pass_id > 0) {
+                vm.get ('passage.json/' + new_pass_id).then ((response) => {
+                    const passage = response.data.data;
+                    ac.siglum  = passage.siglum.toString ();
+                    ac.chapter = passage.chapter.toString ();
+                    ac.verse   = passage.verse.toString ();
+                    ac.word    = passage.word.toString ();
+                });
+            } else {
+                ac.siglum  = '';
+                ac.chapter = '';
+                ac.verse   = '';
+                ac.word    = '';
+            }
         },
     },
     /**
@@ -194,31 +128,7 @@ export default {
      * @function created
      */
     mounted () {
-        const vm = this;
-
-        $ ('form input[data-autocomplete]').tableautocomplete ({
-            'vm'        : vm,
-            'source'    : suggest,
-            'minLength' : 0,
-            'position'  : { 'my' : 'left top', 'at' : 'left bottom+2', 'collision' : 'flipfit' },
-        })
-            .on ('click', function () {
-                $ (this).tableautocomplete ('search');
-            })
-            .on ('tableautocompletechange', function () {
-                // clear following inputs
-                $ (this).nextAll ('input').val ('');
-            })
-            .on ('tableautocompleteselect', function (event, dummy_ui) {
-                let $this = $ (this);
-                $this.nextAll ('input').val ('');
-                if ($this.attr ('data-autocomplete') === 'word') {
-                    // give the control a chance to update the <input> before we call on_nav ()
-                    vm.$nextTick (() => {
-                        vm.on_nav (event);
-                    });
-                }
-            });
+        this.load (this.value);
     },
 };
 </script>
@@ -227,17 +137,15 @@ export default {
 /* navigator.vue */
 @import "bootstrap-custom";
 
-.navigator-vm {
+.vm-navigator {
     @media print {
         display: none;
     }
 
-    /* make buttons the same height as inputs */
-    /* align-items: stretch; */
-
     input.form-control {
         text-align: right;
         width: 3.5em;
+        border-radius: 0;
 
         &[name=siglum] {
             text-align: left;
@@ -246,45 +154,6 @@ export default {
 
         &[name=word] {
             width: 6.5em;
-        }
-    }
-}
-
-/* displayed outside of parent ! */
-.custom-dropdown-menu-table {
-    display: table;
-    z-index: $zindex-dropdown;
-    float: left;
-    padding: 5px 0;
-    margin: 0;
-    font-size: $font-size-base;
-    text-align: left;
-    background-color: $dropdown-bg;
-    border: $dropdown-border-width solid $dropdown-border-color;
-    background-clip: padding-box;
-
-    /* stylelint-disable at-rule-no-unknown */
-    @include border-radius($dropdown-border-radius);
-    @include box-shadow($dropdown-box-shadow);
-
-    &.ui-menu td.ui-menu-item-wrapper {
-        padding: 3px 20px;
-
-        &.ui-state-active {
-            margin: 0;
-            border-width: 0;
-            color: $dropdown-link-active-color;
-            background: $dropdown-link-active-bg;
-        }
-        &.menu-label { text-align: right; }
-        &.menu-description { padding-left: 0; }
-    }
-
-    tr.ui-menu-item {
-        &.ui-state-active {
-            margin: 0;
-            border-width: 0;
-            background: #ccc;
         }
     }
 }

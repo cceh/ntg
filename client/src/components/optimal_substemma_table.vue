@@ -1,12 +1,13 @@
 <template>
-  <div class="optimal-substemma-table-vm">
-    <div class="card-header">
-      <toolbar :toolbar="toolbar" >
+  <div class="vm-optimal-substemma-table">
+    <div class="card-header d-print-none">
+      <toolbar :toolbar="toolbar">
         <button-group slot="right" :options="options.csv" />
       </toolbar>
     </div>
 
-    <table class="table table-bordered table-sm table-hover table-with-details table-sortable table-optimal-substemma" cellspacing="0">
+    <table class="table table-bordered table-sm table-hover table-with-details table-sortable table-optimal-substemma"
+           cellspacing="0">
       <thead>
         <tr @click="on_sort">
           <th class="details-control" />
@@ -35,7 +36,7 @@
       </thead>
       <tbody>
         <template v-for="r in rows">
-          <tr :class="rowclass (r)" :key="r.index">
+          <tr :key="r.index" :class="rowclass (r)">
             <td class="details-control" @click="toggle_details_table (r, $event)" />
 
             <td class="mss" @click="on_click (r.mss)">{{ r.mss }}</td>
@@ -48,10 +49,10 @@
             <td class="open">{{ r.open }}</td>
             <td class="hint">{{ r.hintc }}</td>
           </tr>
-          <tr v-if="r.child" :data-index="r.index" :key="r.index + '_child'" class="child" >
+          <tr v-if="r.child" :key="r.index + '_child'" :data-index="r.index" class="child">
             <td />
             <td colspan="99">
-              <optimal-substemma-details-table :ms="ms" :mss="r.mss" />
+              <optimal-substemma-details-table :ms="ms" :selection="r.mss" />
             </td>
           </tr>
         </template>
@@ -72,16 +73,15 @@
  * 1891 03 5 429 181 2298 04 0120 01
  */
 
-import $ from 'jquery';
-import Vue from 'vue';
+import tools from 'tools';
 import csv_parse from 'csv-parse/lib/sync';
 import { options } from 'widgets/options';
 
 import optimal_substemma_details from 'optimal_substemma_details.vue';
 import sort_mixin                from 'table_sort_mixin.vue';
 import toggle_mixin              from 'table_toggle_mixin.vue';
-
-import tools from 'tools';
+import toolbar                   from 'widgets/toolbar.vue';
+import button_group              from 'widgets/button_group.vue';
 
 /**
  * Row conversion function.  Convert numeric values to numeric types
@@ -101,17 +101,22 @@ function row_conversion (d) {
         'post'    : +d.post,
         'unknown' : +d.unknown,
         'open'    : +d.open,
-        'hint'    : d.hint == 'True',
-        'hintc'   : d.hint == 'True' ? '<<' : '',
+        'hint'    : d.hint === 'True',
+        'hintc'   : d.hint === 'True' ? '<<' : '',
         'child'   : false,
     };
 }
 
 
 export default {
-    'mixins' : [sort_mixin, toggle_mixin],
-    'props'  : ['ms', 'mss'],
+    'props' : {
+        'ms'        : String,
+        'selection' : String,
+    },
+    'mixins'     : [sort_mixin, toggle_mixin],
     'components' : {
+        'toolbar'                         : toolbar,
+        'button-group'                    : button_group,
         'optimal-substemma-details-table' : optimal_substemma_details,
     },
     data () {
@@ -119,63 +124,54 @@ export default {
             'rows'        : [],
             'sorted_by'   : 'hint equal',
             'sorted_desc' : true,
-            'options'   : options,
-            'toolbar'   : {
+            'options'     : options,
+            'toolbar'     : {
                 'csv' : () => this.download (), // show a download csv button
             },
         };
     },
-    'computed' : {
-        'caption' : function () {
-            return `Optimal Substemma for Witness ${this.ms.hs} (${this.ms.open})` ;
-        },
-        'msmss' : function () {
-            return this.ms ? this.ms.ms_id + '-' + this.mss : '';
-        },
-    },
     'watch' : {
-        'msmss' : function () {
+        'ms' : function () {
             this.load_data ();
             this.sort ();
         },
-        caption () {
-            this.$store.commit ('caption', this.caption);
+        'selection' : function () {
+            this.load_data ();
+            this.sort ();
         },
     },
     'methods' : {
         load_data () {
             const vm = this;
-            vm.get (vm.build_url ()).then ((response) => {
-                const rows = csv_parse (response.data, { 'columns' : true });
-                vm.rows = rows.map (row_conversion);
-                vm.sort ();
-            });
-        },
-        on_click (mss) {
-            const vm = this;
-            vm.$router.push ({
-                name : 'set_cover',
-                hash : '#' + $.param ({
-                    'ms'         : vm.ms.hs,
-                    'pre_select' : mss,
-                })
-            });
-        },
-        build_url (page = 'optimal-substemma.csv') {
-            return page + '?' + $.param ({
-                'ms'        : 'id' + this.ms.ms_id,
-                'selection' : this.mss.map ((d) => d.hs).join (' '),
-            });
+            if (vm.ms && vm.selection) {
+                vm.get (vm.build_url ()).then ((response) => {
+                    const rows = csv_parse (response.data, { 'columns' : true });
+                    vm.rows = rows.map (row_conversion);
+                    vm.sort ();
+                });
+            } else {
+                vm.rows = [];
+            }
         },
         download () {
             window.open (this.build_full_api_url (this.build_url (), '_blank'));
         },
+        build_url () {
+            return 'optimal-substemma.csv?' + tools.param (this, ['ms', 'selection']);
+        },
+        on_click () {
+            const vm = this;
+            vm.$router.push ({
+                'name' : 'set_cover',
+                'hash' : '#' + tools.param ({
+                    'ms'         : vm.ms,
+                    'pre_select' : vm.selection,
+                }),
+            });
+        },
         rowclass (r) {
             return (r.hint ? 'hint' : '') + (r.child ? ' shown' : '');
         },
-    },
-    mounted () {
-        // this.load_data ();
     },
 };
 </script>
@@ -184,7 +180,7 @@ export default {
 /* optimal_substemma_table.vue */
 @import "bootstrap-custom";
 
-div.optimal-substemma-table-vm {
+div.vm-optimal-substemma-table {
     table.table-optimal-substemma {
         tr.hint {
             background-color: $card-cap-bg;
@@ -197,6 +193,7 @@ div.optimal-substemma-table-vm {
             &.mss,
             &.hint {
                 text-align: left;
+
                 &[data-sort-by] {
                     padding-left: 1.5em;
                 }

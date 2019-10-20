@@ -64,7 +64,6 @@ def textflow (passage_or_id):
 
     labez        = request.args.get ('labez') or ''
     hyp_a        = request.args.get ('hyp_a') or 'A'
-    chapter      = request.args.get ('range') or 'All'
     connectivity = int (request.args.get ('connectivity') or 10)
     width        = float (request.args.get ('width') or 0.0)
     fontsize     = float (request.args.get ('fontsize') or 10.0)
@@ -110,17 +109,7 @@ def textflow (passage_or_id):
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
-
-        if chapter == 'This':
-            chapter = passage.chapter
-
-        # get rg_id
-        res = execute (conn, """
-        SELECT rg_id
-        FROM ranges
-        WHERE range = :range_ AND bk_id = :bk_id
-        """, dict (parameters, bk_id = passage.bk_id, range_ = chapter))
-        rg_id, = res.fetchone ()
+        rg_id   = passage.request_rg_id (request)
 
         exclude = get_excluded_ms_ids (conn, include)
 

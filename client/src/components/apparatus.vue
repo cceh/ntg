@@ -1,21 +1,31 @@
 <template>
-  <div class="apparatus-vm card-slidable">
-    <ul class="list-group list-group-flush wrapper apparatus-wrapper">
-      <li v-for="(items, group) in groups" :key="group" class="list-group-item">
-        <h3 class="list-group-item-heading">
-          <a v-if="items[0].labez[0] !== 'z'" :data-labez="items[0].labez" class="apparatus-labez fg_labez"
-             @click="goto_attestation (items[0].labez)">{{ items[0].caption }}</a>
-          <span v-else="" :data-labez="items[0].labez"
-                class="apparatus-labez fg_labez">{{ items[0].caption }}</span>
-        </h3>
-        <ul class="list-group-item-text attesting-mss list-inline">
-          <li v-for="item in items" :key="item.ms_id">
-            <a :data-ms-id="item.ms_id" class="ms">{{ item.hs }}.</a>
-            <span> </span>
-          </li>
-        </ul>
-      </li>
-    </ul>
+  <div class="vm-apparatus card-slidable">
+    <div class="card-header">
+      <toolbar :toolbar="toolbar">
+        <button-group v-model="toolbar.cliques" type="checkbox" :options="options.cliques" />
+        <button-group v-model="toolbar.ortho" type="checkbox" :options="options.ortho" />
+        <button-group slot="right" :options="options.find_relatives" />
+      </toolbar>
+    </div>
+
+    <div class="wrapper">
+      <ul class="list-group list-group-flush">
+        <li v-for="(items, group) in groups" :key="group" class="list-group-item">
+          <h3 class="list-group-item-heading">
+            <a v-if="items[0].labez[0] !== 'z'" :data-labez="items[0].labez" class="apparatus-labez fg_labez"
+               @click="goto_attestation (items[0].labez)">{{ items[0].caption }}</a>
+            <span v-else="" :data-labez="items[0].labez"
+                  class="apparatus-labez fg_labez">{{ items[0].caption }}</span>
+          </h3>
+          <ul class="list-group-item-text attesting-mss list-inline">
+            <li v-for="item in items" :key="item.ms_id">
+              <a :data-ms-id="item.ms_id" class="ms">{{ item.hs }}.</a>
+              <span> </span>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -29,34 +39,39 @@
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import _ from 'lodash';
-import { mapGetters } from 'vuex';
+import { groupBy, sortBy, zip } from 'lodash';
 
-import tools from 'tools';
+import button_group     from 'widgets/button_group.vue';
+import toolbar          from 'widgets/toolbar.vue';
+import { options }      from 'widgets/options';
+import tools            from 'tools';
 
 /**
  * Load a new passage.
  *
  * @function
- * @param {Object} passage - The passage to load.
+ * @param {Number} pass_id - The passage to load.
  * @returns {Promise} Promise, resolved when the passage has loaded.
  */
-function load_passage (vm, passage) {
-    if (passage.pass_id === 0) {
+function load_passage (vm, pass_id) {
+    if (pass_id === 0) {
         return Promise.resolve ();
     }
 
-    const xhr = vm.get ('apparatus.json/' + passage.pass_id);
-    const p1 = vm.$wrapper.animate ({ 'opacity' : 0.0 }, 300).promise ();
+    const wrapper = vm.$el.querySelector ('.wrapper');
 
-    return Promise.all ([xhr, p1]).then ((responses) => {
+    const requests = [
+        vm.get ('apparatus.json/' + pass_id),
+        tools.fade_out (wrapper).promise,
+    ];
+
+    return Promise.all (requests).then ((responses) => {
         const show_cliques = vm.toolbar.cliques.includes ('cliques');
         const show_ortho   = vm.toolbar.ortho.includes ('ortho');
 
         /* zip ('a/b/c', '1/2/3') => 'a1/b2/c3' */
-        function zip (... args) {
-            return _.zip (... args.map (e => e.split ('/'))).map (e => e.join ('')).join ('/');
+        function qzip (... args) {
+            return zip (... args.map (e => e.split ('/'))).map (e => e.join ('')).join ('/');
         }
 
         let grouper = item => item.labez;
@@ -64,19 +79,19 @@ function load_passage (vm, passage) {
 
         if (!show_cliques && show_ortho) {
             grouper = item => item.labez + item.labezsuf + item.lesart;
-            caption = item => zip (item.labez, item.labezsuf) + ' ' + item.lesart;
+            caption = item => qzip (item.labez, item.labezsuf) + ' ' + item.lesart;
         } else if (show_cliques && !show_ortho) {
             grouper = item => item.labez + item.clique;
-            caption = item => zip (item.labez, item.clique) + ' ' + item.reading;
+            caption = item => qzip (item.labez, item.clique) + ' ' + item.reading;
         } else if (show_cliques && show_ortho) {
             grouper = item => item.labez + item.clique + item.labezsuf + item.lesart;
-            caption = item => zip (item.labez, item.labezsuf, item.clique) + ' ' + item.lesart;
+            caption = item => qzip (item.labez, item.labezsuf, item.clique) + ' ' + item.lesart;
         }
 
         const manuscripts = responses[0].data.data.manuscripts;
 
         const readings = new Map (responses[0].data.data.readings.map (
-            r => [ r.labez, r.lesart ]
+            r => [r.labez, r.lesart]
         ));
 
         const mss = manuscripts.map (ms => {
@@ -89,32 +104,37 @@ function load_passage (vm, passage) {
             return ms;
         });
 
-        // save current height of card
-        const old_height = tools.save_height (vm.$wrapper);
-
         // group manuscripts and loop over groups
-        vm.groups = _.groupBy (_.sortBy (mss, 'group'), 'group');
+        vm.groups = groupBy (sortBy (mss, 'group'), 'group');
 
-        vm.$nextTick (function () {
-            tools.slide_from (vm.$wrapper, old_height);
+        vm.$nextTick (() => {
+            tools.slide_fade_in (wrapper, true);
         });
     });
 }
 
 export default {
-    'props' : ['toolbar'],
+    'props'      : ['pass_id', 'epoch'],
+    'components' : {
+        'toolbar'      : toolbar,
+        'button-group' : button_group,
+    },
     'data' : function () {
         return {
-            'groups' : [],
+            'groups'  : [],
+            'options' : options,
+            'toolbar' : {
+                'cliques' : [],  // Show readings or cliques.
+                'ortho'   : [],  // Show orthographic variations.
+                'rel'     : this.find_relatives,
+            },
         };
     },
-    'computed' : {
-        ...mapGetters ([
-            'passage',
-        ]),
-    },
     'watch' : {
-        passage () {
+        pass_id () {
+            this.load_passage ();
+        },
+        epoch () {
             this.load_passage ();
         },
         'toolbar' : {
@@ -126,7 +146,7 @@ export default {
     },
     'methods' : {
         load_passage () {
-            return load_passage (this, this.passage);
+            return load_passage (this, this.pass_id);
         },
 
         /**
@@ -141,13 +161,15 @@ export default {
          * Open a page listing all manuscripts.
          */
         find_relatives () {
-            this.$router.push (`attestation#pass_id=${this.passage.pass_id}&labez=a`);
+            this.$router.push ({
+                'name' : 'find_relatives',
+                'hash' : '#' + tools.param ({
+                    'pass_id' : this.pass_id,
+                }),
+            });
         },
     },
     mounted () {
-        this.toolbar.rel = this.find_relatives,
-        this.$card       = $ (this.$el).closest ('.card');
-        this.$wrapper    = $ (this.$el).find ('.wrapper');
         this.load_passage ();
     },
 };
@@ -157,7 +179,7 @@ export default {
 /* apparatus.vue */
 @import "bootstrap-custom";
 
-div.apparatus-vm {
+div.vm-apparatus {
     a:not([href]):not([tabindex]) {
         color: var(--primary);
         cursor: pointer;

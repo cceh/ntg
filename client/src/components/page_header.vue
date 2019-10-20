@@ -34,8 +34,7 @@
       </template>
     </div>
 
-    <div class="container bs-docs-container login-required-message"
-         v-if="!can_read">
+    <div v-if="!can_read" class="container bs-docs-container login-required-message">
       Sorry.  You don't have read access to this section.
     </div>
 
@@ -75,16 +74,22 @@ export default {
 @import "bootstrap-custom";
 
 div.vm-page-header {
-
     div.bs-docs-header {
         margin: 0;
         padding: ($spacer * 0.5) 0 ($spacer * 0.25) 0;
         color: var(--light);
         background-color: var(--brand-color);
+
+        @media print {
+            /* compensate for missing div.login-nav */
+            margin-bottom: $spacer;
+            color: black;
+            background-color: transparent;
+        }
     }
 
     div.bs-docs-container {
-        padding-top:    ($spacer * 0.5);
+        padding-top: ($spacer * 0.5);
         padding-bottom: ($spacer * 0.5);
     }
 

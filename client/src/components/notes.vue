@@ -1,8 +1,17 @@
 <template>
-  <div class="notes-vm card-slidable">
-    <div class="wrapper notes-wrapper">
-      <textarea v-model="current_text" />
+  <div class="vm-notes card-slidable">
+    <div class="card-header">
+      <toolbar :toolbar="toolbar">
+        <b-button-group size="sm">
+          <b-button :disabled="!toolbar.save" variant="primary" size="sm" class="d-print-none"
+                    @click="toolbar.save ()">Save</b-button>
+        </b-button-group>
+      </toolbar>
     </div>
+
+    <textarea v-model="current_text" />
+
+    <alert ref="alert" />
   </div>
 </template>
 
@@ -14,19 +23,33 @@
  * @author Marcello Perathoner
  */
 
-import $     from 'jquery';
-import tools from 'tools';
+import { BButton }      from 'bootstrap-vue/src/components/button/button';
+import { BButtonGroup } from 'bootstrap-vue/src/components/button-group/button-group';
+
+import alert   from 'widgets/alert.vue';
+import toolbar from 'widgets/toolbar.vue';
+import tools   from 'tools';
+
 
 export default {
-    'props' : [ 'toolbar', 'passage' ],
+    'props'      : ['pass_id'],
+    'components' : {
+        'alert'          : alert,
+        'b-button-group' : BButtonGroup,
+        'b-button'       : BButton,
+        'toolbar'        : toolbar,
+    },
     'data' : function () {
         return {
             'original_text' : '',
             'current_text'  : '',
+            'toolbar'       : {
+                'save' : false,
+            },
         };
     },
     'watch' : {
-        passage () {
+        pass_id () {
             this.load_passage ();
         },
         current_text () {
@@ -44,20 +67,21 @@ export default {
          */
         load_passage () {
             const vm = this;
-            if (vm.passage.pass_id === 0) {
+            if (vm.pass_id === 0) {
                 return Promise.resolve ();
             }
-            const $ta = vm.$textarea;
-            const old_height = tools.save_height ($ta);
+            const ta = vm.$el.querySelector ('textarea');
 
-            const xhr = vm.get ('notes.txt/' + vm.passage.pass_id);
-            const p1 = $ta.animate ({ 'opacity' : 0.0 }, 300).promise ();
+            const requests = [
+                vm.get ('notes.txt/' + vm.pass_id),
+                tools.fade_out (ta).promise,
+            ];
 
-            return Promise.all ([xhr, p1]).then (function (p) {
-                vm.current_text  = p[0].data;
+            return Promise.all (requests).then ((responses) => {
+                vm.current_text  = responses[0].data;
                 vm.original_text = vm.current_text;
-                vm.$nextTick (function () {
-                    tools.slide_from ($ta, old_height, false);
+                vm.$nextTick (() => {
+                    tools.slide_fade_in (ta);
                 });
             });
         },
@@ -77,21 +101,17 @@ export default {
         on_save () {
             const vm = this;
 
-            const xhr = vm.put ('notes.txt/' + vm.passage.pass_id, { 'remarks' : vm.current_text });
-            xhr.then ((value) => {
-                vm.original_text = vm.current_text;
-                tools.xhr_alert (value, vm.$wrapper);
-            });
-            xhr.catch ((reason) => {
-                tools.xhr_alert (reason, vm.$wrapper);
-            });
+            vm.put ('notes.txt/' + vm.pass_id, { 'remarks' : vm.current_text })
+                .then ((response) => {
+                    vm.original_text = vm.current_text;
+                    vm.$refs.alert.show (response.data.message, 'success', 2000);
+                }).catch ((error) => {
+                    vm.$refs.alert.show (error.response.data.message, 'error');
+                });
         },
     },
     mounted () {
         const vm = this;
-        vm.$card     = $ (vm.$el).closest ('.card');
-        vm.$wrapper  = $ (vm.$el).find ('.wrapper');
-        vm.$textarea = $ (vm.$el).find ('textarea');
         vm.load_passage ();
     },
 };
@@ -101,15 +121,12 @@ export default {
 /* notes.vue */
 @import "bootstrap-custom";
 
-.notes-vm {
+.vm-notes {
     textarea {
         display: block;
-        resize: vertical;
         width: 100%;
-        max-height: 500px;
         border: none;
         padding: $card-spacer-x;
-        border-radius: $card-border-radius;
     }
 }
 </style>

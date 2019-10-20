@@ -10,7 +10,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text">Witness 1:</span>
             </div>
-            <input id="ms1" v-model="input1" type="text" class="form-control"
+            <input v-model="ms1" type="text" class="form-control"
                    title="Enter the Gregory-Aland no. of the first witness ('A' for the initial text)."
                    aria-label="Witness 1" />
           </div>
@@ -19,7 +19,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text">Witness 2:</span>
             </div>
-            <input id="ms2" v-model="input2" type="text" class="form-control"
+            <input v-model="ms2" type="text" class="form-control"
                    title="Enter the Gregory-Aland no. of the second witness ('A' for the initial text)."
                    aria-label="Witness 2" />
           </div>
@@ -30,8 +30,12 @@
         </form>
       </div>
 
-      <card :caption="caption" cssclass="card-comparison">
-        <comparison-table :ms1="ms1" :ms2="ms2" />
+      <card>
+        <card-caption :slidable="false">
+          {{ caption }}
+        </card-caption>
+
+        <comparison-table :ms1="mso1" :ms2="mso2" />
       </card>
 
     </div>
@@ -49,51 +53,57 @@
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import Vue from 'vue';
-
 import tools from 'tools';
 
+import card             from 'widgets/card.vue';
+import card_caption     from 'widgets/card_caption.vue';
 import comparison_table from 'comparison_table.vue';
-
-Vue.component ('comparison-table', comparison_table);
 
 export default {
     data () {
         return {
-            'ms1'     : { 'hs' : '-' },
-            'ms2'     : { 'hs' : '-' },
-            'input1'  : '',
-            'input2'  : '',
-            'caption' : 'Comparison of Witnesses',
+            'ms1'  : '',  // v-model
+            'ms2'  : '',  // v-model
+            'mso1' : {},
+            'mso2' : {},
         };
     },
+    'components' : {
+        'card'             : card,
+        'card-caption'     : card_caption,
+        'comparison-table' : comparison_table,
+    },
+    'computed' : {
+        'caption' : function () {
+            if (this.mso1.hs && this.mso2.hs) {
+                return `Comparison of Witnesses ${this.mso1.hs} and ${this.mso2.hs}`;
+            }
+            return this.$route.meta.caption;
+        },
+    },
     'methods' : {
-        submit (dummy_event) {
-            window.location.hash = '#' + $.param ({
-                'ms1' : this.input1,
-                'ms2' : this.input2,
-            });
+        submit () {
+            tools.set_hash (this, ['ms1', 'ms2']);
         },
         on_hashchange () {
-            const hash = window.location.hash ? window.location.hash.substring (1) : '';
-            if (hash) {
-                const vm = this;
-                const params = tools.deparam (hash);
+            const vm = this;
+
+            const params = tools.get_hash ();
+            if (params.ms1 && params.ms2) {
                 const requests = [
                     vm.get ('manuscript.json/' + params.ms1),
                     vm.get ('manuscript.json/' + params.ms2),
                 ];
 
                 Promise.all (requests).then ((responses) => {
-                    vm.ms1 = responses[0].data.data;
-                    vm.ms2 = responses[1].data.data;
-                    vm.input1 = vm.ms1.hs;
-                    vm.input2 = vm.ms2.hs;
+                    vm.mso1 = responses[0].data.data;
+                    vm.mso2 = responses[1].data.data;
+                    vm.ms1 = vm.mso1.hs;
+                    vm.ms2 = vm.mso2.hs;
                 });
             } else {
                 // reset data
-                Object.assign (this.$data, this.$options.data.call (this));
+                Object.assign (this.$data, this.$options.data ());
             }
         },
     },

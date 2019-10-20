@@ -1,14 +1,16 @@
 <template>
-  <b-button-group size="sm" class="button-group-vm btn-group-toggle btn-group btn-group-sm"
+  <b-button-group size="sm" class="vm-button-group btn-group-toggle btn-group btn-group-sm"
                   :options="options">
-    <template v-for="button in buttons">
+    <template v-for="button in options">
       <label v-if="type !== 'button'" :key="button.value"
-             :class="'btn btn-primary btn-sm' + (is_active (button.value) ? ' active' : '')" :title="button.title">
+             :title="button.title"
+             class="btn btn-primary" :class="{ 'active' : is_active (button.value) }">
         <span>{{ button.text }}</span>
         <input :type="type" :checked="is_active (button.value)"
                @change="on_change (button, $event)" />
       </label>
-      <button v-if="type === 'button'" :type="type" class="btn btn-primary" :title="button.title"
+      <button v-if="type === 'button'" :key="button.value" :type="type"
+              class="btn btn-primary" :title="button.title"
               @click="on_click (button, $event)">{{ button.text }}</button>
     </template>
   </b-button-group>
@@ -22,64 +24,58 @@
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import _ from 'lodash';
-import 'bootstrap';
-
-import tools from 'tools';
+import { BButtonGroup } from 'bootstrap-vue/src/components/button-group/button-group';
 
 export default {
     'props' : {
-        'eventname' : {
-            'type'    : String,
-            'default' : 'button-group',
+        'value' : {    // v-model
+            'type'     : [String, Array],
         },
         'type' : {
-            'type'    : String,     // "button", "radio", or "checkbox"
-            'default' : 'button',
+            'type'      : String,
+            'default'   : 'button',
+            'validator' : function (value) {
+                return ['button', 'radio', 'checkbox'].includes (value);
+            },
         },
         'options' : {
             'type'     : Array,
             'required' : true,
         },
-        'value' : {
-            'type'     : [String, Array],
-        },
+    },
+    'components' : {
+        'b-button-group' : BButtonGroup,
     },
     'data' : function () {
         return {
-            buttons : [],
         };
-    },
-    'computed' : {
     },
     'watch' : {
         value (newVal, oldVal) {
             if (newVal !== oldVal || newVal !== this.value) {
                 this.$forceUpdate ();
             }
-        }
+        },
     },
     'methods' : {
-        on_click (data, event) {
+        on_click (data) {
             if (this.type === 'button') {
                 this.$trigger ('ntgclick', data.value);
             }
         },
-        on_change (data, event) {
+        on_change (data) {
             if (this.type === 'radio') {
-                this.$trigger (this.eventname, data.value);
                 this.$emit ('input', data.value);  // makes it work with v-model
             }
             if (this.type === 'checkbox') {
-                let a = [];
+                let a = this.value.slice ();
                 if (this.value.includes (data.value)) {
-                    a = _.without (this.value, data.value);
+                    // remove it
+                    a = a.filter (d => d !== data.value);
                 } else {
-                    a = a.concat (this.value);
+                    // add it
                     a.push (data.value);
                 }
-                this.$trigger (this.eventname, a);
                 this.$emit ('input', a);  // makes it work with v-model
             }
         },
@@ -90,9 +86,6 @@ export default {
             return value === this.value;
         },
     },
-    mounted () {
-        this.buttons = this.options;
-    },
 };
 </script>
 
@@ -100,7 +93,7 @@ export default {
 /* button-group.vue */
 @import "bootstrap-custom";
 
-.button-group-vm {
+.vm-button-group {
     @media print {
         display: none;
     }

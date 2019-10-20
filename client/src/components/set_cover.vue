@@ -1,25 +1,25 @@
 <template>
-  <div class="set_cover_vm want_hashchange" @hashchange="on_hashchange">
+  <div class="vm-set-cover want_hashchange" @hashchange="on_hashchange">
 
     <div class="container bs-docs-container">
 
       <div class="navigator">
-        <form class="form-inline" @submit.prevent="submit">
+        <form class="form-inline d-flex justify-content-between" @submit.prevent="submit">
 
           <div class="input-group">
             <div class="input-group-prepend">
               <span class="input-group-text">Witness:</span>
             </div>
-            <input id="ms" v-model="input1" type="text" class="form-control"
-                   title="Enter the Gregory-Aland-No. of the witness."
-                   aria-label="Witness" />
+            <input id="ms" v-model="ms" type="text" class="form-control"
+                   title="Enter the Gregory-Aland-No. of the descendant witness."
+                   aria-label="Descendant Witness" />
           </div>
 
-          <div class="input-group">
+          <div class="input-group input-group-selection">
             <div class="input-group-prepend">
               <span class="input-group-text">Pre-Select:</span>
             </div>
-            <input id="pre" v-model="input2" type="text" class="form-control"
+            <input id="pre" v-model="pre_select" type="text" class="form-control"
                    title="Enter a space-separated list of witnesses to pre-select into the set cover."
                    aria-label="Pre-Select" />
           </div>
@@ -30,11 +30,14 @@
         </form>
       </div>
 
-      <card :caption="caption" cssclass="card-set-cover">
+      <card class="card-set-cover">
+        <card-caption :slidable="false">
+          {{ caption }}
+        </card-caption>
+
         <div class="card-header">
           <toolbar :toolbar="toolbar">
-            <button-group type="checkbox" v-model="toolbar.include"
-                          :options="options.include" />
+            <button-group v-model="toolbar.include" type="checkbox" :options="options.include" />
           </toolbar>
         </div>
 
@@ -61,11 +64,14 @@
 
               <th class="explained"
                   title="Number of variants explained by one of the ancestors.">Total Explained</th>
+
+              <th class="d-print-none"
+                  title="Open Optimal Substemma view"></th>
             </tr>
           </thead>
           <tbody>
             <template v-for="r in cover">
-              <tr :data-ms-id="r.ms_id" :key="r.ms_id" @click="on_click (r.cumsum_hs)">
+              <tr :key="r.ms_id" :data-ms-id="r.ms_id">
                 <td class="n">{{ r.n }}</td>
                 <td class="hs">{{ r.hs }}</td>
                 <td class="equal">{{ r.equal }}</td>
@@ -73,6 +79,13 @@
                 <td class="unknown">{{ r.unknown }}</td>
                 <td class="open">{{ r.open }}</td>
                 <td class="explained">{{ r.explained }}</td>
+
+                <td class="opt-stemma d-print-none"
+                    :title="`Find Optimal Substemma for ${ms} using ${r.cumsum_hs}`"
+                    @click="on_opt_stemma (r.cumsum_hs)">
+                  <span class="fas fa-sitemap"></span>
+                </td>
+
               </tr>
             </template>
           </tbody>
@@ -93,90 +106,95 @@
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import Vue from 'vue';
-
-import tools from 'tools';
+import tools       from 'tools';
 import { options } from 'widgets/options';
+
+import card         from 'widgets/card.vue';
+import card_caption from 'widgets/card_caption.vue';
+import toolbar      from 'widgets/toolbar.vue';
+import button_group from 'widgets/button_group.vue';
 
 export default {
     data () {
         return {
-            'ms'      : { 'hs' : '-' },
-            'mss'     : [],
-            'input1'  : '',
-            'input2'  : '',
-            'cover'   : [],
-            'options'      : options,
-            'toolbar' : {
+            'ms'         : '',  // v-model
+            'pre_select' : '',  // v-model
+            'ms_object'  : {},
+            'cover'      : [],
+            'options'    : options,
+            'toolbar'    : {
                 'include' : [],
-            }
+            },
         };
     },
+    'components' : {
+        'card'         : card,
+        'card-caption' : card_caption,
+        'toolbar'      : toolbar,
+        'button-group' : button_group,
+    },
     'computed' : {
-        'caption' : function () { return `Minimum Set Cover for Witness ${this.ms.hs} (${this.ms.open})` ; }
+        caption () {
+            if (this.ms_object.hs) {
+                const w = `${this.ms_object.hs} (${this.ms_object.open})`;
+                this.$store.commit ('caption', `${w} - Minimum Set Cover`);
+                return `Minimum Set Cover for Witness ${w})`;
+            }
+            return this.$route.meta.caption;
+        },
     },
     'watch' : {
-        'toolbar' : {
-            handler () {
-                this.load_set_cover ();
-            },
-            'deep' : true,
+        'toolbar.include' : function () {
+            this.on_hashchange ();
         },
     },
     'methods' : {
-        submit (dummy_event) {
-            window.location.hash = '#' + $.param ({
-                'ms'         : this.input1,
-                'pre_select' : this.input2,
-            });
-        },
-        on_click (cumsum) {
-            const vm = this;
-            vm.$router.push ({
-                name : 'opt_stemma',
-                hash : '#' + $.param ({
-                    'ms'        : vm.ms.hs,
-                    'selection' : cumsum,
-                })
-            });
-        },
-        load_set_cover () {
-            const vm = this;
-            const params = {
-                'ms'         : vm.input1,
-                'pre_select' : vm.input2,
-                'include'    : vm.toolbar.include,
-            };
-            const requests = [
-                vm.get ('set-cover.json/' + params.ms + '?' + $.param (params)),
-            ];
-
-            Promise.all (requests).then ((responses) => {
-                vm.ms     = responses[0].data.data.ms;
-                vm.mss    = responses[0].data.data.mss;
-                vm.input1 = vm.ms.hs;
-                vm.input2 = vm.mss.map (d => d.hs).join (' ');
-
-                let cumsum = [];
-                vm.cover = responses[0].data.data.cover.map (function (item) {
-                    cumsum.push (item.hs);
-                    item.cumsum_hs = cumsum.join (' ');
-                    return item;
-                });
-            });
+        submit () {
+            tools.set_hash (this, ['ms', 'pre_select']);
         },
         on_hashchange () {
-            const hash = window.location.hash ? window.location.hash.substring (1) : '';
-            if (hash) {
-                const data = tools.deparam (hash);
-                this.input1 = data.ms;
-                this.input2 = data.pre_select;
-                this.load_set_cover ();
+            const vm = this;
+
+            const params   = tools.get_hash ();
+            params.include = vm.toolbar.include;
+
+            if (params.ms) {
+                const requests = [
+                    vm.get (`set-cover.json/${params.ms}?` + tools.param (params, ['pre_select', 'include'])),
+                ];
+                Promise.all (requests).then ((responses) => {
+                    const data = responses[0].data.data;
+                    vm.ms_object  = data.ms;
+                    vm.ms         = data.ms.hs;
+                    vm.pre_select = data.mss.map (d => d.hs).join (' ');
+
+                    let cumsum = [];
+                    vm.cover = data.cover.map (function (item) {
+                        cumsum.push (item.hs);
+                        item.cumsum_hs = cumsum.join (' ');
+                        return item;
+                    });
+                });
             } else {
                 // reset data
-                Object.assign (this.$data, this.$options.data.call (this));
+                vm.ms         = '';
+                vm.pre_select = '';
+                vm.ms_object  = {};
+                vm.cover      = [];
             }
+        },
+        /* open the optimal substemma view with this combination preloaded */
+        on_opt_stemma (cumsum) {
+            const vm = this;
+            window.open (
+                vm.$router.resolve ({
+                    'name' : 'opt_stemma',
+                    'hash' : '#' + tools.param ({
+                        'ms'        : vm.ms,
+                        'selection' : cumsum,
+                    }),
+                }).href, '_blank'
+            ).focus ();
         },
     },
     mounted () {
@@ -189,7 +207,7 @@ export default {
 /* set_cover.vue */
 @import "bootstrap-custom";
 
-div.set_cover_vm {
+div.vm-set-cover {
     div.navigator {
         margin-bottom: $spacer;
 
@@ -212,6 +230,18 @@ div.set_cover_vm {
 
         @media print {
             display: none;
+        }
+
+        .input-group-selection {
+            flex-grow: 1;
+        }
+    }
+
+    td.opt-stemma {
+        width: 1%;
+
+        span.fas {
+            color: var(--green);
         }
     }
 }

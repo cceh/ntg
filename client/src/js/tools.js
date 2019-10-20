@@ -6,8 +6,13 @@
  * @author Marcello Perathoner
  */
 
-import $      from 'jquery';
-import _      from 'lodash';
+import { pick }  from 'lodash';
+import qs        from 'qs';
+import Velocity  from 'velocity-animate/velocity';
+
+Velocity.defaults.duration = 250;
+const velocity_opts = { 'duration' : 250 };
+
 
 /**
  * Format a string in python fashion.  "{count} items found"
@@ -43,8 +48,13 @@ export function natural_sort (s) {
     return s.replace (/\d+/g, (match, dummy_offset, dummy_string) => match.length + match);
 }
 
+const qs_options = {
+    'arrayFormat' : 'brackets',
+    'skipNulls'   : true,
+};
+
 /**
- * The inverse of the jQuery.param () function.
+ * Parse a query string.
  *
  * @function deparam
  *
@@ -54,55 +64,31 @@ export function natural_sort (s) {
  */
 
 export function deparam (query_string) {
-    var params = {};
-    query_string.split ('&').forEach (item => {
-        if (item.length) {
-            var s = item.split ('=').map (i => decodeURIComponent (i.replace ('+', ' ')));
-            params[s[0]] = s[1];
-        }
-    });
-    return params;
+    return qs.parse (query_string, qs_options);
 }
 
 /**
- * Display an auto-closing alert window.
+ * Build a query string.
  *
- * @function xhr_alert
+ * @function param
  *
- * @param {Object} reason - The parameter that was passed to Promise.then ()
- *                          or Promise.catch ().
- * @param {jQuery} $card - The card to append the window to.
+ * @param {Object} params    - Object of params, eg. { p : 1, q : 2 }
+ * @param {Array}  pick_list - Pick only these members, eg. ['p', 'q']
+ *
+ * @returns {String} - A string in the form "p=1&q=2"
  */
 
-export function xhr_alert (reason, $card) {
-    if (!$card) {
-        $card = $ ('body');
-    }
+export function param (params, pick_list = null) {
+    return qs.stringify ((pick_list ? pick (params, pick_list) : params), qs_options);
+}
 
-    let message = '';
-    let category = '';
+export function set_hash (params, pick_list = null) {
+    window.location.hash = '#' + param (params, pick_list);
+}
 
-    if (reason.data && reason.data.message) {
-        message = reason.data.message;
-        category = 'success';
-    }
-    if (reason.response && reason.response.data && reason.response.data.message) {
-        message = reason.response.data.message;
-        category = 'danger';
-    }
-
-    var $alert = $ (`
-        <div class="alert alert-${category} alert-dismissible alert-margins" role="alert">
-            <button type="button" class="close" data-dismiss="alert"
-                    aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            ${message}
-        </div>
-        `);
-    $alert.appendTo ($card).hide ();
-    $alert.on ('click', 'button[data-dismiss="alert"]', function () {
-        $alert.stop (true, true).slideUp (function () { $alert.remove (); });
-    });
-    $alert.slideDown ().delay (5000).slideUp ();
+export function get_hash () {
+    // FIXME ??? window.location.hash ? window.location.hash.substring (1) : '';
+    return deparam (window.location.hash.substring (1));
 }
 
 /**
@@ -124,41 +110,68 @@ export function bfs (edges, start) {
         return edge.elems[0].id === cur;
     }
     while (cur) {
-        _.forEach (_.filter (edges, is_adjacent), function (n) {
+        for (const n of edges.filter (is_adjacent)) {
             var id = n.elems[1].id;
-            if (_.indexOf (ids, id) === -1) {
+            if (ids.indexOf (id) === -1) {
                 ids.push (id);
                 queue.push (id);
             }
-        });
+        }
         cur = queue.shift ();
     }
     return ids;
 }
 
-export function slide_from ($el, old_height, set_auto = true) {
-    // slide an element to its new height
-    $el.height (1);
-    const new_height = $el.prop ('scrollHeight');
-    $el.height (old_height);
-    $el.animate ({ 'height' : new_height }, 300, () => {
-        if (set_auto) {
-            $el.height ('auto');
-        };
-        $el.animate ({ 'opacity' : 1.0 }, 300);
-    });
+export function get_scroll_height (el) {
+    let height = el.scrollHeight;
+    if (height === el.clientHeight) {
+        // content height is smaller than element height
+        const old_height = el.style.height;
+        el.style.height = '1px';
+        height = el.scrollHeight;
+        el.style.height = old_height;
+    }
+    return parseInt (height, 10);
 }
 
-export function save_height ($el) {
-    return $el.height ();
+export function slide_fade_in (el, auto = false) {
+    return el
+        .velocity ({ 'height' : get_scroll_height (el) }, {
+            'complete' : () => {
+                if (auto) {
+                    el.style.height = 'auto';
+                }
+            }, ... velocity_opts })
+        .velocity ({ 'opacity' : 1.0 }, velocity_opts);
+}
+
+export function slide_fade_out (el) {
+    // actually fade then slide out
+    return el
+        .velocity ({ 'opacity' : 0.0 }, velocity_opts)
+        .velocity ({ 'height' : 0 }, velocity_opts);
+}
+
+export function fade_out (el) {
+    return el.velocity ({ 'opacity' : 0.0 }, velocity_opts);
+}
+
+export function fade_in (el) {
+    return el.velocity ({ 'opacity' : 1.0 }, velocity_opts);
 }
 
 export default {
     format,
     natural_sort,
+    param,
     deparam,
-    xhr_alert,
+    set_hash,
+    get_hash,
     bfs,
-    slide_from,
-    save_height,
+    get_scroll_height,
+    slide_fade_in,
+    slide_fade_out,
+    fade_in,
+    fade_out,
+    velocity_opts,
 };

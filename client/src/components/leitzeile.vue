@@ -1,5 +1,5 @@
 <template>
-  <div class="leitzeile_vm" v-html="leitzeile" />
+  <div class="vm-leitzeile" v-html="leitzeile" />
 </template>
 
 <script>
@@ -10,11 +10,9 @@
  * @author Marcello Perathoner
  */
 
-import _ from 'lodash';
-
 function compute_leitzeile_html (leitzeile_json, current_pass_id) {
-
     const leitzeile = [];
+
     for (const item of leitzeile_json) {
         const classes = [];
         const pass_id = item.pass_ids[0];
@@ -43,13 +41,26 @@ function compute_leitzeile_html (leitzeile_json, current_pass_id) {
 }
 
 export default {
-    'data' : function () {
+    'props' : ['pass_id'],
+    'data'  : function () {
         return {
+            'leitzeile' : '',
         };
     },
-    'computed' : {
-        leitzeile () {
-            return compute_leitzeile_html (this.$store.state.leitzeile, this.$store.state.passage.pass_id);
+    'watch' : {
+        pass_id (new_pass_id) {
+            this.load_leitzeile (new_pass_id);
+        },
+    },
+    'methods' : {
+        load_leitzeile (new_pass_id) {
+            const vm = this;
+            const requests = [
+                vm.get ('leitzeile.json/' + new_pass_id),
+            ];
+            Promise.all (requests).then ((responses) => {
+                vm.leitzeile = compute_leitzeile_html (responses[0].data.data, new_pass_id);
+            });
         },
     },
 };
@@ -59,7 +70,7 @@ export default {
 /* leitzeile.vue */
 @import "bootstrap-custom";
 
-.leitzeile_vm {
+.vm-leitzeile {
     @media print {
         display: none;
     }
@@ -69,6 +80,7 @@ export default {
 
     table.item {
         display: inline-table;
+
         td.word {
             font-size: smaller;
             color: var(--gray);

@@ -1,16 +1,19 @@
 <template>
-  <div class="range-vm btn-group btn-group-sm toolbar-range" role="group">
-    <button type="button" :title="title"
-            class="btn btn-primary dropdown-toggle dropdown-toggle-range"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  <div class="vm-range vm-dropdown-mixin dropdown btn-group b-dropdown">
+    <button ref="toggle" size="sm" variant="primary" role="group" type="button" :title="title"
+            class="btn btn-sm btn-primary dropdown-toggle"
+            aria-haspopup="true" :aria-expanded="visible"
+            @click="toggle" @keydown="toggle">
       <slot></slot>
-      <span class="btn_text">{{ value }}</span> <span class="caret" />
+      <span class="btn_text">{{ id2range (value) }}</span> <span class="caret" />
     </button>
-    <div class="dropdown-menu dropdown-menu-range">
-      <div class="btn-group btn-group-sm">
-        <button v-for="range in dd_range" :key="range.range" :data-range="range.value"
-                type="radio" data-type="dropdown" class="btn btn-primary btn-range"
-                @click="on_dropdown_click (range.value, $event)">{{ range.range }}</button>
+
+    <div ref="menu" class="dropdown-menu" tabindex="-1" @keydown="onKeydown">
+      <div v-if="visible" class="btn-group btn-group-sm">
+        <button v-for="range in ranges" :key="range.rg_id" type="radio" tabindex="0"
+                :class="{ 'active' : range.rg_id === current_rg_id }"
+                class="btn btn-primary btn-range"
+                @click="on_item_click (range.rg_id, range.range, $event)">{{ range.range }}</button>
       </div>
     </div>
   </div>
@@ -20,99 +23,90 @@
 /**
  * A navigator for ranges (like chapters).
  *
- * It triggers a 'range' custom event with the range as parameter.
- *
  * @component range
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import 'bootstrap';
+import dropdown_mixin from 'widgets/dropdown_mixin.vue';
 
 export default {
     'props' : {
-        'default' : { // the default reading
-            'type'    : String,
-            'default' : 'All',
+        'value' : { // v-model
+            'type'     : Number,
+            'required' : true,
         },
-        'prefix'  : { // special ranges to add before the actual ranges, eg. 'this'
+        'pass_id' : {
+            'type'     : Number,
+            'required' : true,
+        },
+        'prefix' : { // special ranges to add before the actual ranges, eg. 'this'
             'type'    : Array,
-            'default' : function () { return [{ 'range' : 'This', 'value' : 'this' }] },
+            'default' : function () { return []; },
         },
-        'suffix'  : { // special ranges to add before the actual ranges, eg. 'this'
+        'suffix' : { // special ranges to add before the actual ranges, eg. 'this'
             'type'    : Array,
-            'default' : function () { return [] },
-        },
-        'eventname' : {
-            'type'    : String,
-            'default' : 'range',
+            'default' : function () { return []; },
         },
         'title' : {
             'type'    : String,
             'default' : 'Select a chapter.',
         },
-        'value' : {
-            'type'     : String,
-            'required' : true,
-        },
     },
-    'data' : function () {
+    'mixins' : [dropdown_mixin],
+    'data'   : function () {
         return {
+            'ranges'        : [],
+            'current_rg_id' : 0,
         };
     },
-    'computed' : {
-        ranges () {
-            return this.$store.state.ranges || [];
-        },
-        dd_range () {
-            return this.prefix.concat (this.ranges).concat (this.suffix);
-        },
-
-    },
-    'watch' : {
-        value (newVal, oldVal) {
-            if (newVal !== oldVal || newVal !== this.value) {
-                this.$forceUpdate ();
-            }
-        },
-    },
     'methods' : {
-        change (value) {
-            this.$trigger (this.eventname, value);
-            this.$emit ('input', value);  // makes it work with v-model
+        id2range (rg_id) {
+            const f = this.ranges.filter (d => d.rg_id === rg_id);
+            return f.length ? f[0].range : '';
         },
-        on_dropdown_click (data, event) {
-            const $dropdown = $ (event.target).closest ('.dropdown-menu').parent ().find ('[data-toggle="dropdown"]');
-            $dropdown.dropdown ('toggle');
-            if (data === 'this') {
-                data = this.$store.state.passage.chapter;
+        load_ranges (pass_id) {
+            const vm = this;
+            const requests = [vm.get ('ranges.json/')];
+            if (pass_id > 0) {
+                requests.push (vm.get ('passage.json/' + pass_id));
             }
-            this.change (data);
+
+            Promise.all (requests).then ((responses) => {
+                const ranges = responses[0].data.data;
+                vm.ranges = vm.prefix.concat (ranges).concat (vm.suffix);
+                if (responses.length > 1) {
+                    const passage = responses[1].data.data;
+                    vm.current_rg_id = passage.rg_id;
+                }
+            });
         },
-        on_submit () {
+        on_show () {
+            this.load_ranges (this.pass_id);
         },
     },
     mounted () {
-        $ (this.$el).find ('.dropdown-toggle').dropdown ();
+        this.load_ranges (this.pass_id);
     },
 };
 </script>
 
 <style lang="scss">
-/* range.vue */
+/* widgets/range.vue */
 @import "bootstrap-custom";
 
-.range-vm {
-    @media print {
-        display: none;
-    }
+div.vm-range {
+    .dropdown-menu {
+        width: 20rem;
+        padding: 0;
 
-    /* make buttons the same height as inputs */
-    align-items: stretch;
+        .btn-group {
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
 
-    div.dropdown-menu.dropdown-menu-range {
-        button.btn {
-            min-width: 3rem;
+        button {
+            min-width: 2rem;
         }
     }
 }

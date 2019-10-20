@@ -1,19 +1,19 @@
 <template>
-  <div class="labezator-vm btn-group btn-group-sm">
-    <button :data-labez="value" type="button" :title="options.title"
-            class="btn btn-primary dropdown-toggle dropdown-toggle-labez bg_labez"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <slot>{{ options.text }}</slot>
+  <div class="vm-labezator vm-dropdown-mixin dropdown btn-group b-dropdown">
+    <button ref="toggle" size="sm" variant="primary" role="group" type="button" :title="title"
+            class="btn btn-sm btn-primary dropdown-toggle bg_labez" :data-labez="value"
+            aria-haspopup="true" :aria-expanded="visible"
+            @click="toggle" @keydown="toggle">
+      <slot></slot>
       <span class="btn_text">{{ value }}</span> <span class="caret" />
     </button>
 
-    <div class="dropdown-menu dropdown-menu-labez">
-      <div class="btn-group btn-group-sm">
-        <button v-for="labez in readings"
-                :key="labez.labez" :data-labez="labez.labez"
-                type="radio" data-type="dropdown"
+    <div ref="menu" class="dropdown-menu" tabindex="-1" @keydown="onKeydown">
+      <div v-if="visible" class="btn-group btn-group-sm">
+        <button v-for="labez in readings" :key="labez.labez" :data-labez="labez.labez"
+                type="radio" tabindex="0"
                 class="btn btn-primary btn-labez bg_labez"
-                @click="on_dropdown_click (labez.labez, $event)">{{ labez.labez_i18n }}</button>
+                @click="on_item_click (labez.labez, $event)">{{ labez.labez_i18n }}</button>
       </div>
     </div>
   </div>
@@ -23,122 +23,104 @@
 /**
  * A navigator for labez.
  *
- * It triggers a 'labezator' custom event with the labez as parameter.
- *
  * @component labezator
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import 'bootstrap';
-
-import tools from 'tools';
+import dropdown_mixin from 'widgets/dropdown_mixin.vue';
 
 export default {
     'props' : {
-        'prefix'  : { // special readings to add before the actual readings, eg. 'all'
-            'type'    : Array,
-            'default' : null,
+        'value' : {  // v-model
+            'type'     : String,
+            'required' : true,
         },
-        'suffix'  : { // special readings to add before the actual readings, eg. 'all'
-            'type'    : Array,
-            'default' : null,
+        'pass_id' : {
+            'type'     : Number,
+            'required' : true,
         },
-        'eventname' : {
-            'type'    : String,
-            'default' : 'labez',
+        // special readings to add before and after the actual readings, eg. 'All'
+        'prefix'  : {
+            'type'    : Array,
+            'default' : [],
+        },
+        'suffix' : {
+            'type'    : Array,
+            'default' : [],
         },
         'reduce' : {
-            'type' :    Boolean,
+            'type'    : String,
             'default' : null,
         },
         'title' : {
             'type'    : String,
-            'default' : null,
-        },
-        'value' : {
-            'type'     : String,
-            'required' : true,
-        },
-        'options' : {
-            'type' : Object,
-            'default' : () => { return {
-                'text'   : 'Variant: ',
-                'title'  : 'Select a variant.',
-                'reduce' : true,
-                'prefix' : [],
-                'suffix' : [],
-            }},
+            'default' : 'Select a variant.',
         },
     },
-    'data' : function () {
+    'mixins' : [dropdown_mixin],
+    'data'   : function () {
         return {
+            'readings' : [],
         };
     },
-    'computed' : {
-        readings () {
-            // FIXME: filter zu
-            return this.options.prefix.concat (this.$store.state.passage.readings || []).concat (this.options.suffix);
-        },
-    },
     'watch' : {
-        value (newVal, oldVal) {
-            if (newVal !== oldVal || newVal !== this.value) {
-                this.$forceUpdate ();
-            }
-        },
-        readings () {
-            // reset value if reading is not in new passage
-            if (this.options.reduce) {
-                const mapped_readings = this.readings.map (item => item.labez);
-                if (this.value && !mapped_readings.includes (this.value)) {
-                    this.change (mapped_readings[0]);
-                }
-            }
+        pass_id (new_pass_id) {
+            this.load_labez (new_pass_id);
         },
     },
     'methods' : {
-        change (value) {
-            this.$trigger (this.eventname, value);
-            this.$emit ('input', value);  // makes it work with v-model
-        },
-        on_dropdown_click (data, event) {
-            const $dropdown = $ (event.target).closest ('.dropdown-menu').parent ().find ('[data-toggle="dropdown"]');
-            $dropdown.dropdown ('toggle');
-            this.change (data);
-        },
-        on_submit () {
+        load_labez (pass_id) {
+            const vm = this;
+            if (pass_id > 0) {
+                const requests = [
+                    vm.get ('readings.json/' + pass_id),
+                ];
+
+                Promise.all (requests).then ((responses) => {
+                    const readings = responses[0].data.data;
+                    vm.readings = vm.prefix
+                        .concat (readings.filter (d => d.labez !== 'zu'))
+                        .concat (vm.suffix);
+
+                    // reset value if reading is not in new passage
+                    if (vm.reduce !== null) {
+                        const mapped_readings = vm.readings.map (item => item.labez);
+                        if (vm.value && !mapped_readings.includes (vm.value)) {
+                            vm.$emit ('input', vm.reduce);
+                        }
+                    }
+                });
+            } else {
+                vm.readings = [];
+            }
         },
     },
     mounted () {
-        $ (this.$el).find ('.dropdown-toggle').dropdown ();
-        if (this.title) {
-            this.options.title = this.title;
-        }
-        if (this.prefix) {
-            this.options.prefix = this.prefix;
-        }
-        if (this.suffix) {
-            this.options.suffix = this.suffix;
-        }
-        if (this.reduce) {
-            this.options.reduce = this.reduce;
-        }
-        this.change (this.value);
+        this.load_labez (this.pass_id);
     },
 };
 </script>
 
 <style lang="scss">
-/* labezator.vue */
+/* widgets/labezator.vue */
 @import "bootstrap-custom";
 
-.labezator-vm {
-    @media print {
-        display: none;
-    }
+div.vm-labezator {
+    .dropdown-menu {
+        min-width: 4rem;
+        width: max-content;
+        max-width: 20rem;
+        padding: 0;
 
-    /* make buttons the same height as inputs */
-    align-items: stretch;
+        .btn-group {
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        button {
+            min-width: 2rem;
+        }
+    }
 }
 </style>

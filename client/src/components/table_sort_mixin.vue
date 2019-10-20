@@ -1,5 +1,14 @@
 <script>
-import $ from 'jquery';
+/**
+ * Mixin to make a table sortable
+ *
+ * To use:
+ *
+ * put a class 'table-sortable' on the table
+ * put an attribute 'data-sort-by' on the <th>s of the columns you want made sortable
+ */
+
+import { reverse, sortBy } from 'lodash';
 
 export default {
     data () {
@@ -14,8 +23,8 @@ export default {
     },
     'methods' : {
         on_sort (event) {
-            const $th = $ (event.target);
-            const sort_by = $th.attr ('data-sort-by');
+            const th = event.target;
+            const sort_by = th.getAttribute ('data-sort-by');
 
             if (this.sorted_by === sort_by) {
                 this.sorted_desc = !this.sorted_desc;
@@ -26,23 +35,18 @@ export default {
         },
         sort () {
             const vm = this;
-            const rows = _.sortBy (vm.rows, vm.sorted_by.split (' '));
+            const rows = sortBy (vm.rows, vm.sorted_by.split (' '));
             if (vm.sorted_desc) {
-                _.reverse (rows);
+                reverse (rows);
             }
             vm.rows = rows;
-
-            $ (vm.$el).find ('th[data-sort-by]').each (function (index, e) {
-                const $th = $ (e);
-                const sort_by = $th.attr ('data-sort-by');
-                $th.toggleClass ('asc', false);
-                $th.toggleClass ('desc', false);
+            vm.$el.querySelectorAll ('th[data-sort-by]').forEach (function (th) {
+                const sort_by = th.getAttribute ('data-sort-by');
+                const cl = th.classList;
+                cl.remove ('asc');
+                cl.remove ('desc');
                 if (sort_by === vm.sorted_by) {
-                    if (vm.sorted_desc) {
-                        $th.toggleClass ('desc', true);
-                    } else {
-                        $th.toggleClass ('asc', true);
-                    }
+                    cl.add (vm.sorted_desc ? 'desc' : 'asc');
                 }
             });
         },
@@ -84,11 +88,21 @@ table.table-sortable {
             &.asc[data-sort-by]::after {
                 content: "\f0de";
                 color: var(--red);
+
+                @media print {
+                    display: unset;
+                    color: var(--black);
+                }
             }
 
             &.desc[data-sort-by]::after {
                 content: "\f0dd";
                 color: var(--red);
+
+                @media print {
+                    display: unset;
+                    color: var(--black);
+                }
             }
         }
     }

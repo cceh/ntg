@@ -1,13 +1,16 @@
 <template>
-  <div class="comparison-table-vm">
-    <div class="card-header">
-      <toolbar :toolbar="toolbar" >
-        <button-group slot="right" :options="options.csv" />
-      </toolbar>
-    </div>
-
-    <table class="table table-bordered table-sm table-hover table-with-details table-sortable table-comparison"
-           ref="table" cellspacing="0">
+  <div class="vm-comparison-table">
+    <table ref="table"
+           class="table table-bordered table-sm table-hover table-with-details table-sortable table-comparison"
+           cellspacing="0">
+      <caption class="d-print-none">
+        <div class="d-flex justify-content-between">
+          <div></div>
+          <toolbar :toolbar="toolbar">
+            <button-group slot="right" :options="options.csv" />
+          </toolbar>
+        </div>
+      </caption>
       <thead>
         <tr @click="on_sort">
           <th class="details-control" />
@@ -37,8 +40,7 @@
       </thead>
       <tbody>
         <template v-for="r in rows">
-          <tr :class="rowclass (r)"
-              :data-range="r.range" :key="r.rg_id ">
+          <tr :key="r.rg_id " :class="rowclass (r)" :data-range="r.range">
             <td class="details-control" @click="toggle_details_table (r, $event)" />
 
             <td class="range">{{ r.range }}</td>
@@ -68,7 +70,7 @@
                 title="Number of passages where the respective variants are unrelated">{{ r.norel }}</td>
 
           </tr>
-          <tr v-if="r.child" :data-range="r.range" :key="r.rg_id + '_child'" class="child" >
+          <tr v-if="r.child" :key="r.rg_id + '_child'" :data-range="r.range" class="child">
             <td />
             <td colspan="99">
               <comparison-details-table :ms1="ms1" :ms2="ms2" :range="r.range" />
@@ -91,16 +93,15 @@
  * @author Marcello Perathoner
  */
 
-import $ from 'jquery';
-import Vue from 'vue';
-import csv_parse from 'csv-parse/lib/sync';
+import tools       from 'tools';
+import csv_parse   from 'csv-parse/lib/sync';
 import { options } from 'widgets/options';
 
+import sort_mixin               from 'table_sort_mixin.vue';
+import toggle_mixin             from 'table_toggle_mixin.vue';
 import comparison_details_table from 'comparison_details_table.vue';
-import sort_mixin   from 'table_sort_mixin.vue';
-import toggle_mixin from 'table_toggle_mixin.vue';
-
-Vue.component ('comparison-details-table', comparison_details_table);
+import toolbar                  from 'widgets/toolbar.vue';
+import button_group             from 'widgets/button_group.vue';
 
 /**
  * Return a direction marker, <, =, or >.
@@ -152,51 +153,51 @@ function row_conversion (d) {
 }
 
 export default {
-    'mixins' : [sort_mixin, toggle_mixin],
-    'props'  : ['ms1', 'ms2'],
+    'mixins'     : [sort_mixin, toggle_mixin],
+    'components' : {
+        'comparison-details-table' : comparison_details_table,
+        'toolbar'                  : toolbar,
+        'button-group'             : button_group,
+    },
+    'props' : {
+        'ms1' : Object,
+        'ms2' : Object,
+    },
     data () {
         return {
             'rows'      : [],
-            'sorted_by' : 'rg_id',
+            'sorted_by' : 'rg_id', // initial value
             'options'   : options,
             'toolbar'   : {
                 'csv' : () => this.download (), // show a download csv button
             },
         };
     },
-    'computed' : {
-        'caption' : function () {
-            return this.ms1 ? `Comparison of ${this.ms1.hs} and ${this.ms2.hs}` : 'Comparison';
-        },
-        'ms1ms2' : function () {
-            return this.ms1 ? this.ms1.ms_id + '-' + this.ms2.ms_id : '';
-        },
-    },
     'watch' : {
-        'ms1ms2' : function () {
+        ms1 () {
             this.load_data ();
-            this.sort ();
         },
-        caption () {
-            this.$store.commit ('caption', this.caption);
+        ms2 () {
+            this.load_data ();
         },
     },
     'methods' : {
         load_data () {
             const vm = this;
             vm.get (vm.build_url ()).then ((response) => {
-                const rows = csv_parse (response.data, { 'columns' : true });
-                vm.rows = rows.map (row_conversion);
-            });
-        },
-        build_url (page = 'comparison-summary.csv') {
-            return page + '?' + $.param ({
-                'ms1' : 'id' + this.ms1.ms_id,
-                'ms2' : 'id' + this.ms2.ms_id,
+                vm.rows = csv_parse (response.data, { 'columns' : true })
+                    .map (row_conversion);
+                vm.sort ();
             });
         },
         download () {
             window.open (this.build_full_api_url (this.build_url (), '_blank'));
+        },
+        build_url () {
+            return 'comparison-summary.csv?' + tools.param ({
+                'ms1' : 'id' + this.ms1.ms_id,
+                'ms2' : 'id' + this.ms2.ms_id,
+            });
         },
         rowclass (r) {
             return (r.older > r.newer ? 'older' : '')
@@ -214,16 +215,9 @@ export default {
 /* comparison_table.vue */
 @import "bootstrap-custom";
 
-div.comparison-table-vm {
-    .card-header {
-        @media print {
-            display: none;
-        }
-    }
-}
+table.table {
+    /* also valid for details table */
 
-table.table-comparison,
-table.table-comparison-details {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     background-color: $card-bg;
@@ -231,7 +225,6 @@ table.table-comparison-details {
     caption {
         caption-side: top;
         padding: $card-spacer-y $card-spacer-x;
-        border-bottom: $table-border-width solid $table-border-color;
         font-weight: bold;
         color: inherit;
         background-color: $card-cap-bg;
@@ -254,16 +247,18 @@ table.table-comparison-details {
 
 /* stylelint-disable no-descending-specificity */
 
-table.table-comparison {
-    width: 100%;
-    border-width: 0;
+div.vm-comparison-table {
+    table.table-comparison {
+        width: 100%;
+        border-width: 0;
 
-    th,
-    td {
-        text-align: right;
+        th,
+        td {
+            text-align: right;
 
-        &.direction {
-            text-align: center;
+            &.direction {
+                text-align: center;
+            }
         }
     }
 }

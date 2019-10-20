@@ -9,7 +9,8 @@
         <div class="alert-wrap-inner">
           <div :class="'alert alert-dismissible alert-' + (msg.category === 'error' ? 'danger' : msg.category)"
                role="alert">
-            <button @click="close_message (msg.id)" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"
+                    @click="close_message (msg.id)"><span aria-hidden="true">×</span></button>
             {{ msg.message }}
           </div>
         </div>
@@ -28,11 +29,6 @@
 
 import axios    from 'axios';
 import url      from 'url';
-
-import "velocity-animate/velocity.es5.js";
-// import "velocity-animate/velocity.ui.js";
-
-Velocity.defaults.duration = 500;
 
 
 export default {
@@ -65,12 +61,12 @@ export default {
                 });
             });
         },
-        enter: function (el, done) {
-            el.velocity ({ opacity: [1, 0] }).then (done);
+        enter (el, done) {
+            el.velocity ({ 'opacity' : [1.0, 0.0] }).then (done);
         },
-        leave: function (el, done) {
-            el.velocity ({ opacity: [0, 1] }).velocity ({ height: '0px' }).then (done);
-        }
+        leave (el, done) {
+            el.velocity ({ 'opacity' : [0.0, 1.0] }).velocity ({ 'height' : '0px' }).then (done);
+        },
     },
     created () {
         const vm = this;
@@ -85,7 +81,7 @@ export default {
 @import "bootstrap-custom";
 
 div.vm-flash-messages {
-    margin-top:    0;
+    margin-top: 0;
     margin-bottom: 0;
 
     .alert-wrap {

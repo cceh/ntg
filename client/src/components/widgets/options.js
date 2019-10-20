@@ -24,30 +24,6 @@ const options = {
         { 'text' : 'Sim', 'value' : 'sim', 'title' : 'Use simple priority calculation.'    },
         { 'text' : 'Rec', 'value' : 'rec', 'title' : 'Use recursive priority calculation.' },
     ],
-    'labez' : {
-        'text'   : 'Variant:',
-        'value'  : 'a',
-        'title'  : 'Select a variant.',
-        'reduce' : true,
-        'prefix' : [],
-        'suffix' : [],
-    },
-    'labez_all' : {
-        'text'   : 'Variant:',
-        'value'  : 'all+lac',
-        'title'  : 'Select a variant.',
-        'reduce' : true,
-        'prefix' : [{ 'labez' : 'all',     'labez_i18n' : 'All'     }],
-        'suffix' : [{ 'labez' : 'all+lac', 'labez_i18n' : 'All+Lac' }],
-    },
-    'hyp_a' : {
-        'text'   : 'A =',
-        'value'  : 'A',
-        'title'  : 'Select a different reading for "A".',
-        'reduce' : true,
-        'prefix' : [{ 'labez' : 'A', 'labez_i18n' : 'A' }],
-        'suffix' : [],
-    },
     'cliques' : [
         {
             'text'  : 'Splits',
@@ -95,6 +71,24 @@ const options = {
             'title' : 'List all mss. that offer a certain reading at this passage.',
         },
     ],
+    'labez' : {
+        'title'  : 'Select a variant.',
+        'reduce' : 'a',
+        'prefix' : [],
+        'suffix' : [],
+    },
+    'labez_all' : {
+        'title'  : 'Select a variant.',
+        'reduce' : 'all+lac',
+        'prefix' : [{ 'labez' : 'all',     'labez_i18n' : 'All'     }],
+        'suffix' : [{ 'labez' : 'all+lac', 'labez_i18n' : 'All+Lac' }],
+    },
+    'hyp_a' : {
+        'title'  : 'Select a different reading for "A".',
+        'reduce' : 'A',
+        'prefix' : [{ 'labez' : 'A', 'labez_i18n' : 'A' }],
+        'suffix' : [],
+    },
 }
 
 export { options };

@@ -1,10 +1,17 @@
 <template>
-  <div class="local-stemma-vm card-slidable">
-    <div :class="'wrapper svg-wrapper ' + cssclass"
-         @contextmenu.prevent="on_contextmenu" @click="on_click">
-      <slot />
+  <div class="vm-local-stemma card-slidable">
+    <div class="card-header">
+      <toolbar :toolbar="toolbar">
+        <button-group slot="right" :options="options.png_dot" />
+      </toolbar>
     </div>
-    <context-menu ref="menu" @menu-click="on_menu_click" />
+
+    <div class="svg-wrapper" @contextmenu.prevent="on_contextmenu">
+      <d3stemma ref="engine" prefix="ls_" />
+    </div>
+
+    <context-menu ref="menu" @input="on_menu_input" />
+    <alert ref="alert" />
   </div>
 </template>
 
@@ -16,13 +23,21 @@
  * @author Marcello Perathoner
  */
 
-import { mapGetters } from 'vuex';
-import $       from 'jquery';
-import _       from 'lodash';
-import tools   from 'tools';
-import * as d3 from 'd3';
-import context_menu from 'widgets/context_menu.vue';
-import { mkmsg }    from 'widgets/context_menu.vue';
+import { select, selectAll, event } from 'd3-selection';
+import { drag }                     from 'd3-drag';
+import { groupBy }                  from 'lodash';
+
+import d3_stemma_layout from 'd3_stemma_layout.vue';
+import tools            from 'tools';
+import alert            from 'widgets/alert.vue';
+import button_group     from 'widgets/button_group.vue';
+import context_menu     from 'widgets/context_menu.vue';
+import toolbar          from 'widgets/toolbar.vue';
+import { mkmsg }        from 'widgets/context_menu.vue';
+import { options }      from 'widgets/options';
+
+const SVG_X_BORDER = 40;  // in pixel
+const SVG_Y_BORDER = 40;
 
 
 /** @var {D3selector} dragged_node - The node being dragged or null */
@@ -36,26 +51,23 @@ let target_node  = null;
  * If the user drops the node 'nowhere' then this function slides the node
  * back to the original position.
  *
- * @see: https://github.com/d3/d3-transition#transition_attrTween
- *
  * @function return_to_base
  *
- * @param {Object} node - The node to slide back.
+ * @param {D3selector} node - The node to slide back.
  */
 
-function return_to_base (node) {
-    if (node !== null) {
-        const t = d3.transition ().duration (500).ease (d3.easeLinear);
-        node.transition (t).attrTween ('transform', function (d, dummy_i, dummy_a)  {
-            const delta_x = d.pos.x - d.pos.orig_x;
-            const delta_y = d.pos.y - d.pos.orig_y;
+function return_to_base (d3_node) {
+    if (d3_node !== null) {
+        const d = d3_node.datum ();
+        const n = d3_node.node ();
+        n.velocity ({
+            'transform' : [`translate(${d.pos.orig_x},${d.pos.orig_y})`, `translate(${d.pos.x},${d.pos.y})`],
+        }, {
+            'duration' : 250,
+            'easing'   : 'ease-in-out',
+        }).then (() => {
             d.pos.x = d.pos.orig_x;
             d.pos.y = d.pos.orig_y;
-            return function (tt) {
-                const x = d.pos.x + ((1.0 - tt) * delta_x);
-                const y = d.pos.y + ((1.0 - tt) * delta_y);
-                return 'translate(' + x + ',' + y + ')';
-            };
         });
     }
 }
@@ -81,21 +93,19 @@ function highlight (node, b) {
  * Creates a d3-drag object that implements the drag-and-drop local stemma
  * editor.
  *
- * @function dragListener
+ * @function drag_listener
  *
  * @param {Object} vm - The Vue instance
  */
 
-function dragListener (vm) {
-    const passage = vm.$store.state.passage;
-
-    return d3.drag ()
+function drag_listener (vm) {
+    return drag ()
         .on ('start', function (dummy_d) {
             // do nothing (yet)
         })
         .on ('drag', function (d) {
             if (dragged_node === null) {
-                dragged_node = d3.select (this);
+                dragged_node = select (this);
                 d.pos.orig_x = d.pos.x;
                 d.pos.orig_y = d.pos.y;
                 // Suppress the mouseover event on the node being dragged
@@ -106,10 +116,9 @@ function dragListener (vm) {
                 target_node = null;
                 // console.log ('dragging ' + dragged_node.datum ().label);
             }
-            d.pos.x += d3.event.dx;
-            d.pos.y += d3.event.dy;
+            d.pos.x += event.dx;
+            d.pos.y += event.dy;
             dragged_node.attr ('transform', 'translate(' + d.pos.x + ',' + d.pos.y + ')');
-            // console.log (d3.event.shiftKey ? 'shift' : 'unshift');
         })
         .on ('end', function (dummy_d) {
             const dragged_node_ref = dragged_node;
@@ -118,30 +127,28 @@ function dragListener (vm) {
                 // move, but if the shift key was held down, the action will
                 // be to merge or to split
                 let action = 'move';
-                if (d3.event.sourceEvent.ctrlKey) {
+                if (event.sourceEvent.ctrlKey) {
                     action = 'add';
                 }
-                if (d3.event.sourceEvent.shiftKey) {
+                if (event.sourceEvent.shiftKey) {
                     action = (dragged_node.datum ().labez === target_node.datum ().labez)
                         ? 'merge' : 'split';
                 }
-                const xhr = vm.post ('stemma-edit/' + passage.pass_id, {
+                vm.post ('stemma-edit/' + vm.pass_id, {
                     'action'     : action,
                     'labez_old'  : dragged_node.datum ().labez,
                     'clique_old' : dragged_node.datum ().clique,
                     'labez_new'  : target_node.datum ().labez,
                     'clique_new' : target_node.datum ().clique,
-                });
-                xhr.then (() => {
-                    $ (window).trigger ('hashchange');
-                });
-                xhr.catch ((reason) => {
-                    tools.xhr_alert (reason, vm.$wrapper);
+                }).then (() => {
+                    vm.$trigger ('epoch');
+                }).catch ((error) => {
+                    vm.$refs.alert.show (error.response.data.message, 'error');
                     return_to_base (dragged_node_ref);
                 });
                 highlight (target_node, false);
             } else {
-                // if dropped on no man's land
+                // if dropped on no mans land
                 return_to_base (dragged_node_ref);
             }
             if (dragged_node !== null) {
@@ -163,18 +170,20 @@ function dragListener (vm) {
  * @param {Object} event - The event
  */
 
-function build_contextmenu (event, vm) {
-    const passage = vm.passage;
-    const dataset = event.target.dataset;
+async function build_contextmenu (evt, vm) {
+    const dataset = evt.target.dataset;
     const data = {
         'labez_old'  : dataset.labez,
         'clique_old' : dataset.clique,
     };
-    const cliques = _.filter (vm.$store.state.passage.cliques, o => o.labez[0] !== 'z')
-          .concat ([
-              { 'labez' : '*', 'clique' : '1', 'labez_clique' : '*' },
-              { 'labez' : '?', 'clique' : '1', 'labez_clique' : '?' },
-          ]);
+
+    const response = await vm.get ('cliques.json/' + vm.pass_id);
+
+    const cliques = response.data.data.filter (o => o.labez[0] !== 'z')
+        .concat ([
+            { 'labez' : '*', 'clique' : '1', 'labez_clique' : '*' },
+            { 'labez' : '?', 'clique' : '1', 'labez_clique' : '?' },
+        ]);
 
     const actions = [];
 
@@ -183,11 +192,11 @@ function build_contextmenu (event, vm) {
         'msg'   : mkmsg ('Reading', data.labez_old, data.clique_old),
         'bg'    : data.labez_old,
         'class' : 'disabled',
-        'data' : {
+        'data'  : {
             ... data,
             'action'   : '',
             'disabled' : true,
-        }
+        },
     });
 
     // Split one clique
@@ -196,17 +205,17 @@ function build_contextmenu (event, vm) {
         'msg'   : mkmsg ('Split', data.labez_old, data.clique_old),
         'bg'    : data.labez_old,
         'class' : '',
-        'data' : {
+        'data'  : {
             ... data,
             'action'     : 'split',
             'labez_new'  : '?',
             'clique_new' : '1',
-        }
+        },
     });
 
     // Merge two cliques
 
-    _.forEach (cliques, function (c) {
+    for (const c of cliques) {
         if ((c.labez === data.labez_old) && (c.clique !== data.clique_old)) {
             actions.push ({
                 'msg'   : mkmsg ('Merge into', c.labez, c.clique),
@@ -220,11 +229,11 @@ function build_contextmenu (event, vm) {
                 },
             });
         }
-    });
+    }
 
     // Reassign Source of clique
 
-    _.forEach (cliques, function (c) {
+    for (const c of cliques) {
         if (c.labez !== data.labez_old || c.clique !== data.clique_old) {
             actions.push ({
                 'msg'   : mkmsg ('Set Source to', c.labez, c.clique),
@@ -238,11 +247,11 @@ function build_contextmenu (event, vm) {
                 },
             });
         }
-    });
+    }
 
     // Add another source
 
-    _.forEach (cliques, function (c) {
+    for (const c of cliques) {
         if (c.labez !== data.labez_old || c.clique !== data.clique_old) {
             actions.push ({
                 'msg'   : mkmsg ('Add Source', c.labez, c.clique),
@@ -256,13 +265,13 @@ function build_contextmenu (event, vm) {
                 },
             });
         }
-    });
+    }
 
     // Delete a source
 
     const graph_vm = vm.get_graph_vm ();
     const g = graph_vm.graph;
-    _.forEach (g.edges, (edge, i) => {
+    for (const edge of g.edges) {
         const t_labez = g.nodes[edge.elems[1].id].attrs.labez;
         if (t_labez === dataset.labez) {
             const s_attr = g.nodes[edge.elems[0].id].attrs;
@@ -278,9 +287,9 @@ function build_contextmenu (event, vm) {
                 },
             });
         }
-    });
+    }
 
-    return _.groupBy (actions, a => a.data.action);
+    return groupBy (actions, a => a.data.action);
 }
 
 /**
@@ -288,58 +297,80 @@ function build_contextmenu (event, vm) {
  *
  * @function load_passage
  *
- * @param {Object} passage - Which passage to load.
+ * @param {Number} pass_id - Which passage to load.
  *
  * @return {Promise} Promise, resolved when the new passage has loaded.
  */
-function load_passage (vm, passage) {
-    if (passage.pass_id === 0) {
-        return Promise.resolve ();
+function load_passage (vm, pass_id) {
+    if (pass_id === 0) {
+        return;
     }
 
     const graph_vm = vm.get_graph_vm ();
-    const p1 = graph_vm.load_dot (vm.build_url ('stemma.dot'));
-    p1.then (() => {
-        vm.$card.animate ({ 'width' : (graph_vm.bbox.width + 20) + 'px' });
+    const wrapper = vm.$el.querySelector ('.svg-wrapper');
+
+    const requests = [
+        vm.get ('passage.json/' + vm.pass_id),
+        vm.get (vm.build_url ('stemma.dot')),
+        tools.fade_out (wrapper).promise,
+    ];
+    Promise.all (requests).then ((responses) => {
+        vm.passage = responses[0].data.data;
+        const bbox = graph_vm.load_dot (responses[1].data);
+        wrapper
+            .velocity ({
+                'width'  : (bbox.width  + SVG_X_BORDER),
+                'height' : (bbox.height + SVG_Y_BORDER),
+            }, tools.velocity_opts)
+            .velocity ({
+                'opacity' : 1.0,
+            }, tools.velocity_opts);
 
         if (vm.$store.getters.can_write) {
             // Drag a node.
-            d3.selectAll ('div.local-stemma-vm g.node.draggable')
-                .call (dragListener (vm));
-            d3.selectAll ('div.local-stemma-vm g.node.droptarget')
+            selectAll ('div.vm-local-stemma g.node.draggable')
+                .call (drag_listener (vm));
+            selectAll ('div.vm-local-stemma g.node.droptarget')
                 .on ('mouseover', function (dummy_d) {
-                    if (dragged_node && d3.select (this) !== dragged_node) {
-                        target_node = d3.select (this);
+                    if (dragged_node && select (this) !== dragged_node) {
+                        target_node = select (this);
                         highlight (target_node, true);
                     }
                 })
                 .on ('mouseout', function (dummy_d) {
-                    if (dragged_node && d3.select (this) !== dragged_node) {
+                    if (dragged_node && select (this) !== dragged_node) {
                         highlight (target_node, false);
                         target_node = null;
                     }
                 });
         }
     });
-    return p1;
 }
 
 export default {
+    'props'      : ['pass_id', 'epoch', 'global', 'var_only'],
     'components' : {
+        'alert'        : alert,
+        'button-group' : button_group,
         'context-menu' : context_menu,
+        'toolbar'      : toolbar,
+        'd3stemma'     : d3_stemma_layout,
     },
-    'props' : ['toolbar', 'cssclass', 'global', 'var_only'],
-    'data'  : function () {
+    'data' : function () {
         return {
+            'passage' : {},
+            'options' : options,
+            'toolbar' : {
+                'dot' : () => { this.download ('stemma.dot'); },
+                'png' : () => { this.download ('stemma.png'); },
+            },
         };
     },
-    'computed' : {
-        ...mapGetters ([
-            'passage',
-        ]),
-    },
     'watch' : {
-        passage () {
+        pass_id () {
+            this.load_passage ();
+        },
+        epoch () {
             this.load_passage ();
         },
         'toolbar' : {
@@ -351,53 +382,44 @@ export default {
     },
     'methods' : {
         load_passage () {
-            return load_passage (this, this.passage);
+            load_passage (this, this.pass_id);
         },
         get_graph_vm () {
-            return this.$children[0];
+            return this.$refs.engine;
         },
         build_url (page) {
             const vm = this;
 
             // provide a width and fontsize for GraphViz to format the graph
-            const data = {};
-            data.width = vm.$wrapper.width ();                            // in px
-            data.fontsize = parseFloat (vm.$wrapper.css ('font-size'));   // in px
-
-            return page + '/' + vm.passage.pass_id + '?' + $.param (data);
+            const cstyle = getComputedStyle (vm.$el);
+            const params = {
+                'width'    : parseFloat (cstyle.getPropertyValue ('width')), // in px
+                'fontsize' : parseFloat (cstyle.getPropertyValue ('font-size')), // in px
+            };
+            return `${page}/${vm.pass_id}?` + tools.param (params);
         },
-        on_contextmenu (event) {
+        async on_contextmenu (evt) {
             if (this.$store.getters.can_write) {
-                const $target = $ (event.target);
-                if ($target.closest ('.node.draggable').length) {
-                    this.$refs.menu.open (build_contextmenu (event, this), event.target);
+                if (evt.target.closest ('.node.draggable')) {
+                    this.$refs.menu.open (await build_contextmenu (evt, this), evt.target);
                 }
             }
         },
-        on_click (event) {
-            // close the menu on outside click
-            this.$refs.menu.close ();
-        },
-        on_menu_click (data, event) {
+        on_menu_input (data) {
             const vm = this;
 
-            const xhr2 = vm.post ('stemma-edit/' + vm.passage.pass_id, data);
-            xhr2.then (() => {
-                $ (window).trigger ('hashchange');
-            });
-            xhr2.catch ((reason) => {
-                tools.xhr_alert (reason, vm.$wrapper);
-            });
+            vm.post ('stemma-edit/' + vm.pass_id, data)
+                .then (() => {
+                    vm.$trigger ('epoch');
+                }).catch ((error) => {
+                    vm.$refs.alert.show (error.response.data.message, 'error');
+                });
         },
         download (page) {
             window.open (this.build_full_api_url (this.build_url (page), '_blank'));
         },
     },
     'mounted' : function () {
-        this.toolbar.dot = () => this.download ('stemma.dot');
-        this.toolbar.png = () => this.download ('stemma.png');
-        this.$card    = $ (this.$el).closest ('.card');
-        this.$wrapper = $ (this.$el).find ('.wrapper');
         this.load_passage ();
     },
 };
@@ -407,5 +429,11 @@ export default {
 <style lang="scss">
 /* local_stemma.vue */
 @import "bootstrap-custom";
+
+div.vm-local-stemma {
+    marker.link {
+        visibility: hidden !important;
+    }
+}
 
 </style>

@@ -1,14 +1,14 @@
 <template>
-  <div class="index-vm">
+  <div class="vm-index">
     <div class="container bs-docs-container">
       <div v-if="$store.getters.can_read">
-        <router-link class="biglink" :to="{ 'name' : 'coherence'   }">Coherence and Textual Flow</router-link>
-        <router-link class="biglink" :to="{ 'name' : 'comparison'  }">Comparison of Witnesses</router-link>
-        <router-link class="biglink" :to="{ 'name' : 'attestation' }">Find Relatives</router-link>
+        <router-link class="biglink" :to="{ 'name' : 'coherence' }">Coherence and Textual Flow</router-link>
+        <router-link class="biglink" :to="{ 'name' : 'comparison' }">Comparison of Witnesses</router-link>
+        <router-link class="biglink" :to="{ 'name' : 'find_relatives' }">Find Relatives</router-link>
         <div v-if="$store.getters.can_write">
           <router-link class="biglink" :to="{ 'name' : 'notes_list' }">List of Notes</router-link>
           <router-link class="biglink" :to="{ 'name' : 'opt_stemma' }">Optimal Substemma</router-link>
-          <router-link class="biglink" :to="{ 'name' : 'set_cover'  }">Set Cover</router-link>
+          <router-link class="biglink" :to="{ 'name' : 'set_cover' }">Minimum Set Cover</router-link>
         </div>
       </div>
 
@@ -43,7 +43,7 @@ import awk_logo from  '../images/awk-logo-00.png';
 import cceh_logo from '../images/cceh-logo.png';
 
 export default {
-    'data'  : function () {
+    'data' : function () {
         return {
             'intf_logo' : intf_logo,
             'awk_logo'  : awk_logo,
@@ -56,7 +56,7 @@ export default {
 <style lang="scss">
 /* index.vue */
 
-div.index-vm {
+div.vm-index {
     a.biglink {
         display: block;
         font-size: 150%;

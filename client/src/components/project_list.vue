@@ -1,14 +1,13 @@
 <template>
-  <div class="project-list-vm">
+  <div class="vm-project-list">
     <div class="container bs-docs-container">
       <table class="table table-bordered table-hover">
         <tbody>
           <tr>
             <th>Project</th><th>Editable</th><th>Description</th>
           </tr>
-          <router-link tag="tr" v-for="i of $store.state.instances"
-                       :key="i.application_root"
-                       :to="'/' + i.application_root">
+          <router-link v-for="i of $store.state.instances" :key="i.application_root"
+                       tag="tr" :to="'/' + i.application_root">
             <td class="app_name">
               <a>{{ i.application_name }}</a>
             </td>
@@ -36,7 +35,7 @@
  */
 
 export default {
-    'data'  : function () {
+    'data' : function () {
         return {
         };
     },
@@ -47,17 +46,20 @@ export default {
 <style lang="scss">
 /* project_list.vue */
 
-div.project-list-vm {
+div.vm-project-list {
     td.app_name {
         width: 20%;
     }
+
     td.can_edit {
         width: 1%;
     }
+
     span.fas {
         font-size: 150%;
         color: red;
     }
+
     table {
         margin-top: 2em;
     }

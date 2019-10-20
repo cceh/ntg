@@ -63,11 +63,14 @@ common-clean:
 server-clean:
 	cd server ; make clean; cd ..
 
-docker-build: server-clean common-clean client
+docker-build: server-clean common-clean client-production
 	cd docker; make build; cd ..
 
 docker-run:
 	cd docker; make run; cd ..
+
+docker-push:
+	cd docker; make push; cd ..
 
 users:
 	scripts/cceh/mk_users.py -vvv instance/_global.conf
@@ -82,8 +85,11 @@ clean: client-clean
 #
 # CREATE USER ntg CREATEDB PASSWORD '<password>';
 # CREATE DATABASE ntg_user OWNER ntg;
+#
 # CREATE DATABASE acts_ph4 OWNER ntg;
 # \c acts_ph4
+# CREATE SCHEMA ntg AUTHORIZATION ntg;
+# ALTER DATABASE acts_ph4 SET search_path = ntg, public;
 # CREATE EXTENSION mysql_fdw;
 # GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
 # \q
@@ -118,20 +124,31 @@ import_john_f1:
 	cat ../dumps/DCPJohnFamily1.sql | $(MYSQL) -D DCPJohnFamily1
 	python3 -m scripts.cceh.import -vvv instance/john_f1_ph1.conf
 
-import_mark:
+import_mark_ph1:
 	-$(MYSQL) -e "DROP DATABASE ECM_Mark_Ph12"
 	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph12"
 	cat ../dumps/ECM_Mk_CBGM_Milestone2.dump | $(MYSQL) -D ECM_Mark_Ph12
 	python3 -m scripts.cceh.import -vvv instance/mark_ph12.conf
+
+import_mark_ph2:
+	-$(MYSQL) -e "DROP DATABASE ECM_Mark_Ph2"
+	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph2"
+	cat ../dumps/ECM_Mk_Apparat_6.dump | $(MYSQL) -D ECM_Mark_Ph2
+	python3 -m scripts.cceh.import -vvv instance/mark_ph2.conf
 
 import_nestle:
 	-$(MYSQL) -e "DROP DATABASE Nestle29"
 	$(MYSQL) -e "CREATE DATABASE Nestle29"
 	cat ../dumps/Nestle29-2.dump | $(MYSQL) -D Nestle29
 
-acts:
+acts_ph4:
 	python3 -m scripts.cceh.prepare -vvv instance/acts_ph4.conf
 	python3 -m scripts.cceh.cbgm    -vvv instance/acts_ph4.conf
+
+acts_ph5:
+	$(PSQL) -d template1 -c "DROP DATABASE IF EXISTS acts_ph5"
+	$(PSQL) -d template1 -c "CREATE DATABASE acts_ph5 WITH TEMPLATE acts_ph4 OWNER ntg"
+	python3 -m scripts.cceh.cbgm    -vvv instance/acts_ph5.conf
 
 cl:
 	python3 -m scripts.cceh.prepare -vvv instance/cl_ph2.conf
@@ -145,14 +162,13 @@ john_f1:
 	python3 -m scripts.cceh.prepare -vvv instance/john_f1_ph1.conf
 	python3 -m scripts.cceh.cbgm    -vvv instance/john_f1_ph1.conf
 
-mark:
+mark_ph1:
 	python3 -m scripts.cceh.prepare -vvv instance/mark_ph12.conf
 	python3 -m scripts.cceh.cbgm    -vvv instance/mark_ph12.conf
 
-acts_ph5:
-	$(PSQL) -d template1 -c "DROP DATABASE IF EXISTS acts_ph5"
-	$(PSQL) -d template1 -c "CREATE DATABASE acts_ph5 WITH TEMPLATE acts_ph4 OWNER ntg"
-	python3 -m scripts.cceh.cbgm    -vvv instance/acts_ph5.conf
+mark_ph2:
+	python3 -m scripts.cceh.prepare -vvv instance/mark_ph2.conf
+	python3 -m scripts.cceh.cbgm    -vvv instance/mark_ph2.conf
 
 define UPLOAD_TEMPLATE =
 
@@ -173,7 +189,7 @@ upload_$(1)_from_home:
 
 endef
 
-DBS := acts_ph4 acts_ph5 john_ph1 john_f1_ph1 mark_ph12 cl_ph2
+DBS := acts_ph4 acts_ph5 john_ph1 john_f1_ph1 mark_ph12 mark_ph2 cl_ph2
 
 $(foreach db,$(DBS),$(eval $(call UPLOAD_TEMPLATE,$(db))))
 
@@ -187,15 +203,15 @@ endef
 
 $(foreach db,$(DBS),$(eval $(call LOAD_TEMPLATE,$(db))))
 
-upload_client: client
+upload_client: client-production
 	$(RSYNC) --exclude "api.conf.js" $(CLIENT)/build/* $(NTG_CLIENT)/
 
 upload_server:
-	$(RSYNCPY)                            ntg_common $(NTG_PRJ)/
-	$(RSYNCPY) --exclude "**/instance/**" server     $(NTG_PRJ)/
+	$(RSYNCPY) ntg_common   $(NTG_PRJ)/
+	$(RSYNCPY) server       $(NTG_PRJ)/
 
 upload_scripts:
-	$(RSYNC) --exclude "**/__pycache__"  --exclude "*.pyc"  scripts/cceh $(NTG_PRJ)/scripts/
+	$(RSYNCPY) scripts/cceh $(NTG_PRJ)/scripts/
 
 diff_affinity_acts:
 	scripts/cceh/sqldiff.sh acts_ph4 "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 94 order by ms_id1, ms_id2" | less

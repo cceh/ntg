@@ -4,7 +4,8 @@
 //
 // $ wget https://raw.githubusercontent.com/cpettitt/graphlib-dot/master/src/dot-grammar.pegjs
 //
-// Added Greek characters to ID production: \u0370-\u03FF
+// - Added Greek characters to ID production: \u0370-\u03FF
+// - Import only merge from lodash.
 //
 // See also: http://www.graphviz.org/content/dot-language
 //
@@ -13,7 +14,7 @@
 //  * HTML IDs
 
 {
-  var _ = require("lodash");
+  var merge = require ("lodash/merge");
   var directed;
 }
 
@@ -75,7 +76,7 @@ attrList
   = first:attrListBlock rest:(_* attrListBlock)* {
       var result = first;
       for (var i = 0; i < rest.length; ++i) {
-        _.merge(result, rest[i][1]);
+        merge(result, rest[i][1]);
       }
       return result;
     }
@@ -87,7 +88,7 @@ aList
   = first:idDef rest:(_* ','? _* idDef)* {
       var result = first;
       for (var i = 0; i < rest.length; ++i) {
-        _.merge(result, rest[i][3]);
+        merge(result, rest[i][3]);
       }
       return result;
     }

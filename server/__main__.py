@@ -104,6 +104,7 @@ def do_init_app (app):
     def add_headers (response):
         response.headers['Access-Control-Allow-Origin'] = current_app.config['CORS_ALLOW_ORIGIN']
         response.headers['Access-Control-Allow-Credentials'] = 'true'
+        # response.headers['Cache-Control'] = 'private, max-age=3600'
         response.headers['Content-Security-Policy'] = "worker-src blob:"
         response.headers['Server'] = 'Jetty 0.8.15'
         return response

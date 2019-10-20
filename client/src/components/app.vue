@@ -14,29 +14,28 @@
  * @author Marcello Perathoner
  */
 
-import $              from 'jquery';
 import Vue            from 'vue';
 import Vuex           from 'vuex';
 import { mapGetters } from 'vuex';
 import VueRouter      from 'vue-router';
-import BootstrapVue   from 'bootstrap-vue';
 import axios          from 'axios';
 import url            from 'url';
 
-import page_header    from '../components/page_header.vue';
-import flash_messages from '../components/flash_messages.vue';
-import prj_list       from '../components/project_list.vue';
-import index          from '../components/index.vue';
-import attestation    from '../components/attestation.vue';
-import coherence      from '../components/coherence.vue';
-import comparison     from '../components/comparison.vue';
-import notes_list     from '../components/notes_list.vue';
-import opt_stemma     from '../components/optimal_substemma.vue';
-import set_cover      from '../components/set_cover.vue';
+import d3common       from 'd3_common';
+
+import page_header    from 'page_header.vue';
+import flash_messages from 'flash_messages.vue';
+import prj_list       from 'project_list.vue';
+import index          from 'index.vue';
+import find_relatives from 'find_relatives.vue';
+import coherence      from 'coherence.vue';
+import comparison     from 'comparison.vue';
+import notes_list     from 'notes_list.vue';
+import opt_stemma     from 'optimal_substemma.vue';
+import set_cover      from 'set_cover.vue';
 
 Vue.use (Vuex);
 Vue.use (VueRouter);
-Vue.use (BootstrapVue);
 
 
 const default_home = {
@@ -47,53 +46,85 @@ const default_home = {
 const router = new VueRouter ({
     'mode'   : 'history',
     'routes' : [
-        { 'path' : '/',                           'component' : prj_list,    'name' : 'prj_list',    'props' : true,
-          'meta' : {
-              'caption' : 'Projects',
-              'home'    :  { 'caption' : 'INTF', 'route' : 'external.intf' },
-          }
+        {
+            'path'      : '/',
+            'component' : prj_list,
+            'name'      : 'prj_list',
+            'props'     : true,
+            'meta'      : {
+                'caption' : 'Projects',
+                'home'    : { 'caption' : 'INTF', 'route' : 'external.intf' },
+            },
         },
-        { 'path' : '/:app_id/:phase/',            'component' : index,       'name' : 'index',       'props' : true,
-          'meta' : {
-              'caption' : 'Genealogical Queries',
-              'home'    :  { 'caption' : 'Up', 'route' : 'prj_list' },
-          }
+        {
+            'path'      : '/:app_id/:phase/',
+            'component' : index,
+            'name'      : 'index',
+            'props'     : true,
+            'meta'      : {
+                'caption' : 'Genealogical Queries',
+                'home'    : { 'caption' : 'Up', 'route' : 'prj_list' },
+            },
         },
-        { 'path' : '/:app_id/:phase/attestation', 'component' : attestation, 'name' : 'attestation', 'props' : true,
-          'meta' : {
-              'caption' : 'Find Relatives',
-              'home'    : default_home,
-          }
+        {
+            'path'      : '/:app_id/:phase/find_relatives',
+            'component' : find_relatives,
+            'name'      : 'find_relatives',
+            'props'     : true,
+            'meta'      : {
+                'caption' : 'Find Relatives',
+                'home'    : default_home,
+            },
         },
-        { 'path' : '/:app_id/:phase/coherence',   'component' : coherence,   'name' : 'coherence',   'props' : true,
-          'meta' : {
-              'caption' : 'Coherence',
-              'home'    : default_home,
-          }
+        {
+            'path'      : '/:app_id/:phase/coherence',
+            'component' : coherence,
+            'name'      : 'coherence',
+            'props'     : true,
+            'meta'      : {
+                'caption' : 'Coherence and Textual Flow',
+                'home'    : default_home,
+            },
         },
-        { 'path' : '/:app_id/:phase/comparison',  'component' : comparison,  'name' : 'comparison',  'props' : true,
-          'meta' : {
-              'caption' : 'Comparison',
-              'home'    : default_home,
-          }
+        {
+            'path'      : '/:app_id/:phase/comparison',
+            'component' : comparison,
+            'name'      : 'comparison',
+            'props'     : true,
+            'meta'      : {
+                'caption' : 'Comparison of Witnesses',
+                'home'    : default_home,
+            },
         },
-        { 'path' : '/:app_id/:phase/notes',       'component' : notes_list,  'name' : 'notes_list',  'props' : true,
-          'meta' : {
-              'caption' : 'Notes',
-              'home'    : default_home,
-          }
+        {
+            'path'      : '/:app_id/:phase/notes',
+            'component' : notes_list,
+            'name'      : 'notes_list',
+            'props'     : true,
+            'meta'      : {
+                'caption' : 'List of Notes',
+                'home'    : default_home,
+            },
         },
-        { 'path' : '/:app_id/:phase/opt_stemma',  'component' : opt_stemma,  'name' : 'opt_stemma',  'props' : true,
-          'meta' : {
-              'caption' : 'Optimal Substemma',
-              'home'    : default_home,
-          }
+        {
+            'path'      : '/:app_id/:phase/opt_stemma',
+            'component' : opt_stemma,
+            'name'      : 'opt_stemma',
+            'props'     : true,
+            'meta'      : {
+                'caption' : 'Optimal Substemma',
+                'home'    : default_home,
+            },
         },
-        { 'path' : '/:app_id/:phase/set_cover',   'component' : set_cover,   'name' : 'set_cover',   'props' : true,
-          'meta' : {
-              'caption' : 'Set Cover',
-              'home'    : default_home,
-          }
+        {
+            'path'      : '/:app_id/:phase/set_cover',
+            'component' : set_cover,
+            'name'      : 'set_cover',
+            'props'     : true,
+            'meta'      : {
+                'caption' : 'Minimum Set Cover',
+                'home'    : default_home,
+            },
         },
 
         // external routes
@@ -107,7 +138,10 @@ const router = new VueRouter ({
             'name' : 'external.intf',
             // hack because router cannot handle external links
             // See: https://github.com/vuejs/vue-router/issues/1280
-            beforeEnter () { location.href = 'http://intf.uni-muenster.de/cbgm/acts/' },
+            beforeEnter () {
+                /* eslint-disable-next-line no-restricted-globals */
+                location.href = 'http://intf.uni-muenster.de/cbgm/acts/';
+            },
         },
     ],
 });
@@ -124,14 +158,9 @@ const store = new Vuex.Store ({
             'caption' : 'Index',
             'home'    : default_home,
         },
-        'api_url'   : '',
-        'instances' : [],
-        'ranges'    : [],
-        'leitzeile' : [],
-        'passage'   : {
-            'pass_id' : 0,
-            'hr'      : '',
-        },
+        'api_url'             : '',
+        'instances'           : [],
+        'ranges'              : [],
         'current_application' : {
             ... default_application,
         },
@@ -149,9 +178,11 @@ const store = new Vuex.Store ({
         },
         route_meta (state, data) {
             state.route_meta = data;
+            document.title = data.caption;
         },
         caption (state, data) {
             state.route_meta.caption = data;
+            document.title = data;
         },
         current_user (state, data) {
             state.current_user = data;
@@ -162,15 +193,18 @@ const store = new Vuex.Store ({
         passage (state, data) {
             Object.assign (state, data);
         },
+        ranges (state, data) {
+            state.ranges = data;
+        },
     },
     'getters' : {
-        'api_url'    : state => state.api_url,
-        'route_meta' : state => state.route_meta,
-        'passage'    : state => state.passage,
+        'api_url'             : state => state.api_url,
+        'route_meta'          : state => state.route_meta,
+        'ranges'              : state => state.ranges,
         'current_application' : state => state.current_application,
-        'current_user' : state => state.current_user,
-        'is_logged_in' : state => {
-            return state.current_user.username != 'anonymous';
+        'current_user'        : state => state.current_user,
+        'is_logged_in'        : state => {
+            return state.current_user.username !== 'anonymous';
         },
         'can_read' : state => {
             return state.current_user.roles.includes (state.current_application.read_access);
@@ -181,6 +215,37 @@ const store = new Vuex.Store ({
     },
 });
 
+/*
+ * Get application information *before* displaying the view.
+ */
+
+router.beforeEach ((to, from, next) => {
+    if (to.params.app_id) {
+        const api_url = url.resolve (api_base_url, to.params.app_id + '/' + to.params.phase + '/');
+        if (api_url !== store.state.api_url) {
+            const requests = [
+                axios.get (url.resolve (api_url, 'application.json')),
+                axios.get (url.resolve (api_url, 'ranges.json/')),
+            ];
+            Promise.all (requests).then ((responses) => {
+                store.commit ('current_application', responses[0].data.data);
+                store.commit ('ranges',              responses[1].data.data);
+                store.commit ('api_url',             api_url);
+                store.commit ('route_meta',          to.matched[0].meta);
+                next ();
+            }).catch ((dummy_error) => {
+                next (false);
+            });
+            return;
+        }
+        store.commit ('route_meta', to.matched[0].meta);
+        next ();
+        return;
+    }
+    store.commit ('api_url',    '');
+    store.commit ('route_meta', to.matched[0].meta);
+    next ();
+});
 
 /**
  * Ascend the VM tree until you find an api_url and use it as prefix to build
@@ -188,18 +253,18 @@ const store = new Vuex.Store ({
  *
  * @function build_full_api_url
  *
- * @param {Object} vm  - The Vue instance
- * @param {String} url - Url suffix
+ * @param {Object} vm     - The Vue instance
+ * @param {String} suffix - Url suffix
  *
  * @returns {String} Full API url
  */
 
-Vue.prototype.build_full_api_url = function (url) {
+Vue.prototype.build_full_api_url = function (suffix) {
     let vm = this;
     /* eslint-disable-next-line no-constant-condition */
     while (true) {
         if (vm.api_url) {
-            return vm.api_url + url;
+            return url.resolve (vm.api_url, suffix);
         }
         if (!vm.$parent) {
             break;
@@ -214,22 +279,22 @@ Vue.prototype.build_full_api_url = function (url) {
  *
  * @function get
  *
- * @param {String} url  - Url suffix
- * @param {Object} data - Params for axios call
+ * @param {String} suffix - Url suffix
+ * @param {Object} config - Params for axios call
  *
  * @returns {Promise}
  */
 
-Vue.prototype.get = function (url, data = {}) {
-    return axios.get (this.build_full_api_url (url), data);
+Vue.prototype.get = function (suffix, config = {}) {
+    return axios.get (this.build_full_api_url (suffix), config);
 };
 
-Vue.prototype.post = function (url, data = {}) {
-    return axios.post (this.build_full_api_url (url), data);
+Vue.prototype.post = function (suffix, config = {}) {
+    return axios.post (this.build_full_api_url (suffix), config);
 };
 
-Vue.prototype.put = function (url, data = {}) {
-    return axios.put (this.build_full_api_url (url), data);
+Vue.prototype.put = function (suffix, config = {}) {
+    return axios.put (this.build_full_api_url (suffix), config);
 };
 
 
@@ -255,14 +320,14 @@ Vue.prototype.$trigger = function (name, data) {
 
 /* eslint-disable no-new */
 export default {
-    'data'  : function () {
+    'router' : router,
+    'store'  : store,
+    'data'   : function () {
         return {
-            /* eslint-disable no-undef */
             'api_base_url' : api_base_url,
-        }
+            'bust'         : 1,
+        };
     },
-    'router'     : router,
-    'store'      : store,
     'components' : {
         'page-header'    : page_header,
         'flash-messages' : flash_messages,
@@ -270,73 +335,36 @@ export default {
     'computed' : {
         ...mapGetters ([
             'api_url',
-            'route_meta',
         ]),
-    },
-    'watch' : {
-        route_meta () {
-            document.title = this.route_meta.caption;
-        },
-        api_url () {
-            const vm = this;
-            if (vm.api_url) {
-                const requests = [
-                    vm.get ('application.json'),
-                ];
-                Promise.all (requests).then ((responses) => {
-                    vm.$store.commit ('current_application', responses[0].data.data);
-                });
-            } else {
-                vm.$store.commit ('current_application', default_application);
-            }
-        },
-        $route (to, from) {
-            this.on_route_change (to);
-        },
-    },
-    'methods' : {
-        on_route_change (to) {
-            const vm = this;
-            if (to.params.app_id) {
-                vm.$store.commit (
-                    'api_url',
-                    url.resolve (vm.api_base_url, to.params.app_id + '/' + to.params.phase + '/')
-                );
-            } else {
-                vm.$store.commit ('api_url', null);
-            }
-            vm.$store.commit ('route_meta', to.matched[0].meta);
-        },
-        update_globals () {
-            const vm = this;
-            const requests = [
-                axios.get (url.resolve (vm.api_base_url, 'info.json')),
-                axios.get (url.resolve (vm.api_base_url, 'user.json')),
-            ];
-            Promise.all (requests).then ((responses) => {
-                vm.$store.commit ('instances',    responses[0].data.data.instances);
-                vm.$store.commit ('current_user', responses[1].data.data);
-            });
-        },
     },
     created () {
         const vm = this;
-        vm.update_globals ();
-        this.$router.onReady (() => { vm.on_route_change (this.$router.currentRoute); });
+        const requests = [
+            axios.get (url.resolve (vm.api_base_url, 'info.json')),
+            axios.get (url.resolve (vm.api_base_url, 'user.json')),
+        ];
+        Promise.all (requests).then ((responses) => {
+            vm.$store.commit ('instances',    responses[0].data.data.instances);
+            vm.$store.commit ('current_user', responses[1].data.data);
+        });
+    },
+    mounted () {
+        // insert css for color palettes
+        d3common.insert_css_palette (d3common.generate_css_palette (
+            d3common.labez_palette,
+            d3common.cliques_palette
+        ));
     },
 };
 
-$ (document).off ('.data-api'); // turn off bootstrap's data api
-
 // The browser triggers hashchange only on window.  We want it on every app.
-$ (window).on ('hashchange', function () {
-    // Concoct an event that you can actually catch with vue.js. (jquery events
-    // are not real native events.)  This event does not bubble.
+window.addEventListener ('hashchange', function () {
     const event = new CustomEvent ('hashchange');
-    $ ('.want_hashchange').each (function (i, e) {
-        e.dispatchEvent (event);
+    document.querySelectorAll ('.want_hashchange').forEach (function (el) {
+        el.dispatchEvent (event);
     });
 });
+
 
 </script>
 
@@ -346,10 +374,13 @@ $ (window).on ('hashchange', function () {
 @import "../css/bootstrap-custom.scss";
 
 /* bootstrap */
+
+/* FIXME: this file is huge, maybe pick only the things we use */
 @import "../../node_modules/bootstrap/scss/bootstrap";
-@import "../../node_modules/bootstrap-vue/dist/bootstrap-vue.css";
 
 /* List of icons at: http://astronautweb.co/snippet/font-awesome/ */
+
+/* FIXME: this file is huge, maybe pick only the icons we use */
 @import "../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
 @import "../../node_modules/@fortawesome/fontawesome-free/css/solid.css";
 

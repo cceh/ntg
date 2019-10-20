@@ -12,14 +12,37 @@ import flask_login
 from ntg_common.db_tools import execute
 
 from login import auth
-from helpers import parameters, Passage, Manuscript, csvify, get_excluded_ms_ids, \
+from helpers import parameters, Passage, Manuscript, cache, csvify, get_excluded_ms_ids, \
      make_json_response
 
 bp = flask.Blueprint ('main', __name__)
 
 
-def init_app (_app):
+def init_app (app):
     """ Initialize the flask app. """
+
+    app.config.bk_id = None
+    app.config.rg_id_all = None
+
+    with app.config.dba.engine.begin () as conn:
+        try:
+            res = execute (conn, """
+            SELECT bk_id
+            FROM books
+            WHERE book = :book
+            """, { 'book' : app.config['BOOK'] })
+            app.config.bk_id = res.fetchone ()[0]
+
+            res = execute (conn, """
+            SELECT rg_id
+            FROM ranges
+            WHERE bk_id = :bk_id AND range = 'All'
+            """, { 'bk_id' : app.config.bk_id })
+            rg_id = res.fetchone ()[0]
+
+            app.config.rg_id_all = rg_id
+        except:
+            pass # FIXME
 
 
 def _f_map_word (t):
@@ -51,7 +74,32 @@ def application_json ():
         'read_access'  : conf['READ_ACCESS'],
         'write_access' : conf['WRITE_ACCESS'],
         'start'        : conf['SERVER_START_TIME'],
+        'rg_id_all'    : conf.rg_id_all,
     })
+
+
+@bp.route ('/ranges.json/')
+def ranges_json ():
+    """Endpoint.  Serve a list of ranges.
+
+    Serves a list of the configured ranges that are contained inside a book in
+    the NT.
+
+    """
+
+    conf = current_app.config
+    with conf.dba.engine.begin () as conn:
+        res = execute (conn, """
+        SELECT DISTINCT bk_id, book, rg_id, range, lower (rg.passage) as begadr, upper (rg.passage) as endadr
+        FROM ranges_view rg
+        WHERE bk_id = :bk_id
+        ORDER BY begadr, endadr DESC
+        """, dict (parameters, bk_id = conf.bk_id))
+
+        Ranges = collections.namedtuple ('Ranges', 'bk_id, book, rg_id, range, begadr, endadr')
+        ranges = [ Ranges._make (r)._asdict () for r in res ]
+
+        return cache (make_json_response (ranges))
 
 
 @bp.route ('/passage.json/')
@@ -93,7 +141,22 @@ def passage_json (passage_or_id = None):
             return make_json_response (passage.to_json ())
 
         passage = Passage (conn, passage_or_id)
-        return make_json_response (passage.to_json ())
+        return cache (make_json_response (passage.to_json ()))
+
+
+@bp.route ('/readings.json/<passage_or_id>')
+def readings_json (passage_or_id):
+    """ Endpoint.  Serve all readings found in a passage.
+
+    :param string passage_or_id: The passage id.
+
+    """
+
+    auth ()
+
+    with current_app.config.dba.engine.begin () as conn:
+        passage = Passage (conn, passage_or_id)
+        return cache (make_json_response (passage.readings ()))
 
 
 @bp.route ('/cliques.json/<passage_or_id>')
@@ -167,8 +230,8 @@ def suggest_json ():
 
     # terms entered in previous fields
     siglum  = request.args.get ('siglum')  or ''
-    chapter = request.args.get ('chapter') or 'All'
-    verse   = request.args.get ('verse')   or '1'
+    chapter = request.args.get ('chapter') or 0
+    verse   = request.args.get ('verse')   or 0
 
     Words = collections.namedtuple (
         'Words', 'kapanf, versanf, wortanf, kapend, versend, wortend, lemma')
@@ -225,40 +288,6 @@ def suggest_json ():
     return flask.json.jsonify ([])
 
 
-@bp.route ('/ranges.json/<passage_or_id>')
-def ranges_json (passage_or_id):
-    """Endpoint.  Serve a list of ranges.
-
-    Serves a list of the configured ranges that are contained inside a book in
-    the NT.
-
-    :param string passage_or_id: The passage id.
-    :param integer bk_id:        The id of the book.
-
-    """
-
-    auth ()
-
-    passage_or_id = request.args.get ('pass_id') or passage_or_id or '0'
-
-    with current_app.config.dba.engine.begin () as conn:
-        passage = Passage (conn, passage_or_id)
-        bk_id   = request.args.get ('bk_id') or passage.bk_id
-
-        res = execute (conn, """
-        SELECT DISTINCT range, range, lower (ch.passage) as begadr, upper (ch.passage) as endadr
-        FROM ranges ch
-        WHERE bk_id = :bk_id
-        ORDER BY begadr, endadr DESC
-        """, dict (parameters, bk_id = bk_id))
-
-        Ranges = collections.namedtuple ('Ranges', 'range, value, begadr, endadr')
-        # ranges = list (map (Ranges._make, res))
-        ranges = [ Ranges._make (r)._asdict () for r in res ]
-
-        return make_json_response (ranges)
-
-
 @bp.route ('/manuscript.json/<hs_hsnr_id>')
 def manuscript_json (hs_hsnr_id):
     """Endpoint.  Serve information about a manuscript.
@@ -287,15 +316,14 @@ def manuscript_full_json (passage_or_id, hs_hsnr_id):
     auth ()
 
     hs_hsnr_id = request.args.get ('ms_id') or hs_hsnr_id
-    chapter    = request.args.get ('range') or 'All'
 
     with current_app.config.dba.engine.begin () as conn:
         passage   = Passage (conn, passage_or_id)
         ms        = Manuscript (conn, hs_hsnr_id)
-        rg_id     = passage.range_id (chapter)
+        rg_id     = passage.request_rg_id (request)
 
         json = ms.to_json ()
-        json['length'] = ms.get_length (passage, chapter)
+        json['length'] = ms.get_length (rg_id)
 
         # Get the attestation(s) of the manuscript (may be uncertain eg. a/b/c)
         res = execute (conn, """
@@ -331,7 +359,7 @@ def manuscript_full_json (passage_or_id, hs_hsnr_id):
         if res.rowcount > 0:
             json['mt'], json['mtp'] = res.fetchone ()
 
-        return make_json_response (json)
+        return cache (make_json_response (json))
 
 
 @bp.route ('/relatives.csv/<passage_or_id>/<hs_hsnr_id>')
@@ -346,7 +374,6 @@ def relatives_csv (passage_or_id, hs_hsnr_id):
     auth ()
 
     type_     = request.args.get ('type') or 'rel'
-    chapter   = request.args.get ('range') or 'All'
     limit     = int (request.args.get ('limit') or 0)
     labez     = request.args.get ('labez') or 'all'
     mode      = request.args.get ('mode') or 'sim'
@@ -379,7 +406,7 @@ def relatives_csv (passage_or_id, hs_hsnr_id):
 
         passage   = Passage (conn, passage_or_id)
         ms        = Manuscript (conn, hs_hsnr_id)
-        rg_id     = passage.range_id (chapter)
+        rg_id     = passage.request_rg_id (request)
 
         exclude = get_excluded_ms_ids (conn, include)
 

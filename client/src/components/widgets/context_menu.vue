@@ -1,12 +1,20 @@
 <template>
-  <table class="dropdown-menu" role="menu" ref="menu">
-    <tbody v-for="grp of actions">
-      <tr v-for="a in grp" :class="a.class" @click="on_menu_click (a.data, $event)">
-        <td class="bg_labez" :data-labez="a.bg"></td>
-        <td>{{ a.msg }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="vm-context-menu vm-dropdown-mixin dropdown b-dropdown">
+    <div ref="menu" class="dropdown-menu" tabindex="-1" @keydown="onKeydown">
+      <table v-if="visible" class="table table-sm table-borderless">
+        <tbody v-for="(grp, indexg) of items" :key="'grp_' + indexg">
+          <tr v-for="(a, index_a) in grp" :key="'a_' + index_a" role="menuitem"
+              :class="a.class" class="dropdown-item"
+              tabindex="0"
+              @keydown="on_item_keydown (a.data, $event)"
+              @click="on_item_click (a.data, $event)">
+            <td class="bg_labez" :data-labez="a.bg"></td>
+            <td>{{ a.msg }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -17,9 +25,20 @@
  * @author Marcello Perathoner
  */
 
-import $      from 'jquery';
-import _      from 'lodash';
-import Popper from 'popper.js';
+import dropdown_mixin from 'widgets/dropdown_mixin.vue';
+
+export const popper_opts = {
+    'placement' : 'right-center',
+    'modifiers' : {
+        'offset' : {
+            'offset' : '0,5',
+        },
+        'flip' : {
+            'behavior' : ['right', 'bottom', 'top'],
+        },
+    },
+};
+
 
 /**
  * Format message
@@ -37,96 +56,77 @@ export function mkmsg (msg, labez, clique) {
     return msg + ' ' + labez + (Number (clique) > 1 ? clique : '');
 }
 
-/**
- * Position a context menu aside an svg element.
- *
- * We use Popper since jQuery doesn't grok the SVG DOM.
- *
- * @function svg_contextmenu
- *
- * @param {Object} menu   - The menu
- * @param {Object} target - The DOM object to attach the menu to
- */
-
-export function svg_contextmenu (menu, target) {
-    const $card = $ (target).closest ('div.card');
-    $card.append (menu);
-
-    var popper = new Popper (target, menu, {
-        'placement' : 'right-start',
-        'modifiers' : {
-            'offset' : {
-                'offset' : '0,3',
-            },
-            'flip' : {
-                'behavior' : ['right', 'bottom', 'top']
-            },
-            'preventOverflow' : {
-                'boundariesElement' : $card,
-            },
-        },
-    });
-}
-
 export default {
-    'data'  : function () {
+    'props' : {
+        'value' : { // no v-model in context_menu
+            'required' : false,
+        },
+        'popperOpts' : {
+            'type'    : Object,
+            'default' : () => popper_opts,
+        },
+    },
+    'mixins' : [dropdown_mixin],
+    'data'   : function () {
         return {
-            'actions' : {},
+            'items' : {},
         };
     },
     'methods' : {
-        open (actions, target) {
-            const vm = this;
-            const $el = $ (vm.$el);
-            $el.fadeIn ();
-            vm.actions = actions;
-            svg_contextmenu ($el, target);
-        },
-        close () {
-            const vm = this;
-            $ (vm.$el).fadeOut (function () {
-                vm.actions = {};
-                vm.$emit ('menu-close');
-            });
-        },
-        on_menu_click (data, event) {
-            this.$emit ('menu-click', data);
-            this.close ();
+        open (items, target) {
+            this.items = items;
+            this.$refs.toggle = target;
+            this.show ();
         },
     },
 };
+
 </script>
 
 
 <style lang="scss">
-/* local_stemma.vue */
+/* widgest/context_menu.vue */
 @import "bootstrap-custom";
 
-div.card table.dropdown-menu {
-    font-size: $font-size-base;
-    text-align: left;
+div.vm-context-menu {
+    position: static;
 
-    tbody + tbody {
-        border-top: $dropdown-border-width solid $dropdown-border-color;
-    }
+    .dropdown-menu {
+        padding: 0;
 
-    tr {
-        &:hover {
-            color: $dropdown-link-active-color;
-            background: $dropdown-link-active-bg;
-        }
-        &.disabled,
-        &:disabled {
-            color: $dropdown-link-disabled-color;
-            pointer-events: none;
-            background-color: transparent;
-        }
-    }
+        table {
+            tbody + tbody {
+                border-top: $dropdown-border-width solid $dropdown-border-color;
+            }
 
-    td {
-        padding: 3px 5px;
-        &.bg_labez {
-            padding: 3px 10px;
+            tr {
+                padding: 0;
+
+                &:hover {
+                    color: $dropdown-link-hover-color;
+                    background: $dropdown-link-hover-bg;
+                }
+
+                &.disabled,
+                &:disabled {
+                    color: $dropdown-link-disabled-color;
+                    pointer-events: none;
+                    background-color: transparent;
+                }
+            }
+
+            td {
+                border-top: 0;
+                white-space: nowrap;
+
+                &.bg_labez {
+                    padding: $table-cell-padding-sm 2 * $table-cell-padding-sm;
+                }
+
+                &:first-child {
+                    width: 1%;
+                }
+            }
         }
     }
 }

@@ -22,10 +22,10 @@ dev-server-production: clean $(AUX)
 lint: eslint csslint
 
 eslint:
-	$(ESLINT) src/components/*.vue src/js/*.js src/*.js *.js *.json
+	$(ESLINT) src/components/*.vue src/components/widgets/*.vue src/js/*.js src/*.js *.js *.json
 
 csslint:
-	$(STYLELINT) src/components/*.vue src/less/*.less
+	$(STYLELINT) src/components/*.vue src/components/widgets/*.vue src/css/*.scss
 
 clean:
 	rm -rf build/*
