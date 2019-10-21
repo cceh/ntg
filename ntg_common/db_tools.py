@@ -476,8 +476,8 @@ def local_stemma_to_nx (conn, pass_id, add_isolated_roots = False):
         more_params['droptarget'] = '1'
 
     if '*' in graph:
-        graph.node['*'].update (label = '*', labez='*', clique='1', labez_clique='*', **more_params)
+        graph.nodes['*'].update (label = '*', labez='*', clique='1', labez_clique='*', **more_params)
     if '?' in graph:
-        graph.node['?'].update (label = '?', labez='?', clique='1', labez_clique='?', **more_params)
+        graph.nodes['?'].update (label = '?', labez='?', clique='1', labez_clique='?', **more_params)
 
     return graph

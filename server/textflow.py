@@ -54,7 +54,7 @@ def remove_z_leaves (graph):
         return
 
     for n in reversed (nodes):
-        atts = graph.node[n]
+        atts = graph.nodes[n]
         if graph.out_degree (n) == 0 and 'labez' in atts and atts['labez'][0] == 'z':
             graph.remove_node (n)
 
@@ -212,10 +212,10 @@ def textflow (passage_or_id):
         tags = set ()
         for step in (1, 2):
             for r in ranks:
-                a1 = graph.node[r.ms_id1]
-                if not r.ms_id2 in graph.node:
+                a1 = graph.nodes[r.ms_id1]
+                if not r.ms_id2 in graph.nodes:
                     continue
-                a2 = graph.node[r.ms_id2]
+                a2 = graph.nodes[r.ms_id2]
                 if not (global_textflow) and is_z_node (a2):
                     # disregard zz / zw
                     continue
@@ -249,7 +249,7 @@ def textflow (passage_or_id):
 
         # the if clause fixes #83
         graph.remove_nodes_from ([n for n in nx.isolates (graph)
-                                  if graph.node[n]['labez'] != labez])
+                                  if graph.nodes[n]['labez'] != labez])
 
         if var_only:
             # Panel: Coherence at Variant Passages (GraphViz)
@@ -258,19 +258,19 @@ def textflow (passage_or_id):
             # other predecessors that are not within the same attestation
             for n in graph:
                 within = False
-                attestation_n = graph.node[n][group_field]
+                attestation_n = graph.nodes[n][group_field]
                 for p in graph.predecessors (n):
-                    if graph.node[p][group_field] == attestation_n:
+                    if graph.nodes[p][group_field] == attestation_n:
                         within = True
                         break
                 if within:
                     for p in graph.predecessors (n):
-                        if graph.node[p][group_field] != attestation_n:
+                        if graph.nodes[p][group_field] != attestation_n:
                             graph.remove_edge (p, n)
 
             # remove edges between nodes within the same attestation
             for u, v in list (graph.edges ()):
-                if graph.node[u][group_field] == graph.node[v][group_field]:
+                if graph.nodes[u][group_field] == graph.nodes[v][group_field]:
                     graph.remove_edge (u, v)
 
             # remove now isolated nodes
@@ -278,7 +278,7 @@ def textflow (passage_or_id):
 
             # unconstrain backward edges (yields a better GraphViz layout)
             for u, v in graph.edges ():
-                if graph.node[u][group_field] > graph.node[v][group_field]:
+                if graph.nodes[u][group_field] > graph.nodes[v][group_field]:
                     graph.adj[u][v]['constraint'] = 'false'
 
         else:
@@ -286,11 +286,11 @@ def textflow (passage_or_id):
                 # Use a different label if the parent's labez_clique differs from this
                 # node's labez_clique.
                 pred = list (graph.predecessors (n))
-                attrs = graph.node[n]
+                attrs = graph.nodes[n]
                 if not pred:
                     attrs['label'] = "%s: %s" % (attrs['labez_clique'], attrs['hs'])
                 for p in pred:
-                    if attrs['labez_clique'] != graph.node[p]['labez_clique']:
+                    if attrs['labez_clique'] != graph.nodes[p]['labez_clique']:
                         attrs['label'] = "%s: %s" % (attrs['labez_clique'], attrs['hs'])
                         graph.adj[p][n]['style'] = 'dashed'
 

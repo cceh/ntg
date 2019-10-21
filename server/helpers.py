@@ -492,9 +492,9 @@ def nx_to_dot_subgraphs (graph, field, width = 960.0, fontsize = 10.0):
     dot = dot_skeleton (width = width, fontsize = fontsize, ranksep = 1.2)
 
     # Copy nodes and sort them.  (Sorting nodes is important too.)
-    sorted_nodes = sorted (graph, key = lambda n: (graph.node[n][field], graph.node[n]['hsnr']))
+    sorted_nodes = sorted (graph, key = lambda n: (graph.nodes[n][field], graph.nodes[n]['hsnr']))
     for key, nodes_for_key in itertools.groupby (sorted_nodes,
-                                                 key = lambda n: graph.node[n][field]):
+                                                 key = lambda n: graph.nodes[n][field]):
         dot.append ("subgraph \"cluster_%s\" {" % key)
         dot.append ("style=rounded")
         dot.append ("labeljust=l")
@@ -502,7 +502,7 @@ def nx_to_dot_subgraphs (graph, field, width = 960.0, fontsize = 10.0):
         dot.append ("rank=%s" % ('source' if key in ('a', 'a1') else 'same'))
         dot.append ("label=\"%s\"" % key)
         for n in nodes_for_key:
-            attr = graph.node[n]
+            attr = graph.nodes[n]
             dot.append ("\"%s\" [%s];" %
                         (n, ','.join (["\"%s\"=\"%s\"" % (k, v) for k, v in attr.items ()])))
         dot.append ("}")

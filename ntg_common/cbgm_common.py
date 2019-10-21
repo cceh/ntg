@@ -272,13 +272,13 @@ def calculate_mss_similarity_postco (dba, parameters, val, do_checks = True):
                 # ... and remove it again
                 G.remove_node ('root')
 
-            G.node['*']['mask'] = 0
-            G.node['?']['mask'] = 1 # bitmask == 1 signifies source is unclear
+            G.nodes['*']['mask'] = 0
+            G.nodes['?']['mask'] = 1 # bitmask == 1 signifies source is unclear
 
             # build node bitmasks.  Every node gets a different bit set.
             i = 1
             for n in sorted (G.nodes ()):
-                attrs = G.node[n]
+                attrs = G.nodes[n]
                 attrs['parents'] = 0
                 attrs['ancestors'] = 0
                 if 'mask' not in attrs:
@@ -293,17 +293,17 @@ def calculate_mss_similarity_postco (dba, parameters, val, do_checks = True):
 
             # build the parents bit mask. We set the bits of the parent nodes.
             for n in G:
-                mask = G.node[n]['mask']
+                mask = G.nodes[n]['mask']
                 for succ in G.successors (n):
-                    G.node[succ]['parents'] |= mask
+                    G.nodes[succ]['parents'] |= mask
 
             # build the ancestors mask.  We set the bits of all node ancestors.
             TC = nx.transitive_closure (G)
             for n in TC:
                 # transitive_closure does not copy attributes !
-                mask = G.node[n]['mask']
+                mask = G.nodes[n]['mask']
                 for succ in TC.successors (n):
-                    G.node[succ]['ancestors'] |= mask
+                    G.nodes[succ]['ancestors'] |= mask
 
             # save the graph for later
             stemmas[pass_id - 1] = G
@@ -334,7 +334,7 @@ def calculate_mss_similarity_postco (dba, parameters, val, do_checks = True):
         error_count = 0
         for row in rows:
             try:
-                attrs = stemmas[row.pass_id].node[row.labez_clique]
+                attrs = stemmas[row.pass_id].nodes[row.labez_clique]
                 mask_matrix     [row.ms_id, row.pass_id] = attrs['mask']
                 parent_matrix   [row.ms_id, row.pass_id] = attrs['parents']
                 ancestor_matrix [row.ms_id, row.pass_id] = attrs['ancestors']
