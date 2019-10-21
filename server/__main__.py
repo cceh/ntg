@@ -13,6 +13,7 @@ sub-apps for each book.
 import argparse
 import collections
 import glob
+import logging
 import os
 import os.path
 import time
@@ -25,7 +26,7 @@ import flask_login
 import flask_mail
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
-from ntg_common.config import init_logging
+from ntg_common.config import args, init_logging
 from ntg_common import db_tools
 from ntg_common.exceptions import EditException
 
@@ -197,8 +198,12 @@ def create_app (Config):
 if __name__ == "__main__":
     from werkzeug.serving import run_simple
 
-    args = build_parser ().parse_args ()
-    args = init_logging (args)
+    build_parser ().parse_args (namespace = args)
+    init_logging (
+        args,
+        flask.logging.default_handler,
+        logging.FileHandler ('server.log')
+    )
 
     Config.LOG_LEVEL   = args.log_level
     Config.CONFIG_FILE = args.config_file

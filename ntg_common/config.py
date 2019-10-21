@@ -2,7 +2,6 @@
 
 """The commandline and configuration stuff."""
 
-import datetime
 import logging
 import types
 
@@ -12,23 +11,20 @@ class Args:
 args = Args ()
 """ Globally accessible arguments from command line. """
 
-COLORS = {
-    logging.CRITICAL : ('\x1B[38;2;255;0;0m', '\x1B[0m'),
-    logging.ERROR    : ('\x1B[38;2;255;0;0m', '\x1B[0m'),
-    logging.WARN     : ('', ''),
-    logging.INFO     : ('', ''),
-    logging.DEBUG    : ('', ''),
-}
 
-# colorize error log
-old_factory = logging.getLogRecordFactory ()
+class Formatter (logging.Formatter):
+    """ Allows colorful formatting of log lines. """
+    COLORS = {
+        logging.CRITICAL : ('\x1B[38;2;255;0;0m',  '\x1B[0m'),
+        logging.ERROR    : ('\x1B[38;2;255;0;0m',  '\x1B[0m'),
+        logging.WARN     : ('\x1B[38;2;255;64;0m', '\x1B[0m'),
+        logging.INFO     : ('', ''),
+        logging.DEBUG    : ('', ''),
+    }
 
-def record_factory (*args, **kwargs):
-    record = old_factory (*args, **kwargs)
-    record.esc0, record.esc1 = COLORS[record.levelno]
-    return record
-
-logging.setLogRecordFactory (record_factory)
+    def format (self, record):
+        record.esc0, record.esc1 = self.COLORS[record.levelno]
+        return super ().format (record)
 
 
 def config_from_pyfile (filename):
@@ -55,7 +51,7 @@ def config_from_pyfile (filename):
     return conf
 
 
-def init_logging (args):
+def init_logging (args, *handlers):
     """ Init the logging stuff. """
 
     LOG_LEVELS = {
@@ -67,64 +63,22 @@ def init_logging (args):
     }
     args.log_level = LOG_LEVELS.get (args.verbose, logging.DEBUG)
 
-    logging.getLogger ().setLevel (args.log_level)
-    formatter = logging.Formatter (
+    root = logging.getLogger ()
+    root.setLevel (args.log_level)
+
+    formatter = Formatter (
         fmt = '{esc0}{relativeCreated:6.0f} - {levelname:7} - {message}{esc1}',
         style='{'
     )
 
-    stderr_handler = logging.StreamHandler ()
-    stderr_handler.setFormatter (formatter)
-    logging.getLogger ().addHandler (stderr_handler)
+    if not handlers:
+        handlers = [logging.StreamHandler ()] # stderr
 
-    file_handler = logging.FileHandler ('server.log')
-    file_handler.setFormatter (formatter)
-    logging.getLogger ().addHandler (file_handler)
+    for handler in handlers:
+        handler.setFormatter (formatter)
+        root.addHandler (handler)
 
     if args.log_level == logging.INFO:
         # sqlalchemy is way too verbose on level INFO
         sqlalchemy_logger = logging.getLogger ('sqlalchemy.engine')
         sqlalchemy_logger.setLevel (logging.WARN)
-
-    return args
-
-
-def init_cmdline (parser):
-    """ Obsolete: Init the commandline parameter stuff. """
-
-    parser.parse_args (namespace = args)
-
-    args.start_time = datetime.datetime.now ()
-    LOG_LEVELS = {
-        0: logging.CRITICAL,  #
-        1: logging.ERROR,     # -v
-        2: logging.WARN,      # -vv
-        3: logging.INFO,      # -vvv
-        4: logging.DEBUG      # -vvvv
-    }
-    args.log_level = LOG_LEVELS.get (args.verbose, logging.DEBUG)
-
-    logging.getLogger ().setLevel (args.log_level)
-    formatter = logging.Formatter (
-        fmt = '{esc0}{relativeCreated:6.0f} - {levelname:7} - {message}{esc1}',
-        style='{'
-    )
-
-    stderr_handler = logging.StreamHandler ()
-    stderr_handler.setFormatter (formatter)
-    logging.getLogger ().addHandler (stderr_handler)
-
-    file_handler = logging.FileHandler ('ntg.log')
-    file_handler.setFormatter (formatter)
-    logging.getLogger ().addHandler (file_handler)
-
-    if args.log_level == logging.INFO:
-        # sqlalchemy is way too verbose on level INFO
-        sqlalchemy_logger = logging.getLogger ('sqlalchemy.engine')
-        sqlalchemy_logger.setLevel (logging.WARN)
-
-
-    try:
-        return args, config_from_pyfile (args.profile)
-    except:
-        return args, None

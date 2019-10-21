@@ -22,7 +22,7 @@ from ntg_common import db
 from ntg_common import db_tools
 from ntg_common.db_tools import execute, executemany, warn, info, fix
 from ntg_common.tools import log
-from ntg_common.config import init_cmdline
+from ntg_common.config import args, init_logging, config_from_pyfile
 
 
 def build_parser ():
@@ -38,7 +38,14 @@ def build_parser ():
 
 
 if __name__ == '__main__':
-    args, config = init_cmdline (build_parser ())
+    build_parser ().parse_args (namespace = args)
+    config = config_from_pyfile (args.profile)
+
+    init_logging (
+        args,
+        logging.StreamHandler (), # stderr
+        logging.FileHandler ('load_edits.log')
+    )
 
     parameters = dict ()
     db = db_tools.PostgreSQLEngine (**config)

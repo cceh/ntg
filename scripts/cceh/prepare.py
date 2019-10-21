@@ -61,11 +61,12 @@ from ntg_common import tools
 from ntg_common import db_tools
 from ntg_common.db_tools import execute, executemany, executemany_raw, warn, debug, fix
 from ntg_common.tools import log
-from ntg_common.config import init_cmdline
+from ntg_common.config import args, init_logging, config_from_pyfile
 
 MS_ID_MT = 2
 
 book = None
+
 
 MISFORMED_LABEZ_TEST = """
 SELECT labez, labezsuf, adr2chapter (begadr) AS chapter, count (*) AS count
@@ -1731,8 +1732,14 @@ def build_parser ():
 
 if __name__ == '__main__':
 
-    parser = build_parser ()
-    args, config = init_cmdline (parser)
+    build_parser ().parse_args (namespace = args)
+    config = config_from_pyfile (args.profile)
+
+    init_logging (
+        args,
+        logging.StreamHandler (), # stderr
+        logging.FileHandler ('prepare.log')
+    )
 
     if not re.match ('^[-0-9]*$', args.range):
         print ("Error in range option")
