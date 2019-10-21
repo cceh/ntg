@@ -168,10 +168,13 @@ def tabulate (res):
     for row in rows:
         offset = 0
         for i in cols:
-            lines  = itertools.chain (* [textwrap.wrap (line, width = 78) for line in row[i].splitlines ()])
-            prefix = '|\n' + ' ' * offset
-            for n, l in enumerate (lines):
-                a.append ('{:}| {:<{align}} '.format (prefix if n > 0 else '', l, align = rowlen[i]))
+            if row[i] != '':
+                lines = itertools.chain (* [textwrap.wrap (line, width = 78) for line in row[i].splitlines ()])
+                prefix = '|\n' + ' ' * offset
+                for n, l in enumerate (lines):
+                    a.append ('{:}| {:<{align}} '.format (prefix if n > 0 else '', l, align = rowlen[i]))
+            else:
+                a.append ('| {:<{align}} '.format ('', align = rowlen[i]))
             offset += rowlen[i] + 3
         a.append ('|\n')
     line ()
