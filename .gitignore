@@ -1,16 +1,16 @@
 *~
 \#*\#
 backups/
-pylintgraph.dot
 node_modules/
 jsdoc/
 output/
-papyrus/
 *pg_dump*
-pip-freeze.txt
-server/templates/schemas.xml
-server/instance/*.conf
 instance/*.conf
+server/templates/schemas.xml
+pip-freeze.txt
+pylintgraph.dot
+sauml
+sphinxjs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
