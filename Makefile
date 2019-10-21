@@ -170,7 +170,11 @@ mark_ph2:
 	python3 -m scripts.cceh.prepare -vvv instance/mark_ph2.conf
 	python3 -m scripts.cceh.cbgm    -vvv instance/mark_ph2.conf
 
-define UPLOAD_TEMPLATE =
+DBS := acts_ph4 acts_ph5 john_ph1 john_f1_ph1 mark_ph12 mark_ph2 cl_ph2
+
+
+#################
+define TEMPLATE =
 
 upload_dbs_from_work: upload_$(1)_from_work
 
@@ -187,13 +191,11 @@ upload_$(1)_from_home:
 	$(PGDUMP) --clean --if-exists $(1) | bzip2 > /tmp/$(1).pg_dump.sql.bz2
 	scp /tmp/$(1).pg_dump.sql.bz2 $(NTG_USER)@$(NTG_HOST):~/
 
-endef
+prepare_$(1):
+	python3 -m scripts.cceh.prepare -vvv instance/$(1).conf
 
-DBS := acts_ph4 acts_ph5 john_ph1 john_f1_ph1 mark_ph12 mark_ph2 cl_ph2
-
-$(foreach db,$(DBS),$(eval $(call UPLOAD_TEMPLATE,$(db))))
-
-define LOAD_TEMPLATE =
+cbgm_$(1):
+	python3 -m scripts.cceh.cbgm -vvv instance/$(1).conf
 
 load_$(1):
 	scp $(NTG_PRJ)/backups/saved_edits_$(1)_`date -I`.xml.gz backups/
@@ -201,7 +203,9 @@ load_$(1):
 
 endef
 
-$(foreach db,$(DBS),$(eval $(call LOAD_TEMPLATE,$(db))))
+$(foreach db,$(DBS),$(eval $(call TEMPLATE,$(db))))
+################
+
 
 upload_client: client-production
 	$(RSYNC) --exclude "api.conf.js" $(CLIENT)/build/* $(NTG_CLIENT)/
