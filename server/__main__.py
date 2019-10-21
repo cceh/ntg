@@ -207,7 +207,6 @@ if __name__ == "__main__":
 
     Config.LOG_LEVEL   = args.log_level
     Config.CONFIG_FILE = args.config_file
-
     app = create_app (Config)
 
     run_simple (

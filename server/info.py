@@ -51,8 +51,10 @@ def index ():
             'user_can_write'          : user_can_write (a),
         }
 
+    apps = sorted (instances.values (), key = lambda a: a.config['APPLICATION_NAME'])
+
     return make_json_response ({
-        'instances' : [copy (app) for app in instances.values () if user_can_read (app)],
+        'instances' : [copy (app) for app in apps if user_can_read (app)],
     })
 
 
