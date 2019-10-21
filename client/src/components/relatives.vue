@@ -1,6 +1,7 @@
 <template>
   <div class="vm-relatives"
        @dragover.prevent="on_dragover"
+       @dragenter.prevent="on_dragenter"
        @drop.prevent="on_drop"
        @destroy_relatives_popup="on_destroy_relatives_popup ($event, $event.detail.data)">
 
@@ -34,6 +35,11 @@ export default {
         };
     },
     'methods' : {
+        on_dragenter (event) {
+            if (this.dragging) {
+                this.dragging.vm.on_dragenter (event, this.dragging);
+            }
+        },
         on_dragover (event) {
             if (this.dragging) {
                 this.dragging.vm.on_dragover (event, this.dragging);

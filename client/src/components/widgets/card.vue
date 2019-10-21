@@ -89,7 +89,7 @@ export default {
         /*
          * Use the HTML5 drag and drop protocol to drag the card around.
          *
-         * See also: coherence.vue, widgets/card_caption.vue
+         * See also: relatives.vue, widgets/card_caption.vue
          */
         on_dragstart (event) {
             // bubbled up from card_caption.vue
@@ -121,14 +121,20 @@ export default {
             event.dataTransfer.setDragImage (canvas, 0, 0);
         },
 
+        on_dragenter (event, data) {
+            // reflected by relatives.vue
+            // console.log ('dragenter');
+            this.move (event, data);
+        },
+
         on_dragover (event, data) {
-            // reflected by coherence.vue
+            // reflected by relatives.vue
             // console.log ('dragover');
             this.move (event, data);
         },
 
         on_drop (event, data) {
-            // reflected by coherence.vue
+            // reflected by relatives.vue
             // console.log ('drop');
             this.move (event, data);
         },
