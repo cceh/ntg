@@ -59,6 +59,7 @@ function load_passage (vm, pass_id) {
     }
 
     const wrapper = vm.$el.querySelector ('.wrapper');
+    wrapper.style.height = wrapper.scrollHeight + 'px';
 
     const requests = [
         vm.get ('apparatus.json/' + pass_id),

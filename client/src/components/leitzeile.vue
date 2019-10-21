@@ -1,5 +1,7 @@
 <template>
-  <div class="vm-leitzeile" v-html="leitzeile" />
+  <div class="vm-leitzeile">
+    <div class="wrapper" v-html="leitzeile" />
+  </div>
 </template>
 
 <script>
@@ -9,6 +11,8 @@
  * @component leitzeile
  * @author Marcello Perathoner
  */
+
+import tools from 'tools';
 
 function compute_leitzeile_html (leitzeile_json, current_pass_id) {
     const leitzeile = [];
@@ -55,11 +59,18 @@ export default {
     'methods' : {
         load_leitzeile (new_pass_id) {
             const vm = this;
+            const wrapper = vm.$el.querySelector ('.wrapper');
+            wrapper.style.height = wrapper.scrollHeight + 'px';
+
             const requests = [
                 vm.get ('leitzeile.json/' + new_pass_id),
+                tools.fade_out (wrapper).promise,
             ];
             Promise.all (requests).then ((responses) => {
                 vm.leitzeile = compute_leitzeile_html (responses[0].data.data, new_pass_id);
+                vm.$nextTick (() => {
+                    tools.slide_fade_in (wrapper, true);
+                });
             });
         },
     },
@@ -73,6 +84,10 @@ export default {
 .vm-leitzeile {
     @media print {
         display: none;
+    }
+
+    div.wrapper {
+        overflow: hidden;
     }
 
     margin-bottom: 20px;
