@@ -50,6 +50,7 @@ def auth ():
     """ Check if user is authorized to see what follows. """
 
     if not user_can_read (current_app):
+        read_access = current_app.config['READ_ACCESS']
         raise PrivilegeError ('You don\'t have %s privilege.' % read_access)
 
 
@@ -57,6 +58,7 @@ def edit_auth ():
     """ Check if user is authorized to edit. """
 
     if not user_can_write (current_app):
+        write_access = current_app.config['WRITE_ACCESS']
         raise PrivilegeError ('You don\'t have %s privilege.' % write_access)
 
 
