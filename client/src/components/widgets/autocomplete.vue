@@ -81,15 +81,19 @@ export default {
             const requests = [
                 vm.get ('suggest.json', { 'params' : params }),
             ];
-            Promise.all (requests).then ((responses) => {
+            return Promise.all (requests).then ((responses) => {
                 vm.suggestions = responses[0].data;
                 vm.clip_active_item_index ();
             });
         },
         on_show () {
             const vm = this;
-            vm.active_item_index = 0;
-            vm.load_suggestions (vm.val);
+            vm.load_suggestions (vm.val).then (() => {
+                vm.active_item_index = 0;
+                if (vm.suggestions[0]) {
+                    vm.val = vm.suggestions[0].value.toString ();
+                }
+            });
         },
         on_input () {
             // called every time the input value changes
@@ -130,7 +134,7 @@ export default {
             this.emit_data (this.val);
         },
         focusMenu () {
-            // override base class: we always keep focus on input
+            // this overrides the base class: we always keep the focus on the input
         },
     },
 };
