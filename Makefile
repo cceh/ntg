@@ -112,13 +112,13 @@ import_cl:
 	cat ../dumps/ECM_KB_2.dump | $(MYSQL) -D VG_CL_Ph2
 	python3 -m scripts.cceh.import -vvv instance/cl_ph2.conf
 
-import_john:
+import_john_ph1:
 	-$(MYSQL) -e "DROP DATABASE DCPJohnWithFam"
 	$(MYSQL) -e "CREATE DATABASE DCPJohnWithFam"
 	zcat ../dumps/DCPJohnWithFam-9.sql | $(MYSQL) -D DCPJohnWithFam
 	python3 -m scripts.cceh.import -vvv instance/john_ph1.conf
 
-import_john_f1:
+import_john_f1_ph1:
 	-$(MYSQL) -e "DROP DATABASE DCPJohnFamily1"
 	$(MYSQL) -e "CREATE DATABASE DCPJohnFamily1"
 	cat ../dumps/DCPJohnFamily1.sql | $(MYSQL) -D DCPJohnFamily1
@@ -135,6 +135,12 @@ import_mark_ph2:
 	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph2"
 	cat ../dumps/ECM_Mk_Apparat_6.dump | $(MYSQL) -D ECM_Mark_Ph2
 	python3 -m scripts.cceh.import -vvv instance/mark_ph2.conf
+
+import_mark_ph22:
+	-$(MYSQL) -e "DROP DATABASE ECM_Mark_Ph2"
+	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph2"
+	cat ../dumps/ECM_Mk_Apparat_6.dump | $(MYSQL) -D ECM_Mark_Ph2
+	python3 -m scripts.cceh.import -vvv instance/mark_ph22.conf
 
 import_nestle:
 	-$(MYSQL) -e "DROP DATABASE Nestle29"
@@ -170,7 +176,11 @@ mark_ph2:
 	python3 -m scripts.cceh.prepare -vvv instance/mark_ph2.conf
 	python3 -m scripts.cceh.cbgm    -vvv instance/mark_ph2.conf
 
-DBS := acts_ph4 acts_ph5 john_ph1 john_f1_ph1 mark_ph12 mark_ph2 cl_ph2
+mark_ph22:
+	python3 -m scripts.cceh.prepare -vvv instance/mark_ph22.conf
+	python3 -m scripts.cceh.cbgm    -vvv instance/mark_ph22.conf
+
+DBS := acts_ph3 acts_ph4 acts_ph5 john_ph1 john_f1_ph1 mark_ph1 mark_ph12 mark_ph2 mark_ph22 cl_ph2
 
 
 #################
@@ -201,6 +211,18 @@ load_$(1):
 	scp $(NTG_PRJ)/backups/saved_edits_$(1)_`date -I`.xml.gz backups/
 	zcat backups/saved_edits_$(1)_`date -I`.xml.gz | python3 -m scripts.cceh.load_edits -vvv -i - instance/$(1).conf
 
+backup_custom_$(1):
+	mkdir -p backups/db
+	$(PGDUMP) -Fc $(1) > backups/db/$(1).`date -I`.custom.dump
+
+backup_sql_$(1):
+	mkdir -p backups/db
+	$(PGDUMP) $(1) | gzip > backups/db/$(1).`date -I`.sql.gz
+
+backup_custom_all : backup_custom_$(1)
+
+backup_sql_all : backup_sql_$(1)
+
 endef
 
 $(foreach db,$(DBS),$(eval $(call TEMPLATE,$(db))))
@@ -216,6 +238,12 @@ upload_server:
 
 upload_scripts:
 	$(RSYNCPY) scripts/cceh $(NTG_PRJ)/scripts/
+	$(RSYNC)   Makefile     $(NTG_PRJ)/
+
+get_remote_backups:
+	mkdir -p backups/db
+	$(RSYNC) $(NTG_PRJ)/backups/db backups/
+
 
 diff_affinity_acts:
 	scripts/cceh/sqldiff.sh acts_ph4 "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 94 order by ms_id1, ms_id2" | less

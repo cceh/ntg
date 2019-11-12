@@ -573,7 +573,7 @@ class Passages (Base2):
     fehlvers  = Column (Boolean,       nullable = False, server_default = 'False')
 
     __table_args__ = (
-        ForeignKeyConstraint ([bk_id], ['books.bk_id']),
+        ForeignKeyConstraint ([bk_id], ['books.bk_id'], ondelete = 'CASCADE'),
         UniqueConstraint (passage, name = 'unique_passages_passage'), # needs name
         Index ('ix_passages_passage_gist', passage, postgresql_using = 'gist'),
     )
@@ -659,7 +659,7 @@ class Readings (Base2):
 
     __table_args__ = (
         PrimaryKeyConstraint (pass_id, labez),
-        ForeignKeyConstraint ([pass_id], ['passages.pass_id']),
+        ForeignKeyConstraint ([pass_id], ['passages.pass_id'], ondelete = 'CASCADE'),
     )
 
 
@@ -759,8 +759,8 @@ class Apparatus (Base2):
 
     __table_args__ = (
         PrimaryKeyConstraint (pass_id, ms_id, labez),
-        ForeignKeyConstraint ([ms_id], ['manuscripts.ms_id']),
-        ForeignKeyConstraint ([pass_id, labez], ['readings.pass_id', 'readings.labez']),
+        ForeignKeyConstraint ([ms_id], ['manuscripts.ms_id'], ondelete = 'CASCADE'),
+        ForeignKeyConstraint ([pass_id, labez], ['readings.pass_id', 'readings.labez'], ondelete = 'CASCADE'),
         Index ('ix_apparatus_pass_id_ms_id', pass_id, ms_id, unique = True, postgresql_where = cbgm == True),
         CheckConstraint ('certainty > 0.0 AND certainty <= 1.0'),
         CheckConstraint ('(certainty = 1.0) >= cbgm'),  # cbgm implies 100% certainty
@@ -827,7 +827,8 @@ class Cliques (Cliques_Mixin, Base2):
 
     __table_args__ = (
         PrimaryKeyConstraint ('pass_id', 'labez', 'clique'),
-        ForeignKeyConstraint (['pass_id', 'labez'], ['readings.pass_id', 'readings.labez']),
+        ForeignKeyConstraint (['pass_id', 'labez'], ['readings.pass_id', 'readings.labez'],
+                              ondelete = 'CASCADE'),
     )
 
 
@@ -894,9 +895,12 @@ class MsCliques (MsCliques_Mixin, Base2):
     __table_args__ = (
         # Apparatus can have more than one labez per passage per manuscript
         PrimaryKeyConstraint ('ms_id', 'pass_id', 'labez'),
-        ForeignKeyConstraint (['ms_id', 'pass_id', 'labez'], ['apparatus.ms_id', 'apparatus.pass_id', 'apparatus.labez'],
-                              deferrable = True),
-        ForeignKeyConstraint (['pass_id', 'labez', 'clique'], ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
+        ForeignKeyConstraint (['ms_id', 'pass_id', 'labez'],
+                              ['apparatus.ms_id', 'apparatus.pass_id', 'apparatus.labez'],
+                              deferrable = True, ondelete = 'CASCADE'),
+        ForeignKeyConstraint (['pass_id', 'labez', 'clique'],
+                              ['cliques.pass_id', 'cliques.labez', 'cliques.clique'],
+                              ondelete = 'CASCADE'),
     )
 
 
@@ -913,7 +917,7 @@ class MsCliques_TTS (MsCliques_Mixin, Base2):
     __tablename__ = 'ms_cliques_tts'
 
     __table_args__ = (
-        PrimaryKeyConstraint ('ms_id', 'pass_id', 'sys_period'),
+        PrimaryKeyConstraint ('ms_id', 'pass_id', 'labez', 'sys_period'),
     )
 
 
@@ -977,7 +981,8 @@ class LocStem (LocStem_Mixin, Base2):
         Index ('ix_locstem_unique_original', 'pass_id', unique = True,
                postgresql_where = text ("source_labez = '*'")),
         ForeignKeyConstraint (['pass_id', 'labez', 'clique'],
-                              ['cliques.pass_id', 'cliques.labez', 'cliques.clique']),
+                              ['cliques.pass_id', 'cliques.labez', 'cliques.clique'],
+                              ondelete = 'CASCADE'),
         CheckConstraint ('labez != source_labez', name='check_same_source'),
     )
 
@@ -1016,7 +1021,7 @@ class Notes (Notes_Mixin, Base2):
 
     __table_args__ = (
         PrimaryKeyConstraint ('pass_id'),
-        ForeignKeyConstraint (['pass_id'], ['passages.pass_id']),
+        ForeignKeyConstraint (['pass_id'], ['passages.pass_id'], ondelete = 'CASCADE'),
     )
 
 
@@ -1140,7 +1145,7 @@ class Ranges (Base2):
     passage   = Column (IntRangeType,     nullable = False)
 
     __table_args__ = (
-        ForeignKeyConstraint ([bk_id], ['books.bk_id']),
+        ForeignKeyConstraint ([bk_id], ['books.bk_id'], ondelete = 'CASCADE'),
         Index ('ix_ranges_passage_gist', passage, postgresql_using = 'gist'),
     )
 
@@ -1168,8 +1173,8 @@ class Ms_Ranges (Base2):
 
     __table_args__ = (
         PrimaryKeyConstraint (rg_id, ms_id),
-        ForeignKeyConstraint ([ms_id], ['manuscripts.ms_id']),
-        ForeignKeyConstraint ([rg_id], ['ranges.rg_id']),
+        ForeignKeyConstraint ([ms_id], ['manuscripts.ms_id'], ondelete = 'CASCADE'),
+        ForeignKeyConstraint ([rg_id], ['ranges.rg_id'], ondelete = 'CASCADE'),
     )
 
 
@@ -1235,8 +1240,12 @@ class Affinity (Base2):
     __table_args__ = (
         PrimaryKeyConstraint (rg_id, ms_id1, ms_id2),
         Index ('ix_affinity_rg_id_ms_id2', rg_id, ms_id2),
-        ForeignKeyConstraint ([rg_id, ms_id1], ['ms_ranges.rg_id', 'ms_ranges.ms_id']),
-        ForeignKeyConstraint ([rg_id, ms_id2], ['ms_ranges.rg_id', 'ms_ranges.ms_id']),
+        ForeignKeyConstraint ([rg_id, ms_id1],
+                              ['ms_ranges.rg_id', 'ms_ranges.ms_id'],
+                              ondelete = 'CASCADE'),
+        ForeignKeyConstraint ([rg_id, ms_id2],
+                              ['ms_ranges.rg_id', 'ms_ranges.ms_id'],
+                              ondelete = 'CASCADE'),
     )
 
 
