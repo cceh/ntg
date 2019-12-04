@@ -159,13 +159,18 @@ def stemma_edit (passage_or_id):
                 raise EditError ('The new graph is not connected.')
 
         elif action == 'split':
-            # get the next free clique
+            # Get the lowest free integer for the new clique. See: #122
             res = execute (conn, """
-            SELECT max (clique)
+            SELECT clique
             FROM  cliques
             WHERE pass_id = :pass_id AND labez = :labez_old
             """, dict (parameters, **params))
-            params['clique_next'] = str (int (res.fetchone ()[0]) + 1)
+
+            taken = set ([int (r[0]) for r in res])
+            n = 1
+            while n in taken:
+                n += 1
+            params['clique_next'] = str (n)
 
             # insert into cliques table
             res = execute (conn, """
