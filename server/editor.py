@@ -17,7 +17,7 @@ from ntg_common import db_tools
 from ntg_common.exceptions import EditError, PrivilegeError
 from ntg_common.db_tools import execute
 
-from login import auth, edit_auth
+from login import auth, private_auth, edit_auth
 from helpers import parameters, Passage, make_json_response, make_text_response
 
 # FIXME: this is too lax but we need to accomodate one spurious 'z' reading
@@ -235,16 +235,19 @@ def stemma_edit (passage_or_id):
 
 @bp.route ('/notes.txt/<passage_or_id>', methods = ['GET', 'PUT'])
 def notes_txt (passage_or_id):
-    """Get the editor notes for a passage
+    """Read or write the editor notes for a passage
 
     """
 
-    edit_auth ()
+    private_auth ()
 
     with current_app.config.dba.engine.begin () as conn:
         passage = Passage (conn, passage_or_id)
 
         if request.method == 'PUT':
+
+            edit_auth ()
+
             res = execute (conn, """
             SET LOCAL ntg.user_id = :user_id;
             """, dict (parameters, user_id = flask_login.current_user.id))
@@ -261,6 +264,7 @@ def notes_txt (passage_or_id):
                        note = request.get_json ()['remarks']))
 
             return make_json_response (message = 'Note saved.')
+
         res = execute (conn, """
         SELECT note
         FROM notes
@@ -276,7 +280,7 @@ def notes_txt (passage_or_id):
 def notes_json (range_id):
     """Endpoint.  Get a list of all editor notes."""
 
-    edit_auth ()
+    private_auth ()
 
     with current_app.config.dba.engine.begin () as conn:
         res = execute (conn, """

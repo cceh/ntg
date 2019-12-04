@@ -38,7 +38,7 @@
 
       <!-- Notes -->
 
-      <card v-if="$store.getters.can_write" class="card-notes card-wide" :visible="false">
+      <card v-if="$store.getters.can_read_private" class="card-notes card-wide" :visible="false">
         <card-caption>
           Notes
         </card-caption>

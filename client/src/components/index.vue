@@ -5,7 +5,7 @@
         <router-link class="biglink" :to="{ 'name' : 'coherence' }">Coherence and Textual Flow</router-link>
         <router-link class="biglink" :to="{ 'name' : 'comparison' }">Comparison of Witnesses</router-link>
         <router-link class="biglink" :to="{ 'name' : 'find_relatives' }">Find Relatives</router-link>
-        <div v-if="$store.getters.can_write">
+        <div v-if="$store.getters.can_read_private">
           <router-link class="biglink" :to="{ 'name' : 'notes_list' }">List of Notes</router-link>
           <router-link class="biglink" :to="{ 'name' : 'opt_stemma' }">Optimal Substemma</router-link>
           <router-link class="biglink" :to="{ 'name' : 'set_cover' }">Minimum Set Cover</router-link>

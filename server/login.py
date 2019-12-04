@@ -35,6 +35,17 @@ def user_can_read (app):
     return flask_login.current_user.has_role (read_access)
 
 
+def user_can_read_private (app):
+    """ Return True if user has read access. """
+
+    read_access_private = app.config['READ_ACCESS_PRIVATE']
+
+    if read_access_private == 'public':
+        return True
+
+    return flask_login.current_user.has_role (read_access_private)
+
+
 def user_can_write (app):
     """ Return True if user has write access. """
 
@@ -52,6 +63,14 @@ def auth ():
     if not user_can_read (current_app):
         read_access = current_app.config['READ_ACCESS']
         raise PrivilegeError ('You don\'t have %s privilege.' % read_access)
+
+
+def private_auth ():
+    """ Check if user is authorized to see what follows. """
+
+    if not user_can_read_private (current_app):
+        read_access_private = current_app.config['READ_ACCESS_PRIVATE']
+        raise PrivilegeError ('You don\'t have %s privilege.' % read_access_private)
 
 
 def edit_auth ():

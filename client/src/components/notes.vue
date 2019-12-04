@@ -9,7 +9,7 @@
       </toolbar>
     </div>
 
-    <textarea v-model="current_text" />
+    <textarea v-model="current_text" :readonly="!$store.getters.can_write" />
 
     <alert ref="alert" />
   </div>
@@ -87,7 +87,7 @@ export default {
         },
         can_save () {
             const vm = this;
-            if (vm.current_text !== vm.original_text) {
+            if (vm.$store.getters.can_write && vm.current_text !== vm.original_text) {
                 vm.toolbar.save = () => this.on_save ();
             } else {
                 vm.toolbar.save = false;

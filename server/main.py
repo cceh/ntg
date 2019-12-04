@@ -69,12 +69,13 @@ def application_json ():
     conf = current_app.config
 
     return make_json_response ({
-        'name'         : conf['APPLICATION_NAME'],
-        'root'         : conf['APPLICATION_ROOT'],
-        'read_access'  : conf['READ_ACCESS'],
-        'write_access' : conf['WRITE_ACCESS'],
-        'start'        : conf['SERVER_START_TIME'],
-        'rg_id_all'    : conf.rg_id_all,
+        'name'                : conf['APPLICATION_NAME'],
+        'root'                : conf['APPLICATION_ROOT'],
+        'read_access'         : conf['READ_ACCESS'],
+        'read_access_private' : conf['READ_ACCESS_PRIVATE'],
+        'write_access'        : conf['WRITE_ACCESS'],
+        'start'               : conf['SERVER_START_TIME'],
+        'rg_id_all'           : conf.rg_id_all,
     })
 
 

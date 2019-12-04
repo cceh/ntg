@@ -147,9 +147,10 @@ const router = new VueRouter ({
 });
 
 const default_application = {
-    'name'         : '',
-    'read_access'  : 'public',
-    'write_access' : 'nobody',
+    'name'                : '',
+    'read_access'         : 'public',
+    'read_access_private' : 'nobody',
+    'write_access'        : 'nobody',
 };
 
 const store = new Vuex.Store ({
@@ -208,6 +209,9 @@ const store = new Vuex.Store ({
         },
         'can_read' : state => {
             return state.current_user.roles.includes (state.current_application.read_access);
+        },
+        'can_read_private' : state => {
+            return state.current_user.roles.includes (state.current_application.read_access_private);
         },
         'can_write' : state => {
             return state.current_user.roles.includes (state.current_application.write_access);

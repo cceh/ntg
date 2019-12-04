@@ -1,7 +1,7 @@
 <template>
   <div class="vm-notes-list want_hashchange" @hashchange="on_hashchange">
 
-    <div v-if="$store.getters.can_write" class="container bs-docs-container">
+    <div v-if="$store.getters.can_read_private" class="container bs-docs-container">
 
       <card>
         <card-caption :slidable="false">

@@ -51,19 +51,20 @@ mail = flask_mail.Mail ()
 class Config ():
     """ Default configuration object. """
 
-    APPLICATION_HOST  = 'localhost'
-    APPLICATION_PORT  = 5000
+    APPLICATION_HOST    = 'localhost'
+    APPLICATION_PORT    = 5000
     APPLICATION_DESCRIPTION = ''
-    CONFIG_FILE       = '_global.conf' # default relative to /instance
-    STATIC_FOLDER     = 'static'
-    STATIC_URL_PATH   = 'static'
-    AFTER_LOGIN_URL   = None
-    USE_RELOADER      = False
-    USE_DEBUGGER      = False
-    SERVER_START_TIME = str (int (time.time ())) # for cache busting
-    READ_ACCESS       = 'none'
-    WRITE_ACCESS      = 'none'
-    CORS_ALLOW_ORIGIN = '*'
+    CONFIG_FILE         = '_global.conf' # default relative to /instance
+    STATIC_FOLDER       = 'static'
+    STATIC_URL_PATH     = 'static'
+    AFTER_LOGIN_URL     = None
+    USE_RELOADER        = False
+    USE_DEBUGGER        = False
+    SERVER_START_TIME   = str (int (time.time ())) # for cache busting
+    READ_ACCESS         = 'none'
+    READ_ACCESS_PRIVATE = 'none'
+    WRITE_ACCESS        = 'none'
+    CORS_ALLOW_ORIGIN   = '*'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
