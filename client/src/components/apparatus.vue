@@ -30,6 +30,8 @@
 </template>
 
 <script>
+/** @module client/apparatus */
+
 /**
  * This module displays the apparatus table.  It retrieves the apparatus data in
  * JSON format and builds a list of readings and of the manuscripts that attest
@@ -49,7 +51,6 @@ import tools            from 'tools';
 /**
  * Load a new passage.
  *
- * @function
  * @param {Number} pass_id - The passage to load.
  * @returns {Promise} Promise, resolved when the passage has loaded.
  */
@@ -96,17 +97,21 @@ function load_passage (vm, pass_id) {
         ));
 
         const mss = manuscripts.map (ms => {
-            ms.zw      = (ms.certainty < 1.0) ? 'zw ' : '';
-            ms.reading = ms.lesart || readings.get (ms.labez);
-            ms.lesart  = ms.lesart || '';
-            ms.group   = ms.zw + grouper (ms);
+            ms.zw       = (ms.certainty < 1.0) ? 'zw ' : '';
+            ms.reading  = ms.lesart || readings.get (ms.labez);
+            ms.lesart   = ms.lesart || '';
+            ms.labezsuf = ms.labezsuf || ' ';
+            ms.group    = ms.zw + grouper (ms);
+            // add labezsuf so we don't take the lesart from an *f or *o reading
+            // if a correct reading is also present. See: #125
+            ms.sortby  = ms.zw + grouper (ms) + ms.labezsuf;
             ms.caption = ms.zw + caption (ms);
             ms.labez   = ms.zw + ms.labez;
             return ms;
         });
 
         // group manuscripts and loop over groups
-        vm.groups = groupBy (sortBy (mss, 'group'), 'group');
+        vm.groups = groupBy (sortBy (mss, 'sortby'), 'group');
 
         vm.$nextTick (() => {
             tools.slide_fade_in (wrapper, true);
