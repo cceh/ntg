@@ -1,5 +1,5 @@
 <template>
-  <form class="vm-navigator form-inline" @submit.prevent="on_submit">
+  <form class="vm-navigator form-inline" autocomplete="off" @submit.prevent="on_submit">
 
     <div class="btn-group btn-group-sm mr-2">
       <button type="button" data="-1" class="btn btn-primary"
