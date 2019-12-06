@@ -3,12 +3,13 @@
        @hashchange="on_hashchange"
        @epoch="on_epoch"
        @goto_attestation="on_goto_attestation"
+       @coherence_in_attestations_variant_changed="on_coherence_in_attestations_variant_changed"
   >
     <div class="container bs-docs-container">
       <!-- the parent for all floating cards must be at the top of the page so
            the cards will not move around on page resizes etc. this element will
            only contain absolute-positioned stuff and thus has a height of 0 -->
-      <relatives :pass_id="pass_id" />
+      <relatives :pass_id="pass_id" ref="relatives" />
 
       <div class="btn-toolbar">
         <navigator v-model="pass_id" class="mb-3" />
@@ -209,6 +210,9 @@ export default {
             document.querySelector ('html').velocity ({
                 'scrollTop' : top,
             });
+        },
+        on_coherence_in_attestations_variant_changed (event) {
+            this.$refs.relatives.on_destroy_relatives_popup (event, 0); // Fixes #84
         },
     },
     mounted () {

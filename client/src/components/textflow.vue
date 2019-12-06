@@ -182,6 +182,10 @@ export default {
             },
             'deep' : true,
         },
+        'toolbar.labez' : function () {
+            // Fixes #84
+            this.$trigger ('coherence_in_attestations_variant_changed', null);
+        },
     },
     'methods' : {
         /**

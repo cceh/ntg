@@ -14,11 +14,13 @@
 </template>
 
 <script>
+/** @module components/relatives */
 
 import card            from 'widgets/card.vue';
 import relatives_table from 'relatives_table.vue';
 
 
+/** @lends components/relatives */
 export default {
     'props' : {
         'pass_id' : Number,
@@ -56,8 +58,6 @@ export default {
          *
          * We have to create these dynamically because there may be many open at once.
          *
-         * @function create_relatives_popup
-         *
          * @param {integer} ms_id - The manuscript id
          * @param {HTMLElement} target - An element. The popup will be positioned relative to this element.
          */
@@ -82,6 +82,8 @@ export default {
 
         // install event handlers
 
+        // create a popup if the user clicks on an element that represents a
+        // manuscript
         document.addEventListener ('click', (event) => {
             const ms_id = event.target.getAttribute ('data-ms-id')
                   // the data is on SVG g.node not on circle
