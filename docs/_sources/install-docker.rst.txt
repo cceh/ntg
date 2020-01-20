@@ -5,14 +5,11 @@
 ==========================
 
 This chapter describes how to install the CBGM installation on your own PC with
-the help of Docker.  `Docker <https://www.docker.com/>`_ can run our
+the help of `Docker <https://www.docker.com/>`_. Docker can run our
 application on Linux, Mac, and Windows.
 
-
-We plan to offer various Docker images for scholars who want to run the CBGM
-application on their own machines.
-
-Our images are preloaded with data and the data are editable.
+We plan to offer various Docker images preloaded with data.  The data is
+editable so you can build your own scenarios.
 
 .. warning::
 
@@ -59,8 +56,8 @@ Install
 The Docker service is now installed.
 
 
-Running the Docker service
-==========================
+Running the web application
+===========================
 
 To use the application point your browser to http://localhost:5000/acts/ph4/
 while the Docker service is running.  To run the Docker service change into the
@@ -77,8 +74,8 @@ and to stop it again say:
    $ docker-compose stop
 
 
-CBGM
-====
+Running the CBGM
+================
 
 To run the CBGM say:
 

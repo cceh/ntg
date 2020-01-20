@@ -100,8 +100,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#install">Install</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-docker-service">Running the Docker service</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install-docker.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-web-application">Running the web application</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-cbgm">Running the CBGM</a></li>
 </ul>
 </li>
 </ul>
@@ -135,27 +135,43 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-main">The Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-app">The Application Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-coherence">The Coherence Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison">The Comparison Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-page_header">The Page Header Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-navigator">The Navigator Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-apparatus">The Apparatus Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-local_stemma">The Local Stemma Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#the-notes-component">The Notes Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives">The Relatives Popup Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_table">The Comparison Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card">The Card Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card_caption">The Card Caption Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-toolbar">The Toolbar Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_common">Various functions for D3</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-tools">Various Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-app">client/app</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-apparatus">client/apparatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-coherence">client/coherence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison">client/comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-details-table">client/comparison_details_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-table">client/comparison_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-chord-layout">client/d3_chord_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-common">client/d3_common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-stemma-layout">client/d3_stemma_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-find-relatives">client/find_relatives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-flash-messages">client/flash_messages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-leitzeile">client/leitzeile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-local-stemma">client/local_stemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-notes">client/notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-notes-list">client/notes_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-optimal-substemma">client/optimal_substemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-optimal-substemma-details">client/optimal_substemma_details</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-page-header">client/page_header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-project-list">client/project_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-relatives-metrics">client/relatives_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-relatives-table">client/relatives_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-set-cover">client/set_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-table-sort-mixin">client/table_sort_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-table-toggle-mixin">client/table_toggle_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-textflow">client/textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-tools">client/tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-autocomplete">client/widgets/autocomplete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-button-group">client/widgets/button_group</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-card">client/widgets/card</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-card-caption">client/widgets/card_caption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-connectivity">client/widgets/connectivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-context-menu">client/widgets/context_menu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-dropdown-mixin">client/widgets/dropdown_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-labezator">client/widgets/labezator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-navigator">client/widgets/navigator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-range">client/widgets/range</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-toolbar">client/widgets/toolbar</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
@@ -264,45 +280,45 @@
 <p>This module contains functions for database access.</p>
 <dl class="class">
 <dt id="ntg_common.db_tools.MySQLEngine">
-<em class="property">class </em><code class="descname">MySQLEngine</code><span class="sig-paren">(</span><em>fn=('/etc/my.cnf'</em>, <em>'/etc/mysql/my.cnf'</em>, <em>'~/.my.cnf')</em>, <em>group=('mysql'</em>, <em>'client'</em>, <em>'client-server'</em>, <em>'client-mariadb')</em>, <em>db=''</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.MySQLEngine" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">MySQLEngine</code><span class="sig-paren">(</span><em class="sig-param">fn=('/etc/my.cnf'</em>, <em class="sig-param">'/etc/mysql/my.cnf'</em>, <em class="sig-param">'~/.my.cnf')</em>, <em class="sig-param">group=('mysql'</em>, <em class="sig-param">'client'</em>, <em class="sig-param">'client-server'</em>, <em class="sig-param">'client-mariadb')</em>, <em class="sig-param">db=''</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.MySQLEngine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Database Interface</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="ntg_common.db_tools.PostgreSQLEngine">
-<em class="property">class </em><code class="descname">PostgreSQLEngine</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">PostgreSQLEngine</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine" title="Permalink to this definition">¶</a></dt>
 <dd><p>PostgreSQL Database Interface</p>
 <dl class="method">
 <dt id="ntg_common.db_tools.PostgreSQLEngine.get_connection_params">
-<code class="descname">get_connection_params</code><span class="sig-paren">(</span><em>args={}</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.get_connection_params" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_connection_params</code><span class="sig-paren">(</span><em class="sig-param">args={}</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.get_connection_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get sqlalchemy connection parameters.</p>
 <p>Try to get the connection parameters in turn from these sources:</p>
 <ol class="arabic simple">
-<li>get host, port, database, user from args</li>
-<li>get PGHOST, PGPORT, PGDATABASE, PGUSER from args</li>
-<li>get PGHOST, PGPORT, PGDATABASE, PGUSER from environment</li>
-<li>use defaults</li>
+<li><p>get host, port, database, user from args</p></li>
+<li><p>get PGHOST, PGPORT, PGDATABASE, PGUSER from args</p></li>
+<li><p>get PGHOST, PGPORT, PGDATABASE, PGUSER from environment</p></li>
+<li><p>use defaults</p></li>
 </ol>
 <p>N.B. The postgres client library automatically reads the password from
 the file <code class="file docutils literal notranslate"><span class="pre">~/.pgpass</span></code>.  It should be configured there.</p>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="method">
 <dt id="ntg_common.db_tools.PostgreSQLEngine.receive_checkout">
-<em class="property">static </em><code class="descname">receive_checkout</code><span class="sig-paren">(</span><em>dbapi_connection</em>, <em>_connection_record</em>, <em>_connection_proxy</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.receive_checkout" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">receive_checkout</code><span class="sig-paren">(</span><em class="sig-param">dbapi_connection</em>, <em class="sig-param">_connection_record</em>, <em class="sig-param">_connection_proxy</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.receive_checkout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set a default for the postgres variable ntg.user_id that is used by
 <a class="reference internal" href="database.html#tts"><span class="std std-ref">Transaction-Time State Tables</span></a> tables.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ntg_common.db_tools.PostgreSQLEngine.vacuum">
-<code class="descname">vacuum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.vacuum" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">vacuum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.vacuum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Vacuum the database.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="ntg_common.db_tools.PostgreSQLEngine.wait_for_server">
-<code class="descname">wait_for_server</code><span class="sig-paren">(</span><em>retries=60</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.wait_for_server" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wait_for_server</code><span class="sig-paren">(</span><em class="sig-param">retries=60</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.wait_for_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wait for the Postgres server to come up.</p>
 </dd></dl>
 
@@ -310,31 +326,27 @@ the file <code class="file docutils literal notranslate"><span class="pre">~/.pg
 
 <dl class="function">
 <dt id="ntg_common.db_tools.fix">
-<code class="descname">fix</code><span class="sig-paren">(</span><em>conn</em>, <em>msg</em>, <em>check_sql</em>, <em>fix_sql</em>, <em>parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.fix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fix</code><span class="sig-paren">(</span><em class="sig-param">conn</em>, <em class="sig-param">msg</em>, <em class="sig-param">check_sql</em>, <em class="sig-param">fix_sql</em>, <em class="sig-param">parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.fix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check and eventually fix errors.</p>
 <p>Executes the check_sql statement to check for a possible error conditions
 and, if rows emerge, prints a warning and executes the fix_sql statement.
 The fix_sql statement should be written as to fix the errors reported by the
 check_sql statement.  Finally it executes the check_sql statement again and
 reports an error if the error condition still exists.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>msg</strong> (<em>str</em>) – The warning / error message</li>
-<li><strong>check_sql</strong> (<em>str</em>) – The sql statement that checks for the error condition.</li>
-<li><strong>fix_sql</strong> (<em>str</em>) – The sql statement that fixes the error condition.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<em>str</em>) – The warning / error message</p></li>
+<li><p><strong>check_sql</strong> (<em>str</em>) – The sql statement that checks for the error condition.</p></li>
+<li><p><strong>fix_sql</strong> (<em>str</em>) – The sql statement that fixes the error condition.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="ntg_common.db_tools.init_default_cliques">
-<code class="descname">init_default_cliques</code><span class="sig-paren">(</span><em>conn</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_cliques" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_default_cliques</code><span class="sig-paren">(</span><em class="sig-param">conn</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_cliques" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a default cliques table.</p>
 <p>In a default cliques table there is a default clique ‘1’ for every reading
 in the readings table.</p>
@@ -342,7 +354,7 @@ in the readings table.</p>
 
 <dl class="function">
 <dt id="ntg_common.db_tools.init_default_locstem">
-<code class="descname">init_default_locstem</code><span class="sig-paren">(</span><em>conn</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_locstem" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_default_locstem</code><span class="sig-paren">(</span><em class="sig-param">conn</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_locstem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a default locstem table.</p>
 <p>In a default LocStemEd, labez ‘a’ is the original reading and every other
 reading depends on labez ‘a’, except in a Fehlvers, where ‘b’ is of unknown
@@ -351,7 +363,7 @@ origin and every other reading depends on ‘b’.</p>
 
 <dl class="function">
 <dt id="ntg_common.db_tools.init_default_ms_cliques">
-<code class="descname">init_default_ms_cliques</code><span class="sig-paren">(</span><em>conn</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_ms_cliques" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_default_ms_cliques</code><span class="sig-paren">(</span><em class="sig-param">conn</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_ms_cliques" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a default ms_cliques table.</p>
 <p>In a default ms_cliques table there is a default clique ‘1’ for every reading
 in the apparatus table.</p>
@@ -359,22 +371,19 @@ in the apparatus table.</p>
 
 <dl class="function">
 <dt id="ntg_common.db_tools.local_stemma_to_nx">
-<code class="descname">local_stemma_to_nx</code><span class="sig-paren">(</span><em>conn</em>, <em>pass_id</em>, <em>add_isolated_roots=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.local_stemma_to_nx" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">local_stemma_to_nx</code><span class="sig-paren">(</span><em class="sig-param">conn</em>, <em class="sig-param">pass_id</em>, <em class="sig-param">add_isolated_roots=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.local_stemma_to_nx" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a passage from the database into an nx Graph.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>add_isolated_roots</strong> (<em>bool</em>) – Add an ‘*’ or ‘?’ node even if they are
-isolated.  Needed in edit mode.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>add_isolated_roots</strong> (<em>bool</em>) – Add an ‘*’ or ‘?’ node even if they are
+isolated.  Needed in edit mode.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="ntg_common.db_tools.tabulate">
-<code class="descname">tabulate</code><span class="sig-paren">(</span><em>res</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.tabulate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">tabulate</code><span class="sig-paren">(</span><em class="sig-param">res</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.tabulate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Format and output a rowset</p>
 <p>Uses an output format similar to the one produced by the mysql commandline
 utility.</p>
@@ -386,13 +395,13 @@ utility.</p>
 <p>This module contains some useful functions.</p>
 <dl class="data">
 <dt id="ntg_common.tools.BOOKS">
-<code class="descname">BOOKS</code><em class="property"> = [(1, 'Mt', 'Matthew', 28), (2, 'Mc', 'Mark', 16), (3, 'L', 'Luke', 24), (4, 'J', 'John', 21), (5, 'Acts', 'Acts', 28), (6, 'R', 'Romans', 16), (7, '1K', '1 Corinthians', 16), (8, '2K', '2 Corinthians', 13), (9, 'G', 'Galatians', 6), (10, 'E', 'Ephesians', 6), (11, 'Ph', 'Philippians', 4), (12, 'Kol', 'Colossians', 4), (13, '1Th', '1 Thessalonians', 5), (14, '2Th', '2 Thessalonians', 3), (15, '1T', '1 Timothy', 6), (16, '2T', '2 Timothy', 4), (17, 'Tt', 'Titus', 3), (18, 'Phm', 'Philemon', 1), (19, 'H', 'Hebrews', 13), (20, 'Jc', 'James', 5), (21, '1P', '1 Peter', 5), (22, '2P', '2 Peter', 3), (23, '1J', '1 John', 5), (24, '2J', '2 John', 1), (25, '3J', '3 John', 1), (26, 'Jd', 'Jude', 1), (27, 'Ap', 'Revelation', 22)]</em><a class="headerlink" href="#ntg_common.tools.BOOKS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">BOOKS</code><em class="property"> = [(1, 'Mt', 'Matthew', 28), (2, 'Mc', 'Mark', 16), (3, 'L', 'Luke', 24), (4, 'J', 'John', 21), (5, 'Acts', 'Acts', 28), (6, 'R', 'Romans', 16), (7, '1K', '1 Corinthians', 16), (8, '2K', '2 Corinthians', 13), (9, 'G', 'Galatians', 6), (10, 'E', 'Ephesians', 6), (11, 'Ph', 'Philippians', 4), (12, 'Kol', 'Colossians', 4), (13, '1Th', '1 Thessalonians', 5), (14, '2Th', '2 Thessalonians', 3), (15, '1T', '1 Timothy', 6), (16, '2T', '2 Timothy', 4), (17, 'Tt', 'Titus', 3), (18, 'Phm', 'Philemon', 1), (19, 'H', 'Hebrews', 13), (20, 'Jc', 'James', 5), (21, '1P', '1 Peter', 5), (22, '2P', '2 Peter', 3), (23, '1J', '1 John', 5), (24, '2J', '2 John', 1), (25, '3J', '3 John', 1), (26, 'Jd', 'Jude', 1), (27, 'Ap', 'Revelation', 22)]</em><a class="headerlink" href="#ntg_common.tools.BOOKS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Titles of the NT books</p>
 </dd></dl>
 
 <dl class="data">
 <dt id="ntg_common.tools.BYZ_HSNR_ACTS">
-<code class="descname">BYZ_HSNR_ACTS</code><em class="property"> = '(300010, 300180, 300350, 303300, 303980, 304240, 312410)'</em><a class="headerlink" href="#ntg_common.tools.BYZ_HSNR_ACTS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">BYZ_HSNR_ACTS</code><em class="property"> = '(300010, 300180, 300350, 303300, 303980, 304240, 312410)'</em><a class="headerlink" href="#ntg_common.tools.BYZ_HSNR_ACTS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Manuscripts attesting the Byzantine Text.</p>
 <p>We use these manuscripts as templates to establish the Byzantine Text according
 to our rules.</p>
@@ -400,7 +409,7 @@ to our rules.</p>
 
 <dl class="data">
 <dt id="ntg_common.tools.FEHLVERSE">
-<code class="descname">FEHLVERSE</code><em class="property"> = '\n    (\n      begadr &gt;= 20716000 and endadr &lt;= 20716999 or\n      begadr &gt;= 20944000 and endadr &lt;= 20944999 or\n      begadr &gt;= 20946000 and endadr &lt;= 20946999 or\n      begadr &gt;= 21126000 and endadr &lt;= 21126999 or\n      begadr &gt;= 21528000 and endadr &lt;= 21528999 or\n      begadr &gt;= 21609000 and endadr &lt;= 21620999 or\n      begadr &gt;= 21608068 and endadr &lt;= 21620999 or\n\n      begadr &gt;= 50837002 and endadr &lt;= 50837047 or\n      begadr &gt;= 51534002 and endadr &lt;= 51534013 or\n      begadr &gt;= 52406020 and endadr &lt;= 52408015 or\n      begadr &gt;= 52829002 and endadr &lt;= 52829025\n    )\n    '</em><a class="headerlink" href="#ntg_common.tools.FEHLVERSE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">FEHLVERSE</code><em class="property"> = '\n    (\n      begadr &gt;= 20716000 and endadr &lt;= 20716999 or\n      begadr &gt;= 20944000 and endadr &lt;= 20944999 or\n      begadr &gt;= 20946000 and endadr &lt;= 20946999 or\n      begadr &gt;= 21126000 and endadr &lt;= 21126999 or\n      begadr &gt;= 21528000 and endadr &lt;= 21528999 or\n      begadr &gt;= 21609000 and endadr &lt;= 21620999 or\n      begadr &gt;= 21608068 and endadr &lt;= 21620999 or\n\n      begadr &gt;= 50837002 and endadr &lt;= 50837047 or\n      begadr &gt;= 51534002 and endadr &lt;= 51534013 or\n      begadr &gt;= 52406020 and endadr &lt;= 52408015 or\n      begadr &gt;= 52829002 and endadr &lt;= 52829025\n    )\n    '</em><a class="headerlink" href="#ntg_common.tools.FEHLVERSE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verses added in later times.</p>
 <p>These verses were added to the NT in later times. Because they are not original
 they are not included in the text of manuscript ‘A’.</p>
@@ -408,14 +417,14 @@ they are not included in the text of manuscript ‘A’.</p>
 
 <dl class="function">
 <dt id="ntg_common.tools.graphviz_layout">
-<code class="descname">graphviz_layout</code><span class="sig-paren">(</span><em>dot</em>, <em>format='dot'</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.graphviz_layout" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">graphviz_layout</code><span class="sig-paren">(</span><em class="sig-param">dot</em>, <em class="sig-param">format='dot'</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.graphviz_layout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call the GraphViz dot program to generate an image but mostly to precompute
 the graph layout.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="ntg_common.tools.log">
-<code class="descname">log</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>*aargs</em>, <em>**_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.log" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">log</code><span class="sig-paren">(</span><em class="sig-param">level</em>, <em class="sig-param">msg</em>, <em class="sig-param">*aargs</em>, <em class="sig-param">**_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.log" title="Permalink to this definition">¶</a></dt>
 <dd><p>Low level log function</p>
 </dd></dl>
 
@@ -440,7 +449,7 @@ the graph layout.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016-18 CCeH - Licensed under the GNU GPL v3 or later
+        &copy; Copyright 2016-19 CCeH - Licensed under the GNU GPL v3 or later
 
     </p>
   </div>

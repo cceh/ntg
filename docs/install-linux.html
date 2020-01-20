@@ -101,8 +101,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#install">Install</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-docker-service">Running the Docker service</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install-docker.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-web-application">Running the web application</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-cbgm">Running the CBGM</a></li>
 </ul>
 </li>
 </ul>
@@ -136,27 +136,43 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-main">The Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-app">The Application Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-coherence">The Coherence Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison">The Comparison Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-page_header">The Page Header Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-navigator">The Navigator Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-apparatus">The Apparatus Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-local_stemma">The Local Stemma Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#the-notes-component">The Notes Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives">The Relatives Popup Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_table">The Comparison Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card">The Card Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card_caption">The Card Caption Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-toolbar">The Toolbar Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_common">Various functions for D3</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-tools">Various Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-app">client/app</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-apparatus">client/apparatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-coherence">client/coherence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison">client/comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-details-table">client/comparison_details_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-table">client/comparison_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-chord-layout">client/d3_chord_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-common">client/d3_common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-stemma-layout">client/d3_stemma_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-find-relatives">client/find_relatives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-flash-messages">client/flash_messages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-leitzeile">client/leitzeile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-local-stemma">client/local_stemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-notes">client/notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-notes-list">client/notes_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-optimal-substemma">client/optimal_substemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-optimal-substemma-details">client/optimal_substemma_details</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-page-header">client/page_header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-project-list">client/project_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-relatives-metrics">client/relatives_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-relatives-table">client/relatives_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-set-cover">client/set_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-table-sort-mixin">client/table_sort_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-table-toggle-mixin">client/table_toggle_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-textflow">client/textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-tools">client/tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-autocomplete">client/widgets/autocomplete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-button-group">client/widgets/button_group</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-card">client/widgets/card</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-card-caption">client/widgets/card_caption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-connectivity">client/widgets/connectivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-context-menu">client/widgets/context_menu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-dropdown-mixin">client/widgets/dropdown_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-labezator">client/widgets/labezator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-navigator">client/widgets/navigator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-range">client/widgets/range</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-toolbar">client/widgets/toolbar</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
@@ -267,18 +283,18 @@ If you want to run the application on a desktop machine an
 <h2>Install Prerequisites<a class="headerlink" href="#install-prerequisites" title="Permalink to this headline">¶</a></h2>
 <p>The application should run as a user that has no special privileges.</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Do not run the application as a user with administrative rights.</p>
+<p class="admonition-title">Warning</p>
+<p>Do not run the application as a user with administrative rights.</p>
 </div>
 <p>As a user with admin privileges do:</p>
 <ol class="arabic">
-<li><p class="first">Create user <em>ntg</em></p>
+<li><p>Create user <em>ntg</em></p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo useradd -m -d /home/ntg -s /bin/bash -U ntg
 sudo passwd ntg
 </pre></div>
 </div>
 </li>
-<li><p class="first">Install the software:</p>
+<li><p>Install the software:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo apt-get install git make
 sudo -u ntg bash
 
@@ -301,7 +317,7 @@ make install-prerequisites
 <div class="section" id="mysql-database">
 <h3>MySQL database<a class="headerlink" href="#mysql-database" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic">
-<li><p class="first">Edit (or create) your <code class="file docutils literal notranslate"><span class="pre">~/.my.cnf.ntg</span></code> and add this section:</p>
+<li><p>Edit (or create) your <code class="file docutils literal notranslate"><span class="pre">~/.my.cnf.ntg</span></code> and add this section:</p>
 <div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[mysql]</span>
 <span class="na">host</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
 <span class="na">user</span><span class="o">=</span><span class="s">&quot;&lt;username&gt;&quot;</span>
@@ -311,11 +327,11 @@ make install-prerequisites
 </div>
 <p>Replace <em>&lt;username&gt;</em> and <em>&lt;password&gt;</em> with your own MySQL username and password.</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Make sure <code class="file docutils literal notranslate"><span class="pre">~/.my.cnf</span></code> is readable only by yourself!</p>
+<p class="admonition-title">Warning</p>
+<p>Make sure <code class="file docutils literal notranslate"><span class="pre">~/.my.cnf</span></code> is readable only by yourself!</p>
 </div>
 </li>
-<li><p class="first">Create databases for ECM and VarGenAtt:</p>
+<li><p>Create databases for ECM and VarGenAtt:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo mysql -e <span class="s2">&quot;CREATE DATABASE VarGenAtt_ActPh4&quot;</span>
 sudo mysql -e <span class="s2">&quot;CREATE DATABASE ECM_ActsPh4&quot;</span>
 </pre></div>
@@ -326,7 +342,7 @@ sudo mysql -e <span class="s2">&quot;CREATE DATABASE ECM_ActsPh4&quot;</span>
 <div class="section" id="postgres-database">
 <h3>Postgres database<a class="headerlink" href="#postgres-database" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic" start="0">
-<li><p class="first">Make sure you have the following lines in <code class="file docutils literal notranslate"><span class="pre">pg_hba.conf</span></code> so you can
+<li><p>Make sure you have the following lines in <code class="file docutils literal notranslate"><span class="pre">pg_hba.conf</span></code> so you can
 connect to postgres using password identification.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span># IPv4 local connections:
 host    all             all             127.0.0.1/32            md5
@@ -335,7 +351,7 @@ host    all             all             ::1/128                 md5
 </pre></div>
 </div>
 </li>
-<li><p class="first">Create a postgres user and a foreign data wrapper for MySQL.  The FDW allows
+<li><p>Create a postgres user and a foreign data wrapper for MySQL.  The FDW allows
 Postgres to access the MySQL databases.</p>
 <p>Login as administrative user and say:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo -u postgres psql
@@ -355,20 +371,20 @@ Postgres to access the MySQL databases.</p>
 <p>Replace &lt;password&gt; with a real password.</p>
 <p>Logout.</p>
 </li>
-<li><p class="first">Edit (or create) your <code class="file docutils literal notranslate"><span class="pre">~/.pgpass</span></code> and add this line:</p>
+<li><p>Edit (or create) your <code class="file docutils literal notranslate"><span class="pre">~/.pgpass</span></code> and add this line:</p>
 <p>Login as user <em>ntg</em> and say:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>localhost:5432:*:ntg:&lt;password&gt;
 </pre></div>
 </div>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Make sure <code class="file docutils literal notranslate"><span class="pre">~/.pgpass</span></code> is readable only by yourself!</p>
+<p class="admonition-title">Warning</p>
+<p>Make sure <code class="file docutils literal notranslate"><span class="pre">~/.pgpass</span></code> is readable only by yourself!</p>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
+<p class="admonition-title">Note</p>
 <p>You can now login to the Postgres database as user ntg without having
 to enter your password:</p>
-<div class="last highlight-shell notranslate"><div class="highlight"><pre><span></span>psql -h localhost -U ntg -d acts_ph4
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>psql -h localhost -U ntg -d acts_ph4
 </pre></div>
 </div>
 </div>
@@ -380,7 +396,7 @@ to enter your password:</p>
 <div class="section" id="application-server">
 <h2>Application server<a class="headerlink" href="#application-server" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p class="first">Configure the global settings for the application server.  This configures
+<li><p>Configure the global settings for the application server.  This configures
 the user management database that holds user credentials and the sending of
 confirmation mails.</p>
 <p>Login as user <em>ntg</em> and edit (or create) your <code class="file docutils literal notranslate"><span class="pre">server/instance/_global.conf</span></code></p>
@@ -405,7 +421,7 @@ confirmation mails.</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Configure the CBGM database or databases.  Create one .conf file per
+<li><p>Configure the CBGM database or databases.  Create one .conf file per
 database, the name of the file may be chosen at will but should not start
 with an underscore.</p>
 <p>The APPLICATION_ROOT is the root of the url.  It must have two segments and
@@ -437,11 +453,11 @@ must be different for each database.</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Initialize the user management database and add an administrator user for the
+<li><p>Initialize the user management database and add an administrator user for the
 application server.  You’ll need this user to login in the browser.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This should not be the same username (and password) as the database user
+<p class="admonition-title">Note</p>
+<p>This should not be the same username (and password) as the database user
 above!</p>
 </div>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.mk_users -e &lt;email&gt; -u &lt;username&gt; -p &lt;password&gt; server/instance/_globals.conf
@@ -453,7 +469,7 @@ above!</p>
 <div class="section" id="cbgm">
 <h2>CBGM<a class="headerlink" href="#cbgm" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p class="first">Get the mysql database dumps from Münster (exercise left to the reader) and
+<li><p>Get the mysql database dumps from Münster (exercise left to the reader) and
 import them into mysql:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mysql -D <span class="s2">&quot;ECM_ActsPh4&quot;</span>      &lt; ECM_ActsPh4.dump
 mysql -D <span class="s2">&quot;VarGenAtt_ActPh4&quot;</span> &lt; VarGenAtt_ActPh4.dump
@@ -461,18 +477,18 @@ mysql -D <span class="s2">&quot;Nestle29&quot;</span>         &lt; Nestle29.dump
 </pre></div>
 </div>
 </li>
-<li><p class="first">Import the databases into postgres:</p>
+<li><p>Import the databases into postgres:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.import -vvv server/instance/acts_ph4.conf
 python3 -m scripts.cceh.prepare -vvv server/instance/acts_ph4.conf
 </pre></div>
 </div>
 </li>
-<li><p class="first">Run the CBGM process once.</p>
+<li><p>Run the CBGM process once.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.cbgm -vvv server/instance/acts_ph4.conf
 </pre></div>
 </div>
 </li>
-<li><p class="first">Setup cron to run the CBGM nightly:</p>
+<li><p>Setup cron to run the CBGM nightly:</p>
 <p>This step is optional.  You may also run the cbgm script manually whenever
 you need it.</p>
 <p>Edit your user crontab</p>
@@ -491,7 +507,7 @@ you need it.</p>
 <div class="section" id="run-server">
 <h2>Run Server<a class="headerlink" href="#run-server" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p class="first">Run the application server:</p>
+<li><p>Run the application server:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make server
 </pre></div>
 </div>
@@ -501,7 +517,7 @@ you need it.</p>
 <div class="section" id="build-and-run-client">
 <h2>Build and run client<a class="headerlink" href="#build-and-run-client" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p class="first">Build and run the client</p>
+<li><p>Build and run the client</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> client
 npm install
 <span class="nb">cd</span> ..
@@ -534,7 +550,7 @@ make dev-server
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016-18 CCeH - Licensed under the GNU GPL v3 or later
+        &copy; Copyright 2016-19 CCeH - Licensed under the GNU GPL v3 or later
 
     </p>
   </div>

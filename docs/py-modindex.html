@@ -102,8 +102,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#install">Install</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-docker-service">Running the Docker service</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install-docker.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-web-application">Running the web application</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-cbgm">Running the CBGM</a></li>
 </ul>
 </li>
 </ul>
@@ -137,27 +137,43 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-main">The Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-app">The Application Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-coherence">The Coherence Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison">The Comparison Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-page_header">The Page Header Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-navigator">The Navigator Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-apparatus">The Apparatus Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-local_stemma">The Local Stemma Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#the-notes-component">The Notes Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives">The Relatives Popup Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_table">The Comparison Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card">The Card Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card_caption">The Card Caption Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-toolbar">The Toolbar Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_common">Various functions for D3</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-tools">Various Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-app">client/app</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-apparatus">client/apparatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-coherence">client/coherence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison">client/comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-details-table">client/comparison_details_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-table">client/comparison_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-chord-layout">client/d3_chord_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-common">client/d3_common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-stemma-layout">client/d3_stemma_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-find-relatives">client/find_relatives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-flash-messages">client/flash_messages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-leitzeile">client/leitzeile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-local-stemma">client/local_stemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-notes">client/notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-notes-list">client/notes_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-optimal-substemma">client/optimal_substemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-optimal-substemma-details">client/optimal_substemma_details</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-page-header">client/page_header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-project-list">client/project_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-relatives-metrics">client/relatives_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-relatives-table">client/relatives_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-set-cover">client/set_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-table-sort-mixin">client/table_sort_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-table-toggle-mixin">client/table_toggle_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-textflow">client/textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-tools">client/tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-autocomplete">client/widgets/autocomplete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-button-group">client/widgets/button_group</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-card">client/widgets/card</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-card-caption">client/widgets/card_caption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-connectivity">client/widgets/connectivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-context-menu">client/widgets/context_menu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-dropdown-mixin">client/widgets/dropdown_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-labezator">client/widgets/labezator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-navigator">client/widgets/navigator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-range">client/widgets/range</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-toolbar">client/widgets/toolbar</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
@@ -388,7 +404,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016-18 CCeH - Licensed under the GNU GPL v3 or later
+        &copy; Copyright 2016-19 CCeH - Licensed under the GNU GPL v3 or later
 
     </p>
   </div>

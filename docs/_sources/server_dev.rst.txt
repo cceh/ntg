@@ -1,11 +1,9 @@
-.. module:: server
-   :synopsis: API Server
-
 ============
  API Server
 ============
 
 The API server is written in Python using the Flask framework.
+
 
 server
 ======

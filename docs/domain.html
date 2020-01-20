@@ -101,8 +101,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#install">Install</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-docker-service">Running the Docker service</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install-docker.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-web-application">Running the web application</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-cbgm">Running the CBGM</a></li>
 </ul>
 </li>
 </ul>
@@ -136,27 +136,43 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-main">The Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-app">The Application Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-coherence">The Coherence Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison">The Comparison Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-page_header">The Page Header Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-navigator">The Navigator Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-apparatus">The Apparatus Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-local_stemma">The Local Stemma Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#the-notes-component">The Notes Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives">The Relatives Popup Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_table">The Comparison Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card">The Card Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card_caption">The Card Caption Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-toolbar">The Toolbar Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_common">Various functions for D3</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-tools">Various Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-app">client/app</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-apparatus">client/apparatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-coherence">client/coherence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison">client/comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-details-table">client/comparison_details_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-table">client/comparison_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-chord-layout">client/d3_chord_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-common">client/d3_common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-stemma-layout">client/d3_stemma_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-find-relatives">client/find_relatives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-flash-messages">client/flash_messages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-leitzeile">client/leitzeile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-local-stemma">client/local_stemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-notes">client/notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-notes-list">client/notes_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-optimal-substemma">client/optimal_substemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-optimal-substemma-details">client/optimal_substemma_details</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-page-header">client/page_header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-project-list">client/project_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-relatives-metrics">client/relatives_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-relatives-table">client/relatives_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-set-cover">client/set_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-table-sort-mixin">client/table_sort_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-table-toggle-mixin">client/table_toggle_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-textflow">client/textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-tools">client/tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-autocomplete">client/widgets/autocomplete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-button-group">client/widgets/button_group</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-card">client/widgets/card</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-card-caption">client/widgets/card_caption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-connectivity">client/widgets/connectivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-context-menu">client/widgets/context_menu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-dropdown-mixin">client/widgets/dropdown_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-labezator">client/widgets/labezator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-navigator">client/widgets/navigator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-range">client/widgets/range</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-toolbar">client/widgets/toolbar</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
@@ -267,20 +283,22 @@ entspricht nicht dem neuesten Stand der Forschung.</p>
 <h2>Das Neue Testament<a class="headerlink" href="#das-neue-testament" title="Permalink to this headline">¶</a></h2>
 <p>Es besteht aus:</p>
 <ul class="simple">
-<li>(e) Evangelien<ul>
-<li>(Mk) Markus</li>
-<li>(Mt) Matthäus</li>
-<li>(L) Lukas</li>
-<li>(J) Johannes</li>
+<li><p>(e) Evangelien</p>
+<ul>
+<li><p>(Mk) Markus</p></li>
+<li><p>(Mt) Matthäus</p></li>
+<li><p>(L) Lukas</p></li>
+<li><p>(J) Johannes</p></li>
 </ul>
 </li>
-<li>(a) Apostolos<ul>
-<li>(act)  Apostelgeschichte</li>
-<li>(cath) Katholische Briefe</li>
+<li><p>(a) Apostolos</p>
+<ul>
+<li><p>(act)  Apostelgeschichte</p></li>
+<li><p>(cath) Katholische Briefe</p></li>
 </ul>
 </li>
-<li>(p) Paulusbriefe (14 Briefe)</li>
-<li>(r) Offenbarung des Johannes (revelatio)</li>
+<li><p>(p) Paulusbriefe (14 Briefe)</p></li>
+<li><p>(r) Offenbarung des Johannes (revelatio)</p></li>
 </ul>
 </div>
 <div class="section" id="editionen">
@@ -304,13 +322,13 @@ etwa 600 Seiten,
 ab 98€</p>
 <p>Demnächst erscheint: Apostelgeschichte.  Hierfür ist unsere Mithilfe
 erwünscht.</p>
-<div class="figure" id="id13">
+<div class="figure align-default" id="id13">
 <img alt="_images/Aland1998-fig1.jpeg" src="_images/Aland1998-fig1.jpeg" />
-<p class="caption"><span class="caption-text">Beispielseite: Jak 2,3</span></p>
+<p class="caption"><span class="caption-text">Beispielseite: Jak 2,3</span><a class="headerlink" href="#id13" title="Permalink to this image">¶</a></p>
 </div>
 <p>Die katholischen Briefe wurden ausgewählt, da sie eine größere Variation
 besitzen als das übrige NT und sich daher gut für die Entwicklung der
-CBGM eignen. (<a class="reference internal" href="#aland1998" id="id1">[ALAND1998]</a> §22)</p>
+CBGM eignen. (<a class="reference internal" href="#aland1998" id="id1"><span>[ALAND1998]</span></a> §22)</p>
 </div>
 </div>
 <div class="section" id="die-textzeugen">
@@ -341,25 +359,25 @@ Originaltext.</p>
 Großbuchstaben</p>
 <p>Wichtige Majuskeln:</p>
 <ul class="simple">
-<li>01 (א) Codex Sinaiticus eapr IV</li>
-<li>02 (A) Codex Alexandrinus eapr† V</li>
-<li>03 (B) Codex Vaticanus eap† IV</li>
-<li>04 (C) Codex Ephraemi Syri rescriptus eapr† V</li>
-<li>05 (D) Codex Bezae Cantabrigiensis ea†</li>
+<li><p>01 (א) Codex Sinaiticus eapr IV</p></li>
+<li><p>02 (A) Codex Alexandrinus eapr† V</p></li>
+<li><p>03 (B) Codex Vaticanus eap† IV</p></li>
+<li><p>04 (C) Codex Ephraemi Syri rescriptus eapr† V</p></li>
+<li><p>05 (D) Codex Bezae Cantabrigiensis ea†</p></li>
 </ul>
 <p>Im 7. und 8. Jahrhundert verschlechtert sich das Pergament.  Das Format
 wird verkleinert.  Alte Handschriften werden überschrieben (Palimpsest,
-codex rescriptus).  (<a class="reference internal" href="#nestle1923" id="id2">[NESTLE1923]</a> § 36)</p>
+codex rescriptus).  (<a class="reference internal" href="#nestle1923" id="id2"><span>[NESTLE1923]</span></a> § 36)</p>
 </div>
 <div class="section" id="minuskeln">
 <h3>Minuskeln<a class="headerlink" href="#minuskeln" title="Permalink to this headline">¶</a></h3>
 <p>Ab dem 9. Jahrhundert.  Auf Pergament oder Papier.  Die allermeisten
 davon enthalten den byzantinischen Text und sind für uns uninteressant,
 aber einige wenige sind dem Originaltext sehr nahe.  Es sind 2800
-Minuskeln bekannt.  (<a class="reference internal" href="#aland1989" id="id3">[ALAND1989]</a> S. 140)</p>
+Minuskeln bekannt.  (<a class="reference internal" href="#aland1989" id="id3"><span>[ALAND1989]</span></a> S. 140)</p>
 <p>Bezeichnung: Zahl (z.B. 33)</p>
 <p>Ab dem 13. Jhd. wird Papier für Bibelhandschriften verwendet.
-Im 15. Jhd. beginnt das Papier zu überwiegen.  (<a class="reference internal" href="#nestle1923" id="id4">[NESTLE1923]</a> § 36)</p>
+Im 15. Jhd. beginnt das Papier zu überwiegen.  (<a class="reference internal" href="#nestle1923" id="id4"><span>[NESTLE1923]</span></a> § 36)</p>
 </div>
 <div class="section" id="lektionare">
 <h3>Lektionare<a class="headerlink" href="#lektionare" title="Permalink to this headline">¶</a></h3>
@@ -367,7 +385,7 @@ Im 15. Jhd. beginnt das Papier zu überwiegen.  (<a class="reference internal" h
 NT, geordnet nach dem Kirchenjahr.  Es sind 2300 Lektionare bekannt.
 Das System der Lektionare entstand geschätzt im 4 Jhd.  (Kuriosum: da das
 Kirchenjahr Ostern anfängt, hat es bis zu 57 Wochen.)
-(<a class="reference internal" href="#aland1989" id="id5">[ALAND1989]</a> S. 172ff)</p>
+(<a class="reference internal" href="#aland1989" id="id5"><span>[ALAND1989]</span></a> S. 172ff)</p>
 <p>Lektionare können den gleichen Text mehrmals enthalten, die
 unterschiedlichen Lesungen werden in den Datenbank mit L1, L2
 bezeichnet.</p>
@@ -390,7 +408,7 @@ eigentlichen Zitat im laufenden Text des Kommentars ist oft der
 vollständige Text des Lemmas vorangestellt.</p>
 <p>Das eigentliche Zitat genießt eine höheren Wert.  Der Lemma-Text wurde
 hingegegen oft durch einen geläufigeren Text ersetzt.
-(<a class="reference internal" href="#aland1989" id="id6">[ALAND1989]</a> S. 179)</p>
+(<a class="reference internal" href="#aland1989" id="id6"><span>[ALAND1989]</span></a> S. 179)</p>
 <p>Die unterschiedlichen Lesungen werden in der Datenbank mit T1, T2
 bezeichnet.</p>
 <p>Bezeichnung: Name oder Abkürzung (z.B. Or für Origenes)</p>
@@ -410,8 +428,8 @@ offizielle Text des Mittelalters.  Durch seine Geläufigkeit bei den
 Schreibern wurden andere Lesarten oft durch ihn ersetzt, bewußt oder
 unterbewußt.  Er gilt als minderwertig weil er erst spät entstanden ist.</p>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last">The <a class="reference internal" href="scripts_dev.html#mt-rules"><span class="std std-ref">rules to reconstruct the Majority Text</span></a>.</p>
+<p class="admonition-title">See also</p>
+<p>The <a class="reference internal" href="scripts_dev.html#mt-rules"><span class="std std-ref">rules to reconstruct the Majority Text</span></a>.</p>
 </div>
 </div>
 <div class="section" id="textus-receptus">
@@ -428,19 +446,19 @@ gearbeitet hat und nur wenige Textzeugen verwendet hat.</p>
 <div class="section" id="textkritik">
 <h2>Textkritik<a class="headerlink" href="#textkritik" title="Permalink to this headline">¶</a></h2>
 <p>Ob die Vorlage eine Minuskel oder eine Maiuskel war, ist oft an
-Schreibfehlern festzustellen. (<a class="reference internal" href="#nestle1923" id="id7">[NESTLE1923]</a> § 103)</p>
+Schreibfehlern festzustellen. (<a class="reference internal" href="#nestle1923" id="id7"><span>[NESTLE1923]</span></a> § 103)</p>
 <p>Bei Auslassungen läßt sich durch Zählung der Buchstaben auch ein Bild
-von der Zeilenbreite der Vorlage gewinnen. (<a class="reference internal" href="#nestle1923" id="id8">[NESTLE1923]</a> § 103)</p>
+von der Zeilenbreite der Vorlage gewinnen. (<a class="reference internal" href="#nestle1923" id="id8"><span>[NESTLE1923]</span></a> § 103)</p>
 <p>Brevior lectio potior: die kürzere Lesart ist die stärkere.  Schreiber
 haben öfter hinzugefügt als weggelassen.  (Einige Wissenschaftler
 glauben hingegen, daß die ausgelassene Zeile der häufigste
-Schreiberfehler ist. Siehe: <a class="reference internal" href="#metzger2005" id="id9">[METZGER2005]</a> S. 213f)</p>
+Schreiberfehler ist. Siehe: <a class="reference internal" href="#metzger2005" id="id9"><span>[METZGER2005]</span></a> S. 213f)</p>
 <p>Difficilior lectio potior: die schwerere Lesart ist die Stärkere.
 Schreiber haben schwer verständliche Passagen oft vereinfacht.</p>
 <p><em>Den Vorzug verdient die Lesart,</em> aus der sich die Entstehung der
-anderen Lesarten am leichtesten erklären läßt.  (<a class="reference internal" href="#nestle1923" id="id10">[NESTLE1923]</a> § 115)</p>
+anderen Lesarten am leichtesten erklären läßt.  (<a class="reference internal" href="#nestle1923" id="id10"><span>[NESTLE1923]</span></a> § 115)</p>
 <p><em>Knowledge of documents should precede final judgement upon readings.</em>
-(<a class="reference internal" href="#westcott1881" id="id11">[WESTCOTT1881]</a> S. 31)</p>
+(<a class="reference internal" href="#westcott1881" id="id11"><span>[WESTCOTT1881]</span></a> S. 31)</p>
 </div>
 <div class="section" id="terminologie">
 <h2>Terminologie<a class="headerlink" href="#terminologie" title="Permalink to this headline">¶</a></h2>
@@ -461,12 +479,13 @@ uninteressant.</p>
 <div class="section" id="umfaszte-varianten">
 <span id="umfasst"></span><h3>Umfaßte Varianten<a class="headerlink" href="#umfaszte-varianten" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<div>Beim Herantreten an die Einzelarbeit ist das erste Erfordernis, die
+<div><p>Beim Herantreten an die Einzelarbeit ist das erste Erfordernis, die
 zu untersuchende Lesart als solche richtig abzugrenzen.  Die
 Apparate sind in dieser Hinsicht sehr verschieden angelegt: manche
 buchen ganze Satzvarianten, die man zerlegen muß; andere geben jedes
 Wort für sich, sodaß man, um ein klares Bild zu bekommen,
-zusammenfassen muß.  (<a class="reference internal" href="#nestle1923" id="id12">[NESTLE1923]</a> § 108)</div></blockquote>
+zusammenfassen muß.  (<a class="reference internal" href="#nestle1923" id="id12"><span>[NESTLE1923]</span></a> § 108)</p>
+</div></blockquote>
 <p>Wenn variierte Wörter, die durch andere Satzteile voneinander getrennt
 sind, sinngemäß zu einer Einheit gehören, so verzeichnet unsere
 Datenbank sie als eine einzelne Lesart.  Sind in diesen anderen
@@ -501,97 +520,66 @@ machen???[dubious - discuss]</p>
 </div>
 <div class="section" id="literatur">
 <h2>Literatur<a class="headerlink" href="#literatur" title="Permalink to this headline">¶</a></h2>
-<table class="docutils citation" frame="void" id="aland1989" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[ALAND1989]</td><td><em>(<a class="fn-backref" href="#id3">1</a>, <a class="fn-backref" href="#id5">2</a>, <a class="fn-backref" href="#id6">3</a>)</em> Aland, Kurt, und Barbara Aland.  1989.  <em>Der Text des
+<dl class="citation">
+<dt class="label" id="aland1989"><span class="brackets">ALAND1989</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id5">2</a>,<a href="#id6">3</a>)</span></dt>
+<dd><p>Aland, Kurt, und Barbara Aland.  1989.  <em>Der Text des
 Neuen Testaments: Einführung in die wissenschaftlichen Ausgaben und
 in Theorie wie Praxis der modernen Textkritik. 2. Auflage.</em> Stuttgart:
-Deutsche Bibelgesellschaft.</td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="aland1998" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[ALAND1998]</a></td><td>Aland, Barbara.  1998.  <em>Novum Testamentum Graecum Editio
+Deutsche Bibelgesellschaft.</p>
+</dd>
+<dt class="label" id="aland1998"><span class="brackets"><a class="fn-backref" href="#id1">ALAND1998</a></span></dt>
+<dd><p>Aland, Barbara.  1998.  <em>Novum Testamentum Graecum Editio
 Critica Maior: Presentation of the First Part: The Letter of James.</em>
-Münster.  <a class="reference external" href="http://rosetta.reltech.org/TC/v03/Aland1998.html">http://rosetta.reltech.org/TC/v03/Aland1998.html</a></td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="clark1918" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[CLARK1918]</td><td>Clark, Albert C. 1918. <em>The Descent of Manuscripts</em>.
-Oxford.  <a class="reference external" href="https://archive.org/details/descentofmanuscr02claruoft">https://archive.org/details/descentofmanuscr02claruoft</a></td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="gabel2015" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[GÄBEL2015]</td><td>Georg Gäbel et al. 2015. <em>The CBGM Applied to Variants
+Münster.  <a class="reference external" href="http://rosetta.reltech.org/TC/v03/Aland1998.html">http://rosetta.reltech.org/TC/v03/Aland1998.html</a></p>
+</dd>
+<dt class="label" id="clark1918"><span class="brackets">CLARK1918</span></dt>
+<dd><p>Clark, Albert C. 1918. <em>The Descent of Manuscripts</em>.
+Oxford.  <a class="reference external" href="https://archive.org/details/descentofmanuscr02claruoft">https://archive.org/details/descentofmanuscr02claruoft</a></p>
+</dd>
+<dt class="label" id="gabel2015"><span class="brackets">GÄBEL2015</span></dt>
+<dd><p>Georg Gäbel et al. 2015. <em>The CBGM Applied to Variants
 from Acts. Methodological Background.</em> Institut für Neutestamentliche
 Textforschung, University of Münster.
-<a class="reference external" href="http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-background.pdf">http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-background.pdf</a></td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="metzger2005" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id9">[METZGER2005]</a></td><td>Metzger, Bruce Manning.  2005.  The Text of the New
-Testament.  4th Edition.</td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="mink2008" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[MINK2008]</td><td>Mink, Gerd.  <em>The Coherence-Based Genealogical Method (CBGM)
+<a class="reference external" href="http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-background.pdf">http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-background.pdf</a></p>
+</dd>
+<dt class="label" id="metzger2005"><span class="brackets"><a class="fn-backref" href="#id9">METZGER2005</a></span></dt>
+<dd><p>Metzger, Bruce Manning.  2005.  The Text of the New
+Testament.  4th Edition.</p>
+</dd>
+<dt class="label" id="mink2008"><span class="brackets">MINK2008</span></dt>
+<dd><p>Mink, Gerd.  <em>The Coherence-Based Genealogical Method (CBGM)
 — Introductory Presentation by Gerd Mink.</em>
-<a class="reference external" href="http://www.uni-muenster.de/INTF/cbgm_presentation/CBGM_Presentation.zip">http://www.uni-muenster.de/INTF/cbgm_presentation/CBGM_Presentation.zip</a></td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="nestle1909" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[NESTLE1909]</td><td>Nestle, Eberhard.  1909.  <em>Einführung in das Griechische Neue
+<a class="reference external" href="http://www.uni-muenster.de/INTF/cbgm_presentation/CBGM_Presentation.zip">http://www.uni-muenster.de/INTF/cbgm_presentation/CBGM_Presentation.zip</a></p>
+</dd>
+<dt class="label" id="nestle1909"><span class="brackets">NESTLE1909</span></dt>
+<dd><p>Nestle, Eberhard.  1909.  <em>Einführung in das Griechische Neue
 Testament von Eberhard Nestle.  Dritte, umgearbeitete Auflage.</em>  Göttingen:
-Vandenhoeck &amp; Ruprecht.  <a class="reference external" href="https://archive.org/details/MN42075ucmf_3">https://archive.org/details/MN42075ucmf_3</a></td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="nestle1923" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[NESTLE1923]</td><td><em>(<a class="fn-backref" href="#id2">1</a>, <a class="fn-backref" href="#id4">2</a>, <a class="fn-backref" href="#id7">3</a>, <a class="fn-backref" href="#id8">4</a>, <a class="fn-backref" href="#id10">5</a>, <a class="fn-backref" href="#id12">6</a>)</em> Nestle, Eberhard.  1923.  <em>Eberhard Nestle’s Einführung
+Vandenhoeck &amp; Ruprecht.  <a class="reference external" href="https://archive.org/details/MN42075ucmf_3">https://archive.org/details/MN42075ucmf_3</a></p>
+</dd>
+<dt class="label" id="nestle1923"><span class="brackets">NESTLE1923</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id4">2</a>,<a href="#id7">3</a>,<a href="#id8">4</a>,<a href="#id10">5</a>,<a href="#id12">6</a>)</span></dt>
+<dd><p>Nestle, Eberhard.  1923.  <em>Eberhard Nestle’s Einführung
 in das Griechische Neue Testament. Vierte Auflage.  Völlig
 umgearbeitet von Ernst von Dobschütz.</em>  Göttingen: Vandenhoeck &amp;
-Ruprecht.</td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="wachtel2015" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[WACHTEL2015]</td><td>Wachtel, Klaus.  2015.  <em>The Coherence Method and
+Ruprecht.</p>
+</dd>
+<dt class="label" id="wachtel2015"><span class="brackets">WACHTEL2015</span></dt>
+<dd><p>Wachtel, Klaus.  2015.  <em>The Coherence Method and
 History.</em> Institut für Neutestamentliche Textforschung, University of
-Münster.  <a class="reference external" href="http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-history.pdf">http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-history.pdf</a></td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="wachtel2015a" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[WACHTEL2015a]</td><td>Wachtel, Klaus.  2015.  <em>Constructing Local Stemmata
+Münster.  <a class="reference external" href="http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-history.pdf">http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-history.pdf</a></p>
+</dd>
+<dt class="label" id="wachtel2015a"><span class="brackets">WACHTEL2015a</span></dt>
+<dd><p>Wachtel, Klaus.  2015.  <em>Constructing Local Stemmata
 for the ECM of Acts: Examples.</em>  Institut für Neutestamentliche
 Textforschung, University of Münster.
-<a class="reference external" href="http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-examples.pdf">http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-examples.pdf</a></td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="westcott1881" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id11">[WESTCOTT1881]</a></td><td>Westcott, Brooke Foss and Hort, Fenton John Anthony.
+<a class="reference external" href="http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-examples.pdf">http://rosetta.reltech.org/TC/v20/TC-2015-CBGM-examples.pdf</a></p>
+</dd>
+<dt class="label" id="westcott1881"><span class="brackets"><a class="fn-backref" href="#id11">WESTCOTT1881</a></span></dt>
+<dd><p>Westcott, Brooke Foss and Hort, Fenton John Anthony.
 <em>The New Testament in the Original Greek.  Volume 2.  Introduction
 and Appendix by the Editors</em>
-<a class="reference external" href="https://archive.org/details/newtestamentinor82west">https://archive.org/details/newtestamentinor82west</a></td></tr>
-</tbody>
-</table>
+<a class="reference external" href="https://archive.org/details/newtestamentinor82west">https://archive.org/details/newtestamentinor82west</a></p>
+</dd>
+</dl>
 </div>
 </div>
 
@@ -615,7 +603,7 @@ and Appendix by the Editors</em>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016-18 CCeH - Licensed under the GNU GPL v3 or later
+        &copy; Copyright 2016-19 CCeH - Licensed under the GNU GPL v3 or later
 
     </p>
   </div>

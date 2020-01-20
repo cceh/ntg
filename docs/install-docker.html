@@ -101,8 +101,8 @@
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Installation with Docker</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#install">Install</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#running-the-docker-service">Running the Docker service</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-the-web-application">Running the web application</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-the-cbgm">Running the CBGM</a></li>
 </ul>
 </li>
 </ul>
@@ -136,27 +136,43 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-main">The Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-app">The Application Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-coherence">The Coherence Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison">The Comparison Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-page_header">The Page Header Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-navigator">The Navigator Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-apparatus">The Apparatus Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-local_stemma">The Local Stemma Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#the-notes-component">The Notes Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives">The Relatives Popup Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-relatives_metrics">The Relatives Metrics Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_table">The Comparison Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-comparison_details_table">The Comparison Details Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card">The Card Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-card_caption">The Card Caption Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-toolbar">The Toolbar Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-d3_common">Various functions for D3</a></li>
-<li class="toctree-l3"><a class="reference internal" href="client_dev.html#module-tools">Various Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-app">client/app</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-apparatus">client/apparatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-coherence">client/coherence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison">client/comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-details-table">client/comparison_details_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-table">client/comparison_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-chord-layout">client/d3_chord_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-common">client/d3_common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-stemma-layout">client/d3_stemma_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-find-relatives">client/find_relatives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-flash-messages">client/flash_messages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-leitzeile">client/leitzeile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-local-stemma">client/local_stemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-notes">client/notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-notes-list">client/notes_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-optimal-substemma">client/optimal_substemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-optimal-substemma-details">client/optimal_substemma_details</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-page-header">client/page_header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-project-list">client/project_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-relatives-metrics">client/relatives_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-relatives-table">client/relatives_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-set-cover">client/set_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-table-sort-mixin">client/table_sort_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-table-toggle-mixin">client/table_toggle_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-textflow">client/textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-tools">client/tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-autocomplete">client/widgets/autocomplete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-button-group">client/widgets/button_group</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-card">client/widgets/card</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-card-caption">client/widgets/card_caption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-connectivity">client/widgets/connectivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-context-menu">client/widgets/context_menu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-dropdown-mixin">client/widgets/dropdown_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-labezator">client/widgets/labezator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-navigator">client/widgets/navigator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-range">client/widgets/range</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-toolbar">client/widgets/toolbar</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
@@ -261,54 +277,49 @@
   <div class="section" id="installation-with-docker">
 <span id="docker-install"></span><h1>Installation with Docker<a class="headerlink" href="#installation-with-docker" title="Permalink to this headline">¶</a></h1>
 <p>This chapter describes how to install the CBGM installation on your own PC with
-the help of Docker.  <a class="reference external" href="https://www.docker.com/">Docker</a> can run our
+the help of <a class="reference external" href="https://www.docker.com/">Docker</a>. Docker can run our
 application on Linux, Mac, and Windows.</p>
-<p>We plan to offer various Docker images for scholars who want to run the CBGM
-application on their own machines.</p>
-<p>Our images are preloaded with data and the data are editable.</p>
+<p>We plan to offer various Docker images preloaded with data.  The data is
+editable so you can build your own scenarios.</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">As of now (September 2019) this is a technology preview.
+<p class="admonition-title">Warning</p>
+<p>As of now (September 2019) this is a technology preview.
 More functionality will be added and bugs will be fixed later.
 Feedback is welcome at: <a class="reference external" href="https://github.com/cceh/ntg/issues">https://github.com/cceh/ntg/issues</a></p>
 </div>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">These instructions are tested only on Linux.
+<p class="admonition-title">Warning</p>
+<p>These instructions are tested only on Linux.
 Feedback from Windows and Mac users is welcome:
 <a class="reference external" href="https://github.com/cceh/ntg/issues">https://github.com/cceh/ntg/issues</a></p>
 </div>
 <div class="section" id="install">
 <h2>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p class="first">Install the free community version of Docker:</p>
+<li><p>Install the free community version of Docker:</p>
 <ul class="simple">
-<li>for Windows see: <a class="reference external" href="https://docs.docker.com/docker-for-windows/install/">https://docs.docker.com/docker-for-windows/install/</a></li>
-<li>for Mac see: <a class="reference external" href="https://docs.docker.com/docker-for-mac/install/">https://docs.docker.com/docker-for-mac/install/</a></li>
-<li>for Debian Linux see: <a class="reference external" href="https://docs.docker.com/compose/install/">https://docs.docker.com/compose/install/</a></li>
+<li><p>for Windows see: <a class="reference external" href="https://docs.docker.com/docker-for-windows/install/">https://docs.docker.com/docker-for-windows/install/</a></p></li>
+<li><p>for Mac see: <a class="reference external" href="https://docs.docker.com/docker-for-mac/install/">https://docs.docker.com/docker-for-mac/install/</a></p></li>
+<li><p>for Debian Linux see: <a class="reference external" href="https://docs.docker.com/compose/install/">https://docs.docker.com/compose/install/</a></p></li>
 </ul>
 </li>
-<li><p class="first">Create a new directory and change into it.</p>
-</li>
-<li><p class="first">Download <a class="reference external" href="https://raw.githubusercontent.com/cceh/ntg/master/docker/docker-compose.yml">https://raw.githubusercontent.com/cceh/ntg/master/docker/docker-compose.yml</a></p>
-</li>
-<li><p class="first">Run:</p>
+<li><p>Create a new directory and change into it.</p></li>
+<li><p>Download <a class="reference external" href="https://raw.githubusercontent.com/cceh/ntg/master/docker/docker-compose.yml">https://raw.githubusercontent.com/cceh/ntg/master/docker/docker-compose.yml</a></p></li>
+<li><p>Run:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose up
 </pre></div>
 </div>
 <p>This will download the Docker containers and initialize the database.  It
 will take some time depending on your internet connection speed and your PC.</p>
 </li>
-<li><p class="first">Test the installation: Point your browser to the url:
-<a class="reference external" href="http://localhost:5000/acts/ph4/">http://localhost:5000/acts/ph4/</a> and use the application.</p>
-</li>
-<li><p class="first">When satisfied, hit <kbd class="kbd docutils literal notranslate">Ctrl+C</kbd> to stop the Docker service.</p>
-</li>
+<li><p>Test the installation: Point your browser to the url:
+<a class="reference external" href="http://localhost:5000/acts/ph4/">http://localhost:5000/acts/ph4/</a> and use the application.</p></li>
+<li><p>When satisfied, hit <kbd class="kbd docutils literal notranslate">Ctrl+C</kbd> to stop the Docker service.</p></li>
 </ol>
 <p>The Docker service is now installed.</p>
 </div>
-<div class="section" id="running-the-docker-service">
-<h2>Running the Docker service<a class="headerlink" href="#running-the-docker-service" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="running-the-web-application">
+<h2>Running the web application<a class="headerlink" href="#running-the-web-application" title="Permalink to this headline">¶</a></h2>
 <p>To use the application point your browser to <a class="reference external" href="http://localhost:5000/acts/ph4/">http://localhost:5000/acts/ph4/</a>
 while the Docker service is running.  To run the Docker service change into the
 directory and say:</p>
@@ -320,8 +331,8 @@ directory and say:</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="cbgm">
-<h2>CBGM<a class="headerlink" href="#cbgm" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="running-the-cbgm">
+<h2>Running the CBGM<a class="headerlink" href="#running-the-cbgm" title="Permalink to this headline">¶</a></h2>
 <p>To run the CBGM say:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose run ntg-app-server cbgm
 </pre></div>
@@ -349,7 +360,7 @@ directory and say:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016-18 CCeH - Licensed under the GNU GPL v3 or later
+        &copy; Copyright 2016-19 CCeH - Licensed under the GNU GPL v3 or later
 
     </p>
   </div>

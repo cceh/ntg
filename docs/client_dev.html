@@ -101,8 +101,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#install">Install</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-docker-service">Running the Docker service</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install-docker.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-web-application">Running the web application</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-cbgm">Running the CBGM</a></li>
 </ul>
 </li>
 </ul>
@@ -136,27 +136,43 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Web Client</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-main">The Main Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-app">The Application Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-coherence">The Coherence Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-comparison">The Comparison Page Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-page_header">The Page Header Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-navigator">The Navigator Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-apparatus">The Apparatus Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-local_stemma">The Local Stemma Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#the-notes-component">The Notes Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-textflow">The 3 Coherence and the General Textual Flow Cards</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-relatives">The Relatives Popup Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-relatives_metrics">The Relatives Metrics Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-comparison_table">The Comparison Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-comparison_details_table">The Comparison Details Table Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-card">The Card Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-card_caption">The Card Caption Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-toolbar">The Toolbar Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-d3_chord_layout">The Chord Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-d3_stemma_layout">The Stemma Layout Engine Component</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-d3_common">Various functions for D3</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-tools">Various Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-app">client/app</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-apparatus">client/apparatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-coherence">client/coherence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-comparison">client/comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-comparison-details-table">client/comparison_details_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-comparison-table">client/comparison_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-d3-chord-layout">client/d3_chord_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-d3-common">client/d3_common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-d3-stemma-layout">client/d3_stemma_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-find-relatives">client/find_relatives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-flash-messages">client/flash_messages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-leitzeile">client/leitzeile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-local-stemma">client/local_stemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-notes">client/notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-notes-list">client/notes_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-optimal-substemma">client/optimal_substemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-optimal-substemma-details">client/optimal_substemma_details</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-page-header">client/page_header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-project-list">client/project_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-relatives-metrics">client/relatives_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-relatives-table">client/relatives_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-set-cover">client/set_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-table-sort-mixin">client/table_sort_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-table-toggle-mixin">client/table_toggle_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-textflow">client/textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-tools">client/tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-widgets-autocomplete">client/widgets/autocomplete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-widgets-button-group">client/widgets/button_group</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-widgets-card">client/widgets/card</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-widgets-card-caption">client/widgets/card_caption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-widgets-connectivity">client/widgets/connectivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-widgets-context-menu">client/widgets/context_menu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-widgets-dropdown-mixin">client/widgets/dropdown_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-widgets-labezator">client/widgets/labezator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-widgets-navigator">client/widgets/navigator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-widgets-range">client/widgets/range</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client-widgets-toolbar">client/widgets/toolbar</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
@@ -260,423 +276,1051 @@
             
   <span class="target" id="module-client"></span><div class="section" id="web-client">
 <span id="id1"></span><h1>Web Client<a class="headerlink" href="#web-client" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#client-app" id="id2">client/app</a></p></li>
+<li><p><a class="reference internal" href="#client-apparatus" id="id3">client/apparatus</a></p></li>
+<li><p><a class="reference internal" href="#client-coherence" id="id4">client/coherence</a></p></li>
+<li><p><a class="reference internal" href="#client-comparison" id="id5">client/comparison</a></p></li>
+<li><p><a class="reference internal" href="#client-comparison-details-table" id="id6">client/comparison_details_table</a></p></li>
+<li><p><a class="reference internal" href="#client-comparison-table" id="id7">client/comparison_table</a></p></li>
+<li><p><a class="reference internal" href="#client-d3-chord-layout" id="id8">client/d3_chord_layout</a></p></li>
+<li><p><a class="reference internal" href="#client-d3-common" id="id9">client/d3_common</a></p></li>
+<li><p><a class="reference internal" href="#client-d3-stemma-layout" id="id10">client/d3_stemma_layout</a></p></li>
+<li><p><a class="reference internal" href="#client-find-relatives" id="id11">client/find_relatives</a></p></li>
+<li><p><a class="reference internal" href="#client-flash-messages" id="id12">client/flash_messages</a></p></li>
+<li><p><a class="reference internal" href="#client-leitzeile" id="id13">client/leitzeile</a></p></li>
+<li><p><a class="reference internal" href="#client-local-stemma" id="id14">client/local_stemma</a></p></li>
+<li><p><a class="reference internal" href="#client-notes" id="id15">client/notes</a></p></li>
+<li><p><a class="reference internal" href="#client-notes-list" id="id16">client/notes_list</a></p></li>
+<li><p><a class="reference internal" href="#client-optimal-substemma" id="id17">client/optimal_substemma</a></p></li>
+<li><p><a class="reference internal" href="#client-optimal-substemma-details" id="id18">client/optimal_substemma_details</a></p></li>
+<li><p><a class="reference internal" href="#client-page-header" id="id19">client/page_header</a></p></li>
+<li><p><a class="reference internal" href="#client-project-list" id="id20">client/project_list</a></p></li>
+<li><p><a class="reference internal" href="#client-relatives-metrics" id="id21">client/relatives_metrics</a></p></li>
+<li><p><a class="reference internal" href="#client-relatives-table" id="id22">client/relatives_table</a></p></li>
+<li><p><a class="reference internal" href="#client-set-cover" id="id23">client/set_cover</a></p></li>
+<li><p><a class="reference internal" href="#client-table-sort-mixin" id="id24">client/table_sort_mixin</a></p></li>
+<li><p><a class="reference internal" href="#client-table-toggle-mixin" id="id25">client/table_toggle_mixin</a></p></li>
+<li><p><a class="reference internal" href="#client-textflow" id="id26">client/textflow</a></p></li>
+<li><p><a class="reference internal" href="#client-tools" id="id27">client/tools</a></p></li>
+<li><p><a class="reference internal" href="#client-widgets-autocomplete" id="id28">client/widgets/autocomplete</a></p></li>
+<li><p><a class="reference internal" href="#client-widgets-button-group" id="id29">client/widgets/button_group</a></p></li>
+<li><p><a class="reference internal" href="#client-widgets-card" id="id30">client/widgets/card</a></p></li>
+<li><p><a class="reference internal" href="#client-widgets-card-caption" id="id31">client/widgets/card_caption</a></p></li>
+<li><p><a class="reference internal" href="#client-widgets-connectivity" id="id32">client/widgets/connectivity</a></p></li>
+<li><p><a class="reference internal" href="#client-widgets-context-menu" id="id33">client/widgets/context_menu</a></p></li>
+<li><p><a class="reference internal" href="#client-widgets-dropdown-mixin" id="id34">client/widgets/dropdown_mixin</a></p></li>
+<li><p><a class="reference internal" href="#client-widgets-labezator" id="id35">client/widgets/labezator</a></p></li>
+<li><p><a class="reference internal" href="#client-widgets-navigator" id="id36">client/widgets/navigator</a></p></li>
+<li><p><a class="reference internal" href="#client-widgets-range" id="id37">client/widgets/range</a></p></li>
+<li><p><a class="reference internal" href="#client-widgets-toolbar" id="id38">client/widgets/toolbar</a></p></li>
+</ul>
+</div>
 <p>The web client runs on the user’s browser.</p>
 <p>The web client is written in Javascript with Vue.js, D3.js, and bootstrap.  It
 uses internal routing of URLs.  Most of the application is placed inside Vue.js
 components.</p>
-<p>You probably want to start looking at the <a class="reference internal" href="#coherence" title="coherence"><code class="xref js js-mod docutils literal notranslate"><span class="pre">coherence</span></code></a> or <a class="reference internal" href="#comparison" title="comparison"><code class="xref js js-mod docutils literal notranslate"><span class="pre">comparison</span></code></a>
-components.</p>
-<div class="section" id="module-main">
-<span id="the-main-module"></span><h2>The Main Module<a class="headerlink" href="#module-main" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-app">
-<span id="the-application-component"></span><h2>The Application Component<a class="headerlink" href="#module-app" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-coherence">
-<span id="the-coherence-page-component"></span><h2>The Coherence Page Component<a class="headerlink" href="#module-coherence" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-comparison">
-<span id="the-comparison-page-component"></span><h2>The Comparison Page Component<a class="headerlink" href="#module-comparison" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-page_header">
-<span id="the-page-header-component"></span><h2>The Page Header Component<a class="headerlink" href="#module-page_header" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-navigator">
-<span id="the-navigator-component"></span><h2>The Navigator Component<a class="headerlink" href="#module-navigator" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-apparatus">
-<span id="the-apparatus-component"></span><h2>The Apparatus Component<a class="headerlink" href="#module-apparatus" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-local_stemma">
-<span id="the-local-stemma-component"></span><h2>The Local Stemma Component<a class="headerlink" href="#module-local_stemma" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="the-notes-component">
-<h2>The Notes Component<a class="headerlink" href="#the-notes-component" title="Permalink to this headline">¶</a></h2>
-<p>Displays an editable textarea for editor notes.</p>
-<span class="target" id="module-notes"></span></div>
-<div class="section" id="module-textflow">
-<span id="the-3-coherence-and-the-general-textual-flow-cards"></span><span id="textflow"></span><h2>The 3 Coherence and the General Textual Flow Cards<a class="headerlink" href="#module-textflow" title="Permalink to this headline">¶</a></h2>
-<p>The javascript module that displays the textflow diagrams.</p>
-</div>
-<div class="section" id="module-relatives">
-<span id="the-relatives-popup-component"></span><h2>The Relatives Popup Component<a class="headerlink" href="#module-relatives" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-relatives_metrics">
-<span id="the-relatives-metrics-component"></span><h2>The Relatives Metrics Component<a class="headerlink" href="#module-relatives_metrics" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-comparison_table">
-<span id="the-comparison-table-component"></span><h2>The Comparison Table Component<a class="headerlink" href="#module-comparison_table" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-comparison_details_table">
-<span id="the-comparison-details-table-component"></span><h2>The Comparison Details Table Component<a class="headerlink" href="#module-comparison_details_table" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-card">
-<span id="the-card-component"></span><h2>The Card Component<a class="headerlink" href="#module-card" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-card_caption">
-<span id="the-card-caption-component"></span><h2>The Card Caption Component<a class="headerlink" href="#module-card_caption" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-toolbar">
-<span id="the-toolbar-component"></span><h2>The Toolbar Component<a class="headerlink" href="#module-toolbar" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-d3_chord_layout">
-<span id="the-chord-layout-engine-component"></span><h2>The Chord Layout Engine Component<a class="headerlink" href="#module-d3_chord_layout" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-d3_stemma_layout">
-<span id="the-stemma-layout-engine-component"></span><h2>The Stemma Layout Engine Component<a class="headerlink" href="#module-d3_stemma_layout" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-d3_common">
-<span id="various-functions-for-d3"></span><h2>Various functions for D3<a class="headerlink" href="#module-d3_common" title="Permalink to this headline">¶</a></h2>
-<p>Useful functions for wrestling with D3.</p>
+<p>You probably want to start looking at the <a class="reference internal" href="#client/coherence" title="client/coherence"><code class="xref js js-mod docutils literal notranslate"><span class="pre">client/coherence</span></code></a> or
+<a class="reference internal" href="#client/comparison" title="client/comparison"><code class="xref js js-mod docutils literal notranslate"><span class="pre">client/comparison</span></code></a> components.</p>
+<span class="target" id="module-client/app"></span><div class="section" id="client-app">
+<h2><a class="toc-backref" href="#id2">client/app</a><a class="headerlink" href="#client-app" title="Permalink to this headline">¶</a></h2>
+<p>App component. The whole application.</p>
 <dl class="function">
-<dt id="d3_common.module:d3_common.color_string_to_palette">
-<code class="descclassname">module:d3_common.</code><code class="descname">color_string_to_palette</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#d3_common.module:d3_common.color_string_to_palette" title="Permalink to this definition">¶</a></dt>
+<dt id="client/app.Vue#build_full_api_url">
+<code class="sig-prename descclassname">client/app.</code><code class="sig-name descname">Vue#build_full_api_url</code><span class="sig-paren">(</span><em class="sig-param">suffix</em><span class="sig-paren">)</span><a class="headerlink" href="#client/app.Vue#build_full_api_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ascend the VM tree until you find an api_url and use it as prefix to build the full API url.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>suffix</strong> (<em>String</em>) – Url suffix</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Full API url</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>String</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/app.Vue#get">
+<code class="sig-prename descclassname">client/app.</code><code class="sig-name descname">Vue#get</code><span class="sig-paren">(</span><em class="sig-param">suffix</em>, <em class="sig-param">config</em><span class="sig-paren">)</span><a class="headerlink" href="#client/app.Vue#get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a GET request to the API server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>suffix</strong> (<em>String</em>) – Url suffix</p></li>
+<li><p><strong>config</strong> (<em>Object</em>) – Params for axios call</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Promise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/app.Vue#_S_trigger">
+<code class="sig-prename descclassname">client/app.</code><code class="sig-name descname">Vue#$trigger</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">data</em><span class="sig-paren">)</span><a class="headerlink" href="#client/app.Vue#_S_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trigger a native event. vue.js custom ‘events’ do not bubble, so they are useless. Trigger a real event that bubbles and can be caught by vue.js.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>string</em>) – event name</p></li>
+<li><p><strong>data</strong> (<em>array</em>) – data</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-client/apparatus"></span></div>
+<div class="section" id="client-apparatus">
+<h2><a class="toc-backref" href="#id3">client/apparatus</a><a class="headerlink" href="#client-apparatus" title="Permalink to this headline">¶</a></h2>
+<p>This module displays the apparatus table. It retrieves the apparatus data in JSON format and builds a list of readings and of the manuscripts that attest that reading.</p>
+<dl class="function">
+<dt id="client/apparatus.load_passage">
+<code class="sig-prename descclassname">client/apparatus.</code><code class="sig-name descname">load_passage</code><span class="sig-paren">(</span><em class="sig-param">vm</em>, <em class="sig-param">pass_id</em><span class="sig-paren">)</span><a class="headerlink" href="#client/apparatus.load_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a new passage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vm</strong> (<em>Vue</em>) – The Vue instance</p></li>
+<li><p><strong>pass_id</strong> (<em>Number</em>) – The passage to load.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Promise, resolved when the passage has loaded.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Promise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/apparatus.goto_attestation">
+<code class="sig-prename descclassname">client/apparatus.</code><code class="sig-name descname">goto_attestation</code><span class="sig-paren">(</span><em class="sig-param">labez</em><span class="sig-paren">)</span><a class="headerlink" href="#client/apparatus.goto_attestation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the attestation in the “Coherence in Attestations” card and scroll to that card.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>labez</strong> (<em>string</em>) – The attestation to show.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/apparatus.find_relatives">
+<code class="sig-prename descclassname">client/apparatus.</code><code class="sig-name descname">find_relatives</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#client/apparatus.find_relatives" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open a page listing all manuscripts.</p>
+</dd></dl>
+
+<span class="target" id="module-client/coherence"></span></div>
+<div class="section" id="client-coherence">
+<h2><a class="toc-backref" href="#id4">client/coherence</a><a class="headerlink" href="#client-coherence" title="Permalink to this headline">¶</a></h2>
+<p>This module displays the coherence page. This module is only a container for the Vue.js components that actually display the gadgets.</p>
+<dl class="function">
+<dt id="client/coherence.set_passage">
+<code class="sig-prename descclassname">client/coherence.</code><code class="sig-name descname">set_passage</code><span class="sig-paren">(</span><em class="sig-param">pass_id</em><span class="sig-paren">)</span><a class="headerlink" href="#client/coherence.set_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a new passage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pass_id</strong> (<em>string</em>) – The new passage id</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/coherence.set_hash">
+<code class="sig-prename descclassname">client/coherence.</code><code class="sig-name descname">set_hash</code><span class="sig-paren">(</span><em class="sig-param">param</em>, <em class="sig-param">data</em><span class="sig-paren">)</span><a class="headerlink" href="#client/coherence.set_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the hash in the browser location bar by replacing one parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param</strong> (<em>string</em>) – The parameter name</p></li>
+<li><p><strong>data</strong> (<em>string</em>) – The parameter value</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/coherence.on_hashchange">
+<code class="sig-prename descclassname">client/coherence.</code><code class="sig-name descname">on_hashchange</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#client/coherence.on_hashchange" title="Permalink to this definition">¶</a></dt>
+<dd><p>React to hash changes, eventually move to another passage.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/coherence.on_epoch">
+<code class="sig-prename descclassname">client/coherence.</code><code class="sig-name descname">on_epoch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#client/coherence.on_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>React to epoch changes, tell all children to refresh.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/coherence.on_goto_attestation">
+<code class="sig-prename descclassname">client/coherence.</code><code class="sig-name descname">on_goto_attestation</code><span class="sig-paren">(</span><em class="sig-param">event</em><span class="sig-paren">)</span><a class="headerlink" href="#client/coherence.on_goto_attestation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scroll to the “Coherence in Attestations” card and load the given attestation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (<em>Event</em>) – The event, sent from a child.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/coherence.on_coherence_in_attestations_variant_changed">
+<code class="sig-prename descclassname">client/coherence.</code><code class="sig-name descname">on_coherence_in_attestations_variant_changed</code><span class="sig-paren">(</span><em class="sig-param">event</em><span class="sig-paren">)</span><a class="headerlink" href="#client/coherence.on_coherence_in_attestations_variant_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close all relatives popups if the attestation changes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (<em>Event</em>) – The event, sent from a child.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-client/comparison"></span></div>
+<div class="section" id="client-comparison">
+<h2><a class="toc-backref" href="#id5">client/comparison</a><a class="headerlink" href="#client-comparison" title="Permalink to this headline">¶</a></h2>
+<p>Comparison of 2 witnesses. This module shows a table with a global comparison of two witnesses: in how many passages do they differ, how many are older / younger? There is also a drill-down table for each range with more detail about the differing passages.</p>
+<dl class="function">
+<dt id="client/comparison.submit">
+<code class="sig-prename descclassname">client/comparison.</code><code class="sig-name descname">submit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#client/comparison.submit" title="Permalink to this definition">¶</a></dt>
+<dd><p>React to click of the submit button. Change the hash. Makes the browser back button work.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/comparison.on_hashchange">
+<code class="sig-prename descclassname">client/comparison.</code><code class="sig-name descname">on_hashchange</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#client/comparison.on_hashchange" title="Permalink to this definition">¶</a></dt>
+<dd><p>React to hash changes. Start a new comparison.</p>
+</dd></dl>
+
+<span class="target" id="module-client/comparison_details_table"></span></div>
+<div class="section" id="client-comparison-details-table">
+<h2><a class="toc-backref" href="#id6">client/comparison_details_table</a><a class="headerlink" href="#client-comparison-details-table" title="Permalink to this headline">¶</a></h2>
+<p>Comparison of 2 witnesses. This module shows a drill-down table for each range with more detail about the differing passages.</p>
+<dl class="function">
+<dt id="client/comparison_details_table.dir">
+<code class="sig-prename descclassname">client/comparison_details_table.</code><code class="sig-name descname">dir</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="headerlink" href="#client/comparison_details_table.dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a direction marker: &lt;, &gt;, NoRel or Uncl.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>object</em>) – The data row</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>Direction marker.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/comparison_details_table.row_conversion">
+<code class="sig-prename descclassname">client/comparison_details_table.</code><code class="sig-name descname">row_conversion</code><span class="sig-paren">(</span><em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#client/comparison_details_table.row_conversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detail row conversion function. Convert numeric values to numeric types and add calculated fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<em>object</em>) – The original row</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The converted row</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-client/comparison_table"></span></div>
+<div class="section" id="client-comparison-table">
+<h2><a class="toc-backref" href="#id7">client/comparison_table</a><a class="headerlink" href="#client-comparison-table" title="Permalink to this headline">¶</a></h2>
+<p>Comparison of 2 witnesses. This module shows a table with a global comparison of two witnesses: in how many passages do they differ, how many are older / younger? There is also a drill-down table for each range with more detail about the differing passages.</p>
+<dl class="function">
+<dt id="client/comparison_table.dir">
+<code class="sig-prename descclassname">client/comparison_table.</code><code class="sig-name descname">dir</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="headerlink" href="#client/comparison_table.dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a direction marker, &lt;, =, or &gt;.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>object</em>) – Data row</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>Direction marker.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/comparison_table.row_conversion">
+<code class="sig-prename descclassname">client/comparison_table.</code><code class="sig-name descname">row_conversion</code><span class="sig-paren">(</span><em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#client/comparison_table.row_conversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Row conversion function. Convert numeric values to numeric types and add calculated fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<em>object</em>) – The original row</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The converted row</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-client/d3_chord_layout"></span></div>
+<div class="section" id="client-d3-chord-layout">
+<h2><a class="toc-backref" href="#id8">client/d3_chord_layout</a><a class="headerlink" href="#client-d3-chord-layout" title="Permalink to this headline">¶</a></h2>
+<p>This module converts a graph in .dot format into a SVG chord layout.</p>
+<dl class="function">
+<dt id="client/d3_chord_layout.load_dot">
+<code class="sig-prename descclassname">client/d3_chord_layout.</code><code class="sig-name descname">load_dot</code><span class="sig-paren">(</span><em class="sig-param">vm</em>, <em class="sig-param">dot</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_chord_layout.load_dot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an SVG graph from a dot program.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vm</strong> (<em>Vue</em>) – The Vue instance</p></li>
+<li><p><strong>dot</strong> (<em>string</em>) – A Graphviz .dot program text</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>A promise resolved when all SVG elements have been created.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Promise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-client/d3_common"></span></div>
+<div class="section" id="client-d3-common">
+<h2><a class="toc-backref" href="#id9">client/d3_common</a><a class="headerlink" href="#client-d3-common" title="Permalink to this headline">¶</a></h2>
+<p>This module contains common functions built around the D3 library.</p>
+<dl class="data">
+<dt id="client/d3_common.dot2css">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">dot2css</code><a class="headerlink" href="#client/d3_common.dot2css" title="Permalink to this definition">¶</a></dt>
+<dd><p>(float)
+Conversion factor from standard .dot resolution to standard css resolution. Why 96? See: <a class="reference external" href="https://www.w3.org/TR/css3-values/#reference-pixel">https://www.w3.org/TR/css3-values/#reference-pixel</a> Why 72? All output of GraphViz assumes 72 dpi regardless of the value of the ‘dpi’ field. The ‘dpi’ field is used only for bitmap and svg output.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/d3_common.color_string_to_palette">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">color_string_to_palette</code><span class="sig-paren">(</span><em class="sig-param">s</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_common.color_string_to_palette" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a string of hex RGB to a D3 scale.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>s</strong> (<em>String</em>) – The color palette as string</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> (<em>String</em>) – The color palette as string</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – The color palette as D3 scale.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The color palette as D3 scale.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="data">
+<dt id="client/d3_common.labez_palette">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">labez_palette</code><a class="headerlink" href="#client/d3_common.labez_palette" title="Permalink to this definition">¶</a></dt>
+<dd><p>(d3.scale)
+A D3 color palette suitable for attestations.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="client/d3_common.cliques_palette">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">cliques_palette</code><a class="headerlink" href="#client/d3_common.cliques_palette" title="Permalink to this definition">¶</a></dt>
+<dd><p>(d3.scale)
+A D3 color palette suitable for cliques.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="d3_common.module:d3_common.generate_css_palette">
-<code class="descclassname">module:d3_common.</code><code class="descname">generate_css_palette</code><span class="sig-paren">(</span><em>labez_scale</em>, <em>clique_scale</em><span class="sig-paren">)</span><a class="headerlink" href="#d3_common.module:d3_common.generate_css_palette" title="Permalink to this definition">¶</a></dt>
+<dt id="client/d3_common.generate_css_palette">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">generate_css_palette</code><span class="sig-paren">(</span><em class="sig-param">labez_scale</em>, <em class="sig-param">clique_scale</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_common.generate_css_palette" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates a CSS color palette from a D3 scale.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>labez_scale</strong> (<em>d3.scale</em>) – The color palette for labez as D3 scale.</li>
-<li><strong>clique_scale</strong> (<em>d3.scale</em>) – The color palette for cliques as D3 scale.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>labez_scale</strong> (<em>d3.scale</em>) – The color palette for labez as D3 scale.</p></li>
+<li><p><strong>clique_scale</strong> (<em>d3.scale</em>) – The color palette for cliques as D3 scale.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>String</strong> – The color palette as CSS</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The color palette as CSS</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>String</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="d3_common.module:d3_common.insert_css_palette">
-<code class="descclassname">module:d3_common.</code><code class="descname">insert_css_palette</code><span class="sig-paren">(</span><em>css</em><span class="sig-paren">)</span><a class="headerlink" href="#d3_common.module:d3_common.insert_css_palette" title="Permalink to this definition">¶</a></dt>
+<dt id="client/d3_common.insert_css_palette">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">insert_css_palette</code><span class="sig-paren">(</span><em class="sig-param">css</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_common.insert_css_palette" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert a CSS color palette into the DOM making it active.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>css</strong> (<em>String</em>) – The color palette as CSS.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>css</strong> (<em>String</em>) – The color palette as CSS.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="d3_common.module:d3_common.to_jquery">
-<code class="descclassname">module:d3_common.</code><code class="descname">to_jquery</code><span class="sig-paren">(</span><em>d3_selection</em><span class="sig-paren">)</span><a class="headerlink" href="#d3_common.module:d3_common.to_jquery" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a D3 selection object into a jQuery selection object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>d3_selection</strong> (<em>d3.selection</em>) – The D3 selection object</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>jQuery.selection</strong> – The jQuery selection object. See: <a class="reference external" href="http://collaboradev.com/2014/03/18/d3-and-jquery-interoperability/">http://collaboradev.com/2014/03/18/d3-and-jquery-interoperability/</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="d3_common.module:d3_common.to_d3">
-<code class="descclassname">module:d3_common.</code><code class="descname">to_d3</code><span class="sig-paren">(</span><em>jquery_selection</em><span class="sig-paren">)</span><a class="headerlink" href="#d3_common.module:d3_common.to_d3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a jQuery selection object into a D3 selection object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>jquery_selection</strong> (<em>jQuery.selection</em>) – The jQuery selection object</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>D3.selection</strong> – The D3 selection object.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="d3_common.module:d3_common.append_marker">
-<code class="descclassname">module:d3_common.</code><code class="descname">append_marker</code><span class="sig-paren">(</span><em>svg</em>, <em>id_prefix</em><span class="sig-paren">)</span><a class="headerlink" href="#d3_common.module:d3_common.append_marker" title="Permalink to this definition">¶</a></dt>
+<dt id="client/d3_common.append_marker">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">append_marker</code><span class="sig-paren">(</span><em class="sig-param">svg</em>, <em class="sig-param">id_prefix</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_common.append_marker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Append a triangular marker def to the SVG.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>svg</strong> (<em>jQuery.selection|d3.selection</em>) – The SVG element.</li>
-<li><strong>id_prefix</strong> (<em>String</em>) – The id prefix.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>svg</strong> (<em>d3.selection</em>) – The SVG element.</p></li>
+<li><p><strong>id_prefix</strong> (<em>String</em>) – The id prefix.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="d3_common.module:d3_common.parse_pt">
-<code class="descclassname">module:d3_common.</code><code class="descname">parse_pt</code><span class="sig-paren">(</span><em>commasep</em><span class="sig-paren">)</span><a class="headerlink" href="#d3_common.module:d3_common.parse_pt" title="Permalink to this definition">¶</a></dt>
+<dt id="client/d3_common.parse_pt">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">parse_pt</code><span class="sig-paren">(</span><em class="sig-param">commasep</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_common.parse_pt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse point coordinates from .dot format.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>commasep</strong> (<em>String</em>) – The pt as comma-separated values.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>commasep</strong> (<em>String</em>) – The pt as comma-separated values.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – The point as dictionary { x, y }</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The point as dictionary { x, y }</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Object</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="d3_common.module:d3_common.parse_bbox">
-<code class="descclassname">module:d3_common.</code><code class="descname">parse_bbox</code><span class="sig-paren">(</span><em>commasep</em><span class="sig-paren">)</span><a class="headerlink" href="#d3_common.module:d3_common.parse_bbox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse bounding box coordinates from .dot format.</p>
-<p>From the .dot format docs: rect: “%f,%f,%f,%f” The rectangle
-llx,lly,urx,ury gives the coordinates, in points, of the lower-left
-corner (llx,lly) and the upper-right corner (urx,ury).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>commasep</strong> (<em>String</em>) – The bbox as comma-separated values.</li>
+<dt id="client/d3_common.parse_bbox">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">parse_bbox</code><span class="sig-paren">(</span><em class="sig-param">commasep</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_common.parse_bbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse bounding box coordinates from .dot format. From the .dot format docs: rect: “%f,%f,%f,%f” The rectangle llx,lly,urx,ury gives the coordinates, in points, of the lower-left corner (llx,lly) and the upper-right corner (urx,ury).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>commasep</strong> (<em>String</em>) – The bbox as comma-separated values.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – The bbox as dictionary { x, y, width, height }</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The bbox as dictionary { x, y, width, height }</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Object</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="d3_common.module:d3_common.parse_path">
-<code class="descclassname">module:d3_common.</code><code class="descname">parse_path</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#d3_common.module:d3_common.parse_path" title="Permalink to this definition">¶</a></dt>
+<dt id="client/d3_common.parse_path">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">parse_path</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_common.parse_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse edge path .dot format.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> (<em>String</em>) – The path in .dot format</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>String</em>) – The path in .dot format</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Array</strong> – The path as array of objects  { x, y }</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The path as array of objects { x, y }</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Array</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="d3_common.module:d3_common.parse_path_svg">
-<code class="descclassname">module:d3_common.</code><code class="descname">parse_path_svg</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#d3_common.module:d3_common.parse_path_svg" title="Permalink to this definition">¶</a></dt>
+<dt id="client/d3_common.parse_path_svg">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">parse_path_svg</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_common.parse_path_svg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse edge path .dot format.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> (<em>String</em>) – The path in .dot format</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>String</em>) – The path in .dot format</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>String</strong> – The path as ‘Mx,y Cx,y x,y x,y …’</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The path as ‘Mx,y Cx,y x,y x,y …’</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>String</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="d3_common.module:d3_common.inflate_bbox">
-<code class="descclassname">module:d3_common.</code><code class="descname">inflate_bbox</code><span class="sig-paren">(</span><em>bbox</em>, <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#d3_common.module:d3_common.inflate_bbox" title="Permalink to this definition">¶</a></dt>
+<dt id="client/d3_common.inflate_bbox">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">inflate_bbox</code><span class="sig-paren">(</span><em class="sig-param">bbox</em>, <em class="sig-param">len</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_common.inflate_bbox" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inflate a bbox.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>bbox</strong> (<em>Object</em>) – The bbox as dictionary of x, y, width, height</li>
-<li><strong>len</strong> (<em>float</em>) – The bbox will be twice this wider and taller.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bbox</strong> (<em>Object</em>) – The bbox as dictionary of x, y, width, height</p></li>
+<li><p><strong>len</strong> (<em>float</em>) – The bbox will be twice this wider and taller.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – The bbox as dictionary of x, y, width, height</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The bbox as dictionary of x, y, width, height</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Object</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="d3_common.module:d3_common.dot">
-<code class="descclassname">module:d3_common.</code><code class="descname">dot</code><span class="sig-paren">(</span><em>data</em>, <em>callback</em><span class="sig-paren">)</span><a class="headerlink" href="#d3_common.module:d3_common.dot" title="Permalink to this definition">¶</a></dt>
+<dt id="client/d3_common.key_by">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">key_by</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">attr</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_common.key_by" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an object from an array of objects. The keys are taken from a specified attribute of the array elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>Array</em>) – The input array of objects</p></li>
+<li><p><strong>attr</strong> (<em>String</em>) – The attribute to take the key from.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/d3_common.dot">
+<code class="sig-prename descclassname">client/d3_common.</code><code class="sig-name descname">dot</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_common.dot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse a .dot file into lists of subgraphs, nodes, edges, and graph attributes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<em>String</em>) – The data in .dot format</li>
-<li><strong>callback</strong> (<em>function</em>) – The callback function.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>String</em>) – The data in .dot format</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Promise</strong> –</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Object</p>
+</dd>
+</dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-tools">
-<span id="various-functions"></span><h2>Various Functions<a class="headerlink" href="#module-tools" title="Permalink to this headline">¶</a></h2>
-<p>Useful functions that don’t fit anywhere else.</p>
+<span class="target" id="module-client/d3_stemma_layout"></span></div>
+<div class="section" id="client-d3-stemma-layout">
+<h2><a class="toc-backref" href="#id10">client/d3_stemma_layout</a><a class="headerlink" href="#client-d3-stemma-layout" title="Permalink to this headline">¶</a></h2>
+<p>This module converts a graph in .dot format into SVG. The .dot file must be pre-processed in order to contain coordinates for each node and bezier paths for each edge.</p>
 <dl class="function">
-<dt id="tools.module:tools.format">
-<code class="descclassname">module:tools.</code><code class="descname">format</code><span class="sig-paren">(</span><em>s</em>, <em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.format" title="Permalink to this definition">¶</a></dt>
-<dd><p>Format a string in python fashion.  “{count} items found”</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>s</strong> (<em>String</em>) – The string to format</li>
-<li><strong>data</strong> (<em>dict</em>) – A dictionary of key: value</li>
+<dt id="client/d3_stemma_layout.load_dot">
+<code class="sig-prename descclassname">client/d3_stemma_layout.</code><code class="sig-name descname">load_dot</code><span class="sig-paren">(</span><em class="sig-param">vm</em>, <em class="sig-param">dot</em><span class="sig-paren">)</span><a class="headerlink" href="#client/d3_stemma_layout.load_dot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an SVG graph from a dot program.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vm</strong> (<em>Vue</em>) – The Vue instance</p></li>
+<li><p><strong>dot</strong> (<em>string</em>) – A Graphviz .dot program text</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>String</strong> – The formatted string</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>A promise resolved when all SVG elements have been created.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Promise</p>
+</dd>
+</dl>
 </dd></dl>
 
+<span class="target" id="module-client/find_relatives"></span></div>
+<div class="section" id="client-find-relatives">
+<h2><a class="toc-backref" href="#id11">client/find_relatives</a><a class="headerlink" href="#client-find-relatives" title="Permalink to this headline">¶</a></h2>
+<p>Show all manuscripts with a certain attestation at a certain passage. Internally uses a list of &lt;relatives-table&gt; and a &lt;toolbar&gt;.</p>
 <dl class="function">
-<dt id="tools.module:tools.natural_sort">
-<code class="descclassname">module:tools.</code><code class="descname">natural_sort</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.natural_sort" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transform a string so that numbers in the string sort naturally.</p>
-<p>Transform any contiguous run of digits so that it sorts
-naturally during an alphabetical sort. Every run of digits gets
-the length of the run prepended, eg. 123 =&gt; 3123, 123456 =&gt;
-6123456.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>s</strong> (<em>String</em>) – The input string</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>String</strong> – The transformed string</p>
-</td>
-</tr>
-</tbody>
-</table>
+<dt id="client/find_relatives.goto_manuscript">
+<code class="sig-prename descclassname">client/find_relatives.</code><code class="sig-name descname">goto_manuscript</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#client/find_relatives.goto_manuscript" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scroll to the manuscript.</p>
 </dd></dl>
 
-<dl class="function">
-<dt id="tools.module:tools.deparam">
-<code class="descclassname">module:tools.</code><code class="descname">deparam</code><span class="sig-paren">(</span><em>query_string</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.deparam" title="Permalink to this definition">¶</a></dt>
-<dd><p>The inverse of the jQuery.param () function.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>query_string</strong> (<em>String</em>) – A string in the form “p=1&amp;q=2”</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>Object</strong> – { p : 1, q : 2 }</p>
-</td>
-</tr>
-</tbody>
-</table>
+<span class="target" id="module-client/flash_messages"></span></div>
+<div class="section" id="client-flash-messages">
+<h2><a class="toc-backref" href="#id12">client/flash_messages</a><a class="headerlink" href="#client-flash-messages" title="Permalink to this headline">¶</a></h2>
+<p>Output the flashed messages.</p>
+<span class="target" id="module-client/leitzeile"></span></div>
+<div class="section" id="client-leitzeile">
+<h2><a class="toc-backref" href="#id13">client/leitzeile</a><a class="headerlink" href="#client-leitzeile" title="Permalink to this headline">¶</a></h2>
+<p>This component displays the leitzeile.</p>
+<span class="target" id="module-client/local_stemma"></span></div>
+<div class="section" id="client-local-stemma">
+<h2><a class="toc-backref" href="#id14">client/local_stemma</a><a class="headerlink" href="#client-local-stemma" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the local stemma with drag-and-drop editing.</p>
+<dl class="attribute">
+<dt id="client/local_stemma.dragged_node">
+<code class="sig-prename descclassname">client/local_stemma.</code><code class="sig-name descname">dragged_node</code><a class="headerlink" href="#client/local_stemma.dragged_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>(D3selector)
+The node being dragged or null</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="client/local_stemma.target_node">
+<code class="sig-prename descclassname">client/local_stemma.</code><code class="sig-name descname">target_node</code><a class="headerlink" href="#client/local_stemma.target_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>(D3selector)
+The node under the node being dragged or null</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="tools.module:tools.xhr_alert">
-<code class="descclassname">module:tools.</code><code class="descname">xhr_alert</code><span class="sig-paren">(</span><em>reason</em>, <em>$card</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.xhr_alert" title="Permalink to this definition">¶</a></dt>
-<dd><p>Display an auto-closing alert window.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
-<li><strong>reason</strong> (<em>Object</em>) – The parameter that was passed to Promise.then () or Promise.catch ().</li>
-<li><strong>$card</strong> (<em>jQuery</em>) – The card to append the window to.</li>
+<dt id="client/local_stemma.return_to_base">
+<code class="sig-prename descclassname">client/local_stemma.</code><code class="sig-name descname">return_to_base</code><span class="sig-paren">(</span><em class="sig-param">d3_node</em><span class="sig-paren">)</span><a class="headerlink" href="#client/local_stemma.return_to_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the node back to the original position. If the user drops the node ‘nowhere’ then this function slides the node back to the original position.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d3_node</strong> (<em>D3selector</em>) – The node to slide back.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
-<dt id="tools.module:tools.bfs">
-<code class="descclassname">module:tools.</code><code class="descname">bfs</code><span class="sig-paren">(</span><em>edges</em>, <em>start</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.module:tools.bfs" title="Permalink to this definition">¶</a></dt>
+<dt id="client/local_stemma.highlight">
+<code class="sig-prename descclassname">client/local_stemma.</code><code class="sig-name descname">highlight</code><span class="sig-paren">(</span><em class="sig-param">node</em>, <em class="sig-param">b</em><span class="sig-paren">)</span><a class="headerlink" href="#client/local_stemma.highlight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Highlight or unhighlight a node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>Object</em>) – The node to highlight</p></li>
+<li><p><strong>b</strong> (<em>bool</em>) – Whether to highlight or unhighlight</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/local_stemma.drag_listener">
+<code class="sig-prename descclassname">client/local_stemma.</code><code class="sig-name descname">drag_listener</code><span class="sig-paren">(</span><em class="sig-param">vm</em><span class="sig-paren">)</span><a class="headerlink" href="#client/local_stemma.drag_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drag and drop handler Creates a d3-drag object that implements the drag-and-drop local stemma editor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vm</strong> (<em>Object</em>) – The Vue instance</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/local_stemma.build_contextmenu">
+<code class="sig-prename descclassname">client/local_stemma.</code><code class="sig-name descname">build_contextmenu</code><span class="sig-paren">(</span><em class="sig-param">evt</em>, <em class="sig-param">vm</em><span class="sig-paren">)</span><a class="headerlink" href="#client/local_stemma.build_contextmenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the context menu. The context menu can be used to split the attestation, reassign source nodes or to merge a split.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>evt</strong> (<em>Object</em>) – The event</p></li>
+<li><p><strong>vm</strong> (<em>Vue</em>) – The Vue instance</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/local_stemma.load_passage">
+<code class="sig-prename descclassname">client/local_stemma.</code><code class="sig-name descname">load_passage</code><span class="sig-paren">(</span><em class="sig-param">vm</em>, <em class="sig-param">pass_id</em><span class="sig-paren">)</span><a class="headerlink" href="#client/local_stemma.load_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a new passage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vm</strong> (<em>Vue</em>) – The Vue instance</p></li>
+<li><p><strong>pass_id</strong> (<em>Number</em>) – Which passage to load.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Promise, resolved when the new passage has loaded.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Promise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-client/notes"></span></div>
+<div class="section" id="client-notes">
+<h2><a class="toc-backref" href="#id15">client/notes</a><a class="headerlink" href="#client-notes" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the editor notes card.</p>
+<dl class="function">
+<dt id="client/notes.load_passage">
+<code class="sig-prename descclassname">client/notes.</code><code class="sig-name descname">load_passage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#client/notes.load_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a new passage.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/notes.on_save">
+<code class="sig-prename descclassname">client/notes.</code><code class="sig-name descname">on_save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#client/notes.on_save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save an edited passage.</p>
+</dd></dl>
+
+<span class="target" id="module-client/notes_list"></span></div>
+<div class="section" id="client-notes-list">
+<h2><a class="toc-backref" href="#id16">client/notes_list</a><a class="headerlink" href="#client-notes-list" title="Permalink to this headline">¶</a></h2>
+<p>Show a list of all notes.</p>
+<span class="target" id="module-client/optimal_substemma"></span></div>
+<div class="section" id="client-optimal-substemma">
+<h2><a class="toc-backref" href="#id17">client/optimal_substemma</a><a class="headerlink" href="#client-optimal-substemma" title="Permalink to this headline">¶</a></h2>
+<p>Find the optimal substemma of a witness by exhaustive search. See: Presentation 485ffFind the optimal substemma of a witness by exhaustive search. See: Presentation 485ff</p>
+<dl class="function">
+<dt id="client/optimal_substemma.row_conversion">
+<code class="sig-prename descclassname">client/optimal_substemma.</code><code class="sig-name descname">row_conversion</code><span class="sig-paren">(</span><em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#client/optimal_substemma.row_conversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Row conversion function. Convert numeric values to numeric types and add calculated fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<em>object</em>) – The original row</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The converted row</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-client/optimal_substemma_details"></span></div>
+<div class="section" id="client-optimal-substemma-details">
+<h2><a class="toc-backref" href="#id18">client/optimal_substemma_details</a><a class="headerlink" href="#client-optimal-substemma-details" title="Permalink to this headline">¶</a></h2>
+<p>Exhaustive Search Details. This module shows a drill-down table for any combination with more detail about the explained variants.</p>
+<dl class="function">
+<dt id="client/optimal_substemma_details.row_conversion">
+<code class="sig-prename descclassname">client/optimal_substemma_details.</code><code class="sig-name descname">row_conversion</code><span class="sig-paren">(</span><em class="sig-param">d</em><span class="sig-paren">)</span><a class="headerlink" href="#client/optimal_substemma_details.row_conversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detail row conversion function. Convert numeric values to numeric types and add calculated fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<em>object</em>) – The original row</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The converted row</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-client/page_header"></span></div>
+<div class="section" id="client-page-header">
+<h2><a class="toc-backref" href="#id19">client/page_header</a><a class="headerlink" href="#client-page-header" title="Permalink to this headline">¶</a></h2>
+<p>The page header with the violet ribbon.</p>
+<span class="target" id="module-client/project_list"></span></div>
+<div class="section" id="client-project-list">
+<h2><a class="toc-backref" href="#id20">client/project_list</a><a class="headerlink" href="#client-project-list" title="Permalink to this headline">¶</a></h2>
+<p>Project list component. List the available projects. A project is one book of the NT and one phase.</p>
+<span class="target" id="module-client/relatives_metrics"></span></div>
+<div class="section" id="client-relatives-metrics">
+<h2><a class="toc-backref" href="#id21">client/relatives_metrics</a><a class="headerlink" href="#client-relatives-metrics" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the information bar about the average agreements in the relatives popup.</p>
+<dl class="function">
+<dt id="client/relatives_metrics.load_passage">
+<code class="sig-prename descclassname">client/relatives_metrics.</code><code class="sig-name descname">load_passage</code><span class="sig-paren">(</span><em class="sig-param">passage</em><span class="sig-paren">)</span><a class="headerlink" href="#client/relatives_metrics.load_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load new data. Display new data after the user navigated to a different passage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>passage</strong> (<em>Object</em>) – The new passage</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-client/relatives_table"></span></div>
+<div class="section" id="client-relatives-table">
+<h2><a class="toc-backref" href="#id22">client/relatives_table</a><a class="headerlink" href="#client-relatives-table" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the table in the relatives popup.</p>
+<dl class="function">
+<dt id="client/relatives_table.load_passage">
+<code class="sig-prename descclassname">client/relatives_table.</code><code class="sig-name descname">load_passage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#client/relatives_table.load_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load new data. Display new data in the table after the user navigated to a different passage.</p>
+</dd></dl>
+
+<span class="target" id="module-client/set_cover"></span></div>
+<div class="section" id="client-set-cover">
+<h2><a class="toc-backref" href="#id23">client/set_cover</a><a class="headerlink" href="#client-set-cover" title="Permalink to this headline">¶</a></h2>
+<p>Find the minimum set cover of ancestors for any descendant. See: Presentation 485ff</p>
+<span class="target" id="module-client/table_sort_mixin"></span></div>
+<div class="section" id="client-table-sort-mixin">
+<h2><a class="toc-backref" href="#id24">client/table_sort_mixin</a><a class="headerlink" href="#client-table-sort-mixin" title="Permalink to this headline">¶</a></h2>
+<p>Mixin to make a table sortable To use: put a class ‘table-sortable’ on the table put an attribute ‘data-sort-by’ on the &lt;th&gt;s of the columns you want made sortable</p>
+<dl class="function">
+<dt id="client/table_sort_mixin.on_sort">
+<code class="sig-prename descclassname">client/table_sort_mixin.</code><code class="sig-name descname">on_sort</code><span class="sig-paren">(</span><em class="sig-param">event</em><span class="sig-paren">)</span><a class="headerlink" href="#client/table_sort_mixin.on_sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>React to click on table haders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (<em>Event</em>) – The click event.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/table_sort_mixin.sort">
+<code class="sig-prename descclassname">client/table_sort_mixin.</code><code class="sig-name descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#client/table_sort_mixin.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort the table.</p>
+</dd></dl>
+
+<span class="target" id="module-client/table_toggle_mixin"></span></div>
+<div class="section" id="client-table-toggle-mixin">
+<h2><a class="toc-backref" href="#id25">client/table_toggle_mixin</a><a class="headerlink" href="#client-table-toggle-mixin" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="client/table_toggle_mixin.toggle_details_table">
+<code class="sig-prename descclassname">client/table_toggle_mixin.</code><code class="sig-name descname">toggle_details_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#client/table_toggle_mixin.toggle_details_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens/closes the drill-down table.</p>
+</dd></dl>
+
+<span class="target" id="module-client/textflow"></span></div>
+<div class="section" id="client-textflow">
+<h2><a class="toc-backref" href="#id26">client/textflow</a><a class="headerlink" href="#client-textflow" title="Permalink to this headline">¶</a></h2>
+<p>This module displays a textflow diagram. A textflow diagram is a directed acyclic graph that shows the relationship between all manuscripts that offer one reading at one passage. It can be used to deduce where a reading originated.</p>
+<dl class="function">
+<dt id="client/textflow.build_contextmenu">
+<code class="sig-prename descclassname">client/textflow.</code><code class="sig-name descname">build_contextmenu</code><span class="sig-paren">(</span><em class="sig-param">event</em>, <em class="sig-param">vm</em><span class="sig-paren">)</span><a class="headerlink" href="#client/textflow.build_contextmenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open a context menu when right clicked on a node. The context menu can be used to reassign the node to a different clique.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (<em>Object</em>) – The event</p></li>
+<li><p><strong>vm</strong> (<em>Object</em>) – The Vue instance</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/textflow.load_passage">
+<code class="sig-prename descclassname">client/textflow.</code><code class="sig-name descname">load_passage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#client/textflow.load_passage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a new passage.</p>
+</dd></dl>
+
+<span class="target" id="module-client/tools"></span></div>
+<div class="section" id="client-tools">
+<h2><a class="toc-backref" href="#id27">client/tools</a><a class="headerlink" href="#client-tools" title="Permalink to this headline">¶</a></h2>
+<p>This module implements helper functions and is a container for all stuff that doesn’t fit elsewhere.</p>
+<dl class="function">
+<dt id="client/tools.format">
+<code class="sig-prename descclassname">client/tools.</code><code class="sig-name descname">format</code><span class="sig-paren">(</span><em class="sig-param">s</em>, <em class="sig-param">data</em><span class="sig-paren">)</span><a class="headerlink" href="#client/tools.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a string in python fashion. “{count} items found”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> (<em>String</em>) – The string to format</p></li>
+<li><p><strong>data</strong> (<em>dict</em>) – A dictionary of key: value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The formatted string</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>String</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/tools.natural_sort">
+<code class="sig-prename descclassname">client/tools.</code><code class="sig-name descname">natural_sort</code><span class="sig-paren">(</span><em class="sig-param">s</em><span class="sig-paren">)</span><a class="headerlink" href="#client/tools.natural_sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform a string so that numbers in the string sort naturally. Transform any contiguous run of digits so that it sorts naturally during an alphabetical sort. Every run of digits gets the length of the run prepended, eg. 123 =&gt; 3123, 123456 =&gt; 6123456.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> (<em>String</em>) – The input string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The transformed string</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>String</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/tools.deparam">
+<code class="sig-prename descclassname">client/tools.</code><code class="sig-name descname">deparam</code><span class="sig-paren">(</span><em class="sig-param">query_string</em><span class="sig-paren">)</span><a class="headerlink" href="#client/tools.deparam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a query string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query_string</strong> (<em>String</em>) – A string in the form “p=1&amp;q=2”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>{ p : 1, q : 2 }</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/tools.param">
+<code class="sig-prename descclassname">client/tools.</code><code class="sig-name descname">param</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">pick_list</em><span class="sig-paren">)</span><a class="headerlink" href="#client/tools.param" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a query string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<em>Object</em>) – Object of params, eg. { p : 1, q : 2 }</p></li>
+<li><p><strong>pick_list</strong> (<em>Array</em>) – Pick only these members, eg. [‘p’, ‘q’]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>A string in the form “p=1&amp;q=2”</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>String</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="client/tools.bfs">
+<code class="sig-prename descclassname">client/tools.</code><code class="sig-name descname">bfs</code><span class="sig-paren">(</span><em class="sig-param">edges</em>, <em class="sig-param">start</em><span class="sig-paren">)</span><a class="headerlink" href="#client/tools.bfs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Breadth first search in graph</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
-<li><strong>edges</strong> (<em>Object</em>) – The edges list</li>
-<li><strong>start</strong> (<em>String</em>) – The start node id</li>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>edges</strong> (<em>Object</em>) – The edges list</p></li>
+<li><p><strong>start</strong> (<em>String</em>) – The start node id</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of node ids in breadth-first order</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of node ids in breadth-first order</p>
+</dd>
+</dl>
 </dd></dl>
 
+<span class="target" id="module-client/widgets/autocomplete"></span></div>
+<div class="section" id="client-widgets-autocomplete">
+<h2><a class="toc-backref" href="#id28">client/widgets/autocomplete</a><a class="headerlink" href="#client-widgets-autocomplete" title="Permalink to this headline">¶</a></h2>
+<p>An autocomplete dropdown. The difference between a normal dropdown and this is that we have an input control instead of a button, and we always keep the focus on the input and never give it to the menu.</p>
+<span class="target" id="module-client/widgets/button_group"></span></div>
+<div class="section" id="client-widgets-button-group">
+<h2><a class="toc-backref" href="#id29">client/widgets/button_group</a><a class="headerlink" href="#client-widgets-button-group" title="Permalink to this headline">¶</a></h2>
+<p>A radio or checkbox group.</p>
+<span class="target" id="module-client/widgets/card"></span></div>
+<div class="section" id="client-widgets-card">
+<h2><a class="toc-backref" href="#id30">client/widgets/card</a><a class="headerlink" href="#client-widgets-card" title="Permalink to this headline">¶</a></h2>
+<p>This module is the base for a card. The card may position itself relatively to a target element. The card may be draggable.</p>
+<span class="target" id="module-client/widgets/card_caption"></span></div>
+<div class="section" id="client-widgets-card-caption">
+<h2><a class="toc-backref" href="#id31">client/widgets/card_caption</a><a class="headerlink" href="#client-widgets-card-caption" title="Permalink to this headline">¶</a></h2>
+<p>The card caption with min/max/close buttons.</p>
+<span class="target" id="module-client/widgets/connectivity"></span></div>
+<div class="section" id="client-widgets-connectivity">
+<h2><a class="toc-backref" href="#id32">client/widgets/connectivity</a><a class="headerlink" href="#client-widgets-connectivity" title="Permalink to this headline">¶</a></h2>
+<p>The connectivity slider.</p>
+<span class="target" id="module-client/widgets/context_menu"></span></div>
+<div class="section" id="client-widgets-context-menu">
+<h2><a class="toc-backref" href="#id33">client/widgets/context_menu</a><a class="headerlink" href="#client-widgets-context-menu" title="Permalink to this headline">¶</a></h2>
+<p>This module implements a context menu.</p>
+<dl class="function">
+<dt id="client/widgets/context_menu.mkmsg">
+<code class="sig-prename descclassname">client/widgets/context_menu.</code><code class="sig-name descname">mkmsg</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">labez</em>, <em class="sig-param">clique</em><span class="sig-paren">)</span><a class="headerlink" href="#client/widgets/context_menu.mkmsg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format message</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<em>String</em>) – Message prefix</p></li>
+<li><p><strong>labez</strong> (<em>String</em>) – The labez</p></li>
+<li><p><strong>clique</strong> (<em>String</em>) – The clique</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The formatted message.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>String</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-client/widgets/dropdown_mixin"></span></div>
+<div class="section" id="client-widgets-dropdown-mixin">
+<h2><a class="toc-backref" href="#id34">client/widgets/dropdown_mixin</a><a class="headerlink" href="#client-widgets-dropdown-mixin" title="Permalink to this headline">¶</a></h2>
+<p>A dropdown mixin for the labezator and range components.</p>
+<span class="target" id="module-client/widgets/labezator"></span></div>
+<div class="section" id="client-widgets-labezator">
+<h2><a class="toc-backref" href="#id35">client/widgets/labezator</a><a class="headerlink" href="#client-widgets-labezator" title="Permalink to this headline">¶</a></h2>
+<p>A navigator for labez.</p>
+<span class="target" id="module-client/widgets/navigator"></span></div>
+<div class="section" id="client-widgets-navigator">
+<h2><a class="toc-backref" href="#id36">client/widgets/navigator</a><a class="headerlink" href="#client-widgets-navigator" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the tape-recorder-controls navigator.</p>
+<span class="target" id="module-client/widgets/range"></span></div>
+<div class="section" id="client-widgets-range">
+<h2><a class="toc-backref" href="#id37">client/widgets/range</a><a class="headerlink" href="#client-widgets-range" title="Permalink to this headline">¶</a></h2>
+<p>A navigator for ranges (like chapters).</p>
+<span class="target" id="module-client/widgets/toolbar"></span></div>
+<div class="section" id="client-widgets-toolbar">
+<h2><a class="toc-backref" href="#id38">client/widgets/toolbar</a><a class="headerlink" href="#client-widgets-toolbar" title="Permalink to this headline">¶</a></h2>
+<p>This module implements the toolbar that is on most of the cards. Most of the functionality here resides in widgets. See the widgets subdirectory.</p>
 </div>
 </div>
 
@@ -700,7 +1344,7 @@ the length of the run prepended, eg. 123 =&gt; 3123, 123456 =&gt;
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016-18 CCeH - Licensed under the GNU GPL v3 or later
+        &copy; Copyright 2016-19 CCeH - Licensed under the GNU GPL v3 or later
 
     </p>
   </div>
