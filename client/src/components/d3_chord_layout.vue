@@ -6,7 +6,7 @@
 /**
  * This module converts a graph in .dot format into a SVG chord layout.
  *
- * @component d3_chord_layout
+ * @component client/d3_chord_layout
  * @author Marcello Perathoner
  */
 
@@ -17,11 +17,10 @@ import { radialLine, curveBundle } from 'd3-shape';
 import d3_common from 'd3_common';
 
 /**
- * Create an SVG graph from a dot file.
+ * Create an SVG graph from a dot program.
  *
- * @function load_dot
- *
- * @param {string} url - The url (must serve dot format).
+ * @param {Vue}    vm  - The Vue instance
+ * @param {string} dot - A Graphviz .dot program text
  *
  * @returns {Promise} - A promise resolved when all SVG elements have been created.
  */

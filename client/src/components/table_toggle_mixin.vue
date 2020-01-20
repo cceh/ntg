@@ -1,4 +1,6 @@
 <script>
+/** @module client/table_toggle_mixin */
+
 import tools from 'tools';
 
 export default {
@@ -6,11 +8,10 @@ export default {
         return {
         };
     },
+    /** @lends module:client/table_toggle_mixin */
     'methods' : {
         /**
          * Opens/closes the drill-down table.
-         *
-         * @function toggle_details_table
          */
         toggle_details_table (row, event) {
             if (row.child) {

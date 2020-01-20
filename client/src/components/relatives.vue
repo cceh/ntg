@@ -20,7 +20,7 @@ import card            from 'widgets/card.vue';
 import relatives_table from 'relatives_table.vue';
 
 
-/** @lends components/relatives */
+/** @lends module:components/relatives */
 export default {
     'props' : {
         'pass_id' : Number,

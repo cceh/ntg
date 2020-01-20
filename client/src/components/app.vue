@@ -10,7 +10,7 @@
 /**
  * App component.  The whole application.
  *
- * @component app
+ * @component client/app
  * @author Marcello Perathoner
  */
 
@@ -255,12 +255,9 @@ router.beforeEach ((to, from, next) => {
  * Ascend the VM tree until you find an api_url and use it as prefix to build
  * the full API url.
  *
- * @function build_full_api_url
- *
- * @param {Object} vm     - The Vue instance
- * @param {String} suffix - Url suffix
- *
- * @returns {String} Full API url
+ * @param    {String} suffix - Url suffix
+ * @returns  {String} Full API url
+ * @memberof module:client/app
  */
 
 Vue.prototype.build_full_api_url = function (suffix) {
@@ -281,12 +278,10 @@ Vue.prototype.build_full_api_url = function (suffix) {
 /**
  * Make a GET request to the API server.
  *
- * @function get
- *
  * @param {String} suffix - Url suffix
  * @param {Object} config - Params for axios call
- *
  * @returns {Promise}
+ * @memberof module:client/app
  */
 
 Vue.prototype.get = function (suffix, config = {}) {
@@ -305,13 +300,12 @@ Vue.prototype.put = function (suffix, config = {}) {
 /**
  * Trigger a native event.
  *
- * vue.js custom `events´ do not bubble, so they are useless.  Trigger a real
+ * vue.js custom 'events' do not bubble, so they are useless.  Trigger a real
  * event that bubbles and can be caught by vue.js.
- *
- * @function $trigger
  *
  * @param {string} name - event name
  * @param {array}  data - data
+ * @memberof module:client/app
  */
 
 Vue.prototype.$trigger = function (name, data) {

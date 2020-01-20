@@ -89,7 +89,7 @@
  * are older / younger? There is also a drill-down table for each range with
  * more detail about the differing passages.
  *
- * @component comparison_table
+ * @component client/comparison_table
  * @author Marcello Perathoner
  */
 
@@ -106,11 +106,8 @@ import button_group             from 'widgets/button_group.vue';
 /**
  * Return a direction marker, <, =, or >.
  *
- * @function dir
- *
- * @param {object} row - Data row
- *
- * @return Direction marker.
+ * @param {object} r - Data row
+ * @return {string} - Direction marker.
  */
 
 function dir (r) {
@@ -127,9 +124,8 @@ function dir (r) {
  * Row conversion function.  Convert numeric values to numeric types and add
  * calculated fields.
  *
- * @function main_row_conversion
- *
- * @return The converted row
+ * @param  {object} d - The original row
+ * @return {object}   - The converted row
  */
 
 function row_conversion (d) {

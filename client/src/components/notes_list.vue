@@ -38,7 +38,7 @@
 /**
  * Show a list of all notes.
  *
- * @component notes_list
+ * @component client/notes_list
  * @author Marcello Perathoner
  */
 

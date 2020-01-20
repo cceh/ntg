@@ -12,7 +12,7 @@
  * The card may position itself relatively to a target element.
  * The card may be draggable.
  *
- * @component card
+ * @component client/widgets/card
  * @author Marcello Perathoner
  */
 
@@ -38,8 +38,6 @@ export default {
          * Position the card relative to target.
          *
          * Target usually is the element that the user clicked to create the popup.
-         *
-         * @function position
          *
          * @param {DOM} target - A DOM element relative to which to position the popup.
          */

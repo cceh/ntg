@@ -3,6 +3,8 @@
  * to make a suitable entry point for webpack.
  *
  * See: https://ssr.vuejs.org/guide/structure.html#code-structure-with-webpack
+ *
+ * @module client/app
  */
 
 import Vue from 'vue';

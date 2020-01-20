@@ -20,11 +20,12 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-root = os.path.abspath ('.')
-sys.path.append (root)
-sys.path.append (os.path.join (root, 'server'))
-sys.path.append (os.path.join (root, 'client'))
-sys.path.append (os.path.join (root, 'scripts/cceh'))
+root = os.path.abspath ('..')
+sys.path.insert (0, '/home/highlander/uni/prj/suffix_tree/suffix_tree')
+sys.path.insert (0, root)
+sys.path.insert (0, os.path.join (root, 'server'))
+sys.path.insert (0, os.path.join (root, 'client'))
+sys.path.insert (0, os.path.join (root, 'scripts/cceh'))
 
 
 # -- General configuration ------------------------------------------------
@@ -42,15 +43,17 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.imgconverter',
     'sphinxcontrib.autoprogram',
+    'sphinxcontrib.httpdomain',
     'sphinxcontrib.plantuml',
-    'sphinx_js',
-    #'sphinxjs.sphinx_js',
-    'sauml.sauml',
+
+    'autojsdoc.autojsdoc',
+
+    'sqlalchemy-uml.sqlalchemy-uml',
 ]
 
-js_source_path    = ['client/src/js/', 'client/src/components/']
-root_for_relative_js_paths = 'client/src/'
-jsdoc_config_path = 'jsdoc.conf.js'
+autojsdoc_structure_json = 'jsdoc/structure.json'
+autojsdoc_members = True
+autojsdoc_title = True
 
 sauml_arguments = ['postgresql+psycopg2://ntg@localhost:5432/acts_ph4']
 sauml_dot_table = 'bgcolor=#e7f2fa&color=#2980B9'
@@ -71,7 +74,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'NTG'
-copyright = '2016-18 CCeH - Licensed under the GNU GPL v3 or later'
+copyright = '2016-19 CCeH - Licensed under the GNU GPL v3 or later'
 author = 'Marcello Perathoner'
 
 # The version info for the project you're documenting, acts as replacement for

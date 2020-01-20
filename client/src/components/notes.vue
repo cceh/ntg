@@ -19,7 +19,7 @@
 /**
  * This module implements the editor notes card.
  *
- * @component notes
+ * @component client/notes
  * @author Marcello Perathoner
  */
 
@@ -59,11 +59,10 @@ export default {
             this.can_save ();
         },
     },
+    /** @lends module:client/notes */
     'methods' : {
         /**
          * Load a new passage.
-         *
-         * @function load_passage
          */
         load_passage () {
             const vm = this;
@@ -95,8 +94,6 @@ export default {
         },
         /**
          * Save an edited passage.
-         *
-         * @function save_passage
          */
         on_save () {
             const vm = this;

@@ -104,7 +104,7 @@
  * This module displays the coherence page.  This module is only a container for
  * the Vue.js components that actually display the gadgets.
  *
- * @component coherence
+ * @component client/coherence
  * @author Marcello Perathoner
  */
 

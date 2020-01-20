@@ -23,7 +23,7 @@
 /**
  * The connectivity slider.
  *
- * @component connectivity
+ * @component client/widgets/connectivity
  * @author Marcello Perathoner
  */
 

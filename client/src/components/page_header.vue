@@ -45,7 +45,7 @@
 /**
  * The page header with the violet ribbon.
  *
- * @component page_header
+ * @component client/page_header
  * @author Marcello Perathoner
  */
 

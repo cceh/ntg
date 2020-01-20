@@ -48,7 +48,7 @@
  *
  * See: Presentation 485ff
  *
- * @component optimal_substemma
+ * @component client/optimal_substemma
  * @author Marcello Perathoner
  *
  * 1891 03 5 429 181 2298 04 0120 01

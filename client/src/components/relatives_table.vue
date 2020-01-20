@@ -94,7 +94,7 @@
 /**
  * This module implements the table in the relatives popup.
  *
- * @component relatives_table
+ * @component client/relatives_table
  *
  * @author Marcello Perathoner
  */
@@ -167,14 +167,13 @@ export default {
             'deep' : true,
         },
     },
+    /** @lends module:client/relatives_table */
     'methods' : {
         /**
          * Load new data.
          *
          * Display new data in the table after the user navigated to a different
          * passage.
-         *
-         * @function load_passage
          */
         load_passage () {
             const vm = this;

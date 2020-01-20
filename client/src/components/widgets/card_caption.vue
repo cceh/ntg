@@ -27,7 +27,7 @@
 /**
  * The card caption with min/max/close buttons.
  *
- * @component card_caption
+ * @component client/widgets/card_caption
  * @author Marcello Perathoner
  */
 

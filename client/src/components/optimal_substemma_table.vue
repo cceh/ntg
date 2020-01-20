@@ -67,7 +67,7 @@
  *
  * See: Presentation 485ff
  *
- * @component optimal_substemma
+ * @component client/optimal_substemma
  * @author Marcello Perathoner
  *
  * 1891 03 5 429 181 2298 04 0120 01
@@ -87,9 +87,8 @@ import button_group              from 'widgets/button_group.vue';
  * Row conversion function.  Convert numeric values to numeric types
  * and add calculated fields.
  *
- * @function row_conversion
- *
- * @return The converted row
+ * @param  {object} d - The original row
+ * @return {object}   - The converted row
  */
 
 function row_conversion (d) {

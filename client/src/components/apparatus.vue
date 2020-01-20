@@ -30,14 +30,12 @@
 </template>
 
 <script>
-/** @module client/apparatus */
-
 /**
  * This module displays the apparatus table.  It retrieves the apparatus data in
  * JSON format and builds a list of readings and of the manuscripts that attest
  * that reading.
  *
- * @component apparatus
+ * @component client/apparatus
  * @author Marcello Perathoner
  */
 
@@ -51,6 +49,7 @@ import tools            from 'tools';
 /**
  * Load a new passage.
  *
+ * @param {Vue}    vm      - The Vue instance
  * @param {Number} pass_id - The passage to load.
  * @returns {Promise} Promise, resolved when the passage has loaded.
  */
@@ -150,15 +149,17 @@ export default {
             'deep' : true,
         },
     },
+    /** @lends module:client/apparatus */
     'methods' : {
         load_passage () {
             return load_passage (this, this.pass_id);
         },
 
         /**
-         * Show the attestation in the "Coherence in Attestations" card and scroll to it.
+         * Show the attestation in the "Coherence in Attestations" card and
+         * scroll to that card.
          *
-         * @method goto_attestation
+         * @param {string} labez - The attestation to show.
          */
         goto_attestation (labez) {
             this.$trigger ('goto_attestation', labez);

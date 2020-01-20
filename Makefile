@@ -14,7 +14,7 @@ SHELL       := /bin/bash
 PYTHON      := /usr/bin/python3
 MYSQL       := mysql --defaults-file=~/.my.cnf.ntg
 BROWSER     := firefox
-JSDOC       := node client/node_modules/jsdoc/jsdoc.js -c jsdoc.conf.js
+JSDOC       := jsdoc -c doc_src/jsdoc.conf.js
 RSYNCPY     := $(RSYNC) --exclude "**/__pycache__"  --exclude "*.pyc"
 
 PSQL_PORT   := 5432
@@ -26,8 +26,8 @@ CLIENT      := client
 SCRIPTS     := scripts
 DOCS        := docs
 
-JS_SRC      := `find $(CLIENT)/src -name '*.js'`
-VUE_SRC     := $(wildcard $(CLIENT)/src/components/*.vue)
+JS_SRC      := $(wildcard $(CLIENT)/src/js/*.js)
+VUE_SRC     := $(wildcard $(CLIENT)/src/components/*.vue $(CLIENT)/src/components/widgets/*.vue)
 
 PY_SOURCES  := scripts/cceh/*.py ntg_common/*.py
 
@@ -87,8 +87,11 @@ clean: client-clean
 # CREATE DATABASE ntg_user OWNER ntg;
 #
 # CREATE DATABASE acts_ph4 OWNER ntg;
+# GRANT CONNECT ON DATABASE acts_ph4 TO ntg_readonly;
 # \c acts_ph4
 # CREATE SCHEMA ntg AUTHORIZATION ntg;
+# GRANT USAGE ON SCHEMA ntg TO ntg_readonly;
+# GRANT SELECT ON ALL TABLES IN SCHEMA ntg TO ntg_readonly;
 # ALTER DATABASE acts_ph4 SET search_path = ntg, public;
 # CREATE EXTENSION mysql_fdw;
 # GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
@@ -279,17 +282,20 @@ doc_src/%.nolibs.jsgraph.dot : doc_src/%.jsgraph.dot
 jsgraphs: doc_src/coherence.jsgraph.dot doc_src/comparison.jsgraph.dot \
 			doc_src/coherence.nolibs.jsgraph.dot doc_src/comparison.nolibs.jsgraph.dot
 
-docs: sphinxdoc
 
-sphinxdoc:
-	-rm $(DOCS)/_images/*
-	python3 -msphinx -c . -T -a -E -b html -d $(DOCS)/doctrees doc_src $(DOCS)
+doc_src/jsdoc/structure.json: $(JS_SRC) $(VUE_SRC)
+	mkdir -p doc_src/jsdoc/
+	$(JSDOC) -X $^ > $@
+
+docs: doc_src/jsdoc/structure.json
+	cd doc_src && $(MAKE) -e html
 	cp doc_src/_config.yml $(DOCS)/
-	@echo
-	@echo "Build finished. The HTML pages are in $(DOCS)."
 
-jsdoc:
-	$(JSDOC) -d jsdoc -a all $(JS_SRC) $(VUE_SRC) && $(BROWSER) jsdoc/index.html
+doccs:
+	$(RM) -r docs/*
+	$(MAKE) docs
+
+jsdoc: doc_src/jsdoc/structure.json
 
 sqlacodegen:
 	sqlacodegen mysql:///ECM_ActsPh4?read_default_group=ntg

@@ -1,4 +1,4 @@
-const compiler = require ('./client/node_modules/vue-template-compiler/');
+const compiler = require ('../client/node_modules/vue-template-compiler/');
 
 // @see http://usejsdoc.org/about-plugins.html
 

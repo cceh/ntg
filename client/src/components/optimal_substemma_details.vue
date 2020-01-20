@@ -33,7 +33,7 @@
  * Exhaustive Search Details.  This module shows a drill-down table for any
  * combination with more detail about the explained variants.
  *
- * @component optimal_substemma_details
+ * @component client/optimal_substemma_details
  * @author Marcello Perathoner
  */
 
@@ -49,9 +49,8 @@ import { options }  from 'widgets/options';
  * Detail row conversion function.  Convert numeric values to numeric types
  * and add calculated fields.
  *
- * @function row_conversion
- *
- * @return The converted row
+ * @param  {object} d - The original row
+ * @return {object}   - The converted row
  */
 
 function row_conversion (d) {

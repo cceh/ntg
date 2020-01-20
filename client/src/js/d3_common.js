@@ -1,7 +1,7 @@
 /**
  * This module contains common functions built around the D3 library.
  *
- * @module d3_common
+ * @module client/d3_common
  * @author Marcello Perathoner
  */
 

@@ -20,7 +20,7 @@
 /**
  * A radio or checkbox group.
  *
- * @component button-group
+ * @component client/widgets/button_group
  * @author Marcello Perathoner
  */
 

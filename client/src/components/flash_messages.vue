@@ -23,7 +23,7 @@
 /**
  * Output the flashed messages.
  *
- * @component flash_messages
+ * @component client/flash_messages
  * @author Marcello Perathoner
  */
 

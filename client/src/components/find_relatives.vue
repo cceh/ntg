@@ -60,7 +60,7 @@
  *
  * Internally uses a list of <relatives-table> and a <toolbar>.
  *
- * @component find_relatives
+ * @component client/find_relatives
  * @author Marcello Perathoner
  */
 

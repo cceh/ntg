@@ -19,7 +19,7 @@
 /**
  * This module implements the local stemma with drag-and-drop editing.
  *
- * @component local_stemma
+ * @component client/local_stemma
  * @author Marcello Perathoner
  */
 
@@ -51,9 +51,7 @@ let target_node  = null;
  * If the user drops the node 'nowhere' then this function slides the node
  * back to the original position.
  *
- * @function return_to_base
- *
- * @param {D3selector} node - The node to slide back.
+ * @param {D3selector} d3_node - The node to slide back.
  */
 
 function return_to_base (d3_node) {
@@ -75,10 +73,8 @@ function return_to_base (d3_node) {
 /**
  * Highlight or unhighlight a node
  *
- * @function highlight
- *
  * @param {Object} node - The node to highlight
- * @param {bool} b      - Whether to highlight or unhighlight
+ * @param {bool}   b    - Whether to highlight or unhighlight
  */
 
 function highlight (node, b) {
@@ -92,8 +88,6 @@ function highlight (node, b) {
  *
  * Creates a d3-drag object that implements the drag-and-drop local stemma
  * editor.
- *
- * @function drag_listener
  *
  * @param {Object} vm - The Vue instance
  */
@@ -165,9 +159,8 @@ function drag_listener (vm) {
  * The context menu can be used to split the attestation, reassign source
  * nodes or to merge a split.
  *
- * @function build_contextmenu
- *
- * @param {Object} event - The event
+ * @param {Object} evt - The event
+ * @param {Vue}    vm  - The Vue instance
  */
 
 async function build_contextmenu (evt, vm) {
@@ -295,8 +288,7 @@ async function build_contextmenu (evt, vm) {
 /**
  * Load a new passage.
  *
- * @function load_passage
- *
+ * @param {Vue}    vm      - The Vue instance
  * @param {Number} pass_id - Which passage to load.
  *
  * @return {Promise} Promise, resolved when the new passage has loaded.

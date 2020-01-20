@@ -49,7 +49,7 @@
  * are older / younger? There is also a drill-down table for each range with
  * more detail about the differing passages.
  *
- * @component comparison
+ * @component client/comparison
  * @author Marcello Perathoner
  */
 
@@ -81,10 +81,16 @@ export default {
             return this.$route.meta.caption;
         },
     },
+    /** @lends module:client/comparison */
     'methods' : {
+        /**
+         * React to click of the submit button.  Change the hash.  Makes the
+         * browser back button work.
+         */
         submit () {
             tools.set_hash (this, ['ms1', 'ms2']);
         },
+        /** React to hash changes.  Start a new comparison. */
         on_hashchange () {
             const vm = this;
 

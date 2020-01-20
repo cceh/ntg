@@ -30,7 +30,7 @@
  *
  * A project is one book of the NT and one phase.
  *
- * @component project_list
+ * @component client/project_list
  * @author Marcello Perathoner
  */
 

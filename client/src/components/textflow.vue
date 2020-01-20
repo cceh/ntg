@@ -54,7 +54,7 @@
  * one reading at one passage.  It can be used to deduce where a reading
  * originated.
  *
- * @component textflow
+ * @component client/textflow
  * @author Marcello Perathoner
  */
 
@@ -79,8 +79,6 @@ const SVG_Y_BORDER = 40;
  * Open a context menu when right clicked on a node.
  *
  * The context menu can be used to reassign the node to a different clique.
- *
- * @function build_contextmenu
  *
  * @param {Object} event - The event
  * @param {Object} vm    - The Vue instance
@@ -187,11 +185,10 @@ export default {
             this.$trigger ('coherence_in_attestations_variant_changed', null);
         },
     },
+    /** @lends module:client/textflow */
     'methods' : {
         /**
          * Load a new passage.
-         *
-         * @function load_passage
          */
         load_passage () {
             const vm = this;

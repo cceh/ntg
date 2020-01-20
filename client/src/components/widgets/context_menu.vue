@@ -21,7 +21,7 @@
 /**
  * This module implements a context menu.
  *
- * @component context_menu
+ * @component client/widgets/context_menu
  * @author Marcello Perathoner
  */
 
@@ -42,8 +42,6 @@ export const popper_opts = {
 
 /**
  * Format message
- *
- * @function mkmsg
  *
  * @param {String} msg    - Message prefix
  * @param {String} labez  - The labez

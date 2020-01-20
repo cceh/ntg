@@ -2,7 +2,7 @@
 /**
  * A dropdown mixin for the labezator and range components.
  *
- * @component dropdown_mixin
+ * @component client/widgets/dropdown_mixin
  * @author Marcello Perathoner
  */
 

@@ -6,6 +6,8 @@
  *
  * put a class 'table-sortable' on the table
  * put an attribute 'data-sort-by' on the <th>s of the columns you want made sortable
+ *
+ * @module client/table_sort_mixin
  */
 
 import { reverse, sortBy } from 'lodash';
@@ -21,7 +23,13 @@ export default {
         'sorted_by'   : function () { this.sort (); },
         'sorted_desc' : function () { this.sort (); },
     },
+    /** @lends module:client/table_sort_mixin */
     'methods' : {
+        /**
+         * React to click on table haders.
+         *
+         * @param {Event} event - The click event.
+         */
         on_sort (event) {
             const th = event.target;
             const sort_by = th.getAttribute ('data-sort-by');
@@ -33,6 +41,9 @@ export default {
                 this.sorted_by = sort_by;
             }
         },
+        /**
+         * Sort the table.
+         */
         sort () {
             const vm = this;
             const rows = sortBy (vm.rows, vm.sorted_by.split (' '));

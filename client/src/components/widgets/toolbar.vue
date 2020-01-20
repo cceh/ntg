@@ -13,7 +13,7 @@
  * Most of the functionality here resides in widgets.  See the widgets
  * subdirectory.
  *
- * @component toolbar
+ * @component client/widgets/toolbar
  *
  * @author Marcello Perathoner
  */

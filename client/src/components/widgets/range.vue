@@ -23,7 +23,7 @@
 /**
  * A navigator for ranges (like chapters).
  *
- * @component range
+ * @component client/widgets/range
  * @author Marcello Perathoner
  */
 

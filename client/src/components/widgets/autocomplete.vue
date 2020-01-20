@@ -31,7 +31,7 @@
  * control instead of a button, and we always keep the focus on the input and
  * never give it to the menu.
  *
- * @component autocomplete
+ * @component client/widgets/autocomplete
  * @author Marcello Perathoner
  */
 

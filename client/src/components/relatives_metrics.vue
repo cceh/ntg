@@ -26,7 +26,7 @@
  * This module implements the information bar about the average agreements
  * in the relatives popup.
  *
- * @component relatives_metrics
+ * @component client/relatives_metrics
  *
  * @author Marcello Perathoner
  */
@@ -51,13 +51,12 @@ export default {
             this.load_passage ();
         },
     },
+    /** @lends module:client/relatives_metrics */
     'methods' : {
         /**
          * Load new data.
          *
          * Display new data after the user navigated to a different passage.
-         *
-         * @function load_passage
          *
          * @param {Object} passage - The new passage
          */

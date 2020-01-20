@@ -41,7 +41,7 @@
  * Comparison of 2 witnesses.  This module shows a drill-down table for each range with
  * more detail about the differing passages.
  *
- * @component comparison_details_table
+ * @component client/comparison_details_table
  * @author Marcello Perathoner
  */
 
@@ -57,11 +57,8 @@ import { options }  from 'widgets/options';
 /**
  * Return a direction marker: <, >, NoRel or Uncl.
  *
- * @function dir
- *
  * @param {object} r - The data row
- *
- * @return Direction marker.
+ * @return {string}  - Direction marker.
  */
 
 function dir (r) {
@@ -81,9 +78,8 @@ function dir (r) {
  * Detail row conversion function.  Convert numeric values to numeric types
  * and add calculated fields.
  *
- * @function row_conversion
- *
- * @return The converted row
+ * @param  {object} d - The original row
+ * @return {object}   - The converted row
  */
 
 function row_conversion (d) {

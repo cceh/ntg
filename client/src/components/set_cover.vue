@@ -102,7 +102,7 @@
  *
  * See: Presentation 485ff
  *
- * @component set_cover
+ * @component client/set_cover
  * @author Marcello Perathoner
  */
 

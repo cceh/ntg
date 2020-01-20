@@ -23,7 +23,7 @@
 /**
  * A navigator for labez.
  *
- * @component labezator
+ * @component client/widgets/labezator
  * @author Marcello Perathoner
  */
 

@@ -55,7 +55,7 @@
 /**
  * This module implements the tape-recorder-controls navigator.
  *
- * @component navigator
+ * @component client/widgets/navigator
  * @author Marcello Perathoner
  */
 
@@ -122,11 +122,6 @@ export default {
             }
         },
     },
-    /**
-     * Initialize the module.
-     *
-     * @function created
-     */
     mounted () {
         this.load (this.value);
     },

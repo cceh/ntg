@@ -2,7 +2,7 @@
  * This module implements helper functions and is a container for all stuff
  * that doesn't fit elsewhere.
  *
- * @module tools
+ * @module client/tools
  * @author Marcello Perathoner
  */
 

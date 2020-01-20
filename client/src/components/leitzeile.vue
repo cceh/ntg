@@ -8,7 +8,7 @@
 /**
  * This component displays the leitzeile.
  *
- * @component leitzeile
+ * @component client/leitzeile
  * @author Marcello Perathoner
  */
 
