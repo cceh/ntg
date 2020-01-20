@@ -85,8 +85,8 @@ const options = {
     },
     'hyp_a' : {
         'title'  : 'Select a different reading for "A".',
-        'reduce' : 'A',
-        'prefix' : [{ 'labez' : 'A', 'labez_i18n' : 'A' }],
+        'reduce' : 'a',
+        'prefix' : [],
         'suffix' : [],
     },
 }
