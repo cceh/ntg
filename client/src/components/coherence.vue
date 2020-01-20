@@ -149,7 +149,6 @@ export default {
     'data' : function () {
         return {
             'pass_id' : 0,
-            'passage' : {},
             'epoch'   : 1,  // bump this to reload components
         };
     },
@@ -159,13 +158,12 @@ export default {
             this.set_hash ('pass_id', new_pass_id);
         },
     },
+    /** @lends module:client/coherence */
     'methods' : {
         /**
          * Set a new passage.
          *
-         * @function set_passage
-         *
-         * @param {int} pass_id - The new passage id
+         * @param {string} pass_id - The new passage id
          */
         set_passage (pass_id) {
             const vm = this;
@@ -173,32 +171,43 @@ export default {
                 vm.get ('passage.json/' + pass_id),
             ];
             Promise.all (requests).then ((responses) => {
-                vm.passage = responses[0].data.data;
-                vm.pass_id = pass_id;
-                vm.update_caption ();
+                const passage = responses[0].data.data;
+                vm.pass_id = passage.pass_id;
+                this.$store.commit ('caption', passage.hr);
             });
         },
+        /**
+         * Change the hash in the browser location bar by replacing one parameter.
+         *
+         * @param {string} param - The parameter name
+         * @param {string} data  - The parameter value
+         */
         set_hash (param, data) {
             const hash = window.location.hash ? window.location.hash.substring (1) : '';
             const params = tools.deparam (hash);
             params[param] = data;
             window.location.hash = '#' + tools.param (params);
         },
+        /** React to hash changes, eventually move to another passage. */
         on_hashchange () {
             const params = tools.deparam (window.location.hash.substring (1));
             if ('pass_id' in params) {
-                this.set_passage (parseInt (params.pass_id, 10));
+                this.set_passage (params.pass_id);
             } else {
-                this.set_passage (1);
+                this.set_passage ('1');
             }
         },
+        /** React to epoch changes, tell all children to refresh. */
         on_epoch () {
             this.epoch++;
             // console.log ('epoch: ' + this.epoch);
         },
-        update_caption () {
-            this.$store.commit ('caption', this.passage.hr);
-        },
+        /**
+         * Scroll to the "Coherence in Attestations" card and load the given
+         * attestation.
+         *
+         * @param {Event} event - The event, sent from a child.
+         */
         on_goto_attestation (event) {
             const labez = event.detail.data;
             const lt = this.$refs.lt;
@@ -211,6 +220,11 @@ export default {
                 'scrollTop' : top,
             });
         },
+        /**
+         * Close all relatives popups if the attestation changes.
+         *
+         * @param {Event} event - The event, sent from a child.
+         */
         on_coherence_in_attestations_variant_changed (event) {
             this.$refs.relatives.on_destroy_relatives_popup (event, 0); // Fixes #84
         },
@@ -220,7 +234,7 @@ export default {
         this.on_hashchange ();
     },
     beforeRouteUpdate (to, from, next) {
-        this.update_caption ();
+        this.on_hashchange ();
         next ();
     },
 };

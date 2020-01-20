@@ -100,7 +100,7 @@ export default {
             // transform user input into pass_id
             vm.get ('passage.json/' + vm.value, { 'params' : params }).then ((response) => {
                 const passage = response.data.data;
-                vm.$emit ('input', passage.pass_id);  // makes it work with v-model, sets value
+                vm.$emit ('input', parseInt (passage.pass_id, 10));  // makes it work with v-model, sets value
             });
         },
         load (new_pass_id) {
