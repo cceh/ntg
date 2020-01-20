@@ -89,6 +89,10 @@ def compile (element, compiler, **kw):
     mp = element.mysql_db.params
     return '''
     CREATE SCHEMA {name};
+    -- GRANT CONNECT ON DATABASE XXX  TO ntg_readonly;
+    GRANT USAGE ON SCHEMA ntg TO ntg_readonly;
+    GRANT SELECT ON ALL TABLES IN SCHEMA ntg TO ntg_readonly;
+    GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA ntg TO ntg_readonly;
     -- Following commands don't work because you have to be superuser:
     -- CREATE EXTENSION mysql_fdw;
     -- GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO {username};
