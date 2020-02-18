@@ -146,13 +146,6 @@ function append_marker (svg, id_prefix) {
         .attr ('class',        'link')
         .append ('path')
         .attr ('d', 'M 0 0 L 10 5 L 0 10 z');
-    defs.append ('filter')
-        .attr ('id', 'error')
-        .append ('feDropShadow')
-        .attr ('dx',           '0')
-        .attr ('dy',           '0')
-        .attr ('stdDeviation', '2.5')
-        .attr ('flood-color',  'red');
 }
 
 /**

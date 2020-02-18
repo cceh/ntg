@@ -103,12 +103,9 @@ function load_dot (vm, dot) {
                 + vm.prefix + 'tid-' + d.elems[1].id
                 + (/dashed/.test (d.attrs.style) ? ' dashed' : '')
                 + (/dotted/.test (d.attrs.style) ? ' dotted' : '')
-                + (/bold/.test (d.attrs.style)   ? ' bold'   : '');
+                + (/bold/.test (d.attrs.style)   ? ' congruence-error' : '');
         })
-        .attr ('style', d => {
-            return (/bold/.test (d.attrs.style) ? 'filter:url(#error)' : '');
-        })
-        .attr ('marker-end', 'url(#' + vm.prefix + 'triangle)')
+        .attr ('marker-end', `url(#${vm.prefix}triangle)`)
         .attr ('d', d => d3_common.parse_path_svg (d.attrs.pos));
 
     link.filter (d => d.attrs && d.attrs.head_lp && d.attrs.headlabel)
