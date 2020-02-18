@@ -358,9 +358,9 @@ def cache (response):
 
 def make_json_response (json = None, status = 200, message = None):
     d = dict (status = status)
-    if json:
+    if json is not None:
         d['data'] = json
-    if message:
+    if message is not None:
         d['message'] = message
     return flask.make_response (flask.json.jsonify (d), status, {
         'content-type' : 'application/json;charset=utf-8',

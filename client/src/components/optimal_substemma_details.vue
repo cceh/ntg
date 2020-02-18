@@ -20,7 +20,9 @@
       <tbody>
         <tr v-for="r in rows" :key="r.pass_id" :class="(r.newer ? 'newer' : '') + (r.older ? 'older' : '')">
           <td class="type">{{ r.type }}</td>
-          <td class="pass_hr"><a :href="'coherence#pass_id=' + r.pass_id">{{ r.pass_hr }}</a></td>
+          <td class="pass_hr">
+            <router-link :to="{ 'name' : 'coherence', 'params' : { 'passage_or_id' : r.pass_id }}">{{ r.pass_hr }}</router-link>
+          </td>
           <td class="lesart">{{ r.lesart }}</td>
         </tr>
       </tbody>

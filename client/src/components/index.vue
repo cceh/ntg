@@ -2,7 +2,7 @@
   <div class="vm-index">
     <div class="container bs-docs-container">
       <div v-if="$store.getters.can_read">
-        <router-link class="biglink" :to="{ 'name' : 'coherence' }">Coherence and Textual Flow</router-link>
+        <router-link class="biglink" :to="{ 'name' : 'coherence', 'params' : { 'passage_or_id' : 1 } }">Coherence and Textual Flow</router-link>
         <router-link class="biglink" :to="{ 'name' : 'comparison' }">Comparison of Witnesses</router-link>
         <router-link class="biglink" :to="{ 'name' : 'find_relatives' }">Find Relatives</router-link>
         <div v-if="$store.getters.can_read_private">

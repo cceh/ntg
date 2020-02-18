@@ -77,7 +77,7 @@ const router = new VueRouter ({
             },
         },
         {
-            'path'      : '/:app_id/:phase/coherence',
+            'path'      : '/:app_id/:phase/coherence/:passage_or_id',
             'component' : coherence,
             'name'      : 'coherence',
             'props'     : true,

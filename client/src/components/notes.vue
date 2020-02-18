@@ -32,7 +32,9 @@ import tools   from 'tools';
 
 
 export default {
-    'props'      : ['pass_id'],
+    'props' : {
+        'pass_id' : { 'type' : Number, 'required' : true },
+    },
     'components' : {
         'alert'          : alert,
         'b-button-group' : BButtonGroup,
@@ -53,10 +55,10 @@ export default {
             this.load_passage ();
         },
         current_text () {
-            this.can_save ();
+            this.update_can_save ();
         },
         original_text () {
-            this.can_save ();
+            this.update_can_save ();
         },
     },
     /** @lends module:client/notes */
@@ -69,6 +71,7 @@ export default {
             if (vm.pass_id === 0) {
                 return Promise.resolve ();
             }
+
             const ta = vm.$el.querySelector ('textarea');
 
             const requests = [
@@ -77,7 +80,8 @@ export default {
             ];
 
             return Promise.all (requests).then ((responses) => {
-                vm.current_text  = responses[0].data;
+                // Axios seems to convert a numeric text/plain response to Number
+                vm.current_text  = String (responses[0].data);
                 vm.original_text = vm.current_text;
                 vm.$nextTick (() => {
                     tools.slide_fade_in (ta);
@@ -86,7 +90,11 @@ export default {
         },
         can_save () {
             const vm = this;
-            if (vm.$store.getters.can_write && vm.current_text !== vm.original_text) {
+            return (vm.$store.getters.can_write && vm.current_text !== vm.original_text);
+        },
+        update_can_save () {
+            const vm = this;
+            if (vm.can_save ()) {
                 vm.toolbar.save = () => this.on_save ();
             } else {
                 vm.toolbar.save = false;
@@ -98,13 +106,17 @@ export default {
         on_save () {
             const vm = this;
 
-            vm.put ('notes.txt/' + vm.pass_id, { 'remarks' : vm.current_text })
-                .then ((response) => {
-                    vm.original_text = vm.current_text;
-                    vm.$refs.alert.show (response.data.message, 'success', 2000);
-                }).catch ((error) => {
-                    vm.$refs.alert.show (error.response.data.message, 'error');
-                });
+            const p = vm.put ('notes.txt/' + vm.pass_id, {
+                'note'     : vm.current_text,
+                'original' : vm.original_text,
+            });
+            p.then ((response) => {
+                vm.original_text = vm.current_text;
+                vm.$refs.alert.show (response.data.message, 'success', 2000);
+            }).catch ((error) => {
+                vm.$refs.alert.show (error.response.data.message, 'error');
+            });
+            return p;
         },
     },
     mounted () {

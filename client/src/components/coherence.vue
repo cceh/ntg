@@ -1,6 +1,5 @@
 <template>
-  <div class="vm-coherence want_hashchange"
-       @hashchange="on_hashchange"
+  <div class="vm-coherence"
        @epoch="on_epoch"
        @goto_attestation="on_goto_attestation"
        @coherence_in_attestations_variant_changed="on_coherence_in_attestations_variant_changed"
@@ -12,7 +11,7 @@
       <relatives :pass_id="pass_id" ref="relatives" />
 
       <div class="btn-toolbar">
-        <navigator v-model="pass_id" class="mb-3" />
+        <navigator @input="on_nav" :value="pass_id" class="mb-3" />
       </div>
 
       <leitzeile :pass_id="pass_id" />
@@ -44,7 +43,7 @@
           Notes
         </card-caption>
 
-        <notes :pass_id="pass_id" />
+        <notes :pass_id="pass_id" ref="notes" />
       </card>
 
       <!-- Coherence at Variant Passages (GraphViz) -->
@@ -92,7 +91,7 @@
       </card>
 
       <div class="btn-toolbar">
-        <navigator v-model="pass_id" />
+        <navigator @input="on_nav" :value="pass_id" class="mb-3" />
       </div>
 
     </div>
@@ -146,16 +145,18 @@ Vue.component ('toolbar',      toolbar);
 Vue.component ('toolbar',      toolbar);
 
 export default {
-    'data' : function () {
+    'props' : {
+        'passage_or_id' : { 'type' : [Number, String],  'required' : true },
+    },
+    data () {
         return {
-            'pass_id' : 0,
+            'pass_id' : 0,  // Number !!!
             'epoch'   : 1,  // bump this to reload components
         };
     },
     'watch' : {
-        pass_id (new_pass_id) {
-            // All navigation is done by manipulating the hash.
-            this.set_hash ('pass_id', new_pass_id);
+        passage_or_id (new_value) {
+            this.set_passage (new_value);
         },
     },
     /** @lends module:client/coherence */
@@ -165,40 +166,29 @@ export default {
          *
          * @param {string} pass_id - The new passage id
          */
-        set_passage (pass_id) {
+        set_passage (passage_or_id) {
             const vm = this;
 
             const requests = [
-                vm.get ('passage.json/' + pass_id),
+                vm.get ('passage.json/' + passage_or_id),
             ];
             Promise.all (requests).then ((responses) => {
                 const passage = responses[0].data.data;
-                vm.pass_id = passage.pass_id;
+                vm.pass_id = passage.pass_id; // Number!
                 this.$store.commit ('caption', passage.hr);
             });
         },
+        on_nav (new_pass_id) {
+            // $emit from <navigator> to router
+            this.$router.push ({
+                'name'   : 'coherence',
+                'params' : { 'passage_or_id' : new_pass_id }
+            });
+        },
         /**
-         * Change the hash in the browser location bar by replacing one parameter.
-         *
-         * @param {string} param - The parameter name
-         * @param {string} data  - The parameter value
+         * React to epoch changes, eg. when a child edits the database. Tell
+         * all children to refresh.
          */
-        set_hash (param, data) {
-            const hash = window.location.hash ? window.location.hash.substring (1) : '';
-            const params = tools.deparam (hash);
-            params[param] = data;
-            window.location.hash = '#' + tools.param (params);
-        },
-        /** React to hash changes, eventually move to another passage. */
-        on_hashchange () {
-            const params = tools.deparam (window.location.hash.substring (1));
-            if ('pass_id' in params) {
-                this.set_passage (params.pass_id);
-            } else {
-                this.set_passage ('1');
-            }
-        },
-        /** React to epoch changes, tell all children to refresh. */
         on_epoch () {
             this.epoch++;
             // console.log ('epoch: ' + this.epoch);
@@ -216,7 +206,6 @@ export default {
             lt.load_passage ();
 
             const top = document.querySelector ('.card-local-textflow').offsetTop;
-            // console.log (top);
             document.querySelector ('html').velocity ({
                 'scrollTop' : top + 'px',
             });
@@ -230,13 +219,17 @@ export default {
             this.$refs.relatives.on_destroy_relatives_popup (event, 0); // Fixes #84
         },
     },
-    mounted () {
-        // On first page load simulate user navigation to hash.
-        this.on_hashchange ();
-    },
-    beforeRouteUpdate (to, from, next) {
-        this.on_hashchange ();
+    async beforeRouteUpdate (to, from, next) {
+        const notes = this.$refs.notes;
+        if (notes && notes.can_save ()) {
+            if (confirm ('You have unsaved notes! Save notes?')) {
+                await notes.on_save ();
+            }
+        }
         next ();
+    },
+    mounted () {
+        this.set_passage (this.passage_or_id);
     },
 };
 </script>
@@ -297,6 +290,10 @@ div.vm-coherence {
             }
 
             &.bold {
+                stroke-width: 4px;
+            }
+
+            &.congruence-error {
                 stroke: red !important;
                 stroke-width: 6px;
             }

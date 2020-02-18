@@ -24,7 +24,9 @@
           </thead>
           <tbody>
             <tr v-for="note in notes" :key="note.pass_id">
-              <th><a :href="'coherence#pass_id=' + note.pass_id">{{ note.hr }}</a></th>
+              <th>
+                <router-link :to="{ 'name' : 'coherence', 'params' : { 'passage_or_id' : note.pass_id }}">{{ note.hr }}</router-link>
+              </th>
               <td class="prewrap">{{ note.note }}</td>
             </tr>
           </tbody>
