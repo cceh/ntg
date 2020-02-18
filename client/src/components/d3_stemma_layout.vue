@@ -101,7 +101,12 @@ function load_dot (vm, dot) {
             return 'link fg_labez '
                 + vm.prefix + 'sid-' + d.elems[0].id + ' '
                 + vm.prefix + 'tid-' + d.elems[1].id
-                + (/dashed/.test (d.attrs.style) ? ' dashed' : '');
+                + (/dashed/.test (d.attrs.style) ? ' dashed' : '')
+                + (/dotted/.test (d.attrs.style) ? ' dotted' : '')
+                + (/bold/.test (d.attrs.style)   ? ' bold'   : '');
+        })
+        .attr ('style', d => {
+            return (/bold/.test (d.attrs.style) ? 'filter:url(#error)' : '');
         })
         .attr ('marker-end', 'url(#' + vm.prefix + 'triangle)')
         .attr ('d', d => d3_common.parse_path_svg (d.attrs.pos));

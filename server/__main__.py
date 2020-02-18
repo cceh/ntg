@@ -38,6 +38,7 @@ import textflow
 import comparison
 import editor
 import set_cover
+import checks
 
 dba = flask_sqlalchemy.SQLAlchemy ()
 user, _role, _roles_users = login.declare_user_model_on (dba)
@@ -169,6 +170,7 @@ def create_app (Config):
         sub_app.register_blueprint (comparison.bp)
         sub_app.register_blueprint (editor.bp)
         sub_app.register_blueprint (set_cover.bp)
+        sub_app.register_blueprint (checks.bp)
 
         sub_app.config.dba = db_tools.PostgreSQLEngine (**sub_app.config)
         sub_app.config['SQLALCHEMY_DATABASE_URI'] = user_db_url
@@ -179,6 +181,7 @@ def create_app (Config):
         comparison.init_app (sub_app)
         editor.init_app (sub_app)
         set_cover.init_app (sub_app)
+        checks.init_app (sub_app)
 
         instances[sub_app.config['APPLICATION_ROOT']] = sub_app
 

@@ -133,9 +133,8 @@ function insert_css_palette (css) {
  * @param {String}       id_prefix - The id prefix.
  */
 function append_marker (svg, id_prefix) {
-    svg
-        .append ('defs')
-        .append ('marker')
+    const defs = svg.append ('defs');
+    defs.append ('marker')
         .attr ('id',           id_prefix + 'triangle')
         .attr ('viewBox',      '0 0 10 10')
         .attr ('refX',         '10')
@@ -147,6 +146,13 @@ function append_marker (svg, id_prefix) {
         .attr ('class',        'link')
         .append ('path')
         .attr ('d', 'M 0 0 L 10 5 L 0 10 z');
+    defs.append ('filter')
+        .attr ('id', 'error')
+        .append ('feDropShadow')
+        .attr ('dx',           '0')
+        .attr ('dy',           '0')
+        .attr ('stdDeviation', '2.5')
+        .attr ('flood-color',  'red');
 }
 
 /**

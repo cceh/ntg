@@ -33,6 +33,9 @@
                    :pass_id="pass_id" v-bind="options.hyp_a">
           A =
         </labezator>
+        <button-group v-if="'checks' in toolbar"
+                      v-model="toolbar.checks"
+                      type="checkbox" :options="options.checks" />
         <button-group slot="right" v-if="'png' in toolbar" :options="options.png_dot" />
       </toolbar>
     </div>
@@ -236,6 +239,7 @@ export default {
                 'connectivity' : 5,
                 'var_only'     : ['var_only'],
                 'hyp_a'        : 'A',
+                'checks'       : [],
             };
             const tb_local = {
                 'rg_id'        : rg_id_all,
@@ -245,12 +249,14 @@ export default {
                 'connectivity' : 5,
                 'fragments'    : [],
                 'hyp_a'        : 'A',
+                'checks'       : [],
                 ... download_buttons,
             };
             const tb_global = {
                 'rg_id'   : rg_id_all,
                 'include' : [],
                 'mode'    : 'sim',
+                'checks'       : [],
                 ... download_buttons,
             };
             if (vm.global && vm.var_only) {
@@ -289,7 +295,7 @@ export default {
             const vm = this;
             const params = pick (vm.toolbar, [
                 'labez', 'connectivity', 'rg_id', 'include', 'fragments',
-                'mode', 'hyp_a', 'var_only', 'cliques',
+                'mode', 'hyp_a', 'var_only', 'cliques', 'checks',
             ]);
 
             // provide a width and fontsize for GraphViz to format the graph

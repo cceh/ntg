@@ -18,6 +18,7 @@ from login import auth, user_can_write
 import helpers
 from helpers import parameters, Passage, get_excluded_ms_ids, \
      make_dot_response, make_png_response
+from checks import congruence
 
 
 bp = flask.Blueprint ('textflow', __name__)
@@ -71,10 +72,12 @@ def textflow (passage_or_id):
 
     include      = request.args.getlist ('include[]')   or []
     fragments    = request.args.getlist ('fragments[]') or []
+    checks       = request.args.getlist ('checks[]') or []
     var_only     = request.args.getlist ('var_only[]')  or []
     cliques      = request.args.getlist ('cliques[]')   or []
 
     fragments = 'fragments' in fragments
+    checks    = 'checks'    in checks
     var_only  = 'var_only'  in var_only   # Panel: Coherence at Variant Passages (GraphViz)
     cliques   = 'cliques'   in cliques    # consider or ignore cliques
     leaf_z    = 'Z'         in include    # show leaf z nodes in global textflow?
@@ -293,6 +296,13 @@ def textflow (passage_or_id):
                     if attrs['labez_clique'] != graph.nodes[p]['labez_clique']:
                         attrs['label'] = "%s: %s" % (attrs['labez_clique'], attrs['hs'])
                         graph.adj[p][n]['style'] = 'dashed'
+
+        if checks:
+            for rank in congruence (conn, passage):
+                try:
+                    graph.adj[rank.ms_id1][rank.ms_id2]['style'] = 'bold'
+                except KeyError:
+                    pass
 
     if var_only:
         dot = helpers.nx_to_dot_subgraphs (graph, group_field, width, fontsize)

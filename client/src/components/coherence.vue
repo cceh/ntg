@@ -167,6 +167,7 @@ export default {
          */
         set_passage (pass_id) {
             const vm = this;
+
             const requests = [
                 vm.get ('passage.json/' + pass_id),
             ];
@@ -289,6 +290,15 @@ div.vm-coherence {
 
             &.dashed {
                 stroke-dasharray: 4 4;
+            }
+
+            &.dotted {
+                stroke-dasharray: 1 1;
+            }
+
+            &.bold {
+                stroke: red !important;
+                stroke-width: 6px;
             }
 
             &.hover {

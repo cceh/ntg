@@ -45,6 +45,13 @@ const options = {
             'title' : 'Include document fragments.'
         },
     ],
+    'checks' : [
+        {
+            'text'  : 'CHK',
+            'value' : 'checks',
+            'title' : 'Perform congruence checks.'
+        },
+    ],
     'png_dot' : [
         {
             'text'  : 'PNG',
