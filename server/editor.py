@@ -247,11 +247,26 @@ def notes_txt (passage_or_id):
         if request.method == 'PUT':
 
             edit_auth ()
+            json = request.get_json ()
 
             res = execute (conn, """
             SET LOCAL ntg.user_id = :user_id;
             """, dict (parameters, user_id = flask_login.current_user.id))
 
+            # check for edit conflicts
+            res = execute (conn, """
+            SELECT * FROM notes
+            WHERE pass_id = :pass_id AND note != :old_note
+            """, dict (parameters,
+                       pass_id  = passage.pass_id,
+                       old_note = json['original']))
+            for row in res:
+                return make_json_response (
+                    status = 409,
+                    message = 'Cannot save. The note was edited by another user.'
+                )
+
+            # save
             res = execute (conn, """
             INSERT INTO notes AS n (pass_id, note)
             VALUES (:pass_id, :note)
@@ -261,7 +276,7 @@ def notes_txt (passage_or_id):
             WHERE n.pass_id = EXCLUDED.pass_id
             """, dict (parameters,
                        pass_id = passage.pass_id,
-                       note = request.get_json ()['remarks']))
+                       note    = json['note']))
 
             return make_json_response (message = 'Note saved.')
 
