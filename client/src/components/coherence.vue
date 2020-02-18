@@ -217,7 +217,7 @@ export default {
             const top = document.querySelector ('.card-local-textflow').offsetTop;
             // console.log (top);
             document.querySelector ('html').velocity ({
-                'scrollTop' : top,
+                'scrollTop' : top + 'px',
             });
         },
         /**
