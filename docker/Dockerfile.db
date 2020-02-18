@@ -1,4 +1,4 @@
-FROM postgres:11
+FROM postgres:12
 
 # basically this is a container that restores a database dump
 COPY ./backup/                     /backup/

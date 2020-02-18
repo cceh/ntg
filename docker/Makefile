@@ -10,7 +10,8 @@ build: Makefile
 
 backup:
 	mkdir -p backup
-	pg_dump --format custom acts_ph4 -n ntg -T "ntg.original_*" -T "ntg.tmp_*" > backup/acts_ph4.dump
+	pg_dump --format custom acts_ph4 -n ntg -T "ntg.original_*" -T "ntg.tmp_*" \
+			--exclude-table-data="ntg.notes*" > backup/acts_ph4.dump
 
 run: build
 	docker-compose up
