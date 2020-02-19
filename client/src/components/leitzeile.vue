@@ -77,9 +77,6 @@ export default {
             });
         },
     },
-    mounted () {
-        this.load_leitzeile (this.pass_id);
-    },
 };
 </script>
 

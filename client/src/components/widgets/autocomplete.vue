@@ -128,10 +128,15 @@ export default {
                 if (key === KeyCodes.ENTER) {
                     vm.on_item_enter (vm.val, event);
                 }
+                if (key === KeyCodes.TAB) {
+                    vm.on_item_enter (vm.val, event);
+                }
             }
         },
         on_focusout () {
-            this.emit_data (this.val);
+            // commented out because on_focusout sometimes emits spurious events
+            // let's try to catch the TAB key instead
+            // this.emit_data (this.val);
         },
         focusMenu () {
             // this overrides the base class: we always keep the focus on the input

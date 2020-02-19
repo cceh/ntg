@@ -146,7 +146,7 @@ Vue.component ('toolbar',      toolbar);
 
 export default {
     'props' : {
-        'passage_or_id' : { 'type' : [Number, String],  'required' : true },
+        'passage_or_id' : { 'type' : [Number, String], 'required' : true },
     },
     data () {
         return {
@@ -154,32 +154,36 @@ export default {
             'epoch'   : 1,  // bump this to reload components
         };
     },
-    'watch' : {
-        passage_or_id (new_value) {
-            this.set_passage (new_value);
-        },
-    },
     /** @lends module:client/coherence */
     'methods' : {
         /**
          * Set a new passage.
          *
          * @param {string} pass_id - The new passage id
+         * @return {Promise} - Resolved when the new passage is loaded
          */
         set_passage (passage_or_id) {
             const vm = this;
 
-            const requests = [
+            const p = Promise.all ([
                 vm.get ('passage.json/' + passage_or_id),
-            ];
-            Promise.all (requests).then ((responses) => {
+            ]);
+            p.then ((responses) => {
                 const passage = responses[0].data.data;
-                vm.pass_id = passage.pass_id; // Number!
+                vm.pass_id = passage.pass_id; // Number! updates our children
                 this.$store.commit ('caption', passage.hr);
             });
+            return p;
         },
+        /**
+         * React on user navigation through the navigator widget.
+         *
+         * The navigator widget $emits an input event on navigation.
+         * Translate the event into a new route.
+         *
+         * @param {Number} new_pass_id - Id of the passage to navigate to.
+         */
         on_nav (new_pass_id) {
-            // $emit from <navigator> to router
             this.$router.push ({
                 'name'   : 'coherence',
                 'params' : { 'passage_or_id' : new_pass_id }
@@ -219,17 +223,19 @@ export default {
             this.$refs.relatives.on_destroy_relatives_popup (event, 0); // Fixes #84
         },
     },
+    beforeRouteEnter (to, from, next) {
+        next (vm => vm.set_passage (to.params.passage_or_id));
+    },
     async beforeRouteUpdate (to, from, next) {
+        const vm = this;
         const notes = this.$refs.notes;
         if (notes && notes.can_save ()) {
             if (confirm ('You have unsaved notes! Save notes?')) {
                 await notes.on_save ();
             }
         }
+        await vm.set_passage (to.params.passage_or_id);
         next ();
-    },
-    mounted () {
-        this.set_passage (this.passage_or_id);
     },
 };
 </script>
