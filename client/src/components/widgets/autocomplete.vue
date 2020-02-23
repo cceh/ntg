@@ -106,10 +106,24 @@ export default {
         },
         on_keydown (event) {
             const vm = this;
+            const key = event.keyCode;
+
+            if (key === KeyCodes.ENTER) {
+                vm.on_item_enter (vm.val, event);
+                return;
+            }
+            if (key === KeyCodes.TAB) {
+                vm.on_item_enter (vm.val, event);
+                return;
+            }
+            if (key === KeyCodes.ESC) {
+                vm.hide ();
+                return;
+            }
+
             if (!vm.visible) {
                 vm.toggle (event);
             } else {
-                const key = event.keyCode;
                 if (key === KeyCodes.UP || key === KeyCodes.DOWN) {
                     if (key === KeyCodes.UP) {
                         --vm.active_item_index;
@@ -122,20 +136,11 @@ export default {
                     }
                     return;
                 }
-                if (key === KeyCodes.ESC) {
-                    vm.hide ();
-                }
-                if (key === KeyCodes.ENTER) {
-                    vm.on_item_enter (vm.val, event);
-                }
-                if (key === KeyCodes.TAB) {
-                    vm.on_item_enter (vm.val, event);
-                }
             }
         },
         on_focusout () {
-            // commented out because on_focusout sometimes emits spurious events
-            // let's try to catch the TAB key instead
+            const vm = this;
+            vm.on_item_enter (vm.val, event);
             // this.emit_data (this.val);
         },
         focusMenu () {

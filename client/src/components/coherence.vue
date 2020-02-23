@@ -184,10 +184,13 @@ export default {
          * @param {Number} new_pass_id - Id of the passage to navigate to.
          */
         on_nav (new_pass_id) {
-            this.$router.push ({
-                'name'   : 'coherence',
-                'params' : { 'passage_or_id' : new_pass_id }
-            });
+            const vm = this;
+            if (new_pass_id !== vm.pass_id) {
+                vm.$router.push ({
+                    'name'   : 'coherence',
+                    'params' : { 'passage_or_id' : new_pass_id }
+                });
+            }
         },
         /**
          * React to epoch changes, eg. when a child edits the database. Tell
