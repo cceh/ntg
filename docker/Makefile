@@ -20,8 +20,10 @@ cbgm: build
 	docker-compose run ntg-app-server cbgm
 
 push:
+	cat ~/.dockerhubpass | docker login --username marcelloperathoner --password-stdin
 	docker push cceh/ntg-app-server:latest
 	docker push cceh/ntg-db-server:latest
+	docker logout
 
 clean:
 	docker container stop $$(docker container ls -a -q)
