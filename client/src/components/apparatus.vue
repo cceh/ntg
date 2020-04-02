@@ -18,7 +18,7 @@
                   class="apparatus-labez fg_labez">{{ items[0].caption }}</span>
           </h3>
           <ul class="list-group-item-text attesting-mss list-inline">
-            <li v-for="item in items" :key="item.ms_id">
+            <li v-for="item in sort_by (items, 'hsnr')" :key="item.ms_id">
               <a :data-ms-id="item.ms_id" class="ms">{{ item.hs }}.</a>
               <span> </span>
             </li>
@@ -174,6 +174,9 @@ export default {
                     'pass_id' : this.pass_id,
                 }),
             });
+        },
+        sort_by (items, what) {
+            return sortBy (items, what);
         },
     },
     mounted () {
