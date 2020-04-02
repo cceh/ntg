@@ -166,7 +166,7 @@ export default {
     data () {
         return {
             'passage' : {},
-            'options' : options,
+            'options' : this.get_options (),
             'toolbar' : this.get_toolbar (),
         };
     },
@@ -224,6 +224,13 @@ export default {
                     }, tools.velocity_opts);
             });
         },
+        get_options () {
+            const vm = this;
+            if (vm.global && !vm.var_only) {
+                return Object.assign ({}, options, { 'include' : options.include_z });
+            }
+            return options;
+        },
         get_toolbar () {
             const vm = this;
             const rg_id_all = vm.$store.state.current_application.rg_id_all || 0;
@@ -256,7 +263,7 @@ export default {
                 'rg_id'   : rg_id_all,
                 'include' : [],
                 'mode'    : 'sim',
-                'checks'       : [],
+                'checks'  : [],
                 ... download_buttons,
             };
             if (vm.global && vm.var_only) {
