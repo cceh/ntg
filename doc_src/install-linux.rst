@@ -31,6 +31,7 @@ As a user with admin privileges do:
 
    .. code-block:: shell
 
+      sudo apt-get update
       sudo apt-get install git make
       sudo -u ntg bash
 
@@ -54,7 +55,7 @@ Database Access
 MySQL database
 --------------
 
-1. Edit (or create) your :file:`~/.my.cnf.ntg` and add this section:
+1. Edit (or create) your :file:`~/.my.cnf` and add this section:
 
    .. code-block:: ini
 
@@ -193,7 +194,7 @@ Application server
       PGDATABASE="acts_ph4"
       PGUSER="ntg"
 
-      MYSQL_CONF="~/.my.cnf.ntg"
+      MYSQL_CONF="~/.my.cnf"
       MYSQL_GROUP="mysql"
 
       MYSQL_ECM_DB="ECM_ActsPh4"
