@@ -319,13 +319,15 @@ sqlacodegen:
 
 install-prerequisites:
 	sudo apt-get install apache2 libapache2-mod-wsgi-py3 \
-		postgresql libpg-dev postgresql-10-mysql-fdw \
-		mysql default-libmysqlclient-dev \
+		postgresql \
 		python3 python3-pip \
-	    git make npm graphviz plantuml
+	    git make graphviz
 	sudo pip3 install --upgrade pip
 	sudo pip3 install --upgrade -r server/requirements.txt
 	sudo pip3 install --upgrade -r scripts/cceh/requirements.txt
+
+install-prerequisites-dev:
+	sudo apt-get install mariadb-client mariadb-server libpq-dev postgresql-11-mysql-fdw npm plantuml
 	sudo pip3 install --upgrade \
 		sphinx sphinx_rtd_theme sphinx_js sphinxcontrib-plantuml
 
