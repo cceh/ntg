@@ -1694,6 +1694,8 @@ def build_MT_text (dba, parameters):
             byzlist = tools.BYZ_HSNR_MARK
         elif book == 'John':
             byzlist = tools.BYZ_HSNR_JOHN
+        else:
+            return
 
         # Insert MT where defined according to our rules
         execute (conn, """
