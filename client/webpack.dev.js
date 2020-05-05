@@ -6,6 +6,6 @@ module.exports = merge (common, {
     mode: 'development',
     devtool: 'eval-source-map',
     plugins: [
-        new BundleAnalyzer (),
+        // new BundleAnalyzer (),
     ],
 });
