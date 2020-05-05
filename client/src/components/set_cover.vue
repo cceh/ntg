@@ -138,7 +138,7 @@ export default {
             if (this.ms_object.hs) {
                 const w = `${this.ms_object.hs} (${this.ms_object.open})`;
                 this.$store.commit ('caption', `${w} - Minimum Set Cover`);
-                return `Minimum Set Cover for Witness ${w})`;
+                return `Minimum Set Cover for Witness ${w}`;
             }
             return this.$route.meta.caption;
         },
