@@ -150,6 +150,15 @@ import_nestle:
 	$(MYSQL) -e "CREATE DATABASE Nestle29"
 	cat ../dumps/Nestle29-2.dump | $(MYSQL) -D Nestle29
 
+import_2sam:
+	-$(MYSQL) -e "DROP DATABASE 2Sam_Ph1"
+	$(MYSQL) -e "CREATE DATABASE 2Sam_Ph1"
+	cat ../dumps/2Sam_apparat_20200430.dump | $(MYSQL) -D 2Sam_Ph1
+	-$(MYSQL) -e "DROP DATABASE LXX_Leitzeile"
+	$(MYSQL) -e "CREATE DATABASE LXX_Leitzeile"
+	cat ../dumps/LXX.dump | $(MYSQL) -D LXX_Leitzeile
+	python3 -m scripts.cceh.import -vvv instance/2sam_ph1.conf
+
 acts_ph4:
 	python3 -m scripts.cceh.prepare -vvv instance/acts_ph4.conf
 	python3 -m scripts.cceh.cbgm    -vvv instance/acts_ph4.conf
@@ -183,7 +192,11 @@ mark_ph22:
 	python3 -m scripts.cceh.prepare -vvv instance/mark_ph22.conf
 	python3 -m scripts.cceh.cbgm    -vvv instance/mark_ph22.conf
 
-DBS := acts_ph3 acts_ph4 acts_ph5 john_ph1 john_f1_ph1 mark_ph1 mark_ph12 mark_ph2 mark_ph22 cl_ph2
+2sam_ph1:
+	python3 -m scripts.cceh.prepare -vvv instance/2sam_ph1.conf
+	python3 -m scripts.cceh.cbgm    -vvv instance/2sam_ph1.conf
+
+DBS := acts_ph3 acts_ph4 acts_ph5 john_ph1 john_f1_ph1 mark_ph1 mark_ph12 mark_ph2 mark_ph22 cl_ph2 2sam_ph1
 
 
 #################

@@ -159,9 +159,18 @@ def copy_att (dba, parameters):
             UPDATE original_att SET labezsuf = labezsuf || fehler WHERE fehler != ''
             """, parameters)
 
+        if book == '2 Samuel':
+            for source_table in ('original_att', 'original_lac'):
+                # set a dummy hsnr so it will copy into att
+                execute (dest, """
+                UPDATE {source_table} SET hsnr = 0
+                """, dict (parameters, source_table = source_table))
+
         execute (dest, """
         TRUNCATE att, lac RESTART IDENTITY
         """, parameters)
+
+    with dba.engine.begin () as dest:
 
         for source_table in ('original_att', 'original_lac'):
             is_lac_table = source_table.endswith ('lac')
@@ -204,6 +213,32 @@ def copy_att (dba, parameters):
             DELETE FROM att WHERE hsnr >= 500000;
             DELETE FROM lac WHERE hsnr >= 500000;
             """, parameters)
+
+        if book == '2 Samuel':
+            for t in ('att', 'lac'):
+                execute (conn, """
+                UPDATE {t} SET hs = CASE
+                WHEN hs = 'Base-Text_2Sam'                   THEN 'A'
+                WHEN hs = 'M_Paris_BN_Coisl.1'               THEN 'P1'
+                WHEN hs = 'M_Paris_BN_Coisl.1-C'             THEN 'P1-C'
+                WHEN hs = 'V_Rom_Bibl.Vat.,_Vat._gr._2106'   THEN 'R2106'
+                WHEN hs = 'V_Rom_Bibl.Vat.,_Vat._gr._2106-C' THEN 'R2106-C'
+                WHEN hs ~ '^02.*-C'                          THEN '02-C'
+                WHEN hs ~ '^02'                              THEN '02'
+                WHEN hs ~ '^03.*-C'                          THEN '03-C'
+                WHEN hs ~ '^03'                              THEN '03'
+                ELSE hs
+                END
+                """, dict (parameters, t = t))
+
+                execute (conn, """
+                UPDATE {t} SET hsnr = CASE
+                WHEN hs = 'A'               THEN 1
+                WHEN hs ~ '^P1'             THEN 2110001
+                WHEN hs ~ '^R2106'          THEN 2110002
+                ELSE 2100000 + CAST ((regexp_match (hs, '^[0-9]+'))[1] AS INTEGER)
+                END
+                """, dict (parameters, t = t))
 
         # make a backup of the original labez
         execute (conn, """
@@ -314,6 +349,23 @@ def copy_att (dba, parameters):
             UPDATE att
             SET labez = 'zz'
             WHERE labez ~ '\?';
+            """, parameters)
+
+        if book == '2 Samuel':
+            for t in ('att', 'lac'):
+                fix (conn, "Misformed hs 2 Samuel", MISFORMED_HS_TEST, """
+                """, dict (parameters, t = t))
+
+            fix (conn, "Misformed labez 2 Samuel", MISFORMED_LABEZ_TEST, r"""
+            UPDATE att
+            SET labez = 'c', labezsuf = 'f'
+            WHERE labez = 'cf';
+            UPDATE att
+            SET labez = SUBSTRING (labez, 1, 1) , labezsuf = SUBSTRING (labez, 3)
+            WHERE labez ~ '^._f$';
+            UPDATE att
+            SET labez = 'zw', labezsuf = SUBSTRING (labez, 3)
+            WHERE labez ~ '^zw.';
             """, parameters)
 
         execute (conn, """
@@ -1780,6 +1832,14 @@ if __name__ == '__main__':
         parameters['re_corr']      = '(C[*1-9]?A?([a-z]+2?)?)'
         parameters['re_corr_keep'] = 'C[*]'
         parameters['re_labez']     = '^([a-z]+(/[a-z]+)*|z[u-z])$'
+    if book == '2 Samuel':
+        parameters['re_hs_t']      = '^.*$'
+        parameters['re_hs']        = '^(A|([PR]?[0-9]+(-C)?))'
+        parameters['re_corr']      = '-?[C*]'                  # correctors
+        parameters['re_corr_keep'] = '[*]'                     # correctors to keep
+        parameters['re_suppress']  = '-firsthandV'             # suppress these mss.
+        parameters['re_comm']      = 'T[1-9]'                  # commentaries (there are none)
+        parameters['re_labez']     = '^([a-y]|z[u-z])$'
 
     dbdest = db_tools.PostgreSQLEngine (**config)
 

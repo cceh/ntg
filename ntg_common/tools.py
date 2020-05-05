@@ -43,6 +43,8 @@ BOOKS = [
     (26, "Jd",   "Jude",            1),
 
     (27, "Ap",   "Revelation",     22),
+
+    (210, "2Sam", "2 Samuel",       2), # Hack for Septuaginta Test
 ]
 """ Titles of the NT books """
 
