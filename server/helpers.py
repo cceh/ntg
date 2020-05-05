@@ -74,8 +74,8 @@ class Bag ():
 class Manuscript ():
     """ Represent one manuscript. """
 
-    RE_HSNR = re.compile (r'^\d{6}$')             # 300180
-    RE_MSID = re.compile (r'^id\d+$')             # id123
+    RE_HSNR = re.compile (r'^\d{6}$')                      # 300180
+    RE_MSID = re.compile (r'^id\d+$')                      # id123
     RE_HS   = re.compile (r'^([PL]?[s\d]+|A|MT)$', re.I)   # 01.
 
     def __init__ (self, conn, manuscript_id_or_hs_or_hsnr):
@@ -83,26 +83,28 @@ class Manuscript ():
 
         self.conn = conn
         self.ms_id = self.hs = self.hsnr = None
-        param = manuscript_id_or_hs_or_hsnr
 
-        if Manuscript.RE_HSNR.search (param):
-            where = 'hsnr = :param'
-            param = int (param)
-        elif Manuscript.RE_MSID.search (param):
-            where = 'ms_id = :param'
-            param = int (param[2:])
-        elif Manuscript.RE_HS.search (param):
-            where = 'hs = :param'
+        if Manuscript.RE_HSNR.search (manuscript_id_or_hs_or_hsnr):
+            where = 'hsnr'
+            param = int (manuscript_id_or_hs_or_hsnr)
+        elif Manuscript.RE_MSID.search (manuscript_id_or_hs_or_hsnr):
+            where = 'ms_id'
+            param = int (manuscript_id_or_hs_or_hsnr[2:])
+        elif Manuscript.RE_HS.search (manuscript_id_or_hs_or_hsnr):
+            where = 'hs'
+            param = manuscript_id_or_hs_or_hsnr
         else:
             return
 
         res = execute (conn, """
         SELECT ms_id, hs, hsnr
         FROM manuscripts
-        WHERE {where}
+        WHERE {where} = :param
         """, dict (parameters, where = where, param = param))
 
-        self.ms_id, self.hs, self.hsnr = res.first ()
+        row = res.fetchone ()
+        if row is not None:
+            self.ms_id, self.hs, self.hsnr = row
 
 
     def get_length (self, rg_id):
@@ -203,9 +205,9 @@ class Passage ():
             WHERE pass_id = :pass_id
             """, dict (parameters, pass_id = start))
 
-        res = res.first ()
-        if res is not None:
-            self.pass_id, self.start, self.end, self.bk_id, self.chapter = res
+        row = res.fetchone ()
+        if row is not None:
+            self.pass_id, self.start, self.end, self.bk_id, self.chapter = row
 
 
     @staticmethod
@@ -281,8 +283,8 @@ class Passage ():
         WHERE bk_id = :bk_id AND range = :range_
         """, dict (parameters, bk_id = self.bk_id, range_ = range_))
 
-        res = res.first ()
-        return res[0] if res is not None else None
+        row = res.fetchone ()
+        return row[0] if row is not None else None
 
 
     def request_rg_id (self, request):

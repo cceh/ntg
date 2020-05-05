@@ -3,6 +3,7 @@
 """The API server for CBGM.  The main functions."""
 
 import collections
+import logging
 import re
 
 import flask
@@ -10,6 +11,7 @@ from flask import request, current_app
 import flask_login
 
 from ntg_common.db_tools import execute
+from ntg_common import tools
 
 from login import auth
 from helpers import parameters, Passage, Manuscript, cache, csvify, get_excluded_ms_ids, \
@@ -132,7 +134,6 @@ def passage_json (passage_or_id = None):
     with current_app.config.dba.engine.begin () as conn:
         if siglum and chapter and verse and word and button == 'Go':
             parsed_passage = Passage.parse ("%s %s:%s/%s" % (siglum, chapter, verse, word))
-            # log (logging.INFO, parsed_passage)
             passage = Passage (conn, parsed_passage)
             return make_json_response (passage.to_json ())
 
@@ -323,6 +324,9 @@ def manuscript_full_json (passage_or_id, hs_hsnr_id):
         ms        = Manuscript (conn, hs_hsnr_id)
         rg_id     = passage.request_rg_id (request)
 
+        if ms.ms_id is None:
+            return cache (make_json_response (None, 400, 'Bad request: No such manuscript.'))
+
         json = ms.to_json ()
         json['length'] = ms.get_length (rg_id)
 
@@ -332,7 +336,10 @@ def manuscript_full_json (passage_or_id, hs_hsnr_id):
         FROM apparatus_view_agg
         WHERE ms_id = :ms_id AND pass_id = :pass_id
         """, dict (parameters, ms_id = ms.ms_id, pass_id = passage.pass_id))
-        json['labez'], json['clique'], json['labez_clique'], json['certainty'] = res.fetchone ()
+
+        row = res.fetchone ()
+        if row is not None:
+            json['labez'], json['clique'], json['labez_clique'], json['certainty'] = row
 
         # Get the affinity of the manuscript to all manuscripts
         res = execute (conn, """
@@ -341,7 +348,11 @@ def manuscript_full_json (passage_or_id, hs_hsnr_id):
         FROM affinity a
         WHERE a.ms_id1 = :ms_id1 AND a.rg_id = :rg_id
         """, dict (parameters, ms_id1 = ms.ms_id, rg_id = rg_id))
-        json['aa'], json['ma'] = res.fetchone ()
+
+        json['aa'], json['ma'] = 0.0, 0.0
+        row = res.fetchone ()
+        if row is not None:
+            json['aa'], json['ma'] = row
 
         # Get the affinity of the manuscript to MT
         #
@@ -349,7 +360,6 @@ def manuscript_full_json (passage_or_id, hs_hsnr_id):
         # ActsMsListValPh3.pl and
         # http://intf.uni-muenster.de/cbgm/actsPh3/guide_en.html#Ancestors
 
-        json['mt'], json['mtp'] = 0.0, 0.0
         res = execute (conn, """
         SELECT a.affinity as mt, a.equal::float / c.length as mtp
         FROM affinity a
@@ -357,8 +367,11 @@ def manuscript_full_json (passage_or_id, hs_hsnr_id):
           ON (a.ms_id1, a.rg_id) = (c.ms_id, c.rg_id)
         WHERE a.ms_id1 = :ms_id1 AND a.ms_id2 = 2 AND a.rg_id = :rg_id
         """, dict (parameters, ms_id1 = ms.ms_id, rg_id = rg_id))
-        if res.rowcount > 0:
-            json['mt'], json['mtp'] = res.fetchone ()
+
+        json['mt'], json['mtp'] = 0.0, 0.0
+        row = res.fetchone ()
+        if row is not None:
+            json['mt'], json['mtp'] = row
 
         return cache (make_json_response (json))
 
