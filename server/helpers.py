@@ -152,9 +152,10 @@ class Word ():
             self.book = 0
             if m.group (1):
                 bk = m.group (1).lower ()
-                books = [book for book in enumerate (tools.BOOKS)
-                         if book[1][1].lower () == bk or book[1][2].lower () == bk]
-                self.book = books[0][0] + 1
+                for b in tools.BOOKS:
+                    if b[1].lower () == bk or b[2].lower () == bk:
+                        self.book = b[0]
+                        break
             self.chapter = int (m.group (2) or '0')
             self.verse   = int (m.group (3) or '0')
             self.word    = int (m.group (4) or '0')
@@ -165,11 +166,11 @@ class Word ():
         # Format a word to the format: "Acts 1:2/3-4"
         if start is None:
             return "%s %d:%d/%d" % (
-                tools.BOOKS[self.book - 1][1], self.chapter, self.verse, self.word)
+                tools.get_book_by_id (self.book)[1], self.chapter, self.verse, self.word)
 
         if start.book != self.book:
             return " - %s %d:%d/%d" % (
-                tools.BOOKS[self.book - 1][1], self.chapter, self.verse, self.word)
+                tools.get_book_by_id (self.book)[1], self.chapter, self.verse, self.word)
         if start.chapter != self.chapter:
             return " - %d:%d/%d" % (self.chapter, self.verse, self.word)
         if start.verse != self.verse:
@@ -225,7 +226,7 @@ class Passage ():
     def to_json (self):
         s = Word (self.start)
         hr = self.to_hr ()
-        bk = tools.BOOKS[self.bk_id - 1]
+        bk = tools.get_book_by_id (self.bk_id)
         return {
             'pass_id'  : self.pass_id,
             'hr'       : hr,

@@ -102,6 +102,13 @@ def log (level, msg, *aargs, **_kwargs):
     logger.log (level, msg, *aargs)
 
 
+def get_book_by_id (id_):
+    for b in BOOKS:
+        if b[0] == id_:
+            return b
+    return None
+
+
 def graphviz_layout (dot, format = 'dot'):
     """Call the GraphViz dot program to generate an image but mostly to precompute
     the graph layout.
