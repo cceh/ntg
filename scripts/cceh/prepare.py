@@ -1246,8 +1246,9 @@ def fill_manuscripts_table (dba, parameters):
 
         # ms_id = 2
         execute (conn, """
+        SELECT setval ('manuscripts_ms_id_seq', :ms_id_mt, FALSE);
         INSERT INTO manuscripts (hs, hsnr) VALUES ('MT', 1)
-        """, parameters)
+        """, dict (parameters, ms_id_mt = MS_ID_MT))
 
         # ms_id = 3, 4, 5, ...
         execute (conn, """
@@ -1686,17 +1687,7 @@ def build_MT_text (dba, parameters):
         DELETE FROM apparatus      WHERE ms_id = :ms_id;
         """, dict (parameters, ms_id = MS_ID_MT))
 
-        if book == 'Acts':
-            byzlist = tools.BYZ_HSNR_ACTS
-        elif book == 'CL':
-            byzlist = tools.BYZ_HSNR_CL
-        elif book == 'Mark':
-            byzlist = tools.BYZ_HSNR_MARK
-        elif book == 'John':
-            byzlist = tools.BYZ_HSNR_JOHN
-        else:
-            byzlist = None
-
+        byzlist = tools.BYZ_HSNR[book]
         if byzlist is not None:
             # Insert MT where defined according to our rules
             execute (conn, """
