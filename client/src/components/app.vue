@@ -31,6 +31,7 @@ import find_relatives from 'find_relatives.vue';
 import coherence      from 'coherence.vue';
 import comparison     from 'comparison.vue';
 import notes_list     from 'notes_list.vue';
+import checks_list    from 'checks_list.vue';
 import opt_stemma     from 'optimal_substemma.vue';
 import set_cover      from 'set_cover.vue';
 
@@ -103,6 +104,16 @@ const router = new VueRouter ({
             'props'     : true,
             'meta'      : {
                 'caption' : 'List of Notes',
+                'home'    : default_home,
+            },
+        },
+        {
+            'path'      : '/:app_id/:phase/checks',
+            'component' : checks_list,
+            'name'      : 'checks_list',
+            'props'     : true,
+            'meta'      : {
+                'caption' : 'List of Congruence Check Failures',
                 'home'    : default_home,
             },
         },
