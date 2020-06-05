@@ -164,7 +164,6 @@ Application server
       PGDATABASE="ntg_user"
       PGUSER="ntg"
 
-      USER_APP_NAME="NTG"
       USER_PASSWORD_HASH="pbkdf2_sha512"
       USER_PASSWORD_SALT="<a random string>"
 

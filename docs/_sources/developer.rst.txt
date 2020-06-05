@@ -7,6 +7,7 @@ Developer Manual
    domain
    client_dev
    server_dev
+   server_config
    scripts_dev
    database
    ntg_common

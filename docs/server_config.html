@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation with Docker &mdash; NTG 0.1.1 documentation</title>
+  <title>API Server Configuration Files &mdash; NTG 0.1.1 documentation</title>
   
 
   
@@ -38,8 +38,8 @@
   <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="User Manual" href="user.html" />
-    <link rel="prev" title="Installation on Linux" href="install-linux.html" /> 
+    <link rel="next" title="Scripts" href="scripts_dev.html" />
+    <link rel="prev" title="API Server" href="server_dev.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -89,7 +89,7 @@
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="reference internal" href="install.html">Installation</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="install-linux.html">Installation on Linux</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install-linux.html#install-prerequisites">Install Prerequisites</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install-linux.html#database-access">Database Access</a></li>
@@ -99,11 +99,11 @@
 <li class="toctree-l3"><a class="reference internal" href="install-linux.html#build-and-run-client">Build and run client</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Installation with Docker</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#install">Install</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#running-the-web-application">Running the web application</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#running-the-cbgm">Running the CBGM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#install">Install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-web-application">Running the web application</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-cbgm">Running the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
 </ul>
@@ -125,7 +125,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Manual</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="developer.html">Developer Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="domain.html">Introduction to the Problem Domain (German)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="domain.html#das-neue-testament">Das Neue Testament</a></li>
 <li class="toctree-l3"><a class="reference internal" href="domain.html#editionen">Editionen</a></li>
@@ -188,9 +188,10 @@
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="server_config.html">API Server Configuration Files</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="server_config.html#per-application-configuration-files">Per-Application Configuration Files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="server_config.html#global-configuration-file">Global Configuration File</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">API Server Configuration Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#per-application-configuration-files">Per-Application Configuration Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#global-configuration-file">Global Configuration File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#footnotes">Footnotes</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
@@ -260,15 +261,15 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-          <li><a href="install.html">Installation</a> &raquo;</li>
+          <li><a href="developer.html">Developer Manual</a> &raquo;</li>
         
-      <li>Installation with Docker</li>
+      <li>API Server Configuration Files</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/install-docker.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/server_config.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -281,83 +282,245 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation-with-docker">
-<span id="docker-install"></span><h1>Installation with Docker<a class="headerlink" href="#installation-with-docker" title="Permalink to this headline">¶</a></h1>
-<p>This chapter describes how to install the CBGM installation on your own PC with
-the help of <a class="reference external" href="https://www.docker.com/">Docker</a>. Docker can run our
-application on Linux, Mac, and Windows.</p>
-<p>We plan to offer various Docker images preloaded with data.  The data is
-editable so you can build your own scenarios.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>As of now (September 2019) this is a technology preview.
-More functionality will be added and bugs will be fixed later.
-Feedback is welcome at: <a class="reference external" href="https://github.com/cceh/ntg/issues">https://github.com/cceh/ntg/issues</a></p>
+  <div class="section" id="api-server-configuration-files">
+<h1>API Server Configuration Files<a class="headerlink" href="#api-server-configuration-files" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="per-application-configuration-files">
+<h2>Per-Application Configuration Files<a class="headerlink" href="#per-application-configuration-files" title="Permalink to this headline">¶</a></h2>
+<p>The API server can serve multiple applications.  “Application” is synonymous
+with “project”.  An application (or project) typically is about one book of the
+New Testament.</p>
+<p>Each application has one configuration file.  The API server looks for
+configuration files in the <code class="file docutils literal notranslate"><span class="pre">instance/</span></code> directory.  The files themselves
+must be named <code class="file docutils literal notranslate"><span class="pre">*.conf</span></code> and the name must not begin with an underscore.</p>
+<p>See also: Flask Configuration Handling <a class="footnote-reference brackets" href="#f2" id="id1">2</a> and
+Werkzeug Serving WSGI Applications <a class="footnote-reference brackets" href="#f3" id="id2">3</a>.</p>
+<dl class="py attribute">
+<dt id="APPLICATION_NAME">
+<code class="sig-name descname">APPLICATION_NAME</code><a class="headerlink" href="#APPLICATION_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the application (Project). eg. “Acts Phase 5”</p>
+<p>The name appears in title bar in the client.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="APPLICATION_ROOT">
+<code class="sig-name descname">APPLICATION_ROOT</code><a class="headerlink" href="#APPLICATION_ROOT" title="Permalink to this definition">¶</a></dt>
+<dd><p>The api entrypoint. <a class="footnote-reference brackets" href="#f2" id="id3">2</a> eg. “acts/ph5/”.</p>
+<p>This value is appended to the APPLICATION_ROOT configured in the global
+configuration file to yield the API entry point for this application.</p>
+<p>With the example values the API entrypoint for this application would be
+“<a class="reference external" href="http://localhost:5000/api/acts/ph5/">http://localhost:5000/api/acts/ph5/</a>”.  The API entrypoint is typically
+proxied through an Apache or nginx server that does the TLS handling.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="APPLICATION_DESCRIPTION">
+<code class="sig-name descname">APPLICATION_DESCRIPTION</code><a class="headerlink" href="#APPLICATION_DESCRIPTION" title="Permalink to this definition">¶</a></dt>
+<dd><p>An optional longer description of the application. eg. “(= Phase 4 + CBGM)”.</p>
+<p>It appears in the project selection list in the client.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="BOOK">
+<code class="sig-name descname">BOOK</code><a class="headerlink" href="#BOOK" title="Permalink to this definition">¶</a></dt>
+<dd><p>The book this application is about. eg. “Mark”.</p>
+<p>For a list of books see: <code class="file docutils literal notranslate"><span class="pre">ntg_common/tools.py</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="READ_ACCESS">
+<code class="sig-name descname">READ_ACCESS</code><a class="headerlink" href="#READ_ACCESS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The role that has read access. eg. “editor”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="READ_ACCESS_PRIVATE">
+<code class="sig-name descname">READ_ACCESS_PRIVATE</code><a class="headerlink" href="#READ_ACCESS_PRIVATE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The role that can read editor’s notes. eg. “editor_acts”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="WRITE_ACCESS">
+<code class="sig-name descname">WRITE_ACCESS</code><a class="headerlink" href="#WRITE_ACCESS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The role that can modify the project. eg. “editor_acts”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="PGHOST">
+<code class="sig-name descname">PGHOST</code><a class="headerlink" href="#PGHOST" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Postgres host. eg. “localhost”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="PGPORT">
+<code class="sig-name descname">PGPORT</code><a class="headerlink" href="#PGPORT" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Postgres port. eg. “5432”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="PGDATABASE">
+<code class="sig-name descname">PGDATABASE</code><a class="headerlink" href="#PGDATABASE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Postgres database. eg. “acts_ph5”</p>
+<p>Each project is stored in its own database.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="PGUSER">
+<code class="sig-name descname">PGUSER</code><a class="headerlink" href="#PGUSER" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Postgres user.  eg. “ntg”</p>
+<p>The server connects to the database as this user.  The password for this user
+(and database) should be configured in the standard Postgres
+<code class="file docutils literal notranslate"><span class="pre">~/.pgpass</span></code> <a class="footnote-reference brackets" href="#f1" id="id4">1</a> file in the home directory of the user that owns the API
+server.</p>
+</dd></dl>
+
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>These instructions are tested only on Linux.
-Feedback from Windows and Mac users is welcome:
-<a class="reference external" href="https://github.com/cceh/ntg/issues">https://github.com/cceh/ntg/issues</a></p>
+<div class="section" id="global-configuration-file">
+<h2>Global Configuration File<a class="headerlink" href="#global-configuration-file" title="Permalink to this headline">¶</a></h2>
+<p>This is the configuration file for the whole application server. The global
+configuration file must be named <code class="file docutils literal notranslate"><span class="pre">instance/_global.conf</span></code>.</p>
+<dl class="py attribute">
+<dt id="APPLICATION_HOST">
+<code class="sig-name descname">APPLICATION_HOST</code><a class="headerlink" href="#APPLICATION_HOST" title="Permalink to this definition">¶</a></dt>
+<dd><p>The app server DNS name: eg. “localhost”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="APPLICATION_PORT">
+<code class="sig-name descname">APPLICATION_PORT</code><a class="headerlink" href="#APPLICATION_PORT" title="Permalink to this definition">¶</a></dt>
+<dd><p>The app server port. eg. 5000</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id0">
+<code class="sig-name descname">APPLICATION_ROOT</code><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>The root API entrypoint. <a class="footnote-reference brackets" href="#f2" id="id5">2</a> eg. “/api/”</p>
+<p>With the above mentioned values the API root entrypoint would be
+“<a class="reference external" href="http://localhost:5000/api/">http://localhost:5000/api/</a>”.  Application-specific entrypoints are appended
+to this root.  The API entrypoint is typically proxied through an Apache or
+nginx server that does the TLS handling.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="AFTER_LOGIN_URL">
+<code class="sig-name descname">AFTER_LOGIN_URL</code><a class="headerlink" href="#AFTER_LOGIN_URL" title="Permalink to this definition">¶</a></dt>
+<dd><p>The URL to redirect the user to after she has logged in.
+eg. “<a class="reference external" href="https://ntg.uni-muenster.de/">https://ntg.uni-muenster.de/</a>”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="SECRET_KEY">
+<code class="sig-name descname">SECRET_KEY</code><a class="headerlink" href="#SECRET_KEY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Session cookie encryption. <a class="footnote-reference brackets" href="#f2" id="id6">2</a> eg. “a_long_random_secret_phrase”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="USE_RELOADER">
+<code class="sig-name descname">USE_RELOADER</code><a class="headerlink" href="#USE_RELOADER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should the server automatically restart the python process if modules were
+changed? <a class="footnote-reference brackets" href="#f3" id="id7">3</a>  eg. True</p>
+<p>Development only. Do not use in production servers.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="USE_DEBUGGER">
+<code class="sig-name descname">USE_DEBUGGER</code><a class="headerlink" href="#USE_DEBUGGER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should the werkzeug debugging system be used? <a class="footnote-reference brackets" href="#f3" id="id8">3</a> eg. True</p>
+<p>Starts the web-debugger on Python exceptions. Development only. Do not use in
+production servers.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id9">
+<code class="sig-name descname">PGHOST</code><a class="headerlink" href="#id9" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Postgres host. eg. “localhost”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id10">
+<code class="sig-name descname">PGPORT</code><a class="headerlink" href="#id10" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Postgres port. eg. “5432”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id11">
+<code class="sig-name descname">PGDATABASE</code><a class="headerlink" href="#id11" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Postgres database that holds user login information. eg. “ntg_user”</p>
+<p>This should be the database that holds only the user login information.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="id12">
+<code class="sig-name descname">PGUSER</code><a class="headerlink" href="#id12" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Postgres user eg. “ntg”</p>
+<p>The server connects to the database as this user.  The password for this user
+(and database) should be configured in the standard Postgres
+<code class="file docutils literal notranslate"><span class="pre">~/.pgpass</span></code> <a class="footnote-reference brackets" href="#f1" id="id13">1</a> file in the home directory of the user that owns the API
+server.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="USER_PASSWORD_HASH">
+<code class="sig-name descname">USER_PASSWORD_HASH</code><a class="headerlink" href="#USER_PASSWORD_HASH" title="Permalink to this definition">¶</a></dt>
+<dd><p>The hash algorithm used to encrypt user passwords in the database.
+eg. “pbkdf2_sha512”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="USER_PASSWORD_SALT">
+<code class="sig-name descname">USER_PASSWORD_SALT</code><a class="headerlink" href="#USER_PASSWORD_SALT" title="Permalink to this definition">¶</a></dt>
+<dd><p>The salt used to encrypt the user passwords stored in the database.
+eg. “a_different_long_random_secret_phrase”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MAIL_SERVER">
+<code class="sig-name descname">MAIL_SERVER</code><a class="headerlink" href="#MAIL_SERVER" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mail server used to send user registration confirmation email.
+eg.  “smtp.uni-muenster.de”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MAIL_PORT">
+<code class="sig-name descname">MAIL_PORT</code><a class="headerlink" href="#MAIL_PORT" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mail server port. eg.  25</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MAIL_USE_TLS">
+<code class="sig-name descname">MAIL_USE_TLS</code><a class="headerlink" href="#MAIL_USE_TLS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send mail using TLS. eg.  True</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MAIL_DEFAULT_SENDER">
+<code class="sig-name descname">MAIL_DEFAULT_SENDER</code><a class="headerlink" href="#MAIL_DEFAULT_SENDER" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sender name to use in the user registration confirmation emails.
+eg. “ntg appserver &lt;<a class="reference external" href="mailto:noreply&#37;&#52;&#48;uni-muenster&#46;de">noreply<span>&#64;</span>uni-muenster<span>&#46;</span>de</a>&gt;”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="CORS_ALLOW_ORIGIN">
+<code class="sig-name descname">CORS_ALLOW_ORIGIN</code><a class="headerlink" href="#CORS_ALLOW_ORIGIN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restricts API usage to specified hosts. eg. “*”</p>
+</dd></dl>
+
 </div>
-<div class="section" id="install">
-<h2>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic">
-<li><p>Install the free community version of Docker:</p>
-<ul class="simple">
-<li><p>for Windows see: <a class="reference external" href="https://docs.docker.com/docker-for-windows/install/">https://docs.docker.com/docker-for-windows/install/</a></p></li>
-<li><p>for Mac see: <a class="reference external" href="https://docs.docker.com/docker-for-mac/install/">https://docs.docker.com/docker-for-mac/install/</a></p></li>
-<li><p>for Debian Linux see: <a class="reference external" href="https://docs.docker.com/compose/install/">https://docs.docker.com/compose/install/</a></p></li>
-</ul>
-</li>
-<li><p>Create a new directory and change into it.</p></li>
-<li><p>Download <a class="reference external" href="https://raw.githubusercontent.com/cceh/ntg/master/docker/docker-compose.yml">https://raw.githubusercontent.com/cceh/ntg/master/docker/docker-compose.yml</a></p></li>
-<li><p>Run:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose up
-</pre></div>
-</div>
-<p>This will download the Docker containers and initialize the database.  It
-will take some time depending on your internet connection speed and your PC.</p>
-</li>
-<li><p>Test the installation: Point your browser to the url:
-<a class="reference external" href="http://localhost:5000/acts/ph4/">http://localhost:5000/acts/ph4/</a> and use the application.</p></li>
-<li><p>When satisfied, hit <kbd class="kbd docutils literal notranslate">Ctrl+C</kbd> to stop the Docker service.</p></li>
-</ol>
-<p>The Docker service is now installed.</p>
-</div>
-<div class="section" id="running-the-web-application">
-<h2>Running the web application<a class="headerlink" href="#running-the-web-application" title="Permalink to this headline">¶</a></h2>
-<p>To use the application point your browser to <a class="reference external" href="http://localhost:5000/acts/ph4/">http://localhost:5000/acts/ph4/</a>
-while the Docker service is running.  To run the Docker service change into the
-directory and say:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose start
-</pre></div>
-</div>
-<p>and to stop it again say:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose stop
-</pre></div>
-</div>
-</div>
-<div class="section" id="running-the-cbgm">
-<h2>Running the CBGM<a class="headerlink" href="#running-the-cbgm" title="Permalink to this headline">¶</a></h2>
-<p>To run the CBGM say:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ docker-compose run ntg-app-server cbgm
-</pre></div>
-</div>
-</div>
-<div class="section" id="troubleshooting">
-<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
-<p>After upgrading to a new docker container, if you get the error message: “FATAL:
-database files are incompatible with server”, say:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$     docker-compose down --volumes
-$ docker-compose up
-</pre></div>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This will install a fresh database and overwrite all changes you made to the
-data.</p>
-</div>
+<div class="section" id="footnotes">
+<h2>Footnotes<a class="headerlink" href="#footnotes" title="Permalink to this headline">¶</a></h2>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets">1</span><span class="fn-backref">(<a href="#id4">1</a>,<a href="#id13">2</a>)</span></dt>
+<dd><p>PostgreSQL Documentation: The Password File.
+<a class="reference external" href="https://www.postgresql.org/docs/current/libpq-pgpass.html">https://www.postgresql.org/docs/current/libpq-pgpass.html</a></p>
+</dd>
+<dt class="label" id="f2"><span class="brackets">2</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id3">2</a>,<a href="#id5">3</a>,<a href="#id6">4</a>)</span></dt>
+<dd><p>Flask Documentation: Configuration Handling.
+<a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/config/">https://flask.palletsprojects.com/en/1.1.x/config/</a></p>
+</dd>
+<dt class="label" id="f3"><span class="brackets">3</span><span class="fn-backref">(<a href="#id2">1</a>,<a href="#id7">2</a>,<a href="#id8">3</a>)</span></dt>
+<dd><p>Werkzeug Documentation: Serving WSGI Applications.
+<a class="reference external" href="https://werkzeug.palletsprojects.com/en/1.0.x/serving/">https://werkzeug.palletsprojects.com/en/1.0.x/serving/</a></p>
+</dd>
+</dl>
 </div>
 </div>
 
@@ -369,10 +532,10 @@ data.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="user.html" class="btn btn-neutral float-right" title="User Manual" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="scripts_dev.html" class="btn btn-neutral float-right" title="Scripts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="install-linux.html" class="btn btn-neutral float-left" title="Installation on Linux" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="server_dev.html" class="btn btn-neutral float-left" title="API Server" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

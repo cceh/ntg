@@ -21,11 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -38,7 +38,7 @@
   <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Scripts" href="scripts_dev.html" />
+    <link rel="next" title="API Server Configuration Files" href="server_config.html" />
     <link rel="prev" title="Web Client" href="client_dev.html" /> 
 </head>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#install">Install</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-web-application">Running the web application</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-cbgm">Running the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
 </ul>
@@ -138,6 +139,7 @@
 <li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-app">client/app</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-apparatus">client/apparatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-checks-list">client/checks_list</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-coherence">client/coherence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison">client/comparison</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-details-table">client/comparison_details_table</a></li>
@@ -184,6 +186,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-server.editor">server.editor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-server.login">server.login</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-server.helpers">server.helpers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="server_config.html">API Server Configuration Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_config.html#per-application-configuration-files">Per-Application Configuration Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_config.html#global-configuration-file">Global Configuration File</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
@@ -284,34 +291,34 @@
 <div class="section" id="module-server.main">
 <span id="server-main"></span><h2>server.main<a class="headerlink" href="#module-server.main" title="Permalink to this headline">¶</a></h2>
 <p>The API server for CBGM.  The main functions.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.apparatus_json">
-<code class="sig-name descname">apparatus_json</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.apparatus_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">apparatus_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.apparatus_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>The contents of the apparatus table.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.application_json">
 <code class="sig-name descname">application_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.main.application_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  Serve information about the application.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.attestation_json">
-<code class="sig-name descname">attestation_json</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.attestation_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">attestation_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.attestation_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Answer with a list of the attestations of all manuscripts at one specified
 passage.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.attesting_csv">
-<code class="sig-name descname">attesting_csv</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em>, <em class="sig-param">labez</em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.attesting_csv" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">attesting_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em>, <em class="sig-param"><span class="n">labez</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.attesting_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serve all relatives of all mss. attesting labez at passage.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.cliques_json">
-<code class="sig-name descname">cliques_json</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.cliques_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cliques_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.cliques_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  Serve all cliques found in a passage.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -320,21 +327,21 @@ passage.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.init_app">
-<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param">app</em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.init_app" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.init_app" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the flask app.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.leitzeile_json">
-<code class="sig-name descname">leitzeile_json</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.leitzeile_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">leitzeile_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.leitzeile_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  Serve the leitzeile for the verse containing passage_or_id.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.manuscript_full_json">
-<code class="sig-name descname">manuscript_full_json</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em>, <em class="sig-param">hs_hsnr_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.manuscript_full_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">manuscript_full_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em>, <em class="sig-param"><span class="n">hs_hsnr_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.manuscript_full_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  Serve information about a manuscript.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -343,9 +350,9 @@ passage.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.manuscript_json">
-<code class="sig-name descname">manuscript_json</code><span class="sig-paren">(</span><em class="sig-param">hs_hsnr_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.manuscript_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">manuscript_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hs_hsnr_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.manuscript_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  Serve information about a manuscript.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -354,9 +361,9 @@ passage.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.passage_json">
-<code class="sig-name descname">passage_json</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.passage_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">passage_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.passage_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  Serve information about a passage.</p>
 <p>Return information about a passage or navigate to it.</p>
 <dl class="field-list simple">
@@ -373,7 +380,7 @@ passage.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.ranges_json">
 <code class="sig-name descname">ranges_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.main.ranges_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  Serve a list of ranges.</p>
@@ -381,9 +388,9 @@ passage.</p>
 the NT.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.readings_json">
-<code class="sig-name descname">readings_json</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.readings_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">readings_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.readings_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  Serve all readings found in a passage.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -392,15 +399,15 @@ the NT.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.relatives_csv">
-<code class="sig-name descname">relatives_csv</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em>, <em class="sig-param">hs_hsnr_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.relatives_csv" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">relatives_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em>, <em class="sig-param"><span class="n">hs_hsnr_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.main.relatives_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output a table of the nearest relatives of a manuscript.</p>
 <p>Output a table of the nearest relatives/ancestors/descendants of a
 manuscript and what they attest.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.main.suggest_json">
 <code class="sig-name descname">suggest_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.main.suggest_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  The suggestion drop-downs in the navigator.</p>
@@ -413,21 +420,21 @@ the database.</p>
 <div class="section" id="module-server.textflow">
 <span id="server-textflow"></span><h2>server.textflow<a class="headerlink" href="#module-server.textflow" title="Permalink to this headline">¶</a></h2>
 <p>The API server for CBGM.  The textflow and stemmata diagrams.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="server.textflow.init_app">
-<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param">_app</em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.init_app" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_app</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.init_app" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the flask app.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.textflow.remove_z_leaves">
-<code class="sig-name descname">remove_z_leaves</code><span class="sig-paren">(</span><em class="sig-param">graph</em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.remove_z_leaves" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_z_leaves</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.remove_z_leaves" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes leaves (recursively) if they read z.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.textflow.stemma">
-<code class="sig-name descname">stemma</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.stemma" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stemma</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.stemma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serve a local stemma in dot format.</p>
 <p>A local stemma is a DAG (directed acyclic graph).  The layout of the DAG is
 precomputed on the server using GraphViz.  GraphViz adds a precomputed
@@ -444,33 +451,33 @@ Promising but still early days.</p></li>
 the layout on the server.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.textflow.stemma_dot">
-<code class="sig-name descname">stemma_dot</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.stemma_dot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stemma_dot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.stemma_dot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a local stemma diagram in .dot format.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.textflow.stemma_png">
-<code class="sig-name descname">stemma_png</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.stemma_png" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stemma_png</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.stemma_png" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a local stemma diagram in .png format.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.textflow.textflow">
-<code class="sig-name descname">textflow</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.textflow" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">textflow</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.textflow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output a stemma of manuscripts.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.textflow.textflow_dot">
-<code class="sig-name descname">textflow_dot</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.textflow_dot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">textflow_dot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.textflow_dot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a textflow diagram in .dot format.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.textflow.textflow_png">
-<code class="sig-name descname">textflow_png</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.textflow_png" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">textflow_png</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.textflow.textflow_png" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a textflow diagram in .png format.</p>
 </dd></dl>
 
@@ -478,20 +485,20 @@ the layout on the server.</p>
 <div class="section" id="module-server.comparison">
 <span id="server-comparison"></span><h2>server.comparison<a class="headerlink" href="#module-server.comparison" title="Permalink to this headline">¶</a></h2>
 <p>The comparison function of the API server for CBGM.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="server.comparison.comparison_detail">
 <code class="sig-name descname">comparison_detail</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.comparison.comparison_detail" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output comparison of 2 witnesses, chapter detail.</p>
 <p>Outputs a detail of the differences between 2 manuscripts in one chapter.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.comparison.comparison_detail_csv">
 <code class="sig-name descname">comparison_detail_csv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.comparison.comparison_detail_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint. Serve a CSV table. (see also <a class="reference internal" href="#server.comparison.comparison_detail" title="server.comparison.comparison_detail"><code class="xref py py-func docutils literal notranslate"><span class="pre">comparison_detail()</span></code></a>)</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.comparison.comparison_summary">
 <code class="sig-name descname">comparison_summary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.comparison.comparison_summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output comparison of 2 witnesses, chapter summary.</p>
@@ -499,15 +506,15 @@ the layout on the server.</p>
 per chapters.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.comparison.comparison_summary_csv">
 <code class="sig-name descname">comparison_summary_csv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.comparison.comparison_summary_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint. Serve a CSV table. (see also <a class="reference internal" href="#server.comparison.comparison_summary" title="server.comparison.comparison_summary"><code class="xref py py-func docutils literal notranslate"><span class="pre">comparison_summary()</span></code></a>)</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.comparison.init_app">
-<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param">_app</em><span class="sig-paren">)</span><a class="headerlink" href="#server.comparison.init_app" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_app</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.comparison.init_app" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the flask app.</p>
 </dd></dl>
 
@@ -516,29 +523,29 @@ per chapters.</p>
 <span id="server-set-cover"></span><h2>server.set_cover<a class="headerlink" href="#module-server.set_cover" title="Permalink to this headline">¶</a></h2>
 <p>The API server for CBGM.  The optimal substemma and set cover module.</p>
 <p>See: CBGM_Pres.pdf p. 490ff.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="server.set_cover.Combination">
-<em class="property">class </em><code class="sig-name descname">Combination</code><span class="sig-paren">(</span><em class="sig-param">iterator</em>, <em class="sig-param">index</em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.Combination" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Combination</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">iterator</span></em>, <em class="sig-param"><span class="n">index</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.Combination" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents a combination of manuscripts.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="server.set_cover.Combination.explained">
 <code class="sig-name descname">explained</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.Combination.explained" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate how many variants are explained by this combination.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="server.set_cover.Combination.score">
 <code class="sig-name descname">score</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.Combination.score" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the score for the given combination.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="server.set_cover.Combination.to_csv">
 <code class="sig-name descname">to_csv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.Combination.to_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output the combination in CSV format.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="server.set_cover.Combination.to_json">
 <code class="sig-name descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.Combination.to_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output the combination in JSON format.</p>
@@ -546,9 +553,9 @@ per chapters.</p>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.set_cover.build_explain_matrix">
-<code class="sig-name descname">build_explain_matrix</code><span class="sig-paren">(</span><em class="sig-param">conn</em>, <em class="sig-param">val</em>, <em class="sig-param">ms_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.build_explain_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">build_explain_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em>, <em class="sig-param"><span class="n">val</span></em>, <em class="sig-param"><span class="n">ms_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.build_explain_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build the explain matrix.</p>
 <p>A matrix of 1 x n_passages containing the bitmask of all those readings that
 would explain the reading in the manuscript under scrutiny.</p>
@@ -556,51 +563,51 @@ would explain the reading in the manuscript under scrutiny.</p>
 Bit 2..64 are the bitmask of all cliques.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.set_cover.get_ancestors">
-<code class="sig-name descname">get_ancestors</code><span class="sig-paren">(</span><em class="sig-param">conn</em>, <em class="sig-param">rg_id</em>, <em class="sig-param">ms_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.get_ancestors" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_ancestors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em>, <em class="sig-param"><span class="n">rg_id</span></em>, <em class="sig-param"><span class="n">ms_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.get_ancestors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get all ancestors of ms.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.set_cover.init">
-<code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param">db</em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.init" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do some preparative calculations and cache the results.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.set_cover.init_app">
-<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param">app</em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.init_app" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.init_app" title="Permalink to this definition">¶</a></dt>
 <dd><p>Init the Flask app.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.set_cover.optimal_substemma_csv">
 <code class="sig-name descname">optimal_substemma_csv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.optimal_substemma_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do an exhaustive search for the combination among a given set of ancestors
 that best explains a given manuscript.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.set_cover.optimal_substemma_detail_csv">
 <code class="sig-name descname">optimal_substemma_detail_csv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.optimal_substemma_detail_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Report details about one combination of ancestors.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.set_cover.optimal_substemma_json">
 <code class="sig-name descname">optimal_substemma_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.optimal_substemma_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalize parameters only and add some general info.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.set_cover.powerset">
 <code class="sig-name descname">powerset</code><span class="sig-paren">(</span><em class="sig-param">[1,2,3]) --&gt; () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3</em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.powerset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.set_cover.set_cover_json">
-<code class="sig-name descname">set_cover_json</code><span class="sig-paren">(</span><em class="sig-param">hs_hsnr_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.set_cover_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_cover_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hs_hsnr_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.set_cover.set_cover_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Approximate the minimum set cover for a manuscript.</p>
 <p>See: <a class="reference external" href="https://en.wikipedia.org/wiki/Set_cover_problem">https://en.wikipedia.org/wiki/Set_cover_problem</a></p>
 </dd></dl>
@@ -609,27 +616,27 @@ that best explains a given manuscript.</p>
 <div class="section" id="module-server.editor">
 <span id="server-editor"></span><h2>server.editor<a class="headerlink" href="#module-server.editor" title="Permalink to this headline">¶</a></h2>
 <p>The API server for CBGM.  Stemma editing module.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="server.editor.init_app">
-<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param">_app</em><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.init_app" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_app</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.init_app" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the flask app.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.editor.notes_json">
-<code class="sig-name descname">notes_json</code><span class="sig-paren">(</span><em class="sig-param">range_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.notes_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">notes_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">range_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.notes_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Endpoint.  Get a list of all editor notes.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.editor.notes_txt">
-<code class="sig-name descname">notes_txt</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.notes_txt" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">notes_txt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.notes_txt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read or write the editor notes for a passage</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.editor.stemma_edit">
-<code class="sig-name descname">stemma_edit</code><span class="sig-paren">(</span><em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.stemma_edit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stemma_edit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.editor.stemma_edit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Edit a local stemma.</p>
 <p>Called from local-stemma.js (split, merge, move) and textflow.js (move-manuscripts).</p>
 </dd></dl>
@@ -638,39 +645,39 @@ that best explains a given manuscript.</p>
 <div class="section" id="module-server.login">
 <span id="server-login"></span><h2>server.login<a class="headerlink" href="#module-server.login" title="Permalink to this headline">¶</a></h2>
 <p>An application server for CBGM.  User management module.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="server.login.AnonymousUserMixin">
 <em class="property">class </em><code class="sig-name descname">AnonymousUserMixin</code><a class="headerlink" href="#server.login.AnonymousUserMixin" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the default object for representing an anonymous user.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.login.auth">
 <code class="sig-name descname">auth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.login.auth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if user is authorized to see what follows.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.login.declare_user_model_on">
-<code class="sig-name descname">declare_user_model_on</code><span class="sig-paren">(</span><em class="sig-param">db</em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.declare_user_model_on" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">declare_user_model_on</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.declare_user_model_on" title="Permalink to this definition">¶</a></dt>
 <dd><p>Declare the user model on flask_sqlalchemy.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.login.edit_auth">
 <code class="sig-name descname">edit_auth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.login.edit_auth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if user is authorized to edit.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.login.init_app">
-<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param">app</em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.init_app" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.init_app" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the flask app.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.login.make_safe_url">
-<code class="sig-name descname">make_safe_url</code><span class="sig-paren">(</span><em class="sig-param">url</em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.make_safe_url" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">make_safe_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.make_safe_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Turns an unsafe absolute URL into a safe relative URL
 by removing the scheme and the hostname</p>
 <dl class="simple">
@@ -680,27 +687,27 @@ by removing the scheme and the hostname</p>
 <p>Copied from flask_user/views.py because it was defective.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.login.private_auth">
 <code class="sig-name descname">private_auth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#server.login.private_auth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if user is authorized to see what follows.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.login.user_can_read">
-<code class="sig-name descname">user_can_read</code><span class="sig-paren">(</span><em class="sig-param">app</em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.user_can_read" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">user_can_read</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.user_can_read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if user has read access.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.login.user_can_read_private">
-<code class="sig-name descname">user_can_read_private</code><span class="sig-paren">(</span><em class="sig-param">app</em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.user_can_read_private" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">user_can_read_private</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.user_can_read_private" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if user has read access.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.login.user_can_write">
-<code class="sig-name descname">user_can_write</code><span class="sig-paren">(</span><em class="sig-param">app</em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.user_can_write" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">user_can_write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">app</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.login.user_can_write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if user has write access.</p>
 </dd></dl>
 
@@ -708,58 +715,58 @@ by removing the scheme and the hostname</p>
 <div class="section" id="module-server.helpers">
 <span id="server-helpers"></span><h2>server.helpers<a class="headerlink" href="#module-server.helpers" title="Permalink to this headline">¶</a></h2>
 <p>An application server for CBGM.  Helper classes.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="server.helpers.Bag">
 <em class="property">class </em><code class="sig-name descname">Bag</code><a class="headerlink" href="#server.helpers.Bag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to stick values in.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="server.helpers.EXCLUDE_REGEX_MAP">
 <code class="sig-name descname">EXCLUDE_REGEX_MAP</code><em class="property"> = {'A': 'A', 'F': 'F[1-9Π][0-9]*', 'MT': 'MT'}</em><a class="headerlink" href="#server.helpers.EXCLUDE_REGEX_MAP" title="Permalink to this definition">¶</a></dt>
 <dd><p>Regexes for the include/exclude toolbar buttons.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="server.helpers.Manuscript">
-<em class="property">class </em><code class="sig-name descname">Manuscript</code><span class="sig-paren">(</span><em class="sig-param">conn</em>, <em class="sig-param">manuscript_id_or_hs_or_hsnr</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.Manuscript" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Manuscript</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em>, <em class="sig-param"><span class="n">manuscript_id_or_hs_or_hsnr</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.Manuscript" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represent one manuscript.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="server.helpers.Passage">
-<em class="property">class </em><code class="sig-name descname">Passage</code><span class="sig-paren">(</span><em class="sig-param">conn</em>, <em class="sig-param">passage_or_id</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.Passage" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Passage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em>, <em class="sig-param"><span class="n">passage_or_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.Passage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents one passage.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="server.helpers.Passage.range_id">
-<code class="sig-name descname">range_id</code><span class="sig-paren">(</span><em class="sig-param">range_=None</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.Passage.range_id" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">range_id</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">range_</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.Passage.range_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the id of the range containing this passage.</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="server.helpers.Word">
-<em class="property">class </em><code class="sig-name descname">Word</code><span class="sig-paren">(</span><em class="sig-param">w=0</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.Word" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Word</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">w</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.Word" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents one word address.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.helpers.csvify">
-<code class="sig-name descname">csvify</code><span class="sig-paren">(</span><em class="sig-param">fields</em>, <em class="sig-param">rows</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.csvify" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">csvify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fields</span></em>, <em class="sig-param"><span class="n">rows</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.csvify" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a HTTP response in CSV format.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.helpers.get_excluded_ms_ids">
-<code class="sig-name descname">get_excluded_ms_ids</code><span class="sig-paren">(</span><em class="sig-param">conn</em>, <em class="sig-param">include</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.get_excluded_ms_ids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_excluded_ms_ids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em>, <em class="sig-param"><span class="n">include</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.get_excluded_ms_ids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the ms_ids of manuscripts to exclude.</p>
 <p>Helps to implement the buttons “A”, “MT”, and “F” in the toolbar.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.helpers.nx_to_dot">
-<code class="sig-name descname">nx_to_dot</code><span class="sig-paren">(</span><em class="sig-param">graph</em>, <em class="sig-param">width=960.0</em>, <em class="sig-param">fontsize=10.0</em>, <em class="sig-param">nodesep=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.nx_to_dot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">nx_to_dot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph</span></em>, <em class="sig-param"><span class="n">width</span><span class="o">=</span><span class="default_value">960.0</span></em>, <em class="sig-param"><span class="n">fontsize</span><span class="o">=</span><span class="default_value">10.0</span></em>, <em class="sig-param"><span class="n">nodesep</span><span class="o">=</span><span class="default_value">0.1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.nx_to_dot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert an nx graph into a dot file.</p>
 <p>We’d like to sort the nodes in the graph, but nx internally uses
 dictionaries “all the way down”.  Thus the only chance to sort nodes and
@@ -767,9 +774,9 @@ edges is while writing the file.  This function is a lightweight
 re-implementation of nx.nx_pydot.to_pydot ().</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="server.helpers.nx_to_dot_subgraphs">
-<code class="sig-name descname">nx_to_dot_subgraphs</code><span class="sig-paren">(</span><em class="sig-param">graph</em>, <em class="sig-param">field</em>, <em class="sig-param">width=960.0</em>, <em class="sig-param">fontsize=10.0</em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.nx_to_dot_subgraphs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">nx_to_dot_subgraphs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">graph</span></em>, <em class="sig-param"><span class="n">field</span></em>, <em class="sig-param"><span class="n">width</span><span class="o">=</span><span class="default_value">960.0</span></em>, <em class="sig-param"><span class="n">fontsize</span><span class="o">=</span><span class="default_value">10.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#server.helpers.nx_to_dot_subgraphs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert an nx graph into a dot file.</p>
 <p>We’d like to sort the nodes in the graph, but nx internally uses
 dictionaries “all the way down”.  Thus the only chance to sort nodes and
@@ -788,7 +795,7 @@ re-implementation of nx.nx_pydot.to_pydot ().</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="scripts_dev.html" class="btn btn-neutral float-right" title="Scripts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="server_config.html" class="btn btn-neutral float-right" title="API Server Configuration Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="client_dev.html" class="btn btn-neutral float-left" title="Web Client" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

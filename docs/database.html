@@ -21,11 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#install">Install</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-web-application">Running the web application</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-cbgm">Running the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
 </ul>
@@ -138,6 +139,7 @@
 <li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-app">client/app</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-apparatus">client/apparatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-checks-list">client/checks_list</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-coherence">client/coherence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison">client/comparison</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-details-table">client/comparison_details_table</a></li>
@@ -184,6 +186,11 @@
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.login">server.login</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="server_config.html">API Server Configuration Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_config.html#per-application-configuration-files">Per-Application Configuration Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_config.html#global-configuration-file">Global Configuration File</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
@@ -307,9 +314,9 @@ operations on the current table automagically update the past table also.</p>
 <span id="tables"></span><h3>Tables<a class="headerlink" href="#module-ntg_common.db" title="Permalink to this headline">¶</a></h3>
 <p>This module contains the sqlalchemy classes that create the database structure
 we need for doing the CBGM and running the application server.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Affinity">
-<em class="property">class </em><code class="sig-name descname">Affinity</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Affinity" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Affinity</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Affinity" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains CBGM output related to each pair of manuscripts.</p>
 <p>This table contains the actual results of applying the CBGM: the priority of
 the manuscripts.  It has one row for each pair of manuscripts that have at
@@ -318,37 +325,37 @@ least one passage in common and each range we are interested in.</p>
 locstem data, and one for the backward-compatible non-recurisve
 interpretation (with ‘p_’ prefix).</p>
 <div class="graphviz"><img src="_images/graphviz-a9f93f76fe0ffb293e16ec56982ef36db1759518.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Affinity.common">
 <code class="sig-name descname">common</code><a class="headerlink" href="#ntg_common.db.Affinity.common" title="Permalink to this definition">¶</a></dt>
 <dd><p>No. of passages defined in both manuscripts.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Affinity.equal">
 <code class="sig-name descname">equal</code><a class="headerlink" href="#ntg_common.db.Affinity.equal" title="Permalink to this definition">¶</a></dt>
 <dd><p>No. of passages that have the same reading in both manuscripts.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Affinity.affinity">
 <code class="sig-name descname">affinity</code><a class="headerlink" href="#ntg_common.db.Affinity.affinity" title="Permalink to this definition">¶</a></dt>
 <dd><p>equal / common</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Affinity.older">
 <code class="sig-name descname">older</code><a class="headerlink" href="#ntg_common.db.Affinity.older" title="Permalink to this definition">¶</a></dt>
 <dd><p>No. of passages that have an older reading in ms1.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Affinity.newer">
 <code class="sig-name descname">newer</code><a class="headerlink" href="#ntg_common.db.Affinity.newer" title="Permalink to this definition">¶</a></dt>
 <dd><p>No. of passages that have an newer reading in ms1.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Affinity.unclear">
 <code class="sig-name descname">unclear</code><a class="headerlink" href="#ntg_common.db.Affinity.unclear" title="Permalink to this definition">¶</a></dt>
 <dd><p>No. of passages where it is unclear which reading is older.</p>
@@ -356,12 +363,12 @@ interpretation (with ‘p_’ prefix).</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Apparatus">
-<em class="property">class </em><code class="sig-name descname">Apparatus</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Apparatus" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Apparatus</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Apparatus" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains the <a class="reference internal" href="scripts_dev.html#transform-positive"><span class="std std-ref">positive apparatus</span></a>.</p>
 <div class="graphviz"><img src="_images/graphviz-b55862f4b55ab0a3541f25f38835fa1a8588c81e.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Apparatus.cbgm">
 <code class="sig-name descname">cbgm</code><a class="headerlink" href="#ntg_common.db.Apparatus.cbgm" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if this entry is eligible for CBGM, eg. is by the orginal scribe
@@ -369,17 +376,17 @@ and is 100% certain.  There can be only one entry eligible for CBGM for
 every manuscript and passage.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Apparatus.labezsuf">
 <code class="sig-name descname">labezsuf</code><a class="headerlink" href="#ntg_common.db.Apparatus.labezsuf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contains auxiliary information about the reading:</p>
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Apparatus.f">
 <code class="sig-name descname">f</code><a class="headerlink" href="#ntg_common.db.Apparatus.f" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fehler.  The reading is considered a scribal error.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Apparatus.o">
 <code class="sig-name descname">o</code><a class="headerlink" href="#ntg_common.db.Apparatus.o" title="Permalink to this definition">¶</a></dt>
 <dd><p>Orthographicum.  The reading is considered an orthographical variant,
@@ -388,7 +395,7 @@ eg. a variant place name.</p>
 
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Apparatus.certainty">
 <code class="sig-name descname">certainty</code><a class="headerlink" href="#ntg_common.db.Apparatus.certainty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Certainty of the reading for the purposes of the CBGM.  Only readings
@@ -398,7 +405,7 @@ given if the reading unequivocally witnesses for one labez.</p>
 readings with certainty &lt; 1.0, all of them summing to no more than 1.0.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Apparatus.lesart">
 <code class="sig-name descname">lesart</code><a class="headerlink" href="#ntg_common.db.Apparatus.lesart" title="Permalink to this definition">¶</a></dt>
 <dd><p>The actual reading offered by the manuscript.  A lacuna is stored as
@@ -410,46 +417,46 @@ manuscript’s labez.  (Saves space and can easily be reconstructed.)</p>
 variants) the actual reading will be inserted.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Apparatus.origin">
 <code class="sig-name descname">origin</code><a class="headerlink" href="#ntg_common.db.Apparatus.origin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Used only for debugging.  Shows where this entry in the positive
 apparatus came from.</p>
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Apparatus.ATT">
 <code class="sig-name descname">ATT</code><a class="headerlink" href="#ntg_common.db.Apparatus.ATT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copied from negative apparatus in att table in
 <a class="reference internal" href="scripts_dev.html#scripts.cceh.prepare.fill_apparatus_table" title="scripts.cceh.prepare.fill_apparatus_table"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fill_apparatus_table()</span></code></a>.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Apparatus.BYZ">
 <code class="sig-name descname">BYZ</code><a class="headerlink" href="#ntg_common.db.Apparatus.BYZ" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deduced <a class="reference internal" href="domain.html#mt"><span class="std std-ref">Majority Text</span></a> in <a class="reference internal" href="scripts_dev.html#scripts.cceh.prepare.build_MT_text" title="scripts.cceh.prepare.build_MT_text"><code class="xref py py-meth docutils literal notranslate"><span class="pre">build_MT_text()</span></code></a>.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Apparatus.DEF">
 <code class="sig-name descname">DEF</code><a class="headerlink" href="#ntg_common.db.Apparatus.DEF" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default value from conversion to positive apparatus in
 <a class="reference internal" href="scripts_dev.html#scripts.cceh.prepare.fill_apparatus_table" title="scripts.cceh.prepare.fill_apparatus_table"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fill_apparatus_table()</span></code></a>.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Apparatus.LAC">
 <code class="sig-name descname">LAC</code><a class="headerlink" href="#ntg_common.db.Apparatus.LAC" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unrolled lacuna from lac table in
 <a class="reference internal" href="scripts_dev.html#scripts.cceh.prepare.fill_apparatus_table" title="scripts.cceh.prepare.fill_apparatus_table"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fill_apparatus_table()</span></code></a>.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Apparatus.LOC">
 <code class="sig-name descname">LOC</code><a class="headerlink" href="#ntg_common.db.Apparatus.LOC" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deduced from locstem table in
 <a class="reference internal" href="scripts_dev.html#scripts.cceh.cbgm.build_A_text" title="scripts.cceh.cbgm.build_A_text"><code class="xref py py-meth docutils literal notranslate"><span class="pre">build_A_text()</span></code></a>.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Apparatus.ZW">
 <code class="sig-name descname">ZW</code><a class="headerlink" href="#ntg_common.db.Apparatus.ZW" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uncertain reading from unrolling of ‘zw’ in
@@ -460,9 +467,9 @@ apparatus came from.</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Att">
-<em class="property">class </em><code class="sig-name descname">Att</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Att" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Att</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Att" title="Permalink to this definition">¶</a></dt>
 <dd><p>Input buffer table for the Nestle-Aland ECM_Acts*GVZ tables.</p>
 <p>The Nestle-Aland database contains one table for each chapter (for
 historical reasons). As first step we copy those many tables into one big
@@ -471,13 +478,13 @@ table, this one.</p>
 manuscripts.  For the CBGM the data in this table has to be normalised into
 our database structure and converted into a positive apparatus.</p>
 <div class="graphviz"><img src="_images/graphviz-60cb2264f436615bcf88d50935fd927fc95b4df5.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<span class="target" id="att"></span><dl class="attribute">
+<span class="target" id="att"></span><dl class="py attribute">
 <dt id="ntg_common.db.Att.hsnr">
 <code class="sig-name descname">hsnr</code><a class="headerlink" href="#ntg_common.db.Att.hsnr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interne Handschriftnummer.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Att.hs">
 <code class="sig-name descname">hs</code><a class="headerlink" href="#ntg_common.db.Att.hs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Siglum der Handschrift.  An das Siglum werden <a class="reference internal" href="#suffix"><span class="std std-ref">Suffixe</span></a>
@@ -487,7 +494,7 @@ Handschrift übrigbleibt.  Parallel dazu werden die Suffixe von den Siglen
 entfernt.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt>
 <code class="sig-name descname">begadr, endadr</code></dt>
 <dd><p>Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
@@ -495,23 +502,23 @@ Zwischenräume gezählt.  Gerade Zahlen bezeichnen ein Wort, ungerade einen
 Zwischenraum.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Att.labez">
 <code class="sig-name descname">labez</code><a class="headerlink" href="#ntg_common.db.Att.labez" title="Permalink to this definition">¶</a></dt>
 <dd><p>See the <a class="reference internal" href="#labez"><span class="std std-ref">description of this field in table readings</span></a>.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Att.labezsuf">
 <code class="sig-name descname">labezsuf</code><a class="headerlink" href="#ntg_common.db.Att.labezsuf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contains auxiliary information about the reading:</p>
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Att.f">
 <code class="sig-name descname">f</code><a class="headerlink" href="#ntg_common.db.Att.f" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fehler.  The reading is considered a scribal error.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Att.o">
 <code class="sig-name descname">o</code><a class="headerlink" href="#ntg_common.db.Att.o" title="Permalink to this definition">¶</a></dt>
 <dd><p>Orthographicum.  The reading is considered an orthographical variant,
@@ -523,47 +530,47 @@ readings, eg. “a/b_o/c_f” means this reading may be ‘a’ or an
 orthographicum of ‘b’ or a scribal error of ‘c’.</p>
 </dd></dl>
 
-<span class="target" id="suffix"></span><dl class="attribute">
+<span class="target" id="suffix"></span><dl class="py attribute">
 <dt id="ntg_common.db.Att.suffix">
 <code class="sig-name descname">suffix</code><a class="headerlink" href="#ntg_common.db.Att.suffix" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="data">
+<dd><dl class="py data">
 <dt>
-<code class="sig-name descname">*</code></dt>
+<code class="sig-name descname">\*</code></dt>
 <dd><p>Erste, ursprüngliche Hand</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt>
 <code class="sig-name descname">C*</code></dt>
 <dd><p>Von erster Hand korrigiert</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Att.C1">
 <code class="sig-name descname">C1</code><a class="headerlink" href="#ntg_common.db.Att.C1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Erster Korrektor (Korrektoren der ersten Stunde)</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Att.C2">
 <code class="sig-name descname">C2</code><a class="headerlink" href="#ntg_common.db.Att.C2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Zweiter Korrektor (Korrektoren aus späteren Jahrhunderten)</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Att.C">
 <code class="sig-name descname">C</code><a class="headerlink" href="#ntg_common.db.Att.C" title="Permalink to this definition">¶</a></dt>
 <dd><p>Korrektor (Korrektor aus ungewisser Epoche)</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt>
 <code class="sig-name descname">L1, L2</code></dt>
 <dd><p>Unterschiedliche Lesungen in einem Lektionar.  L2 ist für die CBGM
 nicht relevant.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt>
 <code class="sig-name descname">T1, T2</code></dt>
 <dd><p>Unterschiedliche Lesungen des Textes der ersten Hand.  Die erste Hand
@@ -572,20 +579,20 @@ unterschiedlicher Quelle.  Bei fehlender Übereinstimmung muß ‘zw’
 gesetzt werden.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Att.A">
 <code class="sig-name descname">A</code><a class="headerlink" href="#ntg_common.db.Att.A" title="Permalink to this definition">¶</a></dt>
 <dd><p>Vom Schreiber selbst gekennzeichnete alternative Lesart.  Für die CBGM
 nicht relevant.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Att.K">
 <code class="sig-name descname">K</code><a class="headerlink" href="#ntg_common.db.Att.K" title="Permalink to this definition">¶</a></dt>
 <dd><p>Varianten im Kommentar einer Handschrift.  Für die CBGM nicht relevant.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt>
 <code class="sig-name descname">s, s1, s2</code></dt>
 <dd><p>(supplement) Nachträgliche Ergänzung verlorener Stellen.  Bei nur
@@ -594,7 +601,7 @@ einer Ergänzung wird ‘s’ verwendet.  Bei mehreren Ergänzungen werden
 können nicht die Authorität der jeweiligen Hs beanspruchen.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Att.V">
 <code class="sig-name descname">V</code><a class="headerlink" href="#ntg_common.db.Att.V" title="Permalink to this definition">¶</a></dt>
 <dd><p>(vid, ut videtur) augenscheinlich.  Unsichere aber höchst
@@ -604,26 +611,26 @@ akzeptieren.</p>
 
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Att.fehler">
 <code class="sig-name descname">fehler</code><a class="headerlink" href="#ntg_common.db.Att.fehler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Denotes an orthografical error in Catholic Letters.  This became part of
 labezsuf in the other books.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Att.base">
 <code class="sig-name descname">base</code><a class="headerlink" href="#ntg_common.db.Att.base" title="Permalink to this definition">¶</a></dt>
 <dd><p>Basistext. Nur relevant bei <a class="reference internal" href="domain.html#fehlvers"><span class="std std-ref">Fehlversen</span></a>.</p>
 <p>“‘base = b’ steht für eine alternative Subvariante (dem Textus receptus).”
 – prepare4cbgm_10.py</p>
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Att.a">
 <code class="sig-name descname">a</code><a class="headerlink" href="#ntg_common.db.Att.a" title="Permalink to this definition">¶</a></dt>
 <dd><p>Urtext</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Att.b">
 <code class="sig-name descname">b</code><a class="headerlink" href="#ntg_common.db.Att.b" title="Permalink to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="domain.html#rt"><span class="std std-ref">Textus Receptus</span></a>.</p>
@@ -631,12 +638,12 @@ labezsuf in the other books.</p>
 
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Att.comp">
 <code class="sig-name descname">comp</code><a class="headerlink" href="#ntg_common.db.Att.comp" title="Permalink to this definition">¶</a></dt>
 <dd><p>“Eine variierte Stelle ist eine umfasste Stelle, wenn comp = ‘x’ ist.”
 – prepare4cbgm_10.py</p>
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Att.x">
 <code class="sig-name descname">x</code><a class="headerlink" href="#ntg_common.db.Att.x" title="Permalink to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="domain.html#umfasst"><span class="std std-ref">Umfaßte Variante</span></a>.</p>
@@ -644,7 +651,7 @@ labezsuf in the other books.</p>
 
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Att.lekt">
 <code class="sig-name descname">lekt</code><a class="headerlink" href="#ntg_common.db.Att.lekt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lektionen in einem Lektionar.</p>
@@ -652,31 +659,31 @@ labezsuf in the other books.</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Books">
-<em class="property">class </em><code class="sig-name descname">Books</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Books" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Books</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Books" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that lists all the books of the New Testament.</p>
 <p>This table lists all the books of the NT and the book id given to them.</p>
 <div class="graphviz"><img src="_images/graphviz-d56a8c3cad20a5cff2dee9074f83ff0938bba4c8.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Books.bk_id">
 <code class="sig-name descname">bk_id</code><a class="headerlink" href="#ntg_common.db.Books.bk_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>The book id: 1 - 27 (Matthew - Revelation).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Books.siglum">
 <code class="sig-name descname">siglum</code><a class="headerlink" href="#ntg_common.db.Books.siglum" title="Permalink to this definition">¶</a></dt>
 <dd><p>The book siglum, eg. ‘Mt’</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Books.book">
 <code class="sig-name descname">book</code><a class="headerlink" href="#ntg_common.db.Books.book" title="Permalink to this definition">¶</a></dt>
 <dd><p>The book name, eg. ‘Matthew’</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Books.passage">
 <code class="sig-name descname">passage</code><a class="headerlink" href="#ntg_common.db.Books.passage" title="Permalink to this definition">¶</a></dt>
 <dd><p>The book extent in passages.</p>
@@ -684,9 +691,9 @@ labezsuf in the other books.</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Cliques">
-<em class="property">class </em><code class="sig-name descname">Cliques</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Cliques" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Cliques</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Cliques" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains the cliques at every passage</p>
 <p>A clique is a set of strongly related manuscripts that offer the same
 reading.  A reading may have been originated independently more than once,
@@ -695,27 +702,27 @@ but in a clique a reading has been originated only once.</p>
 <a class="reference internal" href="#ntg_common.db.Cliques_TTS" title="ntg_common.db.Cliques_TTS"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cliques_TTS</span></code></a> is the table that contains the past rows.  See
 <a class="reference internal" href="#tts"><span class="std std-ref">transaction-time state tables</span></a>.</p>
 <div class="graphviz"><img src="_images/graphviz-19b0b656fe8cae058ba7d49471ee20278c57a256.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Cliques.clique">
 <code class="sig-name descname">clique</code><a class="headerlink" href="#ntg_common.db.Cliques.clique" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of the Clique.  ‘1’, ‘2’ …</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Cliques.sys_period">
 <code class="sig-name descname">sys_period</code><a class="headerlink" href="#ntg_common.db.Cliques.sys_period" title="Permalink to this definition">¶</a></dt>
 <dd><p>The time period in which this row is valid.  In this table all rows are
 still valid, so the end of the period is not set.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Cliques.user_id_start">
 <code class="sig-name descname">user_id_start</code><a class="headerlink" href="#ntg_common.db.Cliques.user_id_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>The id of the user making the change at the start of the validity period.
 See: <a class="reference internal" href="#ntg_common.db.User" title="ntg_common.db.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Cliques.user_id_stop">
 <code class="sig-name descname">user_id_stop</code><a class="headerlink" href="#ntg_common.db.Cliques.user_id_stop" title="Permalink to this definition">¶</a></dt>
 <dd><p>The id of the user making the change at the end of the validity period.
@@ -724,86 +731,86 @@ See: <a class="reference internal" href="#ntg_common.db.User" title="ntg_common.
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Cliques_TTS">
-<em class="property">class </em><code class="sig-name descname">Cliques_TTS</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Cliques_TTS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Cliques_TTS</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Cliques_TTS" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains the cliques at every passage</p>
 <p>This is the past table of a transaction state table pair.  <a class="reference internal" href="#ntg_common.db.Cliques" title="ntg_common.db.Cliques"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cliques</span></code></a>
 is the table that contains the current rows.  The structure of the two
 tables is the same.  See <a class="reference internal" href="#tts"><span class="std std-ref">transaction-time state tables</span></a>.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.CreateFDW">
-<em class="property">class </em><code class="sig-name descname">CreateFDW</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">pg_db</em>, <em class="sig-param">mysql_db</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.CreateFDW" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">CreateFDW</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">pg_db</span></em>, <em class="sig-param"><span class="n">mysql_db</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.CreateFDW" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.CreateFunction">
-<em class="property">class </em><code class="sig-name descname">CreateFunction</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">params</em>, <em class="sig-param">returns</em>, <em class="sig-param">sql</em>, <em class="sig-param">**kw</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.CreateFunction" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">CreateFunction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">returns</span></em>, <em class="sig-param"><span class="n">sql</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.CreateFunction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.CreateGeneric">
-<em class="property">class </em><code class="sig-name descname">CreateGeneric</code><span class="sig-paren">(</span><em class="sig-param">create_cmd</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.CreateGeneric" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">CreateGeneric</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">create_cmd</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.CreateGeneric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.CreateView">
-<em class="property">class </em><code class="sig-name descname">CreateView</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">sql</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.CreateView" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">CreateView</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">sql</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.CreateView" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.DropFDW">
-<em class="property">class </em><code class="sig-name descname">DropFDW</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">pg_db</em>, <em class="sig-param">mysql_db</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.DropFDW" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">DropFDW</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">pg_db</span></em>, <em class="sig-param"><span class="n">mysql_db</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.DropFDW" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.DropFunction">
-<em class="property">class </em><code class="sig-name descname">DropFunction</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.DropFunction" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">DropFunction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.DropFunction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.DropGeneric">
-<em class="property">class </em><code class="sig-name descname">DropGeneric</code><span class="sig-paren">(</span><em class="sig-param">drop_cmd</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.DropGeneric" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">DropGeneric</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">drop_cmd</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.DropGeneric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.DropView">
-<em class="property">class </em><code class="sig-name descname">DropView</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.DropView" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">DropView</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.DropView" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Import_Cliques">
-<em class="property">class </em><code class="sig-name descname">Import_Cliques</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Import_Cliques" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Import_Cliques</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Import_Cliques" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table to help importing of saved state.</p>
 <p>This table is used only by the load_edits.py script.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Import_LocStem">
-<em class="property">class </em><code class="sig-name descname">Import_LocStem</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Import_LocStem" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Import_LocStem</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Import_LocStem" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table to help importing of saved state.</p>
 <p>This table is only used by the load_edits.py script.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Import_MsCliques">
-<em class="property">class </em><code class="sig-name descname">Import_MsCliques</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Import_MsCliques" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Import_MsCliques</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Import_MsCliques" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table to help importing of saved state.</p>
 <p>This table is used only by the load_edits.py script.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Import_Notes">
-<em class="property">class </em><code class="sig-name descname">Import_Notes</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Import_Notes" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Import_Notes</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Import_Notes" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table to help importing of saved state.</p>
 <p>This table is only used by the load_edits.py script.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Lac">
-<em class="property">class </em><code class="sig-name descname">Lac</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Lac" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Lac</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Lac" title="Permalink to this definition">¶</a></dt>
 <dd><p>Input buffer table for the Nestle-Aland ECM_Acts*GVZLac tables.</p>
 <p>The Nestle-Aland database contains one table for each chapter (for
 historical reasons). As first step we copy those many tables into one big
@@ -816,9 +823,9 @@ columns see <a class="reference internal" href="#att"><span class="std std-ref">
 <div class="graphviz"><img src="_images/graphviz-2069a3fe94334442b0350379c92112d77bfce030.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.LocStem">
-<em class="property">class </em><code class="sig-name descname">LocStem</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.LocStem" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">LocStem</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.LocStem" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains the priority of the cliques at each passage</p>
 <p>This table contains one DAG (directed acyclic graph) of cliques for each
 passage.  The editors decide from which other clique(s) each clique is
@@ -827,13 +834,13 @@ derived, or if it is original.</p>
 <a class="reference internal" href="#ntg_common.db.LocStem_TTS" title="ntg_common.db.LocStem_TTS"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocStem_TTS</span></code></a> is the table that contains the past rows.  See
 <a class="reference internal" href="#tts"><span class="std std-ref">transaction-time state tables</span></a>.</p>
 <div class="graphviz"><img src="_images/graphviz-380b04a2a4a7489b4473e6e94acefb273a6ca4be.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<dl class="attribute">
+<dl class="py attribute">
 <dt>
 <code class="sig-name descname">labez, clique</code></dt>
 <dd><p>The younger clique which was derived from the older clique.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt>
 <code class="sig-name descname">source_labez, source_clique</code></dt>
 <dd><p>The older clique that was the source of the younger clique, or ‘*’ if
@@ -843,21 +850,21 @@ table but do not, because postgres doesn’t support partial foreign keys
 and the cliques table does not contain the ‘*’ and ‘?’  pseudo-cliques.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.LocStem.sys_period">
 <code class="sig-name descname">sys_period</code><a class="headerlink" href="#ntg_common.db.LocStem.sys_period" title="Permalink to this definition">¶</a></dt>
 <dd><p>The time period in which this row is valid.  In this table all rows are
 still valid, so the end of the period is not set.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.LocStem.user_id_start">
 <code class="sig-name descname">user_id_start</code><a class="headerlink" href="#ntg_common.db.LocStem.user_id_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>The id of the user making the change at the start of the validity period.
 See: <a class="reference internal" href="#ntg_common.db.User" title="ntg_common.db.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.LocStem.user_id_stop">
 <code class="sig-name descname">user_id_stop</code><a class="headerlink" href="#ntg_common.db.LocStem.user_id_stop" title="Permalink to this definition">¶</a></dt>
 <dd><p>The id of the user making the change at the end of the validity period.
@@ -866,23 +873,23 @@ See: <a class="reference internal" href="#ntg_common.db.User" title="ntg_common.
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.LocStem_TTS">
-<em class="property">class </em><code class="sig-name descname">LocStem_TTS</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.LocStem_TTS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">LocStem_TTS</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.LocStem_TTS" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains the priority of the cliques at each passage</p>
 <p>This is the past table of a transaction state table pair.  <a class="reference internal" href="#ntg_common.db.LocStem" title="ntg_common.db.LocStem"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocStem</span></code></a>
 is the table that contains the current rows.  The structure of the two
 tables is the same.  See <a class="reference internal" href="#tts"><span class="std std-ref">transaction-time state tables</span></a>.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Manuscripts">
-<em class="property">class </em><code class="sig-name descname">Manuscripts</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Manuscripts" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Manuscripts</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Manuscripts" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that lists all the manuscripts.</p>
 <p>This table lists all the manuscripts of New Testament that we have collated
 for the edition.</p>
 <div class="graphviz"><img src="_images/graphviz-fc2287d9b3a407c0a7c9b9a54707e82e8d6645e3.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Manuscripts.ms_id">
 <code class="sig-name descname">ms_id</code><a class="headerlink" href="#ntg_common.db.Manuscripts.ms_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>The primary key.  We use a surrogate integer key because we need to
@@ -891,7 +898,7 @@ indices.  If we every lose this requirement, hsnr will become our primary
 key.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Manuscripts.hsnr">
 <code class="sig-name descname">hsnr</code><a class="headerlink" href="#ntg_common.db.Manuscripts.hsnr" title="Permalink to this definition">¶</a></dt>
 <dd><p>The project-internal number of the manuscript.</p>
@@ -905,7 +912,7 @@ second supplement.</p>
 purged from the database.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Manuscripts.hs">
 <code class="sig-name descname">hs</code><a class="headerlink" href="#ntg_common.db.Manuscripts.hs" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Gregory-Aland number of the manuscript. eg. ‘P45’, ‘03’, or ‘1739’.</p>
@@ -913,9 +920,9 @@ purged from the database.</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.MsCliques">
-<em class="property">class </em><code class="sig-name descname">MsCliques</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.MsCliques" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">MsCliques</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.MsCliques" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that relates manuscripts and cliques.</p>
 <p>This table records the editorial decisions regarding which manuscripts
 represent each clique.  The editors decide which reading is derived from
@@ -924,27 +931,27 @@ which other reading(s) at each passage.</p>
 <a class="reference internal" href="#ntg_common.db.MsCliques_TTS" title="ntg_common.db.MsCliques_TTS"><code class="xref py py-class docutils literal notranslate"><span class="pre">MsCliques_TTS</span></code></a> is the table that contains the past rows.  See
 <a class="reference internal" href="#tts"><span class="std std-ref">transaction-time state tables</span></a>.</p>
 <div class="graphviz"><img src="_images/graphviz-c902f3ce929eba0d80ff1613b5401461dc9b7a19.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<dl class="attribute">
+<dl class="py attribute">
 <dt>
 <code class="sig-name descname">labez, clique</code></dt>
 <dd><p>The clique this manuscript represents.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.MsCliques.sys_period">
 <code class="sig-name descname">sys_period</code><a class="headerlink" href="#ntg_common.db.MsCliques.sys_period" title="Permalink to this definition">¶</a></dt>
 <dd><p>The time period in which this row is valid.  In this table all rows are
 still valid, so the end of the period is not set.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.MsCliques.user_id_start">
 <code class="sig-name descname">user_id_start</code><a class="headerlink" href="#ntg_common.db.MsCliques.user_id_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>The id of the user making the change at the start of the validity period.
 See: <a class="reference internal" href="#ntg_common.db.User" title="ntg_common.db.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.MsCliques.user_id_stop">
 <code class="sig-name descname">user_id_stop</code><a class="headerlink" href="#ntg_common.db.MsCliques.user_id_stop" title="Permalink to this definition">¶</a></dt>
 <dd><p>The id of the user making the change at the end of the validity period.
@@ -953,9 +960,9 @@ See: <a class="reference internal" href="#ntg_common.db.User" title="ntg_common.
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.MsCliques_TTS">
-<em class="property">class </em><code class="sig-name descname">MsCliques_TTS</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.MsCliques_TTS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">MsCliques_TTS</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.MsCliques_TTS" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that relates manuscripts and cliques.</p>
 <p>This is the past table of a transaction state table pair.
 <a class="reference internal" href="#ntg_common.db.MsCliques" title="ntg_common.db.MsCliques"><code class="xref py py-class docutils literal notranslate"><span class="pre">MsCliques</span></code></a> is the table that contains the current rows.  The
@@ -963,13 +970,13 @@ structure of the two tables is the same.  See <a class="reference internal" href
 tables</span></a>.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Ms_Ranges">
-<em class="property">class </em><code class="sig-name descname">Ms_Ranges</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Ms_Ranges" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Ms_Ranges</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Ms_Ranges" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains CBGM output related to each manuscript.</p>
 <p>Here we hold values that are calculated by CBGM related to one manuscript.</p>
 <div class="graphviz"><img src="_images/graphviz-d6c3bbab573e1f54a56d38b4ada2c07e4b47c59b.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Ms_Ranges.length">
 <code class="sig-name descname">length</code><a class="headerlink" href="#ntg_common.db.Ms_Ranges.length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculated: no. of defined passages in the manuscript inside this range.</p>
@@ -977,13 +984,13 @@ tables</span></a>.</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Nestle">
-<em class="property">class </em><code class="sig-name descname">Nestle</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Nestle" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Nestle</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Nestle" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Leitzeile from the Nestle-Aland</p>
 <p>Dient der Darstellung der Leitzeile im Navigator.</p>
 <div class="graphviz"><img src="_images/graphviz-c1fdec063f5ed71da1f7f210f144959f7d0f4030.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<span class="target" id="nestle-table"></span><dl class="attribute">
+<span class="target" id="nestle-table"></span><dl class="py attribute">
 <dt>
 <code class="sig-name descname">begadr, endadr</code></dt>
 <dd><p>Zusammengesetzt aus Buch, Kapitel, Vers, Wort.  Es werden Wörter und
@@ -993,7 +1000,7 @@ Zwischenräume.  Jedes Wort hat einen eigenen Eintrag, d.h. für alle
 Einträge gilt: begadr = endadr.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Nestle.lemma">
 <code class="sig-name descname">lemma</code><a class="headerlink" href="#ntg_common.db.Nestle.lemma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Das Lemma-Wort in der Leitzeile.</p>
@@ -1001,33 +1008,33 @@ Einträge gilt: begadr = endadr.</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Notes">
-<em class="property">class </em><code class="sig-name descname">Notes</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Notes" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Notes</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Notes" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains editorial notes attached to passages.</p>
 <p>This is the current table of a transaction state table pair.
 <a class="reference internal" href="#ntg_common.db.Notes_TTS" title="ntg_common.db.Notes_TTS"><code class="xref py py-class docutils literal notranslate"><span class="pre">Notes_TTS</span></code></a> is the table that contains the past rows.  See
 <a class="reference internal" href="#tts"><span class="std std-ref">transaction-time state tables</span></a>.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Notes_TTS">
-<em class="property">class </em><code class="sig-name descname">Notes_TTS</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Notes_TTS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Notes_TTS</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Notes_TTS" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains editorial notes attached to passages.</p>
 <p>This is the past table of a transaction state table pair.  <a class="reference internal" href="#ntg_common.db.Notes" title="ntg_common.db.Notes"><code class="xref py py-class docutils literal notranslate"><span class="pre">Notes</span></code></a> is
 the table that contains the current rows.  The structure of the two tables
 is the same.  See <a class="reference internal" href="#tts"><span class="std std-ref">transaction-time state tables</span></a>.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Passages">
-<em class="property">class </em><code class="sig-name descname">Passages</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Passages" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Passages</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Passages" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that lists the variant passages.</p>
 <p>This table lists all the passages we established during the collation of the
 manuscripts.  Passages that are the same in all manuscripts (invariant) are
 purged because they are irrelevant to the CBGM.</p>
 <div class="graphviz"><img src="_images/graphviz-b7ae8f52c34ee6b3309583ffab01c284a029ef9c.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Passages.pass_id">
 <code class="sig-name descname">pass_id</code><a class="headerlink" href="#ntg_common.db.Passages.pass_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>The primary key.  We use a surrogate integer key because we need to
@@ -1036,7 +1043,7 @@ indices.  If we every lose this requirement, passage will become our
 primary key (but join performance should also be considered).</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Passages.passage">
 <code class="sig-name descname">passage</code><a class="headerlink" href="#ntg_common.db.Passages.passage" title="Permalink to this definition">¶</a></dt>
 <dd><p>The extent of the passage.</p>
@@ -1050,26 +1057,26 @@ word    *          2</p>
 <p>Words are always even and the space between to words is always odd.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Passages.variant">
 <code class="sig-name descname">variant</code><a class="headerlink" href="#ntg_common.db.Passages.variant" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if this passage is a variant passage.  (It has at least two
 different certain readings.)</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Passages.spanning">
 <code class="sig-name descname">spanning</code><a class="headerlink" href="#ntg_common.db.Passages.spanning" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if this passage is spanning other passages.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Passages.spanned">
 <code class="sig-name descname">spanned</code><a class="headerlink" href="#ntg_common.db.Passages.spanned" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if this passage is spanned by other passages.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Passages.fehlvers">
 <code class="sig-name descname">fehlvers</code><a class="headerlink" href="#ntg_common.db.Passages.fehlvers" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if this passage is a later addition, eg. the pericope adulterae.</p>
@@ -1078,9 +1085,9 @@ different certain readings.)</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Ranges">
-<em class="property">class </em><code class="sig-name descname">Ranges</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Ranges" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Ranges</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Ranges" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains the ranges of passages for the CBGM.</p>
 <p>The CBGM is agnostic about the division in books and chapters of the NT.  It
 can be run on any range of passages (in theory even on sets of non-contiguous
@@ -1090,13 +1097,13 @@ each chapter of each book and also one range for each whole book.  The
 ranges corresponding to chapters are named by the chapter number, ‘1’, ‘2’,
 …  The whole book range is called ‘All’.</p>
 <div class="graphviz"><img src="_images/graphviz-a69f1d3cc1d784ac06827952ae681c234038eeb1.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Ranges.range">
 <code class="sig-name descname">range</code><a class="headerlink" href="#ntg_common.db.Ranges.range" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the range, eg. ‘1’ for Chapter 1.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Ranges.passage">
 <code class="sig-name descname">passage</code><a class="headerlink" href="#ntg_common.db.Ranges.passage" title="Permalink to this definition">¶</a></dt>
 <dd><p>The extent of the range.</p>
@@ -1104,15 +1111,15 @@ ranges corresponding to chapters are named by the chapter number, ‘1’, ‘2�
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Readings">
-<em class="property">class </em><code class="sig-name descname">Readings</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Readings" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Readings</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Readings" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains the different readings found at each passage.</p>
 <p>First scribal errors are corrected and orthographical differences are
 normalized, then equal readings are grouped.  Each group of readings is
 assigned an id, the ‘labez’.</p>
 <div class="graphviz"><img src="_images/graphviz-28e2322fa37fbe9120162f766fb97b99f917731f.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<span class="target" id="labez"></span><dl class="attribute">
+<span class="target" id="labez"></span><dl class="py attribute">
 <dt id="ntg_common.db.Readings.labez">
 <code class="sig-name descname">labez</code><a class="headerlink" href="#ntg_common.db.Readings.labez" title="Permalink to this definition">¶</a></dt>
 <dd><p>(LesArtBEZeichnung).  Usually ‘a’ indicates the original reading, while
@@ -1120,7 +1127,7 @@ assigned an id, the ‘labez’.</p>
 not necessarily so.  Exceptions are the <a class="reference internal" href="domain.html#fehlvers"><span class="std std-ref">Fehlverse</span></a> and
 the cases where no original reading could be assessed.</p>
 <p>Readings starting with ‘z’ have special meaning:</p>
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Readings.zu">
 <code class="sig-name descname">zu</code><a class="headerlink" href="#ntg_common.db.Readings.zu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hier nicht zitierbar aufgrund einer übergreifenden Variante.  Diese
@@ -1129,14 +1136,14 @@ verzeichnet.  Entspricht in der ECM einem Pfeil nach oben.  In der
 CBGM ist ‘zu’ wie ‘zz’ zu behandeln.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Readings.zv">
 <code class="sig-name descname">zv</code><a class="headerlink" href="#ntg_common.db.Readings.zv" title="Permalink to this definition">¶</a></dt>
 <dd><p>There is an illegible addition in the manuscript(s) cited which
 makes it impossible to ascribe it to a known variant.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Readings.zw">
 <code class="sig-name descname">zw</code><a class="headerlink" href="#ntg_common.db.Readings.zw" title="Permalink to this definition">¶</a></dt>
 <dd><p>What remains of the text of the manuscript(s) cited would allow
@@ -1146,7 +1153,7 @@ Entspricht in der ECM einem Doppelpfeil nach links-rechts.</p>
 questionable reading will get its own entry with a certainty &lt; 1.0.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Readings.zz">
 <code class="sig-name descname">zz</code><a class="headerlink" href="#ntg_common.db.Readings.zz" title="Permalink to this definition">¶</a></dt>
 <dd><p>The reading is too lacunose to be identified.</p>
@@ -1162,18 +1169,18 @@ der Tabelle Att in derselben Passage mehrmals vorkommen, weil an einigen
 Stellen im Nestle-Aland ein positiver Apparat benutzt wurde.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.db.Readings.lesart">
 <code class="sig-name descname">lesart</code><a class="headerlink" href="#ntg_common.db.Readings.lesart" title="Permalink to this definition">¶</a></dt>
 <dd><p>The normalized reading.  Scribal errors are silently corrected and
 orthographic variants are normalized.  Following abbreviations are used:</p>
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Readings.om">
 <code class="sig-name descname">om</code><a class="headerlink" href="#ntg_common.db.Readings.om" title="Permalink to this definition">¶</a></dt>
 <dd><p>Missing text (omissio).  The scribe did not write any text.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.db.Readings.NULL">
 <code class="sig-name descname">NULL</code><a class="headerlink" href="#ntg_common.db.Readings.NULL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Missing substrate (lacuna).  The manuscript is damaged or missing.</p>
@@ -1183,19 +1190,19 @@ orthographic variants are normalized.  Following abbreviations are used:</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Role">
-<em class="property">class </em><code class="sig-name descname">Role</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Role" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Role</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Role" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.Roles_Users">
-<em class="property">class </em><code class="sig-name descname">Roles_Users</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Roles_Users" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Roles_Users</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.Roles_Users" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db.User">
-<em class="property">class </em><code class="sig-name descname">User</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.User" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">User</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db.User" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -1214,64 +1221,64 @@ The database system is MySQL.</p>
 </div>
 <div class="section" id="id2">
 <h3>Tables<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.src_db.Acts01GVZ">
-<em class="property">class </em><code class="sig-name descname">Acts01GVZ</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.Acts01GVZ" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Acts01GVZ</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.Acts01GVZ" title="Permalink to this definition">¶</a></dt>
 <dd><p>This table contains a negative apparatus.</p>
 <div class="graphviz"><img src="_images/graphviz-35675fab56d9b7ae4333e846e8fe0899791681ac.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.src_db.Acts01GVZlac">
-<em class="property">class </em><code class="sig-name descname">Acts01GVZlac</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.Acts01GVZlac" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Acts01GVZlac</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.Acts01GVZlac" title="Permalink to this definition">¶</a></dt>
 <dd><p>This table contains a list of lacunae.</p>
 <div class="graphviz"><img src="_images/graphviz-49a412d7f0125673bf0ad3c588c837d03e77a63f.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.src_db.LocStemEdAct01">
-<em class="property">class </em><code class="sig-name descname">LocStemEdAct01</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.LocStemEdAct01" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">LocStemEdAct01</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.LocStemEdAct01" title="Permalink to this definition">¶</a></dt>
 <dd><p>A table that contains the priority of the cliques at each passage</p>
 <p>This table contains the main output of the editors.  The editors decide
 which reading is derived from which other reading(s) at each passage.</p>
 <div class="graphviz"><img src="_images/graphviz-1532fa19fcfac8da2543849a5c648490e4a35d3e.png" alt="UML Database Graph" class="sauml graphviz" /></div>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.src_db.LocStemEdAct01.id">
 <code class="sig-name descname">id</code><a class="headerlink" href="#ntg_common.src_db.LocStemEdAct01.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Primary key</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.src_db.LocStemEdAct01.varid">
 <code class="sig-name descname">varid</code><a class="headerlink" href="#ntg_common.src_db.LocStemEdAct01.varid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Same as <a class="reference internal" href="#labez"><span class="std std-ref">labez</span></a>.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.src_db.LocStemEdAct01.varnew">
 <code class="sig-name descname">varnew</code><a class="headerlink" href="#ntg_common.src_db.LocStemEdAct01.varnew" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the <a class="reference internal" href="#labez"><span class="std std-ref">labez</span></a> concatenated with the number of the <a class="reference internal" href="domain.html#split"><span class="std std-ref">split</span></a>.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.src_db.LocStemEdAct01.s1">
 <code class="sig-name descname">s1</code><a class="headerlink" href="#ntg_common.src_db.LocStemEdAct01.s1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Source of this reading.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.src_db.LocStemEdAct01.s2">
 <code class="sig-name descname">s2</code><a class="headerlink" href="#ntg_common.src_db.LocStemEdAct01.s2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optionally second source of reading.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt>
 <code class="sig-name descname">begadr, endadr</code></dt>
 <dd><p>The passage.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="ntg_common.src_db.LocStemEdAct01.w">
 <code class="sig-name descname">w</code><a class="headerlink" href="#ntg_common.src_db.LocStemEdAct01.w" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flag <a class="reference internal" href="domain.html#wt"><span class="std std-ref">“Western Text”</span></a>.  Not needed for the CBGM.</p>
@@ -1279,16 +1286,16 @@ which reading is derived from which other reading(s) at each passage.</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.src_db.RdgAct01">
-<em class="property">class </em><code class="sig-name descname">RdgAct01</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.RdgAct01" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">RdgAct01</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.RdgAct01" title="Permalink to this definition">¶</a></dt>
 <dd><p>This table contains readings.</p>
 <div class="graphviz"><img src="_images/graphviz-fa6c819ec637a0a37df7f729fec6a41d54bc59ee.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.src_db.VarGenAttAct01">
-<em class="property">class </em><code class="sig-name descname">VarGenAttAct01</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.VarGenAttAct01" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">VarGenAttAct01</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.src_db.VarGenAttAct01" title="Permalink to this definition">¶</a></dt>
 <dd><p>This table relates splits to manuscripts.</p>
 <div class="graphviz"><img src="_images/graphviz-994411ecf6fe822a81d63dd283e2607500291162.png" alt="UML Database Graph" class="sauml graphviz" /></div>
 </dd></dl>

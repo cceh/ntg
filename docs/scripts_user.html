@@ -21,11 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -103,6 +103,7 @@
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#install">Install</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-web-application">Running the web application</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-cbgm">Running the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
 </ul>
@@ -138,6 +139,7 @@
 <li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-app">client/app</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-apparatus">client/apparatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-checks-list">client/checks_list</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-coherence">client/coherence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison">client/comparison</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-details-table">client/comparison_details_table</a></li>
@@ -184,6 +186,11 @@
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.login">server.login</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="server_config.html">API Server Configuration Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_config.html#per-application-configuration-files">Per-Application Configuration Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_config.html#global-configuration-file">Global Configuration File</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
@@ -300,21 +307,21 @@ not handle big tables.  The import script is able to join partitioned tables.</p
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/import.py [-h] [-v] path/to/file.conf</span>
 </pre></div>
 </div>
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-import-py-arg-path">
-<code class="sig-name descname">path</code><code class="sig-prename descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-import-py-arg-path" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-import.py-arg-path">
+<code class="sig-name descname">path</code><code class="sig-prename descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-import.py-arg-path" title="Permalink to this definition">¶</a></dt>
 <dd><p>a .conf file (required)</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-import-py-h">
-<code class="sig-name descname">-h</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--help</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-import-py-h" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-import.py-h">
+<span id="cmdoption-scripts-cceh-import.py-help"></span><code class="sig-name descname">-h</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--help</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-import.py-h" title="Permalink to this definition">¶</a></dt>
 <dd><p>show this help message and exit</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-import-py-v">
-<code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-import-py-v" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-import.py-v">
+<span id="cmdoption-scripts-cceh-import.py-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-import.py-v" title="Permalink to this definition">¶</a></dt>
 <dd><p>increase output verbosity</p>
 </dd></dl>
 
@@ -361,27 +368,27 @@ für die CBGM ignoriert.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/prepare.py [-h] [-v] [-r RANGE] path/to/file.conf</span>
 </pre></div>
 </div>
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-prepare-py-arg-path">
-<code class="sig-name descname">path</code><code class="sig-prename descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-prepare-py-arg-path" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-prepare.py-arg-path">
+<code class="sig-name descname">path</code><code class="sig-prename descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-prepare.py-arg-path" title="Permalink to this definition">¶</a></dt>
 <dd><p>a .conf file (required)</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-prepare-py-h">
-<code class="sig-name descname">-h</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--help</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-prepare-py-h" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-prepare.py-h">
+<span id="cmdoption-scripts-cceh-prepare.py-help"></span><code class="sig-name descname">-h</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--help</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-prepare.py-h" title="Permalink to this definition">¶</a></dt>
 <dd><p>show this help message and exit</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-prepare-py-v">
-<code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-prepare-py-v" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-prepare.py-v">
+<span id="cmdoption-scripts-cceh-prepare.py-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-prepare.py-v" title="Permalink to this definition">¶</a></dt>
 <dd><p>increase output verbosity</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-prepare-py-r">
-<code class="sig-name descname">-r</code><code class="sig-prename descclassname"> &lt;range&gt;</code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--range</code><code class="sig-prename descclassname"> &lt;range&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-prepare-py-r" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-prepare.py-r">
+<span id="cmdoption-scripts-cceh-prepare.py-range"></span><code class="sig-name descname">-r</code><code class="sig-prename descclassname"> &lt;range&gt;</code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--range</code><code class="sig-prename descclassname"> &lt;range&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-prepare.py-r" title="Permalink to this definition">¶</a></dt>
 <dd><p>range of steps (default: all)</p>
 </dd></dl>
 
@@ -400,21 +407,21 @@ It also updates the Apparatus table where manuscript ‘A is concerned.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/cbgm.py [-h] [-v] path/to/file.conf</span>
 </pre></div>
 </div>
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-cbgm-py-arg-path">
-<code class="sig-name descname">path</code><code class="sig-prename descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-cbgm-py-arg-path" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-cbgm.py-arg-path">
+<code class="sig-name descname">path</code><code class="sig-prename descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-cbgm.py-arg-path" title="Permalink to this definition">¶</a></dt>
 <dd><p>a .conf file (required)</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-cbgm-py-h">
-<code class="sig-name descname">-h</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--help</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-cbgm-py-h" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-cbgm.py-h">
+<span id="cmdoption-scripts-cceh-cbgm.py-help"></span><code class="sig-name descname">-h</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--help</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-cbgm.py-h" title="Permalink to this definition">¶</a></dt>
 <dd><p>show this help message and exit</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-cbgm-py-v">
-<code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-cbgm-py-v" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-cbgm.py-v">
+<span id="cmdoption-scripts-cceh-cbgm.py-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-cbgm.py-v" title="Permalink to this definition">¶</a></dt>
 <dd><p>increase output verbosity</p>
 </dd></dl>
 
@@ -424,31 +431,30 @@ It also updates the Apparatus table where manuscript ‘A is concerned.</p>
 <p>Save the state of the editor tables.</p>
 <p>This script saves the tables containing the editorial decisions.  It does not
 save the apparatus tables.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/save_edits.py [-h] [-v] -o path/to/output.xml</span>
-<span class="go">                                  path/to/file.conf</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/save_edits.py [-h] [-v] -o path/to/output.xml path/to/file.conf</span>
 </pre></div>
 </div>
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-save-edits-py-arg-path">
-<code class="sig-name descname">path</code><code class="sig-prename descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-save-edits-py-arg-path" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-save_edits.py-arg-path">
+<code class="sig-name descname">path</code><code class="sig-prename descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-save_edits.py-arg-path" title="Permalink to this definition">¶</a></dt>
 <dd><p>a .conf file (required)</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-save-edits-py-h">
-<code class="sig-name descname">-h</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--help</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-save-edits-py-h" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-save_edits.py-h">
+<span id="cmdoption-scripts-cceh-save_edits.py-help"></span><code class="sig-name descname">-h</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--help</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-save_edits.py-h" title="Permalink to this definition">¶</a></dt>
 <dd><p>show this help message and exit</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-save-edits-py-v">
-<code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-save-edits-py-v" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-save_edits.py-v">
+<span id="cmdoption-scripts-cceh-save_edits.py-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-save_edits.py-v" title="Permalink to this definition">¶</a></dt>
 <dd><p>increase output verbosity</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-save-edits-py-o">
-<code class="sig-name descname">-o</code><code class="sig-prename descclassname"> &lt;path/to/output.xml&gt;</code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--output</code><code class="sig-prename descclassname"> &lt;path/to/output.xml&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-save-edits-py-o" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-save_edits.py-o">
+<span id="cmdoption-scripts-cceh-save_edits.py-output"></span><code class="sig-name descname">-o</code><code class="sig-prename descclassname"> &lt;path/to/output.xml&gt;</code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--output</code><code class="sig-prename descclassname"> &lt;path/to/output.xml&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-save_edits.py-o" title="Permalink to this definition">¶</a></dt>
 <dd><p>the output file (required)</p>
 </dd></dl>
 
@@ -462,31 +468,30 @@ by the save_edits.py script.  It does not touch the apparatus tables.</p>
 addresses.  Passages in the apparatus that are not in the save state are reset
 to the default of: reading ‘a’ is original and every other reading is derived
 from ‘a’.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/load_edits.py [-h] [-v] -i path/to/input.xml</span>
-<span class="go">                                  path/to/file.conf</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/load_edits.py [-h] [-v] -i path/to/input.xml path/to/file.conf</span>
 </pre></div>
 </div>
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-load-edits-py-arg-path">
-<code class="sig-name descname">path</code><code class="sig-prename descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-load-edits-py-arg-path" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-load_edits.py-arg-path">
+<code class="sig-name descname">path</code><code class="sig-prename descclassname">/to/file.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-load_edits.py-arg-path" title="Permalink to this definition">¶</a></dt>
 <dd><p>a .conf file (required)</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-load-edits-py-h">
-<code class="sig-name descname">-h</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--help</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-load-edits-py-h" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-load_edits.py-h">
+<span id="cmdoption-scripts-cceh-load_edits.py-help"></span><code class="sig-name descname">-h</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--help</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-load_edits.py-h" title="Permalink to this definition">¶</a></dt>
 <dd><p>show this help message and exit</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-load-edits-py-v">
-<code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-load-edits-py-v" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-load_edits.py-v">
+<span id="cmdoption-scripts-cceh-load_edits.py-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-load_edits.py-v" title="Permalink to this definition">¶</a></dt>
 <dd><p>increase output verbosity</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-load-edits-py-i">
-<code class="sig-name descname">-i</code><code class="sig-prename descclassname"> &lt;path/to/input.xml&gt;</code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--input</code><code class="sig-prename descclassname"> &lt;path/to/input.xml&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-load-edits-py-i" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-load_edits.py-i">
+<span id="cmdoption-scripts-cceh-load_edits.py-input"></span><code class="sig-name descname">-i</code><code class="sig-prename descclassname"> &lt;path/to/input.xml&gt;</code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--input</code><code class="sig-prename descclassname"> &lt;path/to/input.xml&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-load_edits.py-i" title="Permalink to this definition">¶</a></dt>
 <dd><p>the input file (required)</p>
 </dd></dl>
 
@@ -494,43 +499,42 @@ from ‘a’.</p>
 <div class="section" id="scripts-cceh-mk-users-py">
 <span id="mk-users-py"></span><h2>scripts/cceh/mk_users.py<a class="headerlink" href="#scripts-cceh-mk-users-py" title="Permalink to this headline">¶</a></h2>
 <p>Initialize the database for user authentication and authorization.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/mk_users.py [-h] -e EMAIL [-u USERNAME] [-p PASSWORD] [-v]</span>
-<span class="go">                                path/to/_global.conf</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/mk_users.py [-h] -e EMAIL [-u USERNAME] [-p PASSWORD] [-v] path/to/_global.conf</span>
 </pre></div>
 </div>
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-mk-users-py-arg-path">
-<code class="sig-name descname">path</code><code class="sig-prename descclassname">/to/_global.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-mk-users-py-arg-path" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-mk_users.py-arg-path">
+<code class="sig-name descname">path</code><code class="sig-prename descclassname">/to/_global.conf</code><a class="headerlink" href="#cmdoption-scripts-cceh-mk_users.py-arg-path" title="Permalink to this definition">¶</a></dt>
 <dd><p>path to the _global.conf file (required)</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-mk-users-py-h">
-<code class="sig-name descname">-h</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--help</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-mk-users-py-h" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-mk_users.py-h">
+<span id="cmdoption-scripts-cceh-mk_users.py-help"></span><code class="sig-name descname">-h</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--help</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-mk_users.py-h" title="Permalink to this definition">¶</a></dt>
 <dd><p>show this help message and exit</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-mk-users-py-e">
-<code class="sig-name descname">-e</code><code class="sig-prename descclassname"> &lt;email&gt;</code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--email</code><code class="sig-prename descclassname"> &lt;email&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-mk-users-py-e" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-mk_users.py-e">
+<span id="cmdoption-scripts-cceh-mk_users.py-email"></span><code class="sig-name descname">-e</code><code class="sig-prename descclassname"> &lt;email&gt;</code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--email</code><code class="sig-prename descclassname"> &lt;email&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-mk_users.py-e" title="Permalink to this definition">¶</a></dt>
 <dd><p>email</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-mk-users-py-u">
-<code class="sig-name descname">-u</code><code class="sig-prename descclassname"> &lt;username&gt;</code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--username</code><code class="sig-prename descclassname"> &lt;username&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-mk-users-py-u" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-mk_users.py-u">
+<span id="cmdoption-scripts-cceh-mk_users.py-username"></span><code class="sig-name descname">-u</code><code class="sig-prename descclassname"> &lt;username&gt;</code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--username</code><code class="sig-prename descclassname"> &lt;username&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-mk_users.py-u" title="Permalink to this definition">¶</a></dt>
 <dd><p>username</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-mk-users-py-p">
-<code class="sig-name descname">-p</code><code class="sig-prename descclassname"> &lt;password&gt;</code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--password</code><code class="sig-prename descclassname"> &lt;password&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-mk-users-py-p" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-mk_users.py-p">
+<span id="cmdoption-scripts-cceh-mk_users.py-password"></span><code class="sig-name descname">-p</code><code class="sig-prename descclassname"> &lt;password&gt;</code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--password</code><code class="sig-prename descclassname"> &lt;password&gt;</code><a class="headerlink" href="#cmdoption-scripts-cceh-mk_users.py-p" title="Permalink to this definition">¶</a></dt>
 <dd><p>password</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-scripts-cceh-mk-users-py-v">
-<code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-mk-users-py-v" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-scripts-cceh-mk_users.py-v">
+<span id="cmdoption-scripts-cceh-mk_users.py-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-scripts-cceh-mk_users.py-v" title="Permalink to this definition">¶</a></dt>
 <dd><p>increase output verbosity</p>
 </dd></dl>
 

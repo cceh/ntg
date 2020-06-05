@@ -21,11 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -102,6 +102,7 @@
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#install">Install</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-web-application">Running the web application</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-cbgm">Running the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#troubleshooting">Troubleshooting</a></li>
 </ul>
 </li>
 </ul>
@@ -137,6 +138,7 @@
 <li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-app">client/app</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-apparatus">client/apparatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-checks-list">client/checks_list</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-coherence">client/coherence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison">client/comparison</a></li>
 <li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-details-table">client/comparison_details_table</a></li>
@@ -183,6 +185,11 @@
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.login">server.login</a></li>
 <li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="server_config.html">API Server Configuration Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_config.html#per-application-configuration-files">Per-Application Configuration Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_config.html#global-configuration-file">Global Configuration File</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
@@ -278,19 +285,19 @@
 <div class="section" id="module-ntg_common.db_tools">
 <span id="ntg-common-db-tools"></span><h2>ntg_common.db_tools<a class="headerlink" href="#module-ntg_common.db_tools" title="Permalink to this headline">¶</a></h2>
 <p>This module contains functions for database access.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db_tools.MySQLEngine">
-<em class="property">class </em><code class="sig-name descname">MySQLEngine</code><span class="sig-paren">(</span><em class="sig-param">fn=('/etc/my.cnf'</em>, <em class="sig-param">'/etc/mysql/my.cnf'</em>, <em class="sig-param">'~/.my.cnf')</em>, <em class="sig-param">group=('mysql'</em>, <em class="sig-param">'client'</em>, <em class="sig-param">'client-server'</em>, <em class="sig-param">'client-mariadb')</em>, <em class="sig-param">db=''</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.MySQLEngine" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">MySQLEngine</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fn</span><span class="o">=</span><span class="default_value">'/etc/my.cnf', '/etc/mysql/my.cnf', '~/.my.cnf'</span></em>, <em class="sig-param"><span class="n">group</span><span class="o">=</span><span class="default_value">'mysql', 'client', 'client-server', 'client-mariadb'</span></em>, <em class="sig-param"><span class="n">db</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.MySQLEngine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Database Interface</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="ntg_common.db_tools.PostgreSQLEngine">
-<em class="property">class </em><code class="sig-name descname">PostgreSQLEngine</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">PostgreSQLEngine</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine" title="Permalink to this definition">¶</a></dt>
 <dd><p>PostgreSQL Database Interface</p>
-<dl class="method">
+<dl class="py method">
 <dt id="ntg_common.db_tools.PostgreSQLEngine.get_connection_params">
-<code class="sig-name descname">get_connection_params</code><span class="sig-paren">(</span><em class="sig-param">args={}</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.get_connection_params" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_connection_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.get_connection_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get sqlalchemy connection parameters.</p>
 <p>Try to get the connection parameters in turn from these sources:</p>
 <ol class="arabic simple">
@@ -303,30 +310,30 @@
 the file <code class="file docutils literal notranslate"><span class="pre">~/.pgpass</span></code>.  It should be configured there.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="ntg_common.db_tools.PostgreSQLEngine.receive_checkout">
-<em class="property">static </em><code class="sig-name descname">receive_checkout</code><span class="sig-paren">(</span><em class="sig-param">dbapi_connection</em>, <em class="sig-param">_connection_record</em>, <em class="sig-param">_connection_proxy</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.receive_checkout" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">receive_checkout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dbapi_connection</span></em>, <em class="sig-param"><span class="n">_connection_record</span></em>, <em class="sig-param"><span class="n">_connection_proxy</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.receive_checkout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set a default for the postgres variable ntg.user_id that is used by
 <a class="reference internal" href="database.html#tts"><span class="std std-ref">Transaction-Time State Tables</span></a> tables.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="ntg_common.db_tools.PostgreSQLEngine.vacuum">
 <code class="sig-name descname">vacuum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.vacuum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Vacuum the database.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="ntg_common.db_tools.PostgreSQLEngine.wait_for_server">
-<code class="sig-name descname">wait_for_server</code><span class="sig-paren">(</span><em class="sig-param">retries=60</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.wait_for_server" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wait_for_server</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">retries</span><span class="o">=</span><span class="default_value">60</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.PostgreSQLEngine.wait_for_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wait for the Postgres server to come up.</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="ntg_common.db_tools.fix">
-<code class="sig-name descname">fix</code><span class="sig-paren">(</span><em class="sig-param">conn</em>, <em class="sig-param">msg</em>, <em class="sig-param">check_sql</em>, <em class="sig-param">fix_sql</em>, <em class="sig-param">parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.fix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">check_sql</span></em>, <em class="sig-param"><span class="n">fix_sql</span></em>, <em class="sig-param"><span class="n">parameters</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.fix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check and eventually fix errors.</p>
 <p>Executes the check_sql statement to check for a possible error conditions
 and, if rows emerge, prints a warning and executes the fix_sql statement.
@@ -344,34 +351,34 @@ reports an error if the error condition still exists.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="ntg_common.db_tools.init_default_cliques">
-<code class="sig-name descname">init_default_cliques</code><span class="sig-paren">(</span><em class="sig-param">conn</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_cliques" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_default_cliques</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_cliques" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a default cliques table.</p>
 <p>In a default cliques table there is a default clique ‘1’ for every reading
 in the readings table.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="ntg_common.db_tools.init_default_locstem">
-<code class="sig-name descname">init_default_locstem</code><span class="sig-paren">(</span><em class="sig-param">conn</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_locstem" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_default_locstem</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_locstem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a default locstem table.</p>
 <p>In a default LocStemEd, labez ‘a’ is the original reading and every other
 reading depends on labez ‘a’, except in a Fehlvers, where ‘b’ is of unknown
 origin and every other reading depends on ‘b’.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="ntg_common.db_tools.init_default_ms_cliques">
-<code class="sig-name descname">init_default_ms_cliques</code><span class="sig-paren">(</span><em class="sig-param">conn</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_ms_cliques" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">init_default_ms_cliques</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.init_default_ms_cliques" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a default ms_cliques table.</p>
 <p>In a default ms_cliques table there is a default clique ‘1’ for every reading
 in the apparatus table.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="ntg_common.db_tools.local_stemma_to_nx">
-<code class="sig-name descname">local_stemma_to_nx</code><span class="sig-paren">(</span><em class="sig-param">conn</em>, <em class="sig-param">pass_id</em>, <em class="sig-param">add_isolated_roots=False</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.local_stemma_to_nx" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">local_stemma_to_nx</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn</span></em>, <em class="sig-param"><span class="n">pass_id</span></em>, <em class="sig-param"><span class="n">add_isolated_roots</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.local_stemma_to_nx" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load a passage from the database into an nx Graph.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -381,9 +388,9 @@ isolated.  Needed in edit mode.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="ntg_common.db_tools.tabulate">
-<code class="sig-name descname">tabulate</code><span class="sig-paren">(</span><em class="sig-param">res</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.tabulate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">tabulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">res</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.db_tools.tabulate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Format and output a rowset</p>
 <p>Uses an output format similar to the one produced by the mysql commandline
 utility.</p>
@@ -393,21 +400,21 @@ utility.</p>
 <div class="section" id="module-ntg_common.tools">
 <span id="ntg-common-tools"></span><h2>ntg_common.tools<a class="headerlink" href="#module-ntg_common.tools" title="Permalink to this headline">¶</a></h2>
 <p>This module contains some useful functions.</p>
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.tools.BOOKS">
-<code class="sig-name descname">BOOKS</code><em class="property"> = [(1, 'Mt', 'Matthew', 28), (2, 'Mc', 'Mark', 16), (3, 'L', 'Luke', 24), (4, 'J', 'John', 21), (5, 'Acts', 'Acts', 28), (6, 'R', 'Romans', 16), (7, '1K', '1 Corinthians', 16), (8, '2K', '2 Corinthians', 13), (9, 'G', 'Galatians', 6), (10, 'E', 'Ephesians', 6), (11, 'Ph', 'Philippians', 4), (12, 'Kol', 'Colossians', 4), (13, '1Th', '1 Thessalonians', 5), (14, '2Th', '2 Thessalonians', 3), (15, '1T', '1 Timothy', 6), (16, '2T', '2 Timothy', 4), (17, 'Tt', 'Titus', 3), (18, 'Phm', 'Philemon', 1), (19, 'H', 'Hebrews', 13), (20, 'Jc', 'James', 5), (21, '1P', '1 Peter', 5), (22, '2P', '2 Peter', 3), (23, '1J', '1 John', 5), (24, '2J', '2 John', 1), (25, '3J', '3 John', 1), (26, 'Jd', 'Jude', 1), (27, 'Ap', 'Revelation', 22)]</em><a class="headerlink" href="#ntg_common.tools.BOOKS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">BOOKS</code><em class="property"> = [(1, 'Mt', 'Matthew', 28), (2, 'Mc', 'Mark', 16), (3, 'L', 'Luke', 24), (4, 'J', 'John', 21), (5, 'Acts', 'Acts', 28), (6, 'R', 'Romans', 16), (7, '1K', '1 Corinthians', 16), (8, '2K', '2 Corinthians', 13), (9, 'G', 'Galatians', 6), (10, 'E', 'Ephesians', 6), (11, 'Ph', 'Philippians', 4), (12, 'Kol', 'Colossians', 4), (13, '1Th', '1 Thessalonians', 5), (14, '2Th', '2 Thessalonians', 3), (15, '1T', '1 Timothy', 6), (16, '2T', '2 Timothy', 4), (17, 'Tt', 'Titus', 3), (18, 'Phm', 'Philemon', 1), (19, 'H', 'Hebrews', 13), (20, 'Jc', 'James', 5), (21, '1P', '1 Peter', 5), (22, '2P', '2 Peter', 3), (23, '1J', '1 John', 5), (24, '2J', '2 John', 1), (25, '3J', '3 John', 1), (26, 'Jd', 'Jude', 1), (27, 'Ap', 'Revelation', 22), (210, '2Sam', '2 Samuel', 2)]</em><a class="headerlink" href="#ntg_common.tools.BOOKS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Titles of the NT books</p>
 </dd></dl>
 
-<dl class="data">
-<dt id="ntg_common.tools.BYZ_HSNR_ACTS">
-<code class="sig-name descname">BYZ_HSNR_ACTS</code><em class="property"> = '(300010, 300180, 300350, 303300, 303980, 304240, 312410)'</em><a class="headerlink" href="#ntg_common.tools.BYZ_HSNR_ACTS" title="Permalink to this definition">¶</a></dt>
+<dl class="py data">
+<dt id="ntg_common.tools.BYZ_HSNR">
+<code class="sig-name descname">BYZ_HSNR</code><em class="property"> = {'2 Samuel': None, 'Acts': '(300010, 300180, 300350, 303300, 303980, 304240, 312410)', 'CL': '(300010, 300180, 300350, 303300, 303980, 304240, 312410)', 'John': '(200070, 200280, 200450, 300180, 300350, 302260, 313200)', 'Mark': '(300030, 300180, 300350, 301050, 302610, 303510, 326070)'}</em><a class="headerlink" href="#ntg_common.tools.BYZ_HSNR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Manuscripts attesting the Byzantine Text.</p>
 <p>We use these manuscripts as templates to establish the Byzantine Text according
 to our rules.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="ntg_common.tools.FEHLVERSE">
 <code class="sig-name descname">FEHLVERSE</code><em class="property"> = '\n    (\n      begadr &gt;= 20716000 and endadr &lt;= 20716999 or\n      begadr &gt;= 20944000 and endadr &lt;= 20944999 or\n      begadr &gt;= 20946000 and endadr &lt;= 20946999 or\n      begadr &gt;= 21126000 and endadr &lt;= 21126999 or\n      begadr &gt;= 21528000 and endadr &lt;= 21528999 or\n      begadr &gt;= 21609000 and endadr &lt;= 21620999 or\n      begadr &gt;= 21608068 and endadr &lt;= 21620999 or\n\n      begadr &gt;= 50837002 and endadr &lt;= 50837047 or\n      begadr &gt;= 51534002 and endadr &lt;= 51534013 or\n      begadr &gt;= 52406020 and endadr &lt;= 52408015 or\n      begadr &gt;= 52829002 and endadr &lt;= 52829025\n    )\n    '</em><a class="headerlink" href="#ntg_common.tools.FEHLVERSE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verses added in later times.</p>
@@ -415,16 +422,16 @@ to our rules.</p>
 they are not included in the text of manuscript ‘A’.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="ntg_common.tools.graphviz_layout">
-<code class="sig-name descname">graphviz_layout</code><span class="sig-paren">(</span><em class="sig-param">dot</em>, <em class="sig-param">format='dot'</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.graphviz_layout" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">graphviz_layout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dot</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'dot'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.graphviz_layout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call the GraphViz dot program to generate an image but mostly to precompute
 the graph layout.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="ntg_common.tools.log">
-<code class="sig-name descname">log</code><span class="sig-paren">(</span><em class="sig-param">level</em>, <em class="sig-param">msg</em>, <em class="sig-param">*aargs</em>, <em class="sig-param">**_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.log" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">log</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">level</span></em>, <em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">aargs</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">_kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.tools.log" title="Permalink to this definition">¶</a></dt>
 <dd><p>Low level log function</p>
 </dd></dl>
 

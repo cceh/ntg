@@ -82,3 +82,20 @@ To run the CBGM say:
 .. code-block:: shell
 
   $ docker-compose run ntg-app-server cbgm
+
+
+Troubleshooting
+===============
+
+After upgrading to a new docker container, if you get the error message: "FATAL:
+database files are incompatible with server", say:
+
+.. code-block:: shell
+
+  $	docker-compose down --volumes
+  $ docker-compose up
+
+.. warning::
+
+  This will install a fresh database and overwrite all changes you made to the
+  data.
