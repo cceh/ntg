@@ -1,13 +1,15 @@
 PRJ_DIR     := prj/ntg/ntg
 ROOT        := $(UNI_DIR)/$(PRJ_DIR)
 
-NTG_HOST    := ntg.cceh.uni-koeln.de
+#NTG_HOST    := ntg.cceh.uni-koeln.de
+NTG_HOST    := ntg.uni-muenster.de
 NTG_USER    := ntg
 
 NTG         := $(NTG_USER)@$(NTG_HOST)
 NTG_PRJ     := $(NTG):/home/$(NTG_USER)/prj/ntg/ntg
 NTG_SERVER  := $(NTG_PRJ)/server
-NTG_CLIENT  := $(NTG):/var/www/ntg.cceh.uni-koeln.de
+#NTG_CLIENT  := $(NTG):/var/www/ntg.cceh.uni-koeln.de
+NTG_CLIENT  := $(NTG):/var/www/ntg
 
 RSYNC       := /usr/bin/rsync -azv --exclude '*~'
 SHELL       := /bin/bash
