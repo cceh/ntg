@@ -2,6 +2,8 @@
  API Server Configuration Files
 ================================
 
+.. _app-config-files:
+
 Per-Application Configuration Files
 ===================================
 
@@ -50,6 +52,8 @@ Werkzeug Serving WSGI Applications [#f3]_.
 
    The role that has read access. eg. "editor"
 
+   For a description of roles see: :ref:`user-management`.
+
 .. attribute:: READ_ACCESS_PRIVATE
 
    The role that can read editor's notes. eg. "editor_acts"
@@ -81,6 +85,8 @@ Werkzeug Serving WSGI Applications [#f3]_.
    :file:`~/.pgpass` [#f1]_ file in the home directory of the user that owns the API
    server.
 
+
+.. _global-config-file:
 
 Global Configuration File
 =========================
