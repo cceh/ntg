@@ -49,6 +49,8 @@ extensions = [
     'autojsdoc.autojsdoc',
 
     'sqlalchemy-uml.sqlalchemy-uml',
+
+    'sphinxcontrib-pic.pic',
 ]
 
 autojsdoc_structure_json = 'jsdoc/structure.json'
@@ -57,6 +59,44 @@ autojsdoc_title = True
 
 sauml_arguments = ['postgresql+psycopg2://ntg@localhost:5432/acts_ph4']
 sauml_dot_table = 'bgcolor=#e7f2fa&color=#2980B9'
+
+pic_options = {
+    'pic' : {
+        'program' : ["dpic", "-v"],
+        'align'   : "center",
+        'prolog'  : """
+.PS
+copy "config.pic";
+""",
+        'epilog' : """
+.PE
+""",
+    },
+    'uml' : {
+        'program' : ["plantuml", "-tsvg", "-p"],
+        'align'   : "center",
+        'prolog'  : "@startuml\n",
+        'epilog'  : "\n@enduml\n",
+    },
+    'seq' : {
+        'program' : ["dpic", "-v"],
+        'align'   : "center",
+        'prolog'  : """
+.PS
+copy "sequence.pic";
+copy "config.pic";
+""",
+        'epilog' : """
+.PE
+""",
+    },
+    'dot' : {
+        'program' : ["dot", "-Tsvg"],
+        'align'   : "center",
+        'prolog'  : "",
+        'epilog'  : "",
+    },
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

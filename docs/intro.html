@@ -38,7 +38,7 @@
   <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation" href="install.html" />
+    <link rel="next" title="CBGM" href="cbgm.html" />
     <link rel="prev" title="NTG Documentation" href="index.html" /> 
 </head>
 
@@ -83,10 +83,25 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#web-application">Web Application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#applying-the-cbgm">Applying the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#updating-the-apparatus">Updating the Apparatus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scripts">Scripts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#links">Links</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cbgm.html">CBGM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#applying-the-cbgm">Applying the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#new-project">New Project</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#new-phases">New Phases</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id2">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#new-phases-with-apparatus-updates">New Phases With Apparatus Updates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id3">Example</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
@@ -218,6 +233,12 @@
 <li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">ntg_common.tools</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="technologies.html">Technologies Used</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technologies.html#server">Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technologies.html#client">Client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technologies.html#common">Common</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -289,157 +310,166 @@
 <p>A program suite for doing CBGM.</p>
 <p>The CBGM is a method for inferring global manuscript stemmata from local
 stemmata in the manuscripts’ texts.</p>
-<div class="figure align-center" id="id1">
-<div class="graphviz"><img src="_images/graphviz-69d0f2cc874fcae87828bb3864194d548c3923c0.png" alt="strict digraph G {
-	graph [bb=&quot;0,0,220,175&quot;,
-		fontname=&quot;LiberationSans-Regular&quot;,
-		fontsize=10.5,
-		nodesep=0.2,
-		ordering=out,
-		rankdir=TB,
-		ranksep=0.4,
-		remincross=true,
-		size=11.85
-	];
-	node [height=0.3,
-		label=&quot;\N&quot;,
-		margin=0.005,
-		shape=ellipse,
-		width=0.3
-	];
-	edge [arrowhead=normal,
-		arrowtail=none,
-		labelangle=-15.0,
-		labeldistance=2.0
-	];
-	&quot;*&quot;	 [clique=0,
-		droptarget=1,
-		height=0.30556,
-		label=&quot;*&quot;,
-		labez=&quot;*&quot;,
-		labez_clique=&quot;*&quot;,
-		pos=&quot;47,164&quot;,
-		width=0.30556];
-	a	 [clique=1,
-		draggable=1,
-		droptarget=1,
-		height=0.30556,
-		label=a,
-		labez=a,
-		labez_clique=a,
-		pos=&quot;47,113&quot;,
-		width=0.30556];
-	&quot;*&quot; -&gt; a	 [pos=&quot;e,47,124.04 47,152.61 47,147.21 47,140.42 47,134.05&quot;];
-	&quot;?&quot;	 [clique=0,
-		droptarget=1,
-		height=0.30556,
-		label=&quot;?&quot;,
-		labez=&quot;?&quot;,
-		labez_clique=&quot;?&quot;,
-		pos=&quot;173,164&quot;,
-		width=0.30556];
-	a2	 [clique=2,
-		draggable=1,
-		droptarget=1,
-		height=0.30556,
-		label=a2,
-		labez=a,
-		labez_clique=a2,
-		pos=&quot;137,113&quot;,
-		width=0.30556];
-	&quot;?&quot; -&gt; a2	 [pos=&quot;e,143.2,122.44 166.73,154.46 161.93,147.93 155.16,138.71 149.29,130.72&quot;];
-	c3	 [clique=3,
-		draggable=1,
-		droptarget=1,
-		height=0.30556,
-		label=c3,
-		labez=c,
-		labez_clique=c3,
-		pos=&quot;173,113&quot;,
-		width=0.30556];
-	&quot;?&quot; -&gt; c3	 [pos=&quot;e,173,124.04 173,152.61 173,147.21 173,140.42 173,134.05&quot;];
-	d3	 [clique=3,
-		draggable=1,
-		droptarget=1,
-		height=0.30556,
-		label=d3,
-		labez=d,
-		labez_clique=d3,
-		pos=&quot;209,113&quot;,
-		width=0.30556];
-	&quot;?&quot; -&gt; d3	 [pos=&quot;e,202.8,122.44 179.27,154.46 184.07,147.93 190.84,138.71 196.71,130.72&quot;];
-	b	 [clique=1,
-		draggable=1,
-		droptarget=1,
-		height=0.30556,
-		label=b,
-		labez=b,
-		labez_clique=b,
-		pos=&quot;11,62&quot;,
-		width=0.30556];
-	a -&gt; b	 [pos=&quot;e,17.199,71.437 40.729,103.46 35.928,96.93 29.156,87.712 23.287,79.725&quot;];
-	c	 [clique=1,
-		draggable=1,
-		droptarget=1,
-		height=0.30556,
-		label=c,
-		labez=c,
-		labez_clique=c,
-		pos=&quot;47,62&quot;,
-		width=0.30556];
-	a -&gt; c	 [pos=&quot;e,47,73.042 47,101.61 47,96.209 47,89.424 47,83.053&quot;];
-	d	 [clique=1,
-		draggable=1,
-		droptarget=1,
-		height=0.30556,
-		label=d,
-		labez=d,
-		labez_clique=d,
-		pos=&quot;83,62&quot;,
-		width=0.30556];
-	a -&gt; d	 [pos=&quot;e,76.801,71.437 53.271,103.46 58.072,96.93 64.844,87.712 70.713,79.725&quot;];
-	c2	 [clique=2,
-		draggable=1,
-		droptarget=1,
-		height=0.30556,
-		label=c2,
-		labez=c,
-		labez_clique=c2,
-		pos=&quot;119,62&quot;,
-		width=0.30556];
-	a2 -&gt; c2	 [pos=&quot;e,122.58,72.754 133.53,102.55 131.42,96.797 128.64,89.233 126.08,82.263&quot;];
-	d2	 [clique=2,
-		draggable=1,
-		droptarget=1,
-		height=0.30556,
-		label=d2,
-		labez=d,
-		labez_clique=d2,
-		pos=&quot;155,62&quot;,
-		width=0.30556];
-	a2 -&gt; d2	 [pos=&quot;e,151.42,72.754 140.47,102.55 142.58,96.797 145.36,89.233 147.92,82.263&quot;];
-	e	 [clique=1,
-		draggable=1,
-		droptarget=1,
-		height=0.30556,
-		label=e,
-		labez=e,
-		labez_clique=e,
-		pos=&quot;47,11&quot;,
-		width=0.30556];
-	c -&gt; e	 [pos=&quot;e,47,22.042 47,50.608 47,45.209 47,38.424 47,32.053&quot;];
-	f	 [clique=1,
-		draggable=1,
-		droptarget=1,
-		height=0.30556,
-		label=f,
-		labez=f,
-		labez_clique=f,
-		pos=&quot;83,11&quot;,
-		width=0.30556];
-	d -&gt; f	 [pos=&quot;e,83,22.042 83,50.608 83,45.209 83,38.424 83,32.053&quot;];
-}" class="graphviz" /></div>
-<p class="caption"><span class="caption-text">An example of a local stemma</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+<div class="figure align-center" id="id3">
+<div  class="pic pic-format-dot">
+
+
+<!-- Generated by graphviz version 2.43.0 (0)
+ -->
+<!-- Title: G Pages: 1 -->
+<svg width="237pt" height="183pt"
+ viewBox="0.00 0.00 236.99 183.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 179)">
+<title>G</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-179 232.99,-179 232.99,4 -4,4"/>
+<!-- * -->
+<g id="node1" class="node">
+<title>*</title>
+<ellipse fill="none" stroke="black" cx="47" cy="-164" rx="11" ry="11"/>
+<text text-anchor="middle" x="47" y="-160.3" font-family="Times,serif" font-size="14.00">*</text>
+</g>
+<!-- a -->
+<g id="node2" class="node">
+<title>a</title>
+<ellipse fill="none" stroke="black" cx="47" cy="-113" rx="11" ry="11"/>
+<text text-anchor="middle" x="47" y="-109.3" font-family="Times,serif" font-size="14.00">a</text>
+</g>
+<!-- *&#45;&gt;a -->
+<g id="edge1" class="edge">
+<title>*&#45;&gt;a</title>
+<path fill="none" stroke="black" d="M47,-152.61C47,-147.21 47,-140.42 47,-134.05"/>
+<polygon fill="black" stroke="black" points="50.5,-134.04 47,-124.04 43.5,-134.04 50.5,-134.04"/>
+</g>
+<!-- b -->
+<g id="node7" class="node">
+<title>b</title>
+<ellipse fill="none" stroke="black" cx="11" cy="-62" rx="11" ry="11"/>
+<text text-anchor="middle" x="11" y="-58.3" font-family="Times,serif" font-size="14.00">b</text>
+</g>
+<!-- a&#45;&gt;b -->
+<g id="edge5" class="edge">
+<title>a&#45;&gt;b</title>
+<path fill="none" stroke="black" d="M40.73,-103.46C35.93,-96.93 29.16,-87.71 23.29,-79.72"/>
+<polygon fill="black" stroke="black" points="25.94,-77.42 17.2,-71.44 20.3,-81.57 25.94,-77.42"/>
+</g>
+<!-- c -->
+<g id="node8" class="node">
+<title>c</title>
+<ellipse fill="none" stroke="black" cx="47" cy="-62" rx="11" ry="11"/>
+<text text-anchor="middle" x="47" y="-58.3" font-family="Times,serif" font-size="14.00">c</text>
+</g>
+<!-- a&#45;&gt;c -->
+<g id="edge6" class="edge">
+<title>a&#45;&gt;c</title>
+<path fill="none" stroke="black" d="M47,-101.61C47,-96.21 47,-89.42 47,-83.05"/>
+<polygon fill="black" stroke="black" points="50.5,-83.04 47,-73.04 43.5,-83.04 50.5,-83.04"/>
+</g>
+<!-- d -->
+<g id="node9" class="node">
+<title>d</title>
+<ellipse fill="none" stroke="black" cx="83" cy="-62" rx="11" ry="11"/>
+<text text-anchor="middle" x="83" y="-58.3" font-family="Times,serif" font-size="14.00">d</text>
+</g>
+<!-- a&#45;&gt;d -->
+<g id="edge7" class="edge">
+<title>a&#45;&gt;d</title>
+<path fill="none" stroke="black" d="M53.27,-103.46C58.07,-96.93 64.84,-87.71 70.71,-79.72"/>
+<polygon fill="black" stroke="black" points="73.7,-81.57 76.8,-71.44 68.06,-77.42 73.7,-81.57"/>
+</g>
+<!-- ? -->
+<g id="node3" class="node">
+<title>?</title>
+<ellipse fill="none" stroke="black" cx="177" cy="-164" rx="11" ry="11"/>
+<text text-anchor="middle" x="177" y="-160.3" font-family="Times,serif" font-size="14.00">?</text>
+</g>
+<!-- a2 -->
+<g id="node4" class="node">
+<title>a2</title>
+<ellipse fill="none" stroke="black" cx="139" cy="-113" rx="12.11" ry="11"/>
+<text text-anchor="middle" x="139" y="-109.3" font-family="Times,serif" font-size="14.00">a2</text>
+</g>
+<!-- ?&#45;&gt;a2 -->
+<g id="edge2" class="edge">
+<title>?&#45;&gt;a2</title>
+<path fill="none" stroke="black" d="M170.73,-154.91C165.65,-148.36 158.33,-138.92 152,-130.76"/>
+<polygon fill="black" stroke="black" points="154.56,-128.36 145.67,-122.6 149.03,-132.65 154.56,-128.36"/>
+</g>
+<!-- c3 -->
+<g id="node5" class="node">
+<title>c3</title>
+<ellipse fill="none" stroke="black" cx="177" cy="-113" rx="11.74" ry="11"/>
+<text text-anchor="middle" x="177" y="-109.3" font-family="Times,serif" font-size="14.00">c3</text>
+</g>
+<!-- ?&#45;&gt;c3 -->
+<g id="edge3" class="edge">
+<title>?&#45;&gt;c3</title>
+<path fill="none" stroke="black" d="M177,-152.61C177,-147.21 177,-140.42 177,-134.05"/>
+<polygon fill="black" stroke="black" points="180.5,-134.04 177,-124.04 173.5,-134.04 180.5,-134.04"/>
+</g>
+<!-- d3 -->
+<g id="node6" class="node">
+<title>d3</title>
+<ellipse fill="none" stroke="black" cx="216" cy="-113" rx="12.97" ry="11"/>
+<text text-anchor="middle" x="216" y="-109.3" font-family="Times,serif" font-size="14.00">d3</text>
+</g>
+<!-- ?&#45;&gt;d3 -->
+<g id="edge4" class="edge">
+<title>?&#45;&gt;d3</title>
+<path fill="none" stroke="black" d="M183.44,-154.91C188.71,-148.29 196.33,-138.72 202.87,-130.5"/>
+<polygon fill="black" stroke="black" points="205.67,-132.6 209.16,-122.6 200.19,-128.24 205.67,-132.6"/>
+</g>
+<!-- c2 -->
+<g id="node10" class="node">
+<title>c2</title>
+<ellipse fill="none" stroke="black" cx="120" cy="-62" rx="11.74" ry="11"/>
+<text text-anchor="middle" x="120" y="-58.3" font-family="Times,serif" font-size="14.00">c2</text>
+</g>
+<!-- a2&#45;&gt;c2 -->
+<g id="edge8" class="edge">
+<title>a2&#45;&gt;c2</title>
+<path fill="none" stroke="black" d="M135.16,-102.08C132.91,-96.3 130.01,-88.8 127.34,-81.93"/>
+<polygon fill="black" stroke="black" points="130.59,-80.63 123.71,-72.57 124.06,-83.16 130.59,-80.63"/>
+</g>
+<!-- d2 -->
+<g id="node11" class="node">
+<title>d2</title>
+<ellipse fill="none" stroke="black" cx="159" cy="-62" rx="12.97" ry="11"/>
+<text text-anchor="middle" x="159" y="-58.3" font-family="Times,serif" font-size="14.00">d2</text>
+</g>
+<!-- a2&#45;&gt;d2 -->
+<g id="edge9" class="edge">
+<title>a2&#45;&gt;d2</title>
+<path fill="none" stroke="black" d="M142.86,-102.55C145.21,-96.8 148.29,-89.23 151.14,-82.26"/>
+<polygon fill="black" stroke="black" points="154.48,-83.34 155.02,-72.75 148,-80.69 154.48,-83.34"/>
+</g>
+<!-- e -->
+<g id="node12" class="node">
+<title>e</title>
+<ellipse fill="none" stroke="black" cx="47" cy="-11" rx="11" ry="11"/>
+<text text-anchor="middle" x="47" y="-7.3" font-family="Times,serif" font-size="14.00">e</text>
+</g>
+<!-- c&#45;&gt;e -->
+<g id="edge10" class="edge">
+<title>c&#45;&gt;e</title>
+<path fill="none" stroke="black" d="M47,-50.61C47,-45.21 47,-38.42 47,-32.05"/>
+<polygon fill="black" stroke="black" points="50.5,-32.04 47,-22.04 43.5,-32.04 50.5,-32.04"/>
+</g>
+<!-- f -->
+<g id="node13" class="node">
+<title>f</title>
+<ellipse fill="none" stroke="black" cx="83" cy="-11" rx="11" ry="11"/>
+<text text-anchor="middle" x="83" y="-7.3" font-family="Times,serif" font-size="14.00">f</text>
+</g>
+<!-- d&#45;&gt;f -->
+<g id="edge11" class="edge">
+<title>d&#45;&gt;f</title>
+<path fill="none" stroke="black" d="M83,-50.61C83,-45.21 83,-38.42 83,-32.05"/>
+<polygon fill="black" stroke="black" points="86.5,-32.04 83,-22.04 79.5,-32.04 86.5,-32.04"/>
+</g>
+</g>
+</svg>
+</div>
+<p class="caption"><span class="caption-text">An example of a local stemma</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </div>
 <p>In the CBGM we assume that a manuscript is prior to another manuscript if it
 contains a greater percentage of prior readings than posterior readings.  Then
@@ -453,95 +483,68 @@ manuscripts as the parent manuscript.</p>
 <div class="section" id="web-application">
 <h2>Web Application<a class="headerlink" href="#web-application" title="Permalink to this headline">¶</a></h2>
 <p>The web application consists of a <a class="reference internal" href="client_dev.html#module-client" title="client: Web Client"><code class="xref py py-mod docutils literal notranslate"><span class="pre">web</span> <span class="pre">client</span></code></a> and an <a class="reference internal" href="server_dev.html#module-server" title="server: Flask Driver Module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span>
-<span class="pre">server</span></code></a>. The client runs in the user’s browser.  The API server runs on
-a dedicated web server.  It can manage multiple databases.</p>
-<div class="figure align-center" id="id2">
-<p class="plantuml">
-<img src="_images/plantuml-01237eb012b2c8173db215c2581ef249c4e9bec7.png" alt="skinparam backgroundColor transparent
-
-component &quot;Web Client&quot; as client
-component &quot;API Server&quot; as api
-database &quot;Acts&quot; as db1
-database &quot;John&quot; as db2
-database &quot;Mark&quot; as db3
-
-client &lt;--&gt; api
-api &lt;--&gt; db1
-api &lt;--&gt; db2
-api &lt;--&gt; db3"/>
-</p>
-<p class="caption"><span class="caption-text">Web Application</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</div>
-</div>
-<div class="section" id="preparing-the-database-for-the-cbgm">
-<h2>Preparing the Database for the CBGM<a class="headerlink" href="#preparing-the-database-for-the-cbgm" title="Permalink to this headline">¶</a></h2>
-<p>Currently we host the CBGM for three books, namely Acts, John and Mark, by
-different editorial teams and in different stages of completion.  Each book gets
-its own database.</p>
-<p>As raw input we use the database that contains the apparatus of the <em>Editio
-Critica Maior</em> publication.  Supplemental data comes from a database of
-editorial decisions (VarGen) regarding the priority of the readings.  The Nestle
-database contains the “Leitzeile”.</p>
-<p>The <a class="reference internal" href="scripts_user.html#import-py"><span class="std std-ref">scripts/cceh/import.py</span></a> script imports the mysql databases into the postgres database
-and the <a class="reference internal" href="scripts_user.html#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> script transforms the structure of the database into one
-suitable for doing the CBGM.</p>
-<p>This process needs to be done only once.</p>
-<div class="figure align-center" id="id3">
-<p class="plantuml">
-<img src="_images/plantuml-c89d2b0a3a3db24c84927d45a2a4fbee99ec50d2.png" alt="skinparam backgroundColor transparent
-
-database  &quot;ECM&quot;        as dbsrc1
-database  &quot;VarGen&quot;     as dbsrc2
-database  &quot;Nestle&quot;     as dbsrc3
-component &quot;import.py&quot;  as import
-database  &quot;Acts&quot;       as db
-component &quot;prepare.py&quot; as prepare
-
-dbsrc1  --&gt; import
-dbsrc2  --&gt; import
-dbsrc3  --&gt; import
-import  --&gt; prepare
-prepare --&gt; db"/>
-</p>
-<p class="caption"><span class="caption-text">Database Preparation for CBGM</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
-</div>
-<p>The databases for John and Mark are imported in a similar way.  Each team has a
-different workflow, and uses a different structure in their input databases.
-The import script tries to accomodate all those differences.</p>
-</div>
-<div class="section" id="applying-the-cbgm">
-<h2>Applying the CBGM<a class="headerlink" href="#applying-the-cbgm" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script recalculates the CBGM.  Whenever a local stemma changes,
-the CBGM coefficients have to be recalculated.  This process must be run
-immediately after the <a class="reference internal" href="scripts_user.html#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> script.</p>
-<p>To take the project from one phase to the next, make a copy of the database and
-run this process on the new database.</p>
+<span class="pre">server</span></code></a>. The client runs in the user’s browser.  The API server is
+written in Python.  The server can manage multiple databases.</p>
 <div class="figure align-center" id="id4">
-<p class="plantuml">
-<img src="_images/plantuml-73be789f634c5e1b9f57e8aa17cee5205c69e691.png" alt="skinparam backgroundColor transparent
+<div  class="pic pic-format-dot">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="257px" preserveAspectRatio="none" style="width:414px;height:257px;" version="1.1" viewBox="0 0 414 257" width="414px" zoomAndPan="magnify"><defs><filter height="300%" id="fkkyf9589xnl5" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[4a65e84059005d12693a083370a06717]
+entity client--><rect fill="#FEFECE" filter="url(#fkkyf9589xnl5)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="94" x="160" y="8"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="155" y="13"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="155" y="34.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="74" x="170" y="30.9951">Web Client</text><!--MD5=[e2307af040e3f87d22824e7603ca28ec]
+entity api--><rect fill="#FEFECE" filter="url(#fkkyf9589xnl5)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="89" x="162.5" y="104"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="157.5" y="109"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="157.5" y="130.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="69" x="172.5" y="126.9951">API Server</text><!--MD5=[7aa9c583cf047545838c264d3047b712]
+entity db1--><path d="M6,210 C6,200 31,200 31,200 C31,200 56,200 56,210 L56,235.2969 C56,245.2969 31,245.2969 31,245.2969 C31,245.2969 6,245.2969 6,235.2969 L6,210 " fill="#FEFECE" filter="url(#fkkyf9589xnl5)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M6,210 C6,220 31,220 31,220 C31,220 56,220 56,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="16" y="236.9951">Acts</text><!--MD5=[2331507006b4b8bee4c616015350b23c]
+entity db2--><path d="M91,210 C91,200 116,200 116,200 C116,200 141,200 141,210 L141,235.2969 C141,245.2969 116,245.2969 116,245.2969 C116,245.2969 91,245.2969 91,235.2969 L91,210 " fill="#FEFECE" filter="url(#fkkyf9589xnl5)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M91,210 C91,220 116,220 116,220 C116,220 141,220 141,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="101" y="236.9951">John</text><!--MD5=[7a84b64b0b7b7d5ec450ed14b904bacb]
+entity db3--><path d="M176,210 C176,200 207,200 207,200 C207,200 238,200 238,210 L238,235.2969 C238,245.2969 207,245.2969 207,245.2969 C207,245.2969 176,245.2969 176,235.2969 L176,210 " fill="#FEFECE" filter="url(#fkkyf9589xnl5)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M176,210 C176,220 207,220 207,220 C207,220 238,220 238,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="42" x="186" y="236.9951">Mark1</text><!--MD5=[c176c1dae556a162e5c35d6dd4bfcf34]
+entity db4--><path d="M273,210 C273,200 304,200 304,200 C304,200 335,200 335,210 L335,235.2969 C335,245.2969 304,245.2969 304,245.2969 C304,245.2969 273,245.2969 273,235.2969 L273,210 " fill="#FEFECE" filter="url(#fkkyf9589xnl5)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M273,210 C273,220 304,220 304,220 C304,220 335,220 335,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="42" x="283" y="236.9951">Mark2</text><!--MD5=[1fe7a992e89c10c5f2c27a23fb1e129d]
+entity db5--><path d="M370,210 C370,200 386,200 386,200 C386,200 402,200 402,210 L402,235.2969 C402,245.2969 386,245.2969 386,245.2969 C386,245.2969 370,245.2969 370,235.2969 L370,210 " fill="#FEFECE" filter="url(#fkkyf9589xnl5)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M370,210 C370,220 386,220 386,220 C386,220 402,220 402,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="12" x="380" y="236.9951">...</text><!--MD5=[d4ad1d5275391ca8d3acb292d4b26dc5]
+link client to api--><path d="M207,49.66 C207,64.52 207,83.85 207,98.64 " fill="none" id="client-api" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="207,103.87,211,94.87,207,98.87,203,94.87,207,103.87" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="207,44.24,203,53.24,207,49.24,211,53.24,207,44.24" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[e103e8664999dd9756eff2c32e1de5b6]
+link api to db1--><path d="M171.84,142.68 C139.24,160.92 91.27,187.77 60.58,204.95 " fill="none" id="api-db1" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="56.18,207.41,65.9865,206.4977,60.5413,204.9648,62.0742,199.5196,56.18,207.41" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="176.34,140.16,166.53,141.0342,171.9692,142.5882,170.4152,148.0274,176.34,140.16" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c945a0638e97c8d85bbaa16159667354]
+link api to db2--><path d="M187.43,144.18 C173.47,159.29 154.63,179.68 139.8,195.73 " fill="none" id="api-db2" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="136.13,199.72,145.1718,195.8155,139.5196,196.0443,139.2908,190.3921,136.13,199.72" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="191.15,140.16,182.1,144.0455,187.7527,143.8285,187.9696,149.4812,191.15,140.16" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[3c7e9365bf194672ba40a7ba5071302f]
+link api to db3--><path d="M207,145.44 C207,160.06 207,179.21 207,194.64 " fill="none" id="api-db3" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="207,199.72,211,190.72,207,194.72,203,190.72,207,199.72" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="207,140.16,203,149.16,207,145.16,211,149.16,207,140.16" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[eaec4da83caf75e3bf23f71b58a53993]
+link api to db4--><path d="M227.45,143.77 C242.48,159.03 262.99,179.86 279,196.11 " fill="none" id="api-db4" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="282.55,199.72,279.1075,190.4924,279.0504,196.1489,273.3938,196.0918,282.55,199.72" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="223.9,140.16,227.3798,149.3736,227.414,143.7169,233.0708,143.7512,223.9,140.16" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c9ae675fabfaa8d7ce5b4fa98ffa6990]
+link api to db5--><path d="M246.08,142.37 C275.79,157.4 317.47,179.12 353,200 C357.07,202.39 361.34,205.06 365.42,207.67 " fill="none" id="api-db5" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="369.74,210.48,364.3849,202.2143,365.5514,207.7495,360.0161,208.9161,369.74,210.48" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="241.41,140.02,247.6515,147.6386,245.8764,142.2675,251.2475,140.4924,241.41,140.02" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[5f31d3f9dc5fd5c5733db2f6a685036f]
+@startuml
+skinparam backgroundColor transparent
 
-component &quot;cbgm script&quot; as cbgm
-database  &quot;Acts&quot;        as db
+component "Web Client" as client
+component "API Server" as api
+database "Acts" as db1
+database "John" as db2
+database "Mark1" as db3
+database "Mark2" as db4
+database "..."  as db5
 
-db -&gt; cbgm
-db &lt;- cbgm"/>
-</p>
-<p class="caption"><span class="caption-text">Applying the CBGM</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+client <- -> api
+api <- -> db1
+api <- -> db2
+api <- -> db3
+api <- -> db4
+api <- -> db5
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 11:22:07 CET 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.7+10-post-Debian-3
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg></div>
+<p class="caption"><span class="caption-text">Web Application</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
 </div>
+<p>Currently we host the CBGM for three books, namely Acts, John and Mark, by
+different editorial teams and in different stages of completion.
+Each book and phase gets its own database.</p>
 </div>
-<div class="section" id="updating-the-apparatus">
-<h2>Updating the Apparatus<a class="headerlink" href="#updating-the-apparatus" title="Permalink to this headline">¶</a></h2>
-<p>If the apparatus needs an update the whole CBGM database must be rebuilt from
-scratch, the CBGM process must be run and the editorial decisions have to be
-transferred to the new database:</p>
-<ol class="arabic simple">
-<li><p>the <a class="reference internal" href="scripts_user.html#save-edits-py"><span class="std std-ref">scripts/cceh/save_edits.py</span></a> script is used to save the editorial decisions,</p></li>
-<li><p>the <a class="reference internal" href="scripts_user.html#import-py"><span class="std std-ref">scripts/cceh/import.py</span></a> and <a class="reference internal" href="scripts_user.html#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> scripts are used to import and prepare a new
-apparatus, and</p></li>
-<li><p>the <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script is run to apply the CBGM to the new data, and finally</p></li>
-<li><p>the <a class="reference internal" href="scripts_user.html#load-edits-py"><span class="std std-ref">scripts/cceh/load_edits.py</span></a> script is used to restore the editorial decisions into
-the new database.</p></li>
-</ol>
+<div class="section" id="scripts">
+<h2>Scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h2>
+<p>This is a set of scripts that the user can run manually on the server to
+manage the whole <a href="#id1"><span class="problematic" id="id2">:ref:`cbgm`_</span></a> process, that is:</p>
+<ul class="simple">
+<li><p>importing new books,</p></li>
+<li><p>doing the CBGM (passing from one phase to the next),</p></li>
+<li><p>and eventually updating the apparatus.</p></li>
+</ul>
 </div>
 <div class="section" id="links">
 <h2>Links<a class="headerlink" href="#links" title="Permalink to this headline">¶</a></h2>
@@ -559,7 +562,7 @@ the new database.</p></li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="install.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="cbgm.html" class="btn btn-neutral float-right" title="CBGM" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral float-left" title="NTG Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

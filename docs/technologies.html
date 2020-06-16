@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation on Linux &mdash; NTG 0.1.1 documentation</title>
+  <title>Technologies Used &mdash; NTG 0.1.1 documentation</title>
   
 
   
@@ -38,8 +38,7 @@
   <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation with Docker" href="install-docker.html" />
-    <link rel="prev" title="Installation" href="install.html" /> 
+    <link rel="prev" title="Various Functions" href="ntg_common.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -104,14 +103,14 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="reference internal" href="install.html">Installation</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Installation on Linux</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#install-prerequisites">Install Prerequisites</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#database-access">Database Access</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#application-server">Application server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cbgm">CBGM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#run-server">Run Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#build-and-run-client">Build and run client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install-linux.html">Installation on Linux</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#database-access">Database Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#application-server">Application server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#run-server">Run Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#build-and-run-client">Build and run client</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a><ul>
@@ -140,7 +139,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Manual</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="developer.html">Developer Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="domain.html">Introduction to the Problem Domain (German)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="domain.html#das-neue-testament">Das Neue Testament</a></li>
 <li class="toctree-l3"><a class="reference internal" href="domain.html#editionen">Editionen</a></li>
@@ -233,10 +232,10 @@
 <li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">ntg_common.tools</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="technologies.html">Technologies Used</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="technologies.html#server">Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="technologies.html#client">Client</a></li>
-<li class="toctree-l3"><a class="reference internal" href="technologies.html#common">Common</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Technologies Used</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#server">Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#client">Client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#common">Common</a></li>
 </ul>
 </li>
 </ul>
@@ -286,15 +285,15 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-          <li><a href="install.html">Installation</a> &raquo;</li>
+          <li><a href="developer.html">Developer Manual</a> &raquo;</li>
         
-      <li>Installation on Linux</li>
+      <li>Technologies Used</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/install-linux.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/technologies.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -307,259 +306,43 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation-on-linux">
-<span id="linux-install"></span><h1>Installation on Linux<a class="headerlink" href="#installation-on-linux" title="Permalink to this headline">¶</a></h1>
-<p>This chapter describes how to install the CBGM application on a linux server.
-If you want to run the application on a desktop machine an
-<a class="reference internal" href="install-docker.html#docker-install"><span class="std std-ref">installation with Docker</span></a> might be the easier way to go.</p>
-<div class="section" id="install-prerequisites">
-<h2>Install Prerequisites<a class="headerlink" href="#install-prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>The application should run as a user that has no special privileges.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Do not run the application as a user with administrative rights.</p>
-</div>
-<p>As a user with admin privileges do:</p>
-<ol class="arabic">
-<li><p>Create user <em>ntg</em></p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo useradd -m -d /home/ntg -s /bin/bash -U ntg
-sudo passwd ntg
-</pre></div>
-</div>
+  <div class="section" id="technologies-used">
+<span id="technologies"></span><h1>Technologies Used<a class="headerlink" href="#technologies-used" title="Permalink to this headline">¶</a></h1>
+<p>A short (incomplete) list of the technologies used.</p>
+<div class="section" id="server">
+<h2>Server<a class="headerlink" href="#server" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>python</p>
+<ul>
+<li><p>flask</p></li>
+<li><p>networkx</p></li>
+<li><p>numpy</p></li>
+<li><p>sqlalchemy</p></li>
+</ul>
 </li>
-<li><p>Install the software:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo apt-get update
-sudo apt-get install git make
-sudo -u ntg bash
-
-mkdir -p ~/prj/ntg
-<span class="nb">cd</span> !!$
-git clone https://github.com/cceh/ntg
-<span class="nb">cd</span> ntg
-<span class="nb">exit</span>
-
-sudo bash
-<span class="nb">cd</span> ~ntg/prj/ntg/ntg/
-make install-prerequisites
-</pre></div>
+<li><p>graphviz</p></li>
+</ul>
 </div>
+<div class="section" id="client">
+<h2>Client<a class="headerlink" href="#client" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>javascript</p>
+<ul>
+<li><p>bootstrap</p></li>
+<li><p>d3</p></li>
+<li><p>vue.js</p></li>
+</ul>
 </li>
-</ol>
+<li><p>webpack</p></li>
+</ul>
 </div>
-<div class="section" id="database-access">
-<span id="id1"></span><h2>Database Access<a class="headerlink" href="#database-access" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="mysql-database">
-<h3>MySQL database<a class="headerlink" href="#mysql-database" title="Permalink to this headline">¶</a></h3>
-<ol class="arabic">
-<li><p>Edit (or create) your <code class="file docutils literal notranslate"><span class="pre">~/.my.cnf</span></code> and add this section:</p>
-<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[mysql]</span>
-<span class="na">host</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
-<span class="na">user</span><span class="o">=</span><span class="s">&quot;&lt;username&gt;&quot;</span>
-<span class="na">password</span><span class="o">=</span><span class="s">&quot;&lt;password&gt;&quot;</span>
-<span class="na">default-character-set</span><span class="o">=</span><span class="s">&quot;utf8&quot;</span>
-</pre></div>
-</div>
-<p>Replace <em>&lt;username&gt;</em> and <em>&lt;password&gt;</em> with your own MySQL username and password.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Make sure <code class="file docutils literal notranslate"><span class="pre">~/.my.cnf</span></code> is readable only by yourself!</p>
-</div>
-</li>
-<li><p>Create databases for ECM and VarGenAtt:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo mysql -e <span class="s2">&quot;CREATE DATABASE VarGenAtt_ActPh4&quot;</span>
-sudo mysql -e <span class="s2">&quot;CREATE DATABASE ECM_ActsPh4&quot;</span>
-</pre></div>
-</div>
-</li>
-</ol>
-</div>
-<div class="section" id="postgres-database">
-<h3>Postgres database<a class="headerlink" href="#postgres-database" title="Permalink to this headline">¶</a></h3>
-<ol class="arabic" start="0">
-<li><p>Make sure you have the following lines in <code class="file docutils literal notranslate"><span class="pre">pg_hba.conf</span></code> so you can
-connect to postgres using password identification.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span># IPv4 local connections:
-host    all             all             127.0.0.1/32            md5
-# IPv6 local connections:
-host    all             all             ::1/128                 md5
-</pre></div>
-</div>
-</li>
-<li><p>Create a postgres user and a foreign data wrapper for MySQL.  The FDW allows
-Postgres to access the MySQL databases.</p>
-<p>Login as administrative user and say:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo -u postgres psql
-</pre></div>
-</div>
-<div class="highlight-psql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">USER</span> <span class="n">ntg</span> <span class="n">CREATEDB</span> <span class="k">PASSWORD</span> <span class="s1">&#39;&lt;password&gt;&#39;</span><span class="p">;</span>
-<span class="go">CREATE DATABASE ntg_user OWNER ntg;</span>
-<span class="go">CREATE DATABASE acts_ph4 OWNER ntg;</span>
-<span class="go">\c acts_ph4</span>
-<span class="go">CREATE SCHEMA ntg AUTHORIZATION ntg;</span>
-<span class="go">ALTER DATABASE acts_ph4 SET search_path = ntg, public;</span>
-<span class="go">CREATE EXTENSION mysql_fdw;</span>
-<span class="go">GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;</span>
-<span class="go">\q</span>
-</pre></div>
-</div>
-<p>Replace &lt;password&gt; with a real password.</p>
-<p>Logout.</p>
-</li>
-<li><p>Edit (or create) your <code class="file docutils literal notranslate"><span class="pre">~/.pgpass</span></code> and add this line:</p>
-<p>Login as user <em>ntg</em> and say:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>localhost:5432:*:ntg:&lt;password&gt;
-</pre></div>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Make sure <code class="file docutils literal notranslate"><span class="pre">~/.pgpass</span></code> is readable only by yourself!</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>You can now login to the Postgres database as user ntg without having
-to enter your password:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>psql -h localhost -U ntg -d acts_ph4
-</pre></div>
-</div>
-</div>
-<p>Logout.</p>
-</li>
-</ol>
-</div>
-</div>
-<div class="section" id="application-server">
-<h2>Application server<a class="headerlink" href="#application-server" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic">
-<li><p>Configure the global settings for the application server.  This configures
-the user management database that holds user credentials and the sending of
-confirmation mails.</p>
-<p>Login as user <em>ntg</em> and edit (or create) your <code class="file docutils literal notranslate"><span class="pre">server/instance/_global.conf</span></code></p>
-<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">APPLICATION_NAME</span>    <span class="o">=</span> <span class="s">&quot;Root&quot;</span>
-<span class="na">APPLICATION_ROOT</span>    <span class="o">=</span> <span class="s">&quot;/&quot;</span>
-<span class="na">SESSION_COOKIE_PATH</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span>
-<span class="na">SECRET_KEY</span>          <span class="o">=</span> <span class="s">&quot;&lt;a long random string&gt;&quot;</span>
-
-<span class="na">PGHOST</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
-<span class="na">PGPORT</span><span class="o">=</span><span class="s">&quot;5432&quot;</span>
-<span class="na">PGDATABASE</span><span class="o">=</span><span class="s">&quot;ntg_user&quot;</span>
-<span class="na">PGUSER</span><span class="o">=</span><span class="s">&quot;ntg&quot;</span>
-
-<span class="na">USER_PASSWORD_HASH</span><span class="o">=</span><span class="s">&quot;pbkdf2_sha512&quot;</span>
-<span class="na">USER_PASSWORD_SALT</span><span class="o">=</span><span class="s">&quot;&lt;a random string&gt;&quot;</span>
-
-<span class="na">MAIL_SERVER</span>  <span class="o">=</span> <span class="s">&quot;smtp.domain.tld&quot;</span>
-<span class="na">MAIL_PORT</span>    <span class="o">=</span> <span class="s">25</span>
-<span class="na">MAIL_USE_TLS</span> <span class="o">=</span> <span class="s">True</span>
-<span class="na">MAIL_DEFAULT_SENDER</span> <span class="o">=</span> <span class="s">&quot;ntg appserver &lt;noreply@domain.tld&gt;&quot;</span>
-</pre></div>
-</div>
-</li>
-<li><p>Configure the CBGM database or databases.  Create one .conf file per
-database, the name of the file may be chosen at will but should not start
-with an underscore.</p>
-<p>The APPLICATION_ROOT is the root of the url.  It must have two segments and
-must be different for each database.</p>
-<p>Edit (or create) your <code class="file docutils literal notranslate"><span class="pre">server/instance/acts_ph4.conf</span></code></p>
-<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">APPLICATION_NAME</span><span class="o">=</span><span class="s">&quot;Acts Phase 4&quot;</span>
-<span class="na">APPLICATION_ROOT</span><span class="o">=</span><span class="s">&quot;/acts/ph4&quot;</span>
-<span class="na">BOOK</span><span class="o">=</span><span class="s">&quot;Acts&quot;</span>
-
-<span class="na">PGHOST</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
-<span class="na">PGPORT</span><span class="o">=</span><span class="s">&quot;5432&quot;</span>
-<span class="na">PGDATABASE</span><span class="o">=</span><span class="s">&quot;acts_ph4&quot;</span>
-<span class="na">PGUSER</span><span class="o">=</span><span class="s">&quot;ntg&quot;</span>
-
-<span class="na">MYSQL_CONF</span><span class="o">=</span><span class="s">&quot;~/.my.cnf&quot;</span>
-<span class="na">MYSQL_GROUP</span><span class="o">=</span><span class="s">&quot;mysql&quot;</span>
-
-<span class="na">MYSQL_ECM_DB</span><span class="o">=</span><span class="s">&quot;ECM_ActsPh4&quot;</span>
-<span class="na">MYSQL_ATT_TABLES</span><span class="o">=</span><span class="s">&quot;Acts{n}GVZ&quot;</span>
-<span class="na">MYSQL_LAC_TABLES</span><span class="o">=</span><span class="s">&quot;Acts{n}GVZlac&quot;</span>
-
-<span class="na">MYSQL_VG_DB</span><span class="o">=</span><span class="s">&quot;VarGenAtt_ActPh4&quot;</span>
-<span class="na">MYSQL_LOCSTEM_TABLES</span><span class="o">=</span><span class="s">&quot;LocStemEdAct{n}&quot;</span>
-<span class="na">MYSQL_RDG_TABLES</span><span class="o">=</span><span class="s">&quot;RdgAct{n}&quot;</span>
-<span class="na">MYSQL_VAR_TABLES</span><span class="o">=</span><span class="s">&quot;VarGenAttAct{n}&quot;</span>
-<span class="na">MYSQL_MEMO_TABLE</span><span class="o">=</span><span class="s">&quot;Memo&quot;</span>
-
-<span class="na">MYSQL_NESTLE_DB</span><span class="o">=</span><span class="s">&quot;Nestle29&quot;</span>
-</pre></div>
-</div>
-</li>
-<li><p>Initialize the user management database and add an administrator user for the
-application server.  You’ll need this user to login in the browser.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This should not be the same username (and password) as the database user
-above!</p>
-</div>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.mk_users -e &lt;email&gt; -u &lt;username&gt; -p &lt;password&gt; server/instance/_globals.conf
-</pre></div>
-</div>
-</li>
-</ol>
-</div>
-<div class="section" id="cbgm">
-<h2>CBGM<a class="headerlink" href="#cbgm" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic">
-<li><p>Get the mysql database dumps from Münster (exercise left to the reader) and
-import them into mysql:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>mysql -D <span class="s2">&quot;ECM_ActsPh4&quot;</span>      &lt; ECM_ActsPh4.dump
-mysql -D <span class="s2">&quot;VarGenAtt_ActPh4&quot;</span> &lt; VarGenAtt_ActPh4.dump
-mysql -D <span class="s2">&quot;Nestle29&quot;</span>         &lt; Nestle29.dump
-</pre></div>
-</div>
-</li>
-<li><p>Import the databases into postgres:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.import -vvv server/instance/acts_ph4.conf
-python3 -m scripts.cceh.prepare -vvv server/instance/acts_ph4.conf
-</pre></div>
-</div>
-</li>
-<li><p>Run the CBGM process once.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.cbgm -vvv server/instance/acts_ph4.conf
-</pre></div>
-</div>
-</li>
-<li><p>Setup cron to run the CBGM nightly:</p>
-<p>This step is optional.  You may also run the cbgm script manually whenever
-you need it.</p>
-<p>Edit your user crontab</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>crontab -e
-</pre></div>
-</div>
-<p>and put these lines into it:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nv">MAILTO</span><span class="o">=</span>user@example.com
-
-<span class="m">13</span> <span class="m">02</span> * * * <span class="nb">cd</span> /home/ntg/prj/ntg/ntg <span class="o">&amp;&amp;</span> scripts/cceh/update_cbgm
-</pre></div>
-</div>
-</li>
-</ol>
-</div>
-<div class="section" id="run-server">
-<h2>Run Server<a class="headerlink" href="#run-server" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic">
-<li><p>Run the application server:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make server
-</pre></div>
-</div>
-</li>
-</ol>
-</div>
-<div class="section" id="build-and-run-client">
-<h2>Build and run client<a class="headerlink" href="#build-and-run-client" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic">
-<li><p>Build and run the client</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> client
-npm install
-<span class="nb">cd</span> ..
-make dev-server
-</pre></div>
-</div>
-</li>
-</ol>
-<p>Point your browser to <a class="reference external" href="http://localhost:5000/acts/ph4/">http://localhost:5000/acts/ph4/</a></p>
+<div class="section" id="common">
+<h2>Common<a class="headerlink" href="#common" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>apache</p></li>
+<li><p>mysql</p></li>
+<li><p>postgres</p></li>
+</ul>
 </div>
 </div>
 
@@ -571,10 +354,8 @@ make dev-server
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="install-docker.html" class="btn btn-neutral float-right" title="Installation with Docker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="install.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="ntg_common.html" class="btn btn-neutral float-left" title="Various Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

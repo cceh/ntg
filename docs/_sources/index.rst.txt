@@ -8,6 +8,7 @@
    :maxdepth: 2
 
    intro
+   cbgm
    install
    user
    developer
