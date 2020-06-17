@@ -89,14 +89,16 @@ clean: client-clean
 # CREATE DATABASE ntg_user OWNER ntg;
 #
 # CREATE DATABASE acts_ph4 OWNER ntg;
-# GRANT CONNECT ON DATABASE acts_ph4 TO ntg_readonly;
+#
 # \c acts_ph4
 # CREATE SCHEMA ntg AUTHORIZATION ntg;
-# GRANT USAGE ON SCHEMA ntg TO ntg_readonly;
-# GRANT SELECT ON ALL TABLES IN SCHEMA ntg TO ntg_readonly;
 # ALTER DATABASE acts_ph4 SET search_path = ntg, public;
 # CREATE EXTENSION mysql_fdw;
 # GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
+#
+# GRANT CONNECT ON DATABASE acts_ph4 TO ntg_readonly;
+# GRANT USAGE ON SCHEMA ntg TO ntg_readonly;
+# GRANT SELECT ON ALL TABLES IN SCHEMA ntg TO ntg_readonly;
 # \q
 
 import_acts:
@@ -144,13 +146,13 @@ import_mark_ph2:
 import_mark_ph22:
 	-$(MYSQL) -e "DROP DATABASE ECM_Mark_Ph2"
 	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph2"
-	cat ../dumps/ECM_Mk_Apparat_6.dump | $(MYSQL) -D ECM_Mark_Ph2
+	bzcat ../dumps/ECM_Mk_Apparat_6.dump.bz2 | $(MYSQL) -D ECM_Mark_Ph2
 	python3 -m scripts.cceh.import -vvv instance/mark_ph22.conf
 
 import_nestle:
 	-$(MYSQL) -e "DROP DATABASE Nestle29"
 	$(MYSQL) -e "CREATE DATABASE Nestle29"
-	cat ../dumps/Nestle29-2.dump | $(MYSQL) -D Nestle29
+	bzcat ../dumps/Nestle29-2.dump.bz2 | $(MYSQL) -D Nestle29
 
 import_2sam:
 	-$(MYSQL) -e "DROP DATABASE 2Sam_Ph1"
@@ -262,12 +264,6 @@ get_remote_backups:
 	mkdir -p backups/db
 	$(RSYNC) $(NTG_PRJ)/backups/db backups/
 
-
-diff_affinity_acts:
-	scripts/cceh/sqldiff.sh acts_ph4 "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 94 order by ms_id1, ms_id2" | less
-
-diff_affinity_john:
-	scripts/cceh/sqldiff.sh john_ph1 "select ms_id1, ms_id2, affinity, common, equal, older, newer, unclear from affinity where rg_id = 72 order by ms_id1, ms_id2" | less
 
 lint: pylint eslint csslint
 
