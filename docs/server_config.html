@@ -90,16 +90,16 @@
 <li class="toctree-l1"><a class="reference internal" href="cbgm.html">CBGM</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cbgm.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cbgm.html#applying-the-cbgm">Applying the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#new-project">New Project</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-project">Starting a New Project</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#worked-example">Worked Example</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#new-phases">New Phases</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id2">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-phase">Starting a New Phase</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id2">Worked Example</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#new-phases-with-apparatus-updates">New Phases With Apparatus Updates</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id3">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-phase-with-apparatus-update">Starting a New Phase With Apparatus Update</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id3">Worked Example</a></li>
 </ul>
 </li>
 </ul>
@@ -308,7 +308,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="api-server-configuration-files">
-<h1>API Server Configuration Files<a class="headerlink" href="#api-server-configuration-files" title="Permalink to this headline">¶</a></h1>
+<span id="api-server-config-files"></span><h1>API Server Configuration Files<a class="headerlink" href="#api-server-configuration-files" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="per-application-configuration-files">
 <span id="app-config-files"></span><h2>Per-Application Configuration Files<a class="headerlink" href="#per-application-configuration-files" title="Permalink to this headline">¶</a></h2>
 <p>The API server can serve multiple applications.  “Application” is synonymous
@@ -319,6 +319,8 @@ configuration files in the <code class="file docutils literal notranslate"><span
 must be named <code class="file docutils literal notranslate"><span class="pre">*.conf</span></code> and the name must not begin with an underscore.</p>
 <p>See also: Flask Configuration Handling <a class="footnote-reference brackets" href="#f2" id="id1">2</a> and
 Werkzeug Serving WSGI Applications <a class="footnote-reference brackets" href="#f3" id="id2">3</a>.</p>
+<div class="section" id="api-server">
+<h3>API Server<a class="headerlink" href="#api-server" title="Permalink to this headline">¶</a></h3>
 <dl class="py attribute">
 <dt id="APPLICATION_NAME">
 <code class="sig-name descname">APPLICATION_NAME</code><a class="headerlink" href="#APPLICATION_NAME" title="Permalink to this definition">¶</a></dt>
@@ -399,6 +401,114 @@ proxied through an Apache or nginx server that does the TLS handling.</p>
 server.</p>
 </dd></dl>
 
+</div>
+<div class="section" id="import">
+<h3>Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h3>
+<p>The following entries are used by the <a class="reference internal" href="scripts_user.html#import-py"><span class="std std-ref">scripts/cceh/import.py</span></a> script only:</p>
+<dl class="py attribute">
+<dt id="MYSQL_CONF">
+<code class="sig-name descname">MYSQL_CONF</code><a class="headerlink" href="#MYSQL_CONF" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mysql client configuration file.
+eg. <code class="file docutils literal notranslate"><span class="pre">~/.my.cnf.ntg</span></code></p>
+<p>This file contains the credentials to connect to the local mysql server.
+It should be readable only by the users that run the <a class="reference internal" href="scripts_user.html#import-py"><span class="std std-ref">scripts/cceh/import.py</span></a> script.
+The API server itself only connects to the Postgres
+and never to the mysql server.
+Example of file contents:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[mysql]</span>
+<span class="na">host</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<span class="na">user</span><span class="o">=</span><span class="s">&quot;ntg&quot;</span>
+<span class="na">password</span><span class="o">=</span><span class="s">&quot;123456&quot;</span>
+<span class="na">default-character-set</span><span class="o">=</span><span class="s">&quot;utf8&quot;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MYSQL_GROUP">
+<code class="sig-name descname">MYSQL_GROUP</code><a class="headerlink" href="#MYSQL_GROUP" title="Permalink to this definition">¶</a></dt>
+<dd><p>The group to read in the MYSQL_CONF file.
+eg. <code class="code docutils literal notranslate"><span class="pre">mysql</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MYSQL_ECM_DB">
+<code class="sig-name descname">MYSQL_ECM_DB</code><a class="headerlink" href="#MYSQL_ECM_DB" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the <code class="code docutils literal notranslate"><span class="pre">ECM</span></code> database.
+eg. <code class="code docutils literal notranslate"><span class="pre">ECM_Mark_Ph2</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MYSQL_ATT_TABLES">
+<code class="sig-name descname">MYSQL_ATT_TABLES</code><a class="headerlink" href="#MYSQL_ATT_TABLES" title="Permalink to this definition">¶</a></dt>
+<dd><p>A regular expression to find all “att” tables in the <code class="code docutils literal notranslate"><span class="pre">ECM</span></code> database.
+eg. <code class="regexp docutils literal notranslate"><span class="pre">Mk\d+</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MYSQL_LAC_TABLES">
+<code class="sig-name descname">MYSQL_LAC_TABLES</code><a class="headerlink" href="#MYSQL_LAC_TABLES" title="Permalink to this definition">¶</a></dt>
+<dd><p>A regular expression to find all “lac” tables in the <code class="code docutils literal notranslate"><span class="pre">ECM</span></code> database.
+eg. <code class="regexp docutils literal notranslate"><span class="pre">Mk\d+lac</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MYSQL_NESTLE_DB">
+<code class="sig-name descname">MYSQL_NESTLE_DB</code><a class="headerlink" href="#MYSQL_NESTLE_DB" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the <code class="code docutils literal notranslate"><span class="pre">Leitzeile</span></code> database.
+eg. <code class="code docutils literal notranslate"><span class="pre">Nestle29</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MYSQL_NESTLE_TABLE">
+<code class="sig-name descname">MYSQL_NESTLE_TABLE</code><a class="headerlink" href="#MYSQL_NESTLE_TABLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>A regular expression to find all “leitzeile” tables in the <code class="code docutils literal notranslate"><span class="pre">Leitzeile</span></code> database.
+eg. <code class="regexp docutils literal notranslate"><span class="pre">Nestle29</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MYSQL_VG_DB">
+<code class="sig-name descname">MYSQL_VG_DB</code><a class="headerlink" href="#MYSQL_VG_DB" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the <code class="code docutils literal notranslate"><span class="pre">VarGen</span></code> database.  eg. <code class="code docutils literal notranslate"><span class="pre">VarGen_Mark_Ph2</span></code></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">VarGen</span></code> database is optional.
+Without it, default priorities will be used.
+In this case set this variable to the same as
+the MYSQL_ECM_DB variable
+and do not set any of the following variables.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MYSQL_LOCSTEM_TABLES">
+<code class="sig-name descname">MYSQL_LOCSTEM_TABLES</code><a class="headerlink" href="#MYSQL_LOCSTEM_TABLES" title="Permalink to this definition">¶</a></dt>
+<dd><p>A regular expression to find all “locstemed” tables in the <code class="code docutils literal notranslate"><span class="pre">VarGen</span></code> database.
+eg. <code class="regexp docutils literal notranslate"><span class="pre">LocStemEdMark\d+</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MYSQL_RDG_TABLES">
+<code class="sig-name descname">MYSQL_RDG_TABLES</code><a class="headerlink" href="#MYSQL_RDG_TABLES" title="Permalink to this definition">¶</a></dt>
+<dd><p>A regular expression to find all “rdg” tables in the <code class="code docutils literal notranslate"><span class="pre">VarGen</span></code> database.
+eg. <code class="regexp docutils literal notranslate"><span class="pre">RdgMark\d+</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MYSQL_VAR_TABLES">
+<code class="sig-name descname">MYSQL_VAR_TABLES</code><a class="headerlink" href="#MYSQL_VAR_TABLES" title="Permalink to this definition">¶</a></dt>
+<dd><p>A regular expression to find all “var” tables in the <code class="code docutils literal notranslate"><span class="pre">VarGen</span></code> database.
+eg. <code class="regexp docutils literal notranslate"><span class="pre">VarGenAttMark\d+</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="MYSQL_MEMO_TABLE">
+<code class="sig-name descname">MYSQL_MEMO_TABLE</code><a class="headerlink" href="#MYSQL_MEMO_TABLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>A regular expression to find all “memo” tables in the <code class="code docutils literal notranslate"><span class="pre">VarGen</span></code> database.
+eg. <code class="regexp docutils literal notranslate"><span class="pre">Memo</span></code></p>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="global-configuration-file">
 <span id="global-config-file"></span><h2>Global Configuration File<a class="headerlink" href="#global-configuration-file" title="Permalink to this headline">¶</a></h2>
@@ -570,7 +680,7 @@ eg. “ntg appserver &lt;<a class="reference external" href="mailto:noreply&#37;
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016-19 CCeH - Licensed under the GNU GPL v3 or later
+        &copy; Copyright 2016-20 CCeH - Licensed under the GNU GPL v3 or later
 
     </p>
   </div>

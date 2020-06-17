@@ -90,16 +90,16 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">CBGM</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#applying-the-cbgm">Applying the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#new-project">New Project</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#starting-a-new-project">Starting a New Project</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#worked-example">Worked Example</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#new-phases">New Phases</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id2">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#starting-a-new-phase">Starting a New Phase</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Worked Example</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#new-phases-with-apparatus-updates">New Phases With Apparatus Updates</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id3">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#starting-a-new-phase-with-apparatus-update">Starting a New Phase With Apparatus Update</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Worked Example</a></li>
 </ul>
 </li>
 </ul>
@@ -311,30 +311,32 @@
 <h2>Preparing the Database for the CBGM<a class="headerlink" href="#preparing-the-database-for-the-cbgm" title="Permalink to this headline">¶</a></h2>
 <p>All input data must be converted and imported into one Postgres database.</p>
 <ul class="simple">
-<li><p>The mysql database “ECM” contains the apparatus of the <em>Editio
+<li><p>The mysql database <code class="code docutils literal notranslate"><span class="pre">ECM</span></code> contains the apparatus of the <em>Editio
 Critica Maior</em> publication.
 This database is exported from the NTVMR application
 (New Testament Virtual Manuscript Room).</p></li>
-<li><p>The mysql database “Leitzeile” contains the Leitzeile of the
+<li><p>The mysql database <code class="code docutils literal notranslate"><span class="pre">Leitzeile</span></code> contains the Leitzeile of the
 current Nestle-Aland edition or any other appropriate “Leitzeile”.</p></li>
-<li><p>Optionally the mysql database “VarGen” contains
+<li><p>Optionally the mysql database <code class="code docutils literal notranslate"><span class="pre">VarGen</span></code> contains
 previous editorial decisions regarding the priority of the readings.
 If this database is not supplied default priorities are used.</p></li>
 </ul>
 <div class="figure align-center" id="id4">
 <div  class="pic pic-format-dot">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="362px" preserveAspectRatio="none" style="width:381px;height:362px;" version="1.1" viewBox="0 0 381 362" width="381px" zoomAndPan="magnify"><defs><filter height="300%" id="f6witmvmxh5um" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[a09e890d9cf6c6dd92f16829561ddf3b]
-entity dbsrc1--><path d="M100,18 C100,8 125.5,8 125.5,8 C125.5,8 151,8 151,18 L151,43.2969 C151,53.2969 125.5,53.2969 125.5,53.2969 C125.5,53.2969 100,53.2969 100,43.2969 L100,18 " fill="#FEFECE" filter="url(#f6witmvmxh5um)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M100,18 C100,28 125.5,28 125.5,28 C125.5,28 151,28 151,18 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="31" x="110" y="44.9951">ECM</text><!--MD5=[7d63862b52a36b6665604f25716fc8eb]
-entity dbsrc2--><path d="M186.5,18 C186.5,8 224.5,8 224.5,8 C224.5,8 262.5,8 262.5,18 L262.5,43.2969 C262.5,53.2969 224.5,53.2969 224.5,53.2969 C224.5,53.2969 186.5,53.2969 186.5,43.2969 L186.5,18 " fill="#FEFECE" filter="url(#f6witmvmxh5um)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M186.5,18 C186.5,28 224.5,28 224.5,28 C224.5,28 262.5,28 262.5,18 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="56" x="196.5" y="44.9951">Leitzeile</text><!--MD5=[96357831773e3601c2424f417933b234]
-entity dbsrc3--><path d="M298,18 C298,8 333.5,8 333.5,8 C333.5,8 369,8 369,18 L369,43.2969 C369,53.2969 333.5,53.2969 333.5,53.2969 C333.5,53.2969 298,53.2969 298,43.2969 L298,18 " fill="#FEFECE" filter="url(#f6witmvmxh5um)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M298,18 C298,28 333.5,28 333.5,28 C333.5,28 369,28 369,18 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="51" x="308" y="44.9951">VarGen</text><path d="M6,18 L6,43.1328 A0,0 0 0 0 6,43.1328 L65,43.1328 A0,0 0 0 0 65,43.1328 L65,36 L99.99,30.5 L65,28 L65,28 L55,18 L6,18 A0,0 0 0 0 6,18 " fill="#FBFB77" filter="url(#f6witmvmxh5um)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M55,18 L55,28 L65,28 L55,18 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="38" x="12" y="35.0669">mysql</text><!--MD5=[6b4bfa9e00b0b9cc08101d1a1ff13128]
-entity import--><rect fill="#FEFECE" filter="url(#f6witmvmxh5um)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="84" x="182.5" y="113"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="177.5" y="118"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="177.5" y="139.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="64" x="192.5" y="135.9951">import.py</text><!--MD5=[6921483303ceaa8b08d66e7f0bec6faf]
-entity prepare--><rect fill="#FEFECE" filter="url(#f6witmvmxh5um)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="94" x="177.5" y="209"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="172.5" y="214"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="172.5" y="235.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="74" x="187.5" y="231.9951">prepare.py</text><!--MD5=[7468467f3b6b392f1d176d828c753b77]
-entity db--><path d="M199.5,315 C199.5,305 224.5,305 224.5,305 C224.5,305 249.5,305 249.5,315 L249.5,340.2969 C249.5,350.2969 224.5,350.2969 224.5,350.2969 C224.5,350.2969 199.5,350.2969 199.5,340.2969 L199.5,315 " fill="#FEFECE" filter="url(#f6witmvmxh5um)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M199.5,315 C199.5,325 224.5,325 224.5,325 C224.5,325 249.5,325 249.5,315 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="209.5" y="341.9951">Acts</text><path d="M87,315 L87,340.1328 A0,0 0 0 0 87,340.1328 L164,340.1328 A0,0 0 0 0 164,340.1328 L164,333 L199.05,327.5 L164,325 L164,325 L154,315 L87,315 A0,0 0 0 0 87,315 " fill="#FBFB77" filter="url(#f6witmvmxh5um)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M154,315 L154,325 L164,325 L154,315 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="56" x="93" y="332.0669">Postgres</text><!--MD5=[06153d669ba4a6091edc55114736c23a]
-link dbsrc1 to import--><path d="M147.47,53.36 C164.21,70.01 187.1,92.79 203.57,109.18 " fill="none" id="dbsrc1-&gt;import" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="207.19,112.78,203.6359,103.5948,203.6473,109.2516,197.9905,109.263,207.19,112.78" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[1181806e114f4b3efc6dc9b5cc5253ec]
-link dbsrc2 to import--><path d="M224.5,53.36 C224.5,69.45 224.5,91.26 224.5,107.5 " fill="none" id="dbsrc2-&gt;import" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="224.5,112.78,228.5,103.78,224.5,107.78,220.5,103.78,224.5,112.78" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[8366de4ce307ed482a2c0322a7c6885b]
-link dbsrc3 to import--><path d="M309.58,53.12 C291.17,69.75 265.87,92.61 247.66,109.07 " fill="none" id="dbsrc3-&gt;import" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="243.65,112.69,253.009,109.6226,247.3594,109.3373,247.6447,103.6876,243.65,112.69" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c0911d2e3ff2220116761a4b114330c6]
-link import to prepare--><path d="M224.5,149.24 C224.5,164.48 224.5,186.81 224.5,203.46 " fill="none" id="import-&gt;prepare" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="224.5,208.87,228.5,199.87,224.5,203.87,220.5,199.87,224.5,208.87" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[f2ecf892a456a737d9315cbf0a56c5ce]
-link prepare to db--><path d="M224.5,245.16 C224.5,260.14 224.5,282.15 224.5,299.5 " fill="none" id="prepare-&gt;db" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="224.5,304.72,228.5,295.72,224.5,299.72,220.5,295.72,224.5,304.72" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[7350b5c0cb67e39f503fc3e092c5e789]
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="475px" preserveAspectRatio="none" style="width:460px;height:475px;" version="1.1" viewBox="0 0 460 475" width="460px" zoomAndPan="magnify"><defs><filter height="300%" id="fg1bo571ylkrn" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[a09e890d9cf6c6dd92f16829561ddf3b]
+entity dbsrc1--><path d="M100,18 C100,8 125.5,8 125.5,8 C125.5,8 151,8 151,18 L151,43.2969 C151,53.2969 125.5,53.2969 125.5,53.2969 C125.5,53.2969 100,53.2969 100,43.2969 L100,18 " fill="#FEFECE" filter="url(#fg1bo571ylkrn)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M100,18 C100,28 125.5,28 125.5,28 C125.5,28 151,28 151,18 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="31" x="110" y="44.9951">ECM</text><!--MD5=[7d63862b52a36b6665604f25716fc8eb]
+entity dbsrc2--><path d="M186.5,18 C186.5,8 224.5,8 224.5,8 C224.5,8 262.5,8 262.5,18 L262.5,43.2969 C262.5,53.2969 224.5,53.2969 224.5,53.2969 C224.5,53.2969 186.5,53.2969 186.5,43.2969 L186.5,18 " fill="#FEFECE" filter="url(#fg1bo571ylkrn)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M186.5,18 C186.5,28 224.5,28 224.5,28 C224.5,28 262.5,28 262.5,18 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="56" x="196.5" y="44.9951">Leitzeile</text><!--MD5=[96357831773e3601c2424f417933b234]
+entity dbsrc3--><path d="M298,18 C298,8 333.5,8 333.5,8 C333.5,8 369,8 369,18 L369,43.2969 C369,53.2969 333.5,53.2969 333.5,53.2969 C333.5,53.2969 298,53.2969 298,43.2969 L298,18 " fill="#FEFECE" filter="url(#fg1bo571ylkrn)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M298,18 C298,28 333.5,28 333.5,28 C333.5,28 369,28 369,18 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="51" x="308" y="44.9951">VarGen</text><path d="M6,18 L6,43.1328 A0,0 0 0 0 6,43.1328 L65,43.1328 A0,0 0 0 0 65,43.1328 L65,36 L99.99,30.5 L65,28 L65,28 L55,18 L6,18 A0,0 0 0 0 6,18 " fill="#FBFB77" filter="url(#fg1bo571ylkrn)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M55,18 L55,28 L65,28 L55,18 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="38" x="12" y="35.0669">mysql</text><!--MD5=[6b4bfa9e00b0b9cc08101d1a1ff13128]
+entity import--><rect fill="#FEFECE" filter="url(#fg1bo571ylkrn)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="84" x="182.5" y="115"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="177.5" y="120"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="177.5" y="141.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="64" x="192.5" y="137.9951">import.py</text><!--MD5=[6921483303ceaa8b08d66e7f0bec6faf]
+entity prepare--><rect fill="#FEFECE" filter="url(#fg1bo571ylkrn)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="94" x="177.5" y="320"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="172.5" y="325"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="172.5" y="346.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="74" x="187.5" y="342.9951">prepare.py</text><!--MD5=[7aa9c583cf047545838c264d3047b712]
+entity db1--><path d="M199.5,223 C199.5,213 224.5,213 224.5,213 C224.5,213 249.5,213 249.5,223 L249.5,248.2969 C249.5,258.2969 224.5,258.2969 224.5,258.2969 C224.5,258.2969 199.5,258.2969 199.5,248.2969 L199.5,223 " fill="#FEFECE" filter="url(#fg1bo571ylkrn)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M199.5,223 C199.5,233 224.5,233 224.5,233 C224.5,233 249.5,233 249.5,223 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="209.5" y="249.9951">Acts</text><!--MD5=[2331507006b4b8bee4c616015350b23c]
+entity db2--><path d="M199.5,428 C199.5,418 224.5,418 224.5,418 C224.5,418 249.5,418 249.5,428 L249.5,453.2969 C249.5,463.2969 224.5,463.2969 224.5,463.2969 C224.5,463.2969 199.5,463.2969 199.5,453.2969 L199.5,428 " fill="#FEFECE" filter="url(#fg1bo571ylkrn)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M199.5,428 C199.5,438 224.5,438 224.5,438 C224.5,438 249.5,438 249.5,428 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="209.5" y="454.9951">Acts</text><path d="M87,223 L87,248.1328 A0,0 0 0 0 87,248.1328 L164,248.1328 A0,0 0 0 0 164,248.1328 L164,241 L199.05,235.5 L164,233 L164,233 L154,223 L87,223 A0,0 0 0 0 87,223 " fill="#FBFB77" filter="url(#fg1bo571ylkrn)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M154,223 L154,233 L164,233 L154,223 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="56" x="93" y="240.0669">Postgres</text><path d="M301.5,113 L301.5,129 L266.58,133 L301.5,137 L301.5,153.2656 A0,0 0 0 0 301.5,153.2656 L405.5,153.2656 A0,0 0 0 0 405.5,153.2656 L405.5,123 L395.5,113 L301.5,113 A0,0 0 0 0 301.5,113 " fill="#FBFB77" filter="url(#fg1bo571ylkrn)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M395.5,113 L395.5,123 L405.5,123 L395.5,113 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="83" x="307.5" y="130.0669">copies mysql</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="73" x="307.5" y="145.1997">to Postgres</text><path d="M306.5,318 L306.5,334 L271.71,338 L306.5,342 L306.5,358.2656 A0,0 0 0 0 306.5,358.2656 L448.5,358.2656 A0,0 0 0 0 448.5,358.2656 L448.5,328 L438.5,318 L306.5,318 A0,0 0 0 0 306.5,318 " fill="#FBFB77" filter="url(#fg1bo571ylkrn)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M438.5,318 L438.5,328 L448.5,328 L438.5,318 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="98" x="312.5" y="335.0669">normalizes and</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="121" x="312.5" y="350.1997">checks for integrity</text><!--MD5=[06153d669ba4a6091edc55114736c23a]
+link dbsrc1 to import--><path d="M146.98,53.31 C163.9,70.48 187.33,94.27 203.99,111.18 " fill="none" id="dbsrc1-&gt;import" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="207.65,114.89,204.1887,105.6694,204.1431,111.3261,198.4864,111.2805,207.65,114.89" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[1181806e114f4b3efc6dc9b5cc5253ec]
+link dbsrc2 to import--><path d="M224.5,53.31 C224.5,70.05 224.5,93.07 224.5,109.89 " fill="none" id="dbsrc2-&gt;import" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="224.5,114.89,228.5,105.89,224.5,109.89,220.5,105.89,224.5,114.89" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[8366de4ce307ed482a2c0322a7c6885b]
+link dbsrc3 to import--><path d="M310.12,53.06 C291.51,70.22 265.62,94.09 247.19,111.08 " fill="none" id="dbsrc3-&gt;import" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="243.14,114.81,252.4674,111.6477,246.8151,111.4198,247.043,105.7675,243.14,114.81" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[05569b3573de5ed439c6c7f9188f549a]
+link import to db1--><path d="M224.5,151.05 C224.5,166.48 224.5,189.46 224.5,207.41 " fill="none" id="import-&gt;db1" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="224.5,212.8,228.5,203.8,224.5,207.8,220.5,203.8,224.5,212.8" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[d1760f369732b98798e8d9188f1fe7af]
+link db1 to prepare--><path d="M224.5,258.31 C224.5,275.05 224.5,298.07 224.5,314.89 " fill="none" id="db1-&gt;prepare" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="224.5,319.89,228.5,310.89,224.5,314.89,220.5,310.89,224.5,319.89" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[47475cb2a52acfb89fde596ec548ee3a]
+link prepare to db2--><path d="M224.5,356.05 C224.5,371.48 224.5,394.46 224.5,412.41 " fill="none" id="prepare-&gt;db2" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="224.5,417.8,228.5,408.8,224.5,412.8,220.5,408.8,224.5,417.8" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[7ed0b5a615c4a05894934ee3085547c1]
 @startuml
 skinparam backgroundColor transparent
 
@@ -345,14 +347,18 @@ note left of dbsrc1: mysql
 
 component "import.py"  as import
 component "prepare.py" as prepare
-database  "Acts"       as db
-note left of db: Postgres
+database  "Acts"       as db1
+database  "Acts"       as db2
+note left of db1: Postgres
+note right of import: copies mysql\nto Postgres
+note right of prepare: normalizes and\nchecks for integrity
 
 dbsrc1  - -> import
 dbsrc2  - -> import
 dbsrc3  - -> import
-import  - -> prepare
-prepare - -> db
+import  - -> db1
+db1     - -> prepare
+prepare - -> db2
 @enduml
 
 PlantUML version 1.2020.02(Sun Mar 01 11:22:07 CET 2020)
@@ -369,40 +375,44 @@ Country: US
 </div>
 <p>The <a class="reference internal" href="scripts_user.html#import-py"><span class="std std-ref">scripts/cceh/import.py</span></a> script copies the mysql databases into temporary tables of the
 postgres database without doing any integrity checking.
-The temporary tables are named “original_*”.
+The temporary tables are named <code class="file docutils literal notranslate"><span class="pre">original_*</span></code>.
 These tables are very useful for finding and understanding data errors.</p>
 <p>The <a class="reference internal" href="scripts_user.html#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> script reads the temporary tables in the Postgres database and
-writes tables in a <span class="xref std std-ref">&lt;cbgm-db database structure&gt;</span> suitable for doing the CBGM.
-This structure is normalized and data integrity is enforced.</p>
-<p>All data integrity errors that surface at this point must be fixed in the source
-data before the database can be fully prepared.  Then the source data must be
-imported again. This is an iterative and very time-consuming process.</p>
-<p>This process needs to be done only once for each project.</p>
-<p>The databases for John and Mark are imported in a similar way.  Each team has a
-different workflow, and uses a different structure in their input databases.
-The prepare.py script tries to accomodate all those differences by special
-casing.  See the source.</p>
+writes tables in a <a class="reference internal" href="database.html#cbgm-db"><span class="std std-ref">database structure</span></a> suitable for doing the CBGM.
+This structure is normalized and data integrity is enforced.
+The script will print all data integrity errors found
+and also log them in the file <code class="file docutils literal notranslate"><span class="pre">prepare.log</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The script will not complete if there are data integrity errors.</p>
+</div>
+<p>All data integrity errors that surface at this point must be fixed in the
+source data with the aid of the NTVMR people.  Then the source data must be
+imported again. This is an iterative and often very time-consuming process.</p>
 </div>
 <div class="section" id="applying-the-cbgm">
 <h2>Applying the CBGM<a class="headerlink" href="#applying-the-cbgm" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script recalculates the CBGM.  Whenever a local stemma changes,
-the CBGM coefficients have to be recalculated.  This process must be run
-immediately after the <a class="reference internal" href="scripts_user.html#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> script.</p>
+<p>The <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script applies the CBGM method.
+The CBGM is applied at the start of every new project phase.
+It must also be applied immediately after the <a class="reference internal" href="scripts_user.html#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> script.</p>
 <div class="figure align-center" id="id5">
 <div  class="pic pic-format-dot">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="65px" preserveAspectRatio="none" style="width:203px;height:65px;" version="1.1" viewBox="0 0 203 65" width="203px" zoomAndPan="magnify"><defs><filter height="300%" id="f1xu1wwfs278ts" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[a7c658c4e382d375c7bed7cfd253cf1d]
-entity cbgm--><rect fill="#FEFECE" filter="url(#f1xu1wwfs278ts)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="101" x="91.5" y="12.5"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="86.5" y="17.5"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="86.5" y="38.7969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="81" x="101.5" y="35.4951">cbgm script</text><!--MD5=[7468467f3b6b392f1d176d828c753b77]
-entity db--><path d="M6,18 C6,8 31,8 31,8 C31,8 56,8 56,18 L56,43.2969 C56,53.2969 31,53.2969 31,53.2969 C31,53.2969 6,53.2969 6,43.2969 L6,18 " fill="#FEFECE" filter="url(#f1xu1wwfs278ts)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M6,18 C6,28 31,28 31,28 C31,28 56,28 56,18 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="16" y="44.9951">Acts</text><!--MD5=[01a8732ff988ece8f7fe2e1f25b3371e]
-link db to cbgm--><path d="M56.15,42.33 C66.14,45.65 76.14,47.33 86.13,47.37 " fill="none" id="db-&gt;cbgm" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="91.36,47.25,82.2602,43.4827,86.3617,47.3785,82.4658,51.48,91.36,47.25" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[fce18b097a0e10776d903d164d89fdcf]
-reverse link db to cbgm--><path d="M61.1,17.16 C71.19,14.35 81.27,13.22 91.36,13.75 " fill="none" id="db&lt;-cbgm" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="56.15,18.67,65.9259,19.8669,60.932,17.2096,63.5893,12.2158,56.15,18.67" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[b189dfe880e09e17158c66676ca88891]
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="270px" preserveAspectRatio="none" style="width:268px;height:270px;" version="1.1" viewBox="0 0 268 270" width="268px" zoomAndPan="magnify"><defs><filter height="300%" id="f1bun1n00v9exl" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[7aa9c583cf047545838c264d3047b712]
+entity db1--><path d="M31.5,18 C31.5,8 56.5,8 56.5,8 C56.5,8 81.5,8 81.5,18 L81.5,43.2969 C81.5,53.2969 56.5,53.2969 56.5,53.2969 C56.5,53.2969 31.5,53.2969 31.5,43.2969 L31.5,18 " fill="#FEFECE" filter="url(#f1bun1n00v9exl)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M31.5,18 C31.5,28 56.5,28 56.5,28 C56.5,28 81.5,28 81.5,18 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="41.5" y="44.9951">Acts</text><!--MD5=[a7c658c4e382d375c7bed7cfd253cf1d]
+entity cbgm--><rect fill="#FEFECE" filter="url(#f1bun1n00v9exl)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="101" x="6" y="115"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="1" y="120"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="1" y="141.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="81" x="16" y="137.9951">cbgm script</text><!--MD5=[2331507006b4b8bee4c616015350b23c]
+entity db2--><path d="M31.5,223 C31.5,213 56.5,213 56.5,213 C56.5,213 81.5,213 81.5,223 L81.5,248.2969 C81.5,258.2969 56.5,258.2969 56.5,258.2969 C56.5,258.2969 31.5,258.2969 31.5,248.2969 L31.5,223 " fill="#FEFECE" filter="url(#f1bun1n00v9exl)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M31.5,223 C31.5,233 56.5,233 56.5,233 C56.5,233 81.5,233 81.5,223 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="41.5" y="249.9951">Acts</text><path d="M142.5,113 L142.5,129 L107.05,133 L142.5,137 L142.5,153.2656 A0,0 0 0 0 142.5,153.2656 L256.5,153.2656 A0,0 0 0 0 256.5,153.2656 L256.5,123 L246.5,113 L142.5,113 A0,0 0 0 0 142.5,113 " fill="#FBFB77" filter="url(#f1bun1n00v9exl)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M246.5,113 L246.5,123 L256.5,123 L246.5,113 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="70" x="148.5" y="130.0669">applies the</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="93" x="148.5" y="145.1997">CBGM method</text><!--MD5=[1cd7f459a84e8fd1cc49111a8330160c]
+link db1 to cbgm--><path d="M56.5,53.31 C56.5,70.05 56.5,93.07 56.5,109.89 " fill="none" id="db1-&gt;cbgm" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="56.5,114.89,60.5,105.89,56.5,109.89,52.5,105.89,56.5,114.89" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[7693daf61ee517e311126795d3132108]
+link cbgm to db2--><path d="M56.5,151.05 C56.5,166.48 56.5,189.46 56.5,207.41 " fill="none" id="cbgm-&gt;db2" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="56.5,212.8,60.5,203.8,56.5,207.8,52.5,203.8,56.5,212.8" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[7499786b5985c13d146b597e1bcf0c3a]
 @startuml
 skinparam backgroundColor transparent
 
+database  "Acts"        as db1
 component "cbgm script" as cbgm
-database  "Acts"        as db
+database  "Acts"        as db2
+note right of cbgm: applies the\nCBGM method
 
-db -> cbgm
-db <- cbgm
+db1  - -> cbgm
+cbgm - -> db2
 @enduml
 
 PlantUML version 1.2020.02(Sun Mar 01 11:22:07 CET 2020)
@@ -418,45 +428,59 @@ Country: US
 <p class="caption"><span class="caption-text">Applying the CBGM</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </div>
 </div>
-<div class="section" id="new-project">
-<h2>New Project<a class="headerlink" href="#new-project" title="Permalink to this headline">¶</a></h2>
-<p>A new project is created.</p>
-<div class="section" id="example">
-<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
-<p>As an example let us create a new project: Matthew Phase 1.</p>
-<p>ssh into the server and create an empty Postgres database:</p>
+<div class="section" id="starting-a-new-project">
+<span id="cbgm-new-project"></span><h2>Starting a New Project<a class="headerlink" href="#starting-a-new-project" title="Permalink to this headline">¶</a></h2>
+<p>To start a new project:</p>
+<ul class="simple">
+<li><p>create local copies of the mysql databases of the project,</p></li>
+<li><p>create a new Postgres database for the project,</p></li>
+<li><p>add an instance to the server,</p></li>
+<li><p>prepare the new Postgres database,</p></li>
+<li><p>run the CBGM,</p></li>
+<li><p>restart the application server.</p></li>
+</ul>
+<div class="section" id="worked-example">
+<h3>Worked Example<a class="headerlink" href="#worked-example" title="Permalink to this headline">¶</a></h3>
+<p>As an example we will create a new project: Matthew Phase 1.</p>
+<p>We have obtained three mysql databases dumps from the NTVMR people:
+<code class="file docutils literal notranslate"><span class="pre">ECM_MtPh1.dump.sql</span></code>, <code class="file docutils literal notranslate"><span class="pre">VarGenAtt_MtPh1.dump.sql</span></code>,
+and <code class="file docutils literal notranslate"><span class="pre">Nestle29.dump.sql</span></code>.
+We will name the new Postgres database: <code class="code docutils literal notranslate"><span class="pre">mt_ph1</span></code>.</p>
+<p>ssh into the server and import the database dumps into three local mysql
+databases:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -u ntg bash
-psql -c <span class="s2">&quot;CREATE DATABASE mt_ph1&quot;</span>
-</pre></div>
-</div>
-<p>Now create local mysql databases:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mysql -e <span class="s2">&quot;CREATE DATABASE ECM_MtPh1&quot;</span>
+
+mysql -e <span class="s2">&quot;CREATE DATABASE ECM_MtPh1&quot;</span>
 mysql -e <span class="s2">&quot;CREATE DATABASE VarGenAtt_MtPh1&quot;</span>
 mysql -e <span class="s2">&quot;CREATE DATABASE Nestle29&quot;</span>
-</pre></div>
-</div>
-<p>And fill them with data.
-You probably got these database dumps from the NTVMR people.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cat ECM_MtPh1.dump.sql       <span class="p">|</span> mysql -D ECM_MtPh1
+
+cat ECM_MtPh1.dump.sql       <span class="p">|</span> mysql -D ECM_MtPh1
 cat VarGenAtt_MtPh1.dump.sql <span class="p">|</span> mysql -D VarGenAtt_MtPh1
 cat Nestle29.dump.sql        <span class="p">|</span> mysql -D Nestle29
+</pre></div>
+</div>
+<p>Now create a new Postgres database:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>psql -c <span class="s2">&quot;CREATE DATABASE mt_ph1&quot;</span>
 </pre></div>
 </div>
 <p>Then create a new server instance.
 The fastest way is to just copy an old instance configuration file and edit it:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> ~/prj/ntg/ntg/instance
-cp acts_ph4.conf mt_ph1.conf
+cp mark_ph22.conf mt_ph1.conf
 emacs mt_ph1.conf
 </pre></div>
 </div>
-<p>Change all relevant parts of the instance configuration file.</p>
+<p>Change all relevant parts of the instance configuration file.
+See: <a class="reference internal" href="server_config.html#api-server-config-files"><span class="std std-ref">API Server Configuration Files</span></a>.</p>
 <p>Use the <a class="reference internal" href="scripts_user.html#import-py"><span class="std std-ref">scripts/cceh/import.py</span></a> and <a class="reference internal" href="scripts_user.html#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> scripts to import
-the mysql databases into Postgres and prepare them for CBGM,
-then do the CBGM with the <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script:</p>
+the mysql databases into Postgres and prepare them for CBGM:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> ~/prj/ntg/ntg
 python3 -m scripts.cceh.import  -vvv instance/mt_ph1.conf
 python3 -m scripts.cceh.prepare -vvv instance/mt_ph1.conf
-python3 -m scripts.cceh.cbgm    -vvv instance/mt_ph1.conf
+</pre></div>
+</div>
+<p>Then run the CBGM with the <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.cbgm -vvv instance/mt_ph1.conf
 </pre></div>
 </div>
 <p>Last, restart the application server:</p>
@@ -467,10 +491,18 @@ python3 -m scripts.cceh.cbgm    -vvv instance/mt_ph1.conf
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo /bin/journalctl -u ntg
 </pre></div>
 </div>
+<p>If you are satisfied with the new project,
+you may drop the mysql databases.
+The application server uses the Postgres database only.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mysql -e <span class="s2">&quot;DROP DATABASE ECM_MtPh1&quot;</span>
+mysql -e <span class="s2">&quot;DROP DATABASE VarGenAtt_MtPh1&quot;</span>
+mysql -e <span class="s2">&quot;DROP DATABASE Nestle29&quot;</span>
+</pre></div>
 </div>
 </div>
-<div class="section" id="new-phases">
-<h2>New Phases<a class="headerlink" href="#new-phases" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="starting-a-new-phase">
+<h2>Starting a New Phase<a class="headerlink" href="#starting-a-new-phase" title="Permalink to this headline">¶</a></h2>
 <p>A new phase of the project is entered after the editors have completed a pass
 over the whole text.
 All editorial decisions taken during this pass are used to recalculate
@@ -482,25 +514,33 @@ the CBGM for the next phase.</p>
 <li><p>run the CBGM on the new instance.</p></li>
 </ul>
 <div class="section" id="id2">
-<h3>Example<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>As an example let us create a new Acts Phase 5 from an existing Acts Phase 4.</p>
+<h3>Worked Example<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>As an example let us create a new Mark Phase 2.3 from an existing Mark Phase 2.2.</p>
 <p>ssh into the server and
-stop the application server and make a copy of the acts_ph4 database:</p>
+stop the application server and make a copy of the mark_ph22 database:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -u ntg bash
 sudo /bin/systemctl stop ntg
-psql -c <span class="s2">&quot;CREATE DATABASE acts_ph5 WITH TEMPLATE acts_ph4&quot;</span>
+psql -c <span class="s2">&quot;CREATE DATABASE mark_ph23 TEMPLATE mark_ph22&quot;</span>
 sudo /bin/systemctl start ntg
 </pre></div>
 </div>
 <p>Then create a new server instance:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> ~/prj/ntg/ntg/instance
-cp acts_ph4.conf acts_ph5.conf
-emacs acts_ph5.conf
+cp mark_ph22.conf mark_ph23.conf
 </pre></div>
 </div>
-<p>Change all relevant parts of the configuration file. Then run the CBGM on the <em>new</em> instance:</p>
+<p>Change all relevant parts of the instance configuration file.
+See: <a class="reference internal" href="server_config.html#api-server-config-files"><span class="std std-ref">API Server Configuration Files</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emacs mark_ph23.conf
+</pre></div>
+</div>
+<p>Put the old database in read-only mode:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emacs mark_ph22.conf
+</pre></div>
+</div>
+<p>Then run the CBGM on the <em>new</em> instance:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> ~/prj/ntg/ntg
-python3 -m scripts.cceh.cbgm -vvv instance/acts_ph5.conf
+python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
 </pre></div>
 </div>
 <p>Last, restart the application server:</p>
@@ -509,48 +549,37 @@ python3 -m scripts.cceh.cbgm -vvv instance/acts_ph5.conf
 </div>
 </div>
 </div>
-<div class="section" id="new-phases-with-apparatus-updates">
-<h2>New Phases With Apparatus Updates<a class="headerlink" href="#new-phases-with-apparatus-updates" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="starting-a-new-phase-with-apparatus-update">
+<h2>Starting a New Phase With Apparatus Update<a class="headerlink" href="#starting-a-new-phase-with-apparatus-update" title="Permalink to this headline">¶</a></h2>
 <p>Sometimes a new phase goes hand in hand with a change in the apparatus.</p>
 <p>To update the apparatus while maintaining (most) editorial decisions:</p>
 <ul class="simple">
-<li><p>create a new databse for the phase,</p></li>
+<li><p>create a new database for the phase,</p></li>
 <li><p>add an instance to the server,</p></li>
-<li><p>prepare a new database with the new apparatus,</p></li>
+<li><p>prepare the new database with the new apparatus,</p></li>
 <li><p>save the editorial decisions from the old database,</p></li>
 <li><p>load the editorial decisions into the new database, and</p></li>
 <li><p>run the CBGM on the new instance.</p></li>
 </ul>
 <div class="section" id="id3">
-<h3>Example<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<p>As an example let us create a new Acts Phase 6 from an existing Acts Phase 5
+<h3>Worked Example<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>As an example let us create a new Mark Phase 2.3 from an existing Mark Phase 2.2
 using a new apparatus.</p>
-<p>ssh into the server and create a new database for the new phase:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -u ntg bash
-psql -c <span class="s2">&quot;CREATE DATABASE acts_ph6&quot;</span>
-</pre></div>
-</div>
-<p>Then create a new server instance:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> ~/prj/ntg/ntg/instance
-cp acts_ph5.conf acts_ph6.conf
-emacs acts_ph6.conf
-</pre></div>
-</div>
-<p>Change all relevant parts of the configuration file.</p>
-<p>Now import the new apparatus: follow the steps in <a class="reference internal" href="#new-project">New Project</a> above.</p>
+<p>First follow the steps in <a class="reference internal" href="#cbgm-new-project"><span class="std std-ref">Starting a New Project</span></a> above, until you reach the
+CBGM step.</p>
 <p>Then use the <a class="reference internal" href="scripts_user.html#save-edits-py"><span class="std std-ref">scripts/cceh/save_edits.py</span></a> script to save the editorial decisions
-of the previous instance and the <a class="reference internal" href="scripts_user.html#load-edits-py"><span class="std std-ref">scripts/cceh/load_edits.py</span></a> script to load them
+of the previous phase and the <a class="reference internal" href="scripts_user.html#load-edits-py"><span class="std std-ref">scripts/cceh/load_edits.py</span></a> script to load them
 into the new instance:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> ~/prj/ntg/ntg
-python3 -m scripts.cceh.save_edits -vvv -o saved_edits.xml instance/acts_ph5.conf
-python3 -m scripts.cceh.load_edits -vvv -i saved_edits.xml instance/acts_ph6.conf
+python3 -m scripts.cceh.save_edits -vvv -o saved_edits.xml instance/mark_ph22.conf
+python3 -m scripts.cceh.load_edits -vvv -i saved_edits.xml instance/mark_ph23.conf
 </pre></div>
 </div>
 <p>The last command will also output a list of passages in the old apparatus
 that are missing or different in the new apparatus and store them
 in the file <code class="file docutils literal notranslate"><span class="pre">load_edits.log</span></code>.</p>
 <p>Then run the <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script on the <em>new</em> instance to apply the CBGM method:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.cbgm -vvv instance/acts_ph6.conf
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
 </pre></div>
 </div>
 <p>Last, restart the application server:</p>
@@ -581,7 +610,7 @@ in the file <code class="file docutils literal notranslate"><span class="pre">lo
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016-19 CCeH - Licensed under the GNU GPL v3 or later
+        &copy; Copyright 2016-20 CCeH - Licensed under the GNU GPL v3 or later
 
     </p>
   </div>

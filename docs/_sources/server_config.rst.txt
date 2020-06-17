@@ -1,3 +1,5 @@
+.. _api-server-config-files:
+
 ================================
  API Server Configuration Files
 ================================
@@ -18,6 +20,8 @@ must be named :file:`*.conf` and the name must not begin with an underscore.
 See also: Flask Configuration Handling [#f2]_ and
 Werkzeug Serving WSGI Applications [#f3]_.
 
+API Server
+~~~~~~~~~~
 
 .. attribute:: APPLICATION_NAME
 
@@ -84,6 +88,93 @@ Werkzeug Serving WSGI Applications [#f3]_.
    (and database) should be configured in the standard Postgres
    :file:`~/.pgpass` [#f1]_ file in the home directory of the user that owns the API
    server.
+
+
+Import
+~~~~~~
+
+The following entries are used by the `import.py` script only:
+
+.. attribute:: MYSQL_CONF
+
+   The mysql client configuration file.
+   eg. :file:`~/.my.cnf.ntg`
+
+   This file contains the credentials to connect to the local mysql server.
+   It should be readable only by the users that run the `import.py` script.
+   The API server itself only connects to the Postgres
+   and never to the mysql server.
+   Example of file contents:
+
+   .. code:: ini
+
+      [mysql]
+      host="localhost"
+      user="ntg"
+      password="123456"
+      default-character-set="utf8"
+
+.. attribute:: MYSQL_GROUP
+
+   The group to read in the MYSQL_CONF file.
+   eg. :code:`mysql`
+
+.. attribute:: MYSQL_ECM_DB
+
+   The name of the :code:`ECM` database.
+   eg. :code:`ECM_Mark_Ph2`
+
+.. attribute:: MYSQL_ATT_TABLES
+
+   A regular expression to find all "att" tables in the :code:`ECM` database.
+   eg. :regexp:`Mk\\d+`
+
+.. attribute:: MYSQL_LAC_TABLES
+
+   A regular expression to find all "lac" tables in the :code:`ECM` database.
+   eg. :regexp:`Mk\\d+lac`
+
+.. attribute:: MYSQL_NESTLE_DB
+
+   The name of the :code:`Leitzeile` database.
+   eg. :code:`Nestle29`
+
+.. attribute:: MYSQL_NESTLE_TABLE
+
+   A regular expression to find all "leitzeile" tables in the :code:`Leitzeile` database.
+   eg. :regexp:`Nestle29`
+
+.. attribute:: MYSQL_VG_DB
+
+   The name of the :code:`VarGen` database.  eg. :code:`VarGen_Mark_Ph2`
+
+   .. note::
+
+      The :code:`VarGen` database is optional.
+      Without it, default priorities will be used.
+      In this case set this variable to the same as
+      the MYSQL_ECM_DB variable
+      and do not set any of the following variables.
+
+.. attribute:: MYSQL_LOCSTEM_TABLES
+
+   A regular expression to find all "locstemed" tables in the :code:`VarGen` database.
+   eg. :regexp:`LocStemEdMark\\d+`
+
+.. attribute:: MYSQL_RDG_TABLES
+
+   A regular expression to find all "rdg" tables in the :code:`VarGen` database.
+   eg. :regexp:`RdgMark\\d+`
+
+.. attribute:: MYSQL_VAR_TABLES
+
+   A regular expression to find all "var" tables in the :code:`VarGen` database.
+   eg. :regexp:`VarGenAttMark\\d+`
+
+.. attribute:: MYSQL_MEMO_TABLE
+
+   A regular expression to find all "memo" tables in the :code:`VarGen` database.
+   eg. :regexp:`Memo`
 
 
 .. _global-config-file:

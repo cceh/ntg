@@ -114,7 +114,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'NTG'
-copyright = '2016-19 CCeH - Licensed under the GNU GPL v3 or later'
+copyright = '2016-20 CCeH - Licensed under the GNU GPL v3 or later'
 author = 'Marcello Perathoner'
 
 # The version info for the project you're documenting, acts as replacement for

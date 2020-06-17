@@ -10,15 +10,15 @@ Preparing the Database for the CBGM
 
 All input data must be converted and imported into one Postgres database.
 
-- The mysql database "ECM" contains the apparatus of the *Editio
+- The mysql database :code:`ECM` contains the apparatus of the *Editio
   Critica Maior* publication.
   This database is exported from the NTVMR application
   (New Testament Virtual Manuscript Room).
 
-- The mysql database "Leitzeile" contains the Leitzeile of the
+- The mysql database :code:`Leitzeile` contains the Leitzeile of the
   current Nestle-Aland edition or any other appropriate "Leitzeile".
 
-- Optionally the mysql database "VarGen" contains
+- Optionally the mysql database :code:`VarGen` contains
   previous editorial decisions regarding the priority of the readings.
   If this database is not supplied default priorities are used.
 
@@ -34,88 +34,105 @@ All input data must be converted and imported into one Postgres database.
 
    component "import.py"  as import
    component "prepare.py" as prepare
-   database  "Acts"       as db
-   note left of db: Postgres
+   database  "Acts"       as db1
+   database  "Acts"       as db2
+   note left of db1: Postgres
+   note right of import: copies mysql\nto Postgres
+   note right of prepare: normalizes and\nchecks for integrity
 
    dbsrc1  --> import
    dbsrc2  --> import
    dbsrc3  --> import
-   import  --> prepare
-   prepare --> db
+   import  --> db1
+   db1     --> prepare
+   prepare --> db2
 
 The `import.py` script copies the mysql databases into temporary tables of the
 postgres database without doing any integrity checking.
-The temporary tables are named "original_*".
+The temporary tables are named :file:`original_*`.
 These tables are very useful for finding and understanding data errors.
 
 The `prepare.py` script reads the temporary tables in the Postgres database and
-writes tables in a :ref:`<cbgm-db database structure>` suitable for doing the CBGM.
+writes tables in a :ref:`database structure <cbgm-db>` suitable for doing the CBGM.
 This structure is normalized and data integrity is enforced.
+The script will print all data integrity errors found
+and also log them in the file :file:`prepare.log`.
 
-All data integrity errors that surface at this point must be fixed in the source
-data before the database can be fully prepared.  Then the source data must be
-imported again. This is an iterative and very time-consuming process.
+.. warning::
 
-This process needs to be done only once for each project.
+   The script will not complete if there are data integrity errors.
 
-The databases for John and Mark are imported in a similar way.  Each team has a
-different workflow, and uses a different structure in their input databases.
-The prepare.py script tries to accomodate all those differences by special
-casing.  See the source.
+All data integrity errors that surface at this point must be fixed in the
+source data with the aid of the NTVMR people.  Then the source data must be
+imported again. This is an iterative and often very time-consuming process.
 
 
 Applying the CBGM
 =================
 
-The `cbgm.py` script recalculates the CBGM.  Whenever a local stemma changes,
-the CBGM coefficients have to be recalculated.  This process must be run
-immediately after the `prepare.py` script.
+The `cbgm.py` script applies the CBGM method.
+The CBGM is applied at the start of every new project phase.
+It must also be applied immediately after the `prepare.py` script.
 
 .. pic:: uml
    :caption: Applying the CBGM
 
    skinparam backgroundColor transparent
 
+   database  "Acts"        as db1
    component "cbgm script" as cbgm
-   database  "Acts"        as db
+   database  "Acts"        as db2
+   note right of cbgm: applies the\nCBGM method
 
-   db -> cbgm
-   db <- cbgm
+   db1  --> cbgm
+   cbgm --> db2
 
 
-New Project
-===========
+.. _cbgm-new-project:
 
-A new project is created.
+Starting a New Project
+======================
 
-Example
--------
+To start a new project:
 
-As an example let us create a new project: Matthew Phase 1.
+- create local copies of the mysql databases of the project,
+- create a new Postgres database for the project,
+- add an instance to the server,
+- prepare the new Postgres database,
+- run the CBGM,
+- restart the application server.
 
-ssh into the server and create an empty Postgres database:
+
+Worked Example
+--------------
+
+As an example we will create a new project: Matthew Phase 1.
+
+We have obtained three mysql databases dumps from the NTVMR people:
+:file:`ECM_MtPh1.dump.sql`, :file:`VarGenAtt_MtPh1.dump.sql`,
+and :file:`Nestle29.dump.sql`.
+We will name the new Postgres database: :code:`mt_ph1`.
+
+ssh into the server and import the database dumps into three local mysql
+databases:
 
 .. code:: bash
 
    sudo -u ntg bash
-   psql -c "CREATE DATABASE mt_ph1"
-
-Now create local mysql databases:
-
-.. code:: bash
 
    mysql -e "CREATE DATABASE ECM_MtPh1"
    mysql -e "CREATE DATABASE VarGenAtt_MtPh1"
    mysql -e "CREATE DATABASE Nestle29"
 
-And fill them with data.
-You probably got these database dumps from the NTVMR people.
-
-.. code:: bash
-
    cat ECM_MtPh1.dump.sql       | mysql -D ECM_MtPh1
    cat VarGenAtt_MtPh1.dump.sql | mysql -D VarGenAtt_MtPh1
    cat Nestle29.dump.sql        | mysql -D Nestle29
+
+Now create a new Postgres database:
+
+.. code:: bash
+
+   psql -c "CREATE DATABASE mt_ph1"
 
 Then create a new server instance.
 The fastest way is to just copy an old instance configuration file and edit it:
@@ -123,21 +140,26 @@ The fastest way is to just copy an old instance configuration file and edit it:
 .. code:: bash
 
    cd ~/prj/ntg/ntg/instance
-   cp acts_ph4.conf mt_ph1.conf
+   cp mark_ph22.conf mt_ph1.conf
    emacs mt_ph1.conf
 
 Change all relevant parts of the instance configuration file.
+See: :ref:`api-server-config-files`.
 
 Use the `import.py` and `prepare.py` scripts to import
-the mysql databases into Postgres and prepare them for CBGM,
-then do the CBGM with the `cbgm.py` script:
+the mysql databases into Postgres and prepare them for CBGM:
 
 .. code:: bash
 
    cd ~/prj/ntg/ntg
    python3 -m scripts.cceh.import  -vvv instance/mt_ph1.conf
    python3 -m scripts.cceh.prepare -vvv instance/mt_ph1.conf
-   python3 -m scripts.cceh.cbgm    -vvv instance/mt_ph1.conf
+
+Then run the CBGM with the `cbgm.py` script:
+
+.. code:: bash
+
+   python3 -m scripts.cceh.cbgm -vvv instance/mt_ph1.conf
 
 Last, restart the application server:
 
@@ -151,9 +173,19 @@ If the server doesn't start, check for configuration errors:
 
    sudo /bin/journalctl -u ntg
 
+If you are satisfied with the new project,
+you may drop the mysql databases.
+The application server uses the Postgres database only.
 
-New Phases
-==========
+.. code:: bash
+
+   mysql -e "DROP DATABASE ECM_MtPh1"
+   mysql -e "DROP DATABASE VarGenAtt_MtPh1"
+   mysql -e "DROP DATABASE Nestle29"
+
+
+Starting a New Phase
+====================
 
 A new phase of the project is entered after the editors have completed a pass
 over the whole text.
@@ -167,19 +199,19 @@ To start a new phase:
 - run the CBGM on the new instance.
 
 
-Example
--------
+Worked Example
+--------------
 
-As an example let us create a new Acts Phase 5 from an existing Acts Phase 4.
+As an example let us create a new Mark Phase 2.3 from an existing Mark Phase 2.2.
 
 ssh into the server and
-stop the application server and make a copy of the acts_ph4 database:
+stop the application server and make a copy of the mark_ph22 database:
 
 .. code:: bash
 
    sudo -u ntg bash
    sudo /bin/systemctl stop ntg
-   psql -c "CREATE DATABASE acts_ph5 WITH TEMPLATE acts_ph4"
+   psql -c "CREATE DATABASE mark_ph23 TEMPLATE mark_ph22"
    sudo /bin/systemctl start ntg
 
 Then create a new server instance:
@@ -187,15 +219,27 @@ Then create a new server instance:
 .. code:: bash
 
    cd ~/prj/ntg/ntg/instance
-   cp acts_ph4.conf acts_ph5.conf
-   emacs acts_ph5.conf
+   cp mark_ph22.conf mark_ph23.conf
 
-Change all relevant parts of the configuration file. Then run the CBGM on the *new* instance:
+Change all relevant parts of the instance configuration file.
+See: :ref:`api-server-config-files`.
+
+.. code:: bash
+
+   emacs mark_ph23.conf
+
+Put the old database in read-only mode:
+
+.. code:: bash
+
+   emacs mark_ph22.conf
+
+Then run the CBGM on the *new* instance:
 
 .. code:: bash
 
    cd ~/prj/ntg/ntg
-   python3 -m scripts.cceh.cbgm -vvv instance/acts_ph5.conf
+   python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
 
 Last, restart the application server:
 
@@ -204,55 +248,39 @@ Last, restart the application server:
    sudo /bin/systemctl restart ntg
 
 
-New Phases With Apparatus Updates
-=================================
+Starting a New Phase With Apparatus Update
+==========================================
 
 Sometimes a new phase goes hand in hand with a change in the apparatus.
 
 To update the apparatus while maintaining (most) editorial decisions:
 
-- create a new databse for the phase,
+- create a new database for the phase,
 - add an instance to the server,
-- prepare a new database with the new apparatus,
+- prepare the new database with the new apparatus,
 - save the editorial decisions from the old database,
 - load the editorial decisions into the new database, and
 - run the CBGM on the new instance.
 
 
-Example
--------
+Worked Example
+--------------
 
-As an example let us create a new Acts Phase 6 from an existing Acts Phase 5
+As an example let us create a new Mark Phase 2.3 from an existing Mark Phase 2.2
 using a new apparatus.
 
-ssh into the server and create a new database for the new phase:
-
-.. code:: bash
-
-   sudo -u ntg bash
-   psql -c "CREATE DATABASE acts_ph6"
-
-Then create a new server instance:
-
-.. code:: bash
-
-   cd ~/prj/ntg/ntg/instance
-   cp acts_ph5.conf acts_ph6.conf
-   emacs acts_ph6.conf
-
-Change all relevant parts of the configuration file.
-
-Now import the new apparatus: follow the steps in `New Project`_ above.
+First follow the steps in :ref:`cbgm-new-project` above, until you reach the
+CBGM step.
 
 Then use the `save_edits.py` script to save the editorial decisions
-of the previous instance and the `load_edits.py` script to load them
+of the previous phase and the `load_edits.py` script to load them
 into the new instance:
 
 .. code:: bash
 
    cd ~/prj/ntg/ntg
-   python3 -m scripts.cceh.save_edits -vvv -o saved_edits.xml instance/acts_ph5.conf
-   python3 -m scripts.cceh.load_edits -vvv -i saved_edits.xml instance/acts_ph6.conf
+   python3 -m scripts.cceh.save_edits -vvv -o saved_edits.xml instance/mark_ph22.conf
+   python3 -m scripts.cceh.load_edits -vvv -i saved_edits.xml instance/mark_ph23.conf
 
 The last command will also output a list of passages in the old apparatus
 that are missing or different in the new apparatus and store them
@@ -262,7 +290,7 @@ Then run the `cbgm.py` script on the *new* instance to apply the CBGM method:
 
 .. code:: bash
 
-   python3 -m scripts.cceh.cbgm -vvv instance/acts_ph6.conf
+   python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
 
 Last, restart the application server:
 
