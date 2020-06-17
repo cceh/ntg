@@ -38,12 +38,17 @@ written in Python.  The server can manage multiple databases.
    skinparam backgroundColor transparent
 
    component "Web Client" as client
+   note left of client: javascript
    component "API Server" as api
-   database "Acts" as db1
-   database "John" as db2
-   database "Mark1" as db3
-   database "Mark2" as db4
-   database "..."  as db5
+   note left of api: python
+   database "Acts\nPhase 4" as db1
+   note top of db1: Postgres
+   database "Acts\nPhase 5" as db2
+   database "John\nPhase 1" as db3
+   database "Mark\nPhase 1" as db4
+   database "Mark\nPhase 2" as db5
+   database "..."  as db6
+
 
    client <--> api
    api <--> db1
@@ -51,6 +56,7 @@ written in Python.  The server can manage multiple databases.
    api <--> db3
    api <--> db4
    api <--> db5
+   api <--> db6
 
 
 Currently we host the CBGM for three books, namely Acts, John and Mark, by
@@ -62,7 +68,7 @@ Scripts
 =======
 
 This is a set of scripts that the user can run manually on the server to
-manage the whole :ref:`cbgm`_ process, that is:
+manage the whole :ref:`cbgm` process, that is:
 
 - importing new books,
 - doing the CBGM (passing from one phase to the next),

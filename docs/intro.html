@@ -90,16 +90,16 @@
 <li class="toctree-l1"><a class="reference internal" href="cbgm.html">CBGM</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cbgm.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cbgm.html#applying-the-cbgm">Applying the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#adding-a-new-project">Adding a New Project</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-project">Starting a New Project</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#worked-example">Worked Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-phase">Starting a New Phase</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id2">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id2">Worked Example</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-phase-with-apparatus-update">Starting a New Phase With Apparatus Update</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id3">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id3">Worked Example</a></li>
 </ul>
 </li>
 </ul>
@@ -310,7 +310,7 @@
 <p>A program suite for doing CBGM.</p>
 <p>The CBGM is a method for inferring global manuscript stemmata from local
 stemmata in the manuscripts’ texts.</p>
-<div class="figure align-center" id="id3">
+<div class="figure align-center" id="id1">
 <div  class="pic pic-format-dot">
 
 
@@ -469,7 +469,7 @@ stemmata in the manuscripts’ texts.</p>
 </g>
 </svg>
 </div>
-<p class="caption"><span class="caption-text">An example of a local stemma</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">An example of a local stemma</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </div>
 <p>In the CBGM we assume that a manuscript is prior to another manuscript if it
 contains a greater percentage of prior readings than posterior readings.  Then
@@ -485,32 +485,39 @@ manuscripts as the parent manuscript.</p>
 <p>The web application consists of a <a class="reference internal" href="client_dev.html#module-client" title="client: Web Client"><code class="xref py py-mod docutils literal notranslate"><span class="pre">web</span> <span class="pre">client</span></code></a> and an <a class="reference internal" href="server_dev.html#module-server" title="server: Flask Driver Module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span>
 <span class="pre">server</span></code></a>. The client runs in the user’s browser.  The API server is
 written in Python.  The server can manage multiple databases.</p>
-<div class="figure align-center" id="id4">
+<div class="figure align-center" id="id2">
 <div  class="pic pic-format-dot">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="257px" preserveAspectRatio="none" style="width:414px;height:257px;" version="1.1" viewBox="0 0 414 257" width="414px" zoomAndPan="magnify"><defs><filter height="300%" id="fkkyf9589xnl5" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[4a65e84059005d12693a083370a06717]
-entity client--><rect fill="#FEFECE" filter="url(#fkkyf9589xnl5)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="94" x="160" y="8"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="155" y="13"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="155" y="34.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="74" x="170" y="30.9951">Web Client</text><!--MD5=[e2307af040e3f87d22824e7603ca28ec]
-entity api--><rect fill="#FEFECE" filter="url(#fkkyf9589xnl5)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="89" x="162.5" y="104"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="157.5" y="109"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="157.5" y="130.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="69" x="172.5" y="126.9951">API Server</text><!--MD5=[7aa9c583cf047545838c264d3047b712]
-entity db1--><path d="M6,210 C6,200 31,200 31,200 C31,200 56,200 56,210 L56,235.2969 C56,245.2969 31,245.2969 31,245.2969 C31,245.2969 6,245.2969 6,235.2969 L6,210 " fill="#FEFECE" filter="url(#fkkyf9589xnl5)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M6,210 C6,220 31,220 31,220 C31,220 56,220 56,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="16" y="236.9951">Acts</text><!--MD5=[2331507006b4b8bee4c616015350b23c]
-entity db2--><path d="M91,210 C91,200 116,200 116,200 C116,200 141,200 141,210 L141,235.2969 C141,245.2969 116,245.2969 116,245.2969 C116,245.2969 91,245.2969 91,235.2969 L91,210 " fill="#FEFECE" filter="url(#fkkyf9589xnl5)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M91,210 C91,220 116,220 116,220 C116,220 141,220 141,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="101" y="236.9951">John</text><!--MD5=[7a84b64b0b7b7d5ec450ed14b904bacb]
-entity db3--><path d="M176,210 C176,200 207,200 207,200 C207,200 238,200 238,210 L238,235.2969 C238,245.2969 207,245.2969 207,245.2969 C207,245.2969 176,245.2969 176,235.2969 L176,210 " fill="#FEFECE" filter="url(#fkkyf9589xnl5)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M176,210 C176,220 207,220 207,220 C207,220 238,220 238,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="42" x="186" y="236.9951">Mark1</text><!--MD5=[c176c1dae556a162e5c35d6dd4bfcf34]
-entity db4--><path d="M273,210 C273,200 304,200 304,200 C304,200 335,200 335,210 L335,235.2969 C335,245.2969 304,245.2969 304,245.2969 C304,245.2969 273,245.2969 273,235.2969 L273,210 " fill="#FEFECE" filter="url(#fkkyf9589xnl5)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M273,210 C273,220 304,220 304,220 C304,220 335,220 335,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="42" x="283" y="236.9951">Mark2</text><!--MD5=[1fe7a992e89c10c5f2c27a23fb1e129d]
-entity db5--><path d="M370,210 C370,200 386,200 386,200 C386,200 402,200 402,210 L402,235.2969 C402,245.2969 386,245.2969 386,245.2969 C386,245.2969 370,245.2969 370,235.2969 L370,210 " fill="#FEFECE" filter="url(#fkkyf9589xnl5)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M370,210 C370,220 386,220 386,220 C386,220 402,220 402,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="12" x="380" y="236.9951">...</text><!--MD5=[d4ad1d5275391ca8d3acb292d4b26dc5]
-link client to api--><path d="M207,49.66 C207,64.52 207,83.85 207,98.64 " fill="none" id="client-api" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="207,103.87,211,94.87,207,98.87,203,94.87,207,103.87" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="207,44.24,203,53.24,207,49.24,211,53.24,207,44.24" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[e103e8664999dd9756eff2c32e1de5b6]
-link api to db1--><path d="M171.84,142.68 C139.24,160.92 91.27,187.77 60.58,204.95 " fill="none" id="api-db1" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="56.18,207.41,65.9865,206.4977,60.5413,204.9648,62.0742,199.5196,56.18,207.41" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="176.34,140.16,166.53,141.0342,171.9692,142.5882,170.4152,148.0274,176.34,140.16" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c945a0638e97c8d85bbaa16159667354]
-link api to db2--><path d="M187.43,144.18 C173.47,159.29 154.63,179.68 139.8,195.73 " fill="none" id="api-db2" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="136.13,199.72,145.1718,195.8155,139.5196,196.0443,139.2908,190.3921,136.13,199.72" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="191.15,140.16,182.1,144.0455,187.7527,143.8285,187.9696,149.4812,191.15,140.16" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[3c7e9365bf194672ba40a7ba5071302f]
-link api to db3--><path d="M207,145.44 C207,160.06 207,179.21 207,194.64 " fill="none" id="api-db3" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="207,199.72,211,190.72,207,194.72,203,190.72,207,199.72" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="207,140.16,203,149.16,207,145.16,211,149.16,207,140.16" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[eaec4da83caf75e3bf23f71b58a53993]
-link api to db4--><path d="M227.45,143.77 C242.48,159.03 262.99,179.86 279,196.11 " fill="none" id="api-db4" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="282.55,199.72,279.1075,190.4924,279.0504,196.1489,273.3938,196.0918,282.55,199.72" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="223.9,140.16,227.3798,149.3736,227.414,143.7169,233.0708,143.7512,223.9,140.16" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c9ae675fabfaa8d7ce5b4fa98ffa6990]
-link api to db5--><path d="M246.08,142.37 C275.79,157.4 317.47,179.12 353,200 C357.07,202.39 361.34,205.06 365.42,207.67 " fill="none" id="api-db5" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="369.74,210.48,364.3849,202.2143,365.5514,207.7495,360.0161,208.9161,369.74,210.48" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="241.41,140.02,247.6515,147.6386,245.8764,142.2675,251.2475,140.4924,241.41,140.02" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[5f31d3f9dc5fd5c5733db2f6a685036f]
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="273px" preserveAspectRatio="none" style="width:605px;height:273px;" version="1.1" viewBox="0 0 605 273" width="605px" zoomAndPan="magnify"><defs><filter height="300%" id="fq5yx5dyrxuqy" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[4a65e84059005d12693a083370a06717]
+entity client--><rect fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="94" x="274.5" y="8"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="269.5" y="13"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="269.5" y="34.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="74" x="284.5" y="30.9951">Web Client</text><path d="M157.5,13.5 L157.5,38.6328 A0,0 0 0 0 157.5,38.6328 L239.5,38.6328 A0,0 0 0 0 239.5,38.6328 L239.5,31.5 L274.28,26 L239.5,23.5 L239.5,23.5 L229.5,13.5 L157.5,13.5 A0,0 0 0 0 157.5,13.5 " fill="#FBFB77" filter="url(#fq5yx5dyrxuqy)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M229.5,13.5 L229.5,23.5 L239.5,23.5 L229.5,13.5 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="61" x="163.5" y="30.5669">javascript</text><!--MD5=[e2307af040e3f87d22824e7603ca28ec]
+entity api--><rect fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="89" x="277" y="104"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="272" y="109"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="272" y="130.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="69" x="287" y="126.9951">API Server</text><path d="M177,109.5 L177,134.6328 A0,0 0 0 0 177,134.6328 L242,134.6328 A0,0 0 0 0 242,134.6328 L242,127.5 L276.96,122 L242,119.5 L242,119.5 L232,109.5 L177,109.5 A0,0 0 0 0 177,109.5 " fill="#FBFB77" filter="url(#fq5yx5dyrxuqy)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M232,109.5 L232,119.5 L242,119.5 L232,109.5 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="44" x="183" y="126.5669">python</text><!--MD5=[7aa9c583cf047545838c264d3047b712]
+entity db1--><path d="M6.5,210 C6.5,200 44.5,200 44.5,200 C44.5,200 82.5,200 82.5,210 L82.5,251.5938 C82.5,261.5938 44.5,261.5938 44.5,261.5938 C44.5,261.5938 6.5,261.5938 6.5,251.5938 L6.5,210 " fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M6.5,210 C6.5,220 44.5,220 44.5,220 C44.5,220 82.5,220 82.5,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="16.5" y="236.9951">Acts</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="56" x="16.5" y="253.292">Phase 4</text><path d="M6,109.5 L6,134.6328 A0,0 0 0 0 6,134.6328 L40.5,134.6328 L44.5,199.85 L48.5,134.6328 L83,134.6328 A0,0 0 0 0 83,134.6328 L83,119.5 L73,109.5 L6,109.5 A0,0 0 0 0 6,109.5 " fill="#FBFB77" filter="url(#fq5yx5dyrxuqy)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M73,109.5 L73,119.5 L83,119.5 L73,109.5 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="56" x="12" y="126.5669">Postgres</text><!--MD5=[2331507006b4b8bee4c616015350b23c]
+entity db2--><path d="M117.5,210 C117.5,200 155.5,200 155.5,200 C155.5,200 193.5,200 193.5,210 L193.5,251.5938 C193.5,261.5938 155.5,261.5938 155.5,261.5938 C155.5,261.5938 117.5,261.5938 117.5,251.5938 L117.5,210 " fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M117.5,210 C117.5,220 155.5,220 155.5,220 C155.5,220 193.5,220 193.5,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="127.5" y="236.9951">Acts</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="56" x="127.5" y="253.292">Phase 5</text><!--MD5=[7a84b64b0b7b7d5ec450ed14b904bacb]
+entity db3--><path d="M228.5,210 C228.5,200 266.5,200 266.5,200 C266.5,200 304.5,200 304.5,210 L304.5,251.5938 C304.5,261.5938 266.5,261.5938 266.5,261.5938 C266.5,261.5938 228.5,261.5938 228.5,251.5938 L228.5,210 " fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M228.5,210 C228.5,220 266.5,220 266.5,220 C266.5,220 304.5,220 304.5,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="238.5" y="236.9951">John</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="56" x="238.5" y="253.292">Phase 1</text><!--MD5=[c176c1dae556a162e5c35d6dd4bfcf34]
+entity db4--><path d="M339.5,210 C339.5,200 377.5,200 377.5,200 C377.5,200 415.5,200 415.5,210 L415.5,251.5938 C415.5,261.5938 377.5,261.5938 377.5,261.5938 C377.5,261.5938 339.5,261.5938 339.5,251.5938 L339.5,210 " fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M339.5,210 C339.5,220 377.5,220 377.5,220 C377.5,220 415.5,220 415.5,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="33" x="349.5" y="236.9951">Mark</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="56" x="349.5" y="253.292">Phase 1</text><!--MD5=[1fe7a992e89c10c5f2c27a23fb1e129d]
+entity db5--><path d="M450.5,210 C450.5,200 488.5,200 488.5,200 C488.5,200 526.5,200 526.5,210 L526.5,251.5938 C526.5,261.5938 488.5,261.5938 488.5,261.5938 C488.5,261.5938 450.5,261.5938 450.5,251.5938 L450.5,210 " fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M450.5,210 C450.5,220 488.5,220 488.5,220 C488.5,220 526.5,220 526.5,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="33" x="460.5" y="236.9951">Mark</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="56" x="460.5" y="253.292">Phase 2</text><!--MD5=[7c123ab891f61afa165271fa88b5c437]
+entity db6--><path d="M561.5,218.5 C561.5,208.5 577.5,208.5 577.5,208.5 C577.5,208.5 593.5,208.5 593.5,218.5 L593.5,243.7969 C593.5,253.7969 577.5,253.7969 577.5,253.7969 C577.5,253.7969 561.5,253.7969 561.5,243.7969 L561.5,218.5 " fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M561.5,218.5 C561.5,228.5 577.5,228.5 577.5,228.5 C577.5,228.5 593.5,228.5 593.5,218.5 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="12" x="571.5" y="245.4951">...</text><!--MD5=[d4ad1d5275391ca8d3acb292d4b26dc5]
+link client to api--><path d="M321.5,49.66 C321.5,64.52 321.5,83.85 321.5,98.64 " fill="none" id="client-api" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="321.5,103.87,325.5,94.87,321.5,98.87,317.5,94.87,321.5,103.87" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="321.5,44.24,317.5,53.24,321.5,49.24,325.5,53.24,321.5,44.24" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[e103e8664999dd9756eff2c32e1de5b6]
+link api to db1--><path d="M271.98,137.59 C226.38,151.62 157.27,174.44 99.5,200 C95.41,201.81 91.21,203.81 87.05,205.9 " fill="none" id="api-db1" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="82.56,208.19,92.395,207.6674,87.0149,205.9197,88.7626,200.5396,82.56,208.19" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="276.86,136.09,267.0819,134.9116,272.0808,137.5594,269.433,142.5583,276.86,136.09" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c945a0638e97c8d85bbaa16159667354]
+link api to db2--><path d="M290.54,142.96 C264.49,159.75 226.99,183.92 198.11,202.54 " fill="none" id="api-db2" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="193.55,205.47,203.2823,203.9596,197.7536,202.7626,198.9505,197.2338,193.55,205.47" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="294.83,140.19,285.0964,141.6921,290.6241,142.8938,289.4224,148.4215,294.83,140.19" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[3c7e9365bf194672ba40a7ba5071302f]
+link api to db3--><path d="M310.23,144.92 C302.78,159.42 292.85,178.74 284.34,195.3 " fill="none" id="api-db3" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="281.98,199.89,289.6698,193.7364,284.2787,195.4497,282.5654,190.0586,281.98,199.89" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="312.66,140.19,304.9858,146.3631,310.3726,144.6361,312.0996,150.0229,312.66,140.19" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[eaec4da83caf75e3bf23f71b58a53993]
+link api to db4--><path d="M332.97,144.92 C340.56,159.42 350.67,178.74 359.34,195.3 " fill="none" id="api-db4" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="361.74,199.89,361.1167,190.0609,359.4242,195.4586,354.0265,193.7661,361.74,199.89" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="330.5,140.19,331.1233,150.0191,332.8158,144.6214,338.2135,146.3139,330.5,140.19" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c9ae675fabfaa8d7ce5b4fa98ffa6990]
+link api to db5--><path d="M352.65,142.96 C378.96,159.82 416.89,184.12 445.99,202.77 " fill="none" id="api-db5" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="450.22,205.47,444.7997,197.2468,446.0099,202.7727,440.4841,203.9829,450.22,205.47" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="348.33,140.19,353.7376,148.4215,352.5359,142.8938,358.0636,141.6921,348.33,140.19" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[e34d9993e7729f5b16c19447e2bb412d]
+link api to db6--><path d="M371.13,133.97 C418.04,145.73 489.26,167.25 544.5,200 C549,202.67 553.41,206.01 557.49,209.49 " fill="none" id="api-db6" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="561.43,213,557.3799,204.0224,557.7001,209.6702,552.0523,209.9903,561.43,213" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="366.1,132.73,373.8611,138.7934,370.9507,133.9427,375.8014,131.0323,366.1,132.73" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c0488591b809ede7f813439c51749aea]
 @startuml
 skinparam backgroundColor transparent
 
 component "Web Client" as client
+note left of client: javascript
 component "API Server" as api
-database "Acts" as db1
-database "John" as db2
-database "Mark1" as db3
-database "Mark2" as db4
-database "..."  as db5
+note left of api: python
+database "Acts\nPhase 4" as db1
+note top of db1: Postgres
+database "Acts\nPhase 5" as db2
+database "John\nPhase 1" as db3
+database "Mark\nPhase 1" as db4
+database "Mark\nPhase 2" as db5
+database "..."  as db6
+
 
 client <- -> api
 api <- -> db1
@@ -518,6 +525,7 @@ api <- -> db2
 api <- -> db3
 api <- -> db4
 api <- -> db5
+api <- -> db6
 @enduml
 
 PlantUML version 1.2020.02(Sun Mar 01 11:22:07 CET 2020)
@@ -530,7 +538,7 @@ Default Encoding: UTF-8
 Language: en
 Country: US
 --></g></svg></div>
-<p class="caption"><span class="caption-text">Web Application</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">Web Application</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
 <p>Currently we host the CBGM for three books, namely Acts, John and Mark, by
 different editorial teams and in different stages of completion.
@@ -539,7 +547,7 @@ Each book and phase gets its own database.</p>
 <div class="section" id="scripts">
 <h2>Scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h2>
 <p>This is a set of scripts that the user can run manually on the server to
-manage the whole <a href="#id1"><span class="problematic" id="id2">:ref:`cbgm`_</span></a> process, that is:</p>
+manage the whole <a class="reference internal" href="cbgm.html#cbgm"><span class="std std-ref">CBGM</span></a> process, that is:</p>
 <ul class="simple">
 <li><p>importing new books,</p></li>
 <li><p>doing the CBGM (passing from one phase to the next),</p></li>

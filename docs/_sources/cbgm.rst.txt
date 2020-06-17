@@ -79,9 +79,9 @@ It must also be applied immediately after the `prepare.py` script.
 
    skinparam backgroundColor transparent
 
-   database  "Acts"        as db1
-   component "cbgm script" as cbgm
-   database  "Acts"        as db2
+   database  "Acts"    as db1
+   component "cbgm.py" as cbgm
+   database  "Acts"    as db2
    note right of cbgm: applies the\nCBGM method
 
    db1  --> cbgm
@@ -95,8 +95,8 @@ Starting a New Project
 
 To start a new project:
 
-- create local copies of the mysql databases of the project,
-- create a new Postgres database for the project,
+- create a new Postgres database,
+- create local copies of the mysql databases,
 - add an instance to the server,
 - prepare the new Postgres database,
 - run the CBGM,
@@ -106,33 +106,36 @@ To start a new project:
 Worked Example
 --------------
 
-As an example we will create a new project: Matthew Phase 1.
+As an example we will create a new project: Mark Phase 9.9.
 
-We have obtained three mysql databases dumps from the NTVMR people:
-:file:`ECM_MtPh1.dump.sql`, :file:`VarGenAtt_MtPh1.dump.sql`,
-and :file:`Nestle29.dump.sql`.
-We will name the new Postgres database: :code:`mt_ph1`.
+The name of the new Postgres database is: :code:`mark_ph99`.
 
-ssh into the server and import the database dumps into three local mysql
-databases:
+We assume having obtained two mysql database dumps from the NTVMR people:
+:file:`ECM_Mk_Apparat_6.dump.bz2` and :file:`Nestle29-2.dump.bz2`.
+
+ssh into the server.
+
+.. note::
+
+   You need to have permission to sudo postgres and sudo ntg.
+
+First create a new Postgres database:
+
+.. code:: bash
+
+   sudo -u postgres ~ntg/prj/ntg/ntg/scripts/cceh/create_database.sh mark_ph99
+
+Then import the database dumps into three local mysql databases:
 
 .. code:: bash
 
    sudo -u ntg bash
 
-   mysql -e "CREATE DATABASE ECM_MtPh1"
-   mysql -e "CREATE DATABASE VarGenAtt_MtPh1"
+   mysql -e "CREATE DATABASE ECM_Mark_Ph99"
    mysql -e "CREATE DATABASE Nestle29"
 
-   cat ECM_MtPh1.dump.sql       | mysql -D ECM_MtPh1
-   cat VarGenAtt_MtPh1.dump.sql | mysql -D VarGenAtt_MtPh1
-   cat Nestle29.dump.sql        | mysql -D Nestle29
-
-Now create a new Postgres database:
-
-.. code:: bash
-
-   psql -c "CREATE DATABASE mt_ph1"
+   bzcat ECM_Mk_Apparat_6.dump.bz2 | mysql -D ECM_Mark_Ph99
+   bzcat Nestle29-2.dump.bz2       | mysql -D Nestle29
 
 Then create a new server instance.
 The fastest way is to just copy an old instance configuration file and edit it:
@@ -140,8 +143,8 @@ The fastest way is to just copy an old instance configuration file and edit it:
 .. code:: bash
 
    cd ~/prj/ntg/ntg/instance
-   cp mark_ph22.conf mt_ph1.conf
-   emacs mt_ph1.conf
+   cp mark_ph22.conf mark_ph99.conf
+   emacs mark_ph99.conf
 
 Change all relevant parts of the instance configuration file.
 See: :ref:`api-server-config-files`.
@@ -152,14 +155,14 @@ the mysql databases into Postgres and prepare them for CBGM:
 .. code:: bash
 
    cd ~/prj/ntg/ntg
-   python3 -m scripts.cceh.import  -vvv instance/mt_ph1.conf
-   python3 -m scripts.cceh.prepare -vvv instance/mt_ph1.conf
+   python3 -m scripts.cceh.import  -vvv instance/mark_ph99.conf
+   python3 -m scripts.cceh.prepare -vvv instance/mark_ph99.conf
 
 Then run the CBGM with the `cbgm.py` script:
 
 .. code:: bash
 
-   python3 -m scripts.cceh.cbgm -vvv instance/mt_ph1.conf
+   python3 -m scripts.cceh.cbgm -vvv instance/mark_ph99.conf
 
 Last, restart the application server:
 
@@ -179,8 +182,7 @@ The application server uses the Postgres database only.
 
 .. code:: bash
 
-   mysql -e "DROP DATABASE ECM_MtPh1"
-   mysql -e "DROP DATABASE VarGenAtt_MtPh1"
+   mysql -e "DROP DATABASE ECM_Mark_Ph99"
    mysql -e "DROP DATABASE Nestle29"
 
 
@@ -204,20 +206,25 @@ Worked Example
 
 As an example let us create a new Mark Phase 2.3 from an existing Mark Phase 2.2.
 
-ssh into the server and
-stop the application server and make a copy of the mark_ph22 database:
+ssh into the server.
+
+.. note::
+
+   You need to have permission to sudo postgres and sudo ntg.
+
+First stop the application server and make a copy of the mark_ph22 database:
 
 .. code:: bash
 
-   sudo -u ntg bash
-   sudo /bin/systemctl stop ntg
-   psql -c "CREATE DATABASE mark_ph23 TEMPLATE mark_ph22"
-   sudo /bin/systemctl start ntg
+   sudo -u ntg sudo /bin/systemctl stop ntg
+   sudo -u postgres psql -c "CREATE DATABASE mark_ph23 TEMPLATE mark_ph22 OWNER ntg"
+   sudo -u ntg sudo /bin/systemctl start ntg
 
 Then create a new server instance:
 
 .. code:: bash
 
+   sudo -u ntg bash
    cd ~/prj/ntg/ntg/instance
    cp mark_ph22.conf mark_ph23.conf
 
