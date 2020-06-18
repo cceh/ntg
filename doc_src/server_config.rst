@@ -36,6 +36,8 @@ API Server
    This value is appended to the APPLICATION_ROOT configured in the global
    configuration file to yield the API entry point for this application.
 
+   This value must have exactly 2 segments, eg. "<project>/<phase>/".
+
    With the example values the API entrypoint for this application would be
    "http://localhost:5000/api/acts/ph5/".  The API entrypoint is typically
    proxied through an Apache or nginx server that does the TLS handling.

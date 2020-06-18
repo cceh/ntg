@@ -36,5 +36,5 @@ Common
 ======
 
 - apache
-- mysql
+- mysql (for data conversion only)
 - postgres

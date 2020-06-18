@@ -1,0 +1,500 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ntg.uni-muenster.de &mdash; NTG 0.1.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Technologies Used" href="technologies.html" />
+    <link rel="prev" title="Various Functions" href="ntg_common.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> NTG
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#web-application">Web Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#scripts">Scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cbgm.html">CBGM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#applying-the-cbgm">Applying the CBGM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-project">Starting a New Project</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#worked-example">Worked Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-phase">Starting a New Phase</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id2">Worked Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-phase-with-apparatus-update">Starting a New Phase With Apparatus Update</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id3">Worked Example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install-linux.html">Installation on Linux</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#install-prerequisites">Install Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#database-access">Database Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#application-server">Application server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#cbgm">CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#run-server">Run Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-linux.html#build-and-run-client">Build and run client</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="install-docker.html">Installation with Docker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#install">Install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-web-application">Running the web application</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#running-the-cbgm">Running the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-docker.html#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user.html">User Manual</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="client_user.html">Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_user.html">Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_user.html#server-main-py">server/__main__.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="scripts_user.html">Scripts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-import-py">scripts/cceh/import.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-prepare-py">scripts/cceh/prepare.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-cbgm-py">scripts/cceh/cbgm.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-save-edits-py">scripts/cceh/save_edits.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-load-edits-py">scripts/cceh/load_edits.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_user.html#scripts-cceh-mk-users-py">scripts/cceh/mk_users.py</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="developer.html">Developer Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="domain.html">Introduction to the Problem Domain (German)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#das-neue-testament">Das Neue Testament</a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#editionen">Editionen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#die-textzeugen">Die Textzeugen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#textformen-texttypen">Textformen (Texttypen)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#textkritik">Textkritik</a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#terminologie">Terminologie</a></li>
+<li class="toctree-l3"><a class="reference internal" href="domain.html#literatur">Literatur</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="client_dev.html">Web Client</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-app">client/app</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-apparatus">client/apparatus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-checks-list">client/checks_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-coherence">client/coherence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison">client/comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-details-table">client/comparison_details_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-comparison-table">client/comparison_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-chord-layout">client/d3_chord_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-common">client/d3_common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-d3-stemma-layout">client/d3_stemma_layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-find-relatives">client/find_relatives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-flash-messages">client/flash_messages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-leitzeile">client/leitzeile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-local-stemma">client/local_stemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-notes">client/notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-notes-list">client/notes_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-optimal-substemma">client/optimal_substemma</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-optimal-substemma-details">client/optimal_substemma_details</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-page-header">client/page_header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-project-list">client/project_list</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-relatives-metrics">client/relatives_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-relatives-table">client/relatives_table</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-set-cover">client/set_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-table-sort-mixin">client/table_sort_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-table-toggle-mixin">client/table_toggle_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-textflow">client/textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-tools">client/tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-autocomplete">client/widgets/autocomplete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-button-group">client/widgets/button_group</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-card">client/widgets/card</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-card-caption">client/widgets/card_caption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-connectivity">client/widgets/connectivity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-context-menu">client/widgets/context_menu</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-dropdown-mixin">client/widgets/dropdown_mixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-labezator">client/widgets/labezator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-navigator">client/widgets/navigator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-range">client/widgets/range</a></li>
+<li class="toctree-l3"><a class="reference internal" href="client_dev.html#client-widgets-toolbar">client/widgets/toolbar</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="server_dev.html">API Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server">server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.main">server.main</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.textflow">server.textflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.comparison">server.comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.set_cover">server.set_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.editor">server.editor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.login">server.login</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_dev.html#module-server.helpers">server.helpers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="server_config.html">API Server Configuration Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="server_config.html#per-application-configuration-files">Per-Application Configuration Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_config.html#global-configuration-file">Global Configuration File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="server_config.html#footnotes">Footnotes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="user_management.html">User Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user_management.html#manual-user-management">Manual User Management</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import">scripts.cceh.import</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare">scripts.cceh.prepare</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.cbgm">scripts.cceh.cbgm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.save_edits">scripts.cceh.save_edits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.load_edits">scripts.cceh.load_edits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.mk_users">scripts.cceh.mk_users</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="database.html">Database Structure</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="database.html#cbgm-database">CBGM Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="database.html#source-database">Source Database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="database.html#literature">Literature</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html">Various Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools">ntg_common.db_tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">ntg_common.tools</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ntg.uni-muenster.de</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#users">Users</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="technologies.html">Technologies Used</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="technologies.html#server">Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technologies.html#client">Client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technologies.html#common">Common</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NTG</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="developer.html">Developer Manual</a> &raquo;</li>
+        
+      <li>ntg.uni-muenster.de</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/vm.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ntg-uni-muenster-de">
+<span id="vm"></span><h1>ntg.uni-muenster.de<a class="headerlink" href="#ntg-uni-muenster-de" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<div class="figure align-center" id="id1">
+<div  class="pic pic-format-dot">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="548px" preserveAspectRatio="none" style="width:914px;height:548px;" version="1.1" viewBox="0 0 914 548" width="914px" zoomAndPan="magnify"><defs><filter height="300%" id="f1lcdey6htvvpg" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[93a731d9655d31a24a7a13887cfdd628]
+entity https--><ellipse cx="412" cy="20.5" fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" rx="8" ry="8" style="stroke: #A80036; stroke-width: 2.0;"/><!--MD5=[b5654460cbaf38336751f5f23441241e]
+entity pubapi--><ellipse cx="465" cy="20.5" fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" rx="8" ry="8" style="stroke: #A80036; stroke-width: 2.0;"/><!--MD5=[ed9702f7e4f8c03b92d9e03bb4685cf3]
+entity apache--><rect fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="72" x="403" y="97.5"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="398" y="102.5"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="398" y="123.7969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="52" x="413" y="120.4951">Apache</text><!--MD5=[e2307af040e3f87d22824e7603ca28ec]
+entity api--><ellipse cx="439" cy="210.5" fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" rx="8" ry="8" style="stroke: #A80036; stroke-width: 2.0;"/><!--MD5=[4541fb81c80c07473fe4b07432ef0971]
+entity app--><rect fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="88" x="395" y="283"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="390" y="288"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="390" y="309.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="68" x="405" y="305.9951">API server</text><!--MD5=[4819d7e546ed2c2981b8955b82e72e10]
+entity pg--><rect fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="82" x="398" y="379"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="393" y="384"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="393" y="405.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="62" x="408" y="401.9951">Postgres</text><!--MD5=[6fd1f25b81ff7bc9aa64bbe7da104c1e]
+entity dba--><path d="M6,493.5 C6,483.5 32,483.5 32,483.5 C32,483.5 58,483.5 58,493.5 L58,518.7969 C58,528.7969 32,528.7969 32,528.7969 C32,528.7969 6,528.7969 6,518.7969 L6,493.5 " fill="#FFFF00" filter="url(#f1lcdey6htvvpg)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M6,493.5 C6,503.5 32,503.5 32,503.5 C32,503.5 58,503.5 58,493.5 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="32" x="16" y="520.4951">User</text><!--MD5=[7aa9c583cf047545838c264d3047b712]
+entity db1--><path d="M93.5,485 C93.5,475 119,475 119,475 C119,475 144.5,475 144.5,485 L144.5,526.5938 C144.5,536.5938 119,536.5938 119,536.5938 C119,536.5938 93.5,536.5938 93.5,526.5938 L93.5,485 " fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M93.5,485 C93.5,495 119,495 119,495 C119,495 144.5,495 144.5,485 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="103.5" y="511.9951">Acts</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="31" x="103.5" y="528.292">Ph 4</text><!--MD5=[2331507006b4b8bee4c616015350b23c]
+entity db2--><path d="M179.5,485 C179.5,475 205,475 205,475 C205,475 230.5,475 230.5,485 L230.5,526.5938 C230.5,536.5938 205,536.5938 205,536.5938 C205,536.5938 179.5,536.5938 179.5,526.5938 L179.5,485 " fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M179.5,485 C179.5,495 205,495 205,495 C205,495 230.5,495 230.5,485 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="189.5" y="511.9951">Acts</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="31" x="189.5" y="528.292">Ph 5</text><!--MD5=[7a84b64b0b7b7d5ec450ed14b904bacb]
+entity db3--><path d="M266,485 C266,475 298,475 298,475 C298,475 330,475 330,485 L330,526.5938 C330,536.5938 298,536.5938 298,536.5938 C298,536.5938 266,536.5938 266,526.5938 L266,485 " fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M266,485 C266,495 298,495 298,495 C298,495 330,495 330,485 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="33" x="276" y="511.9951">Mark</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="44" x="276" y="528.292">Ph 1.2</text><!--MD5=[c176c1dae556a162e5c35d6dd4bfcf34]
+entity db4--><path d="M365.5,485 C365.5,475 392,475 392,475 C392,475 418.5,475 418.5,485 L418.5,526.5938 C418.5,536.5938 392,536.5938 392,536.5938 C392,536.5938 365.5,536.5938 365.5,526.5938 L365.5,485 " fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M365.5,485 C365.5,495 392,495 392,495 C392,495 418.5,495 418.5,485 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="33" x="375.5" y="511.9951">Mark</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="31" x="375.5" y="528.292">Ph 2</text><!--MD5=[1fe7a992e89c10c5f2c27a23fb1e129d]
+entity db5--><path d="M454,485 C454,475 486,475 486,475 C486,475 518,475 518,485 L518,526.5938 C518,536.5938 486,536.5938 486,536.5938 C486,536.5938 454,536.5938 454,526.5938 L454,485 " fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M454,485 C454,495 486,495 486,495 C486,495 518,495 518,485 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="33" x="464" y="511.9951">Mark</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="44" x="464" y="528.292">Ph 2.2</text><!--MD5=[7c123ab891f61afa165271fa88b5c437]
+entity db6--><path d="M553.5,485 C553.5,475 579,475 579,475 C579,475 604.5,475 604.5,485 L604.5,526.5938 C604.5,536.5938 579,536.5938 579,536.5938 C579,536.5938 553.5,536.5938 553.5,526.5938 L553.5,485 " fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M553.5,485 C553.5,495 579,495 579,495 C579,495 604.5,495 604.5,485 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="563.5" y="511.9951">John</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="31" x="563.5" y="528.292">Ph 1</text><!--MD5=[7688d0450149c4ef37c1d06f15ad9982]
+entity db7--><path d="M639.5,485 C639.5,475 681,475 681,475 C681,475 722.5,475 722.5,485 L722.5,526.5938 C722.5,536.5938 681,536.5938 681,536.5938 C681,536.5938 639.5,536.5938 639.5,526.5938 L639.5,485 " fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M639.5,485 C639.5,495 681,495 681,495 C681,495 722.5,495 722.5,485 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="63" x="649.5" y="511.9951">John Fam</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="31" x="649.5" y="528.292">Ph 1</text><!--MD5=[7b450b2668e206adc181713a61c5aad5]
+entity db8--><path d="M757.5,485 C757.5,475 787,475 787,475 C787,475 816.5,475 816.5,485 L816.5,526.5938 C816.5,536.5938 787,536.5938 787,536.5938 C787,536.5938 757.5,536.5938 757.5,526.5938 L757.5,485 " fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M757.5,485 C757.5,495 787,495 787,495 C787,495 816.5,495 816.5,485 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="39" x="767.5" y="511.9951">2Sam</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="31" x="767.5" y="528.292">Ph 1</text><!--MD5=[db69b4829325f35aec7fbea77fa76c96]
+entity db9--><path d="M851.5,485 C851.5,475 877,475 877,475 C877,475 902.5,475 902.5,485 L902.5,526.5938 C902.5,536.5938 877,536.5938 877,536.5938 C877,536.5938 851.5,536.5938 851.5,526.5938 L851.5,485 " fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M851.5,485 C851.5,495 877,495 877,495 C877,495 902.5,495 902.5,485 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="17" x="861.5" y="511.9951">CL</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="31" x="861.5" y="528.292">Ph 2</text><!--MD5=[4a65e84059005d12693a083370a06717]
+entity client--><path d="M292.5,103 C292.5,93 330,93 330,93 C330,93 367.5,93 367.5,103 L367.5,128.2969 C367.5,138.2969 330,138.2969 330,138.2969 C330,138.2969 292.5,138.2969 292.5,128.2969 L292.5,103 " fill="#FEFECE" filter="url(#f1lcdey6htvvpg)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M292.5,103 C292.5,113 330,113 330,113 C330,113 367.5,113 367.5,103 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="55" x="302.5" y="129.9951">JS Client</text><path d="M156.5,8 L156.5,33.1328 A0,0 0 0 0 156.5,33.1328 L367.5,33.1328 A0,0 0 0 0 367.5,33.1328 L367.5,26 L402.67,20.5 L367.5,18 L367.5,18 L357.5,8 L156.5,8 A0,0 0 0 0 156.5,8 " fill="#FBFB77" filter="url(#f1lcdey6htvvpg)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M357.5,8 L357.5,18 L367.5,18 L357.5,8 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="190" x="162.5" y="25.0669">"https://ntg.uni-muenster.de/"</text><path d="M509,8 L509,16.5 L474.12,20.5 L509,24.5 L509,33.1328 A0,0 0 0 0 509,33.1328 L743,33.1328 A0,0 0 0 0 743,33.1328 L743,18 L733,8 L509,8 A0,0 0 0 0 509,8 " fill="#FBFB77" filter="url(#f1lcdey6htvvpg)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M733,8 L733,18 L743,18 L733,8 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="213" x="515" y="25.0669">"https://ntg.uni-muenster.de/api/"</text><path d="M146.5,103 L146.5,128.1328 A0,0 0 0 0 146.5,128.1328 L257.5,128.1328 A0,0 0 0 0 257.5,128.1328 L257.5,121 L292.33,115.5 L257.5,113 L257.5,113 L247.5,103 L146.5,103 A0,0 0 0 0 146.5,103 " fill="#FBFB77" filter="url(#f1lcdey6htvvpg)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M247.5,103 L247.5,113 L257.5,113 L247.5,103 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="90" x="152.5" y="120.0669">"/var/www/ntg"</text><path d="M483.5,198 L483.5,206.5 L448.23,210.5 L483.5,214.5 L483.5,223.1328 A0,0 0 0 0 483.5,223.1328 L672.5,223.1328 A0,0 0 0 0 672.5,223.1328 L672.5,208 L662.5,198 L483.5,198 A0,0 0 0 0 483.5,198 " fill="#FBFB77" filter="url(#f1lcdey6htvvpg)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M662.5,198 L662.5,208 L672.5,208 L662.5,198 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="168" x="489.5" y="215.0669">"http://localhost:5000/api/"</text><!--MD5=[ef70586285777f529464d019369e401d]
+link https to apache--><path d="M414.4,29.75 C418.44,43.69 426.75,72.32 432.59,92.43 " fill="none" id="https-&gt;apache" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="434.02,97.35,435.34,87.59,432.62,92.55,427.66,89.83,434.02,97.35" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[0963baf1884cd3725a2cb10f3305d9a6]
+link pubapi to apache--><path d="M462.69,29.75 C458.8,43.69 450.79,72.32 445.17,92.43 " fill="none" id="pubapi-&gt;apache" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="443.79,97.35,450.0819,89.7729,445.1466,92.5376,442.382,87.6023,443.79,97.35" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[5f7aa51edec1ccd0c35c041092e2d62b]
+reverse link client to apache--><path d="M373.09,115.5 C383.02,115.5 392.96,115.5 402.89,115.5 " fill="none" id="client&lt;-apache" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="367.89,115.5,376.89,119.5,372.89,115.5,376.89,111.5,367.89,115.5" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[b7857999a0b43fe0c196b88de54dd0ed]
+link apache to api--><path d="M439,133.56 C439,151.65 439,179.84 439,196.31 " fill="none" id="apache-&gt;api" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="439,201.41,443,192.41,439,196.41,435,192.41,439,201.41" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[507397596a6af31457158c510808ed58]
+link api to app--><path d="M439,219.67 C439,232.73 439,258.78 439,277.68 " fill="none" id="api-&gt;app" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="439,282.81,443,273.81,439,277.81,435,273.81,439,282.81" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[a054dd03eb75155d929201dd7c7d8647]
+link app to pg--><path d="M439,319.24 C439,334.48 439,356.81 439,373.46 " fill="none" id="app-&gt;pg" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="439,378.87,443,369.87,439,373.87,435,369.87,439,378.87" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[7bd6007c2a7efa8dd941b32ab7ded528]
+link pg to dba--><path d="M397.97,401.48 C329.03,408.45 186.64,427.74 76,475 C71.41,476.96 66.8,479.43 62.38,482.1 " fill="none" id="pg-&gt;dba" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="58.03,484.84,67.7807,483.4532,62.2676,482.1862,63.5346,476.673,58.03,484.84" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[fcb332adb03c7e94c4f76b39676d180d]
+link pg to db1--><path d="M397.56,404.98 C342.02,415.34 241.25,437.68 162,475 C157.55,477.09 153.07,479.64 148.76,482.35 " fill="none" id="pg-&gt;db1" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="144.52,485.11,154.2439,483.5461,148.7086,482.3795,149.8751,476.8443,144.52,485.11" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[d2ecd24c256e05f65bf52dbae6029ce5]
+link pg to db2--><path d="M397.83,411.8 C358.56,425.63 298.26,448.62 249,475 C244.48,477.42 239.85,480.2 235.37,483.08 " fill="none" id="pg-&gt;db2" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="230.95,485.97,240.6714,484.3908,235.1343,483.233,236.2922,477.6959,230.95,485.97" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[982b903e5506c70a79cf8df1a834f997]
+link pg to db3--><path d="M416.35,415.19 C394.18,432.01 360.06,457.91 334.14,477.57 " fill="none" id="pg-&gt;db3" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="330.06,480.67,339.646,478.4098,334.0411,477.6449,334.8059,472.04,330.06,480.67" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[ffadb8ac7b4ff3b9a801467c904961e7]
+link pg to db4--><path d="M431.45,415.19 C424.94,430 415.35,451.85 407.25,470.28 " fill="none" id="pg-&gt;db4" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="405.23,474.89,412.5118,468.2586,407.2408,470.3122,405.1872,465.0412,405.23,474.89" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[970ec8dc5c7e792f3e3b6f34d8ac12b9]
+link pg to db5--><path d="M446.55,415.19 C453.06,430 462.65,451.85 470.75,470.28 " fill="none" id="pg-&gt;db5" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="472.77,474.89,472.8128,465.0412,470.7592,470.3122,465.4882,468.2586,472.77,474.89" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[32a3aca306ee283f8faf090dfeb0564c]
+link pg to db6--><path d="M461.49,415.19 C485.27,433.36 522.88,462.11 549.12,482.17 " fill="none" id="pg-&gt;db6" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="553.24,485.31,548.5287,476.6611,549.271,482.269,543.6631,483.0114,553.24,485.31" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c532ff3ea196abc6c32203a72f525e3b]
+link pg to db7--><path d="M480.07,414.29 C517.4,429.34 573.85,452.66 622,475 C626.13,476.92 630.4,478.96 634.67,481.05 " fill="none" id="pg-&gt;db7" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="639.28,483.32,632.9803,475.7495,634.7965,481.1068,629.4391,482.9231,639.28,483.32" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[1366877536a899643c19a81afe7707e9]
+link pg to db8--><path d="M480.27,404.28 C539.55,414.24 651.42,436.58 740,475 C744.3,476.87 748.66,479.1 752.9,481.5 " fill="none" id="pg-&gt;db8" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="757.45,484.16,751.6882,476.1724,753.1301,481.6424,747.6601,483.0843,757.45,484.16" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[eba01aae846f56940ba4403ae89a9449]
+link pg to db9--><path d="M480.15,400.41 C553.81,405.92 711.94,423.27 834,475 C838.31,476.83 842.62,479.13 846.76,481.64 " fill="none" id="pg-&gt;db9" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="851.18,484.44,845.7201,476.2431,846.957,481.763,841.437,482.9999,851.18,484.44" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[d75946af0920143781de96b388ef008c]
+@startuml
+skinparam backgroundColor transparent
+
+interface " "               as https
+interface " "               as pubapi
+component "Apache"          as apache
+interface " "               as api
+component "API server"      as app
+component "Postgres"        as pg
+
+database  "User"            as dba #yellow
+
+database  "Acts\nPh 4"      as db1
+database  "Acts\nPh 5"      as db2
+database  "Mark\nPh 1.2"    as db3
+database  "Mark\nPh 2"      as db4
+database  "Mark\nPh 2.2"    as db5
+database  "John\nPh 1"      as db6
+database  "John Fam\nPh 1"  as db7
+database  "2Sam\nPh 1"      as db8
+database  "CL\nPh 2"        as db9
+
+database  "JS Client"       as client
+
+note left  of https:   "https://ntg.uni-muenster.de/"
+note right of pubapi:  "https://ntg.uni-muenster.de/api/"
+note left  of client:  "/var/www/ntg"
+note right of api:     "http://localhost:5000/api/"
+
+https   - -> apache
+pubapi  - -> apache
+client  <-  apache
+apache  - -> api
+api     - -> app
+app     - -> pg
+
+pg      - -> dba
+
+pg      - -> db1
+pg      - -> db2
+pg      - -> db3
+pg      - -> db4
+pg      - -> db5
+pg      - -> db6
+pg      - -> db7
+pg      - -> db8
+pg      - -> db9
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 11:22:07 CET 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.7+10-post-Debian-3
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg></div>
+<p class="caption"><span class="caption-text">Overview of VM</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<p>The Apache server has 2 functions:</p>
+<ul class="simple">
+<li><p>to serve the javascript client files and</p></li>
+<li><p>to proxy the public API endpoint to the local App server.</p></li>
+</ul>
+<p>The javascript client files are served from <code class="file docutils literal notranslate"><span class="pre">/var/www/ntg/</span></code>.
+The javascript client also needs to know where to find the world-visible API endpoint.
+That is configured in the file <code class="file docutils literal notranslate"><span class="pre">/var/www/ntg/api.conf.js</span></code>:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">api_base_url</span> <span class="o">=</span> <span class="s1">&#39;https://ntg.uni-muenster.de/api/&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Apache also proxies all api requests from the client to the API server.
+The world-visible API endpoint “<a class="reference external" href="https://ntg.uni-muenster.de/api/">https://ntg.uni-muenster.de/api/</a>” is proxied
+to the internal “<a class="reference external" href="http://localhost:5000/api/">http://localhost:5000/api/</a>” using mod_rewrite.
+Apache does all SSL stuff.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is not hardwired: as an alternative the API server could be made
+world-visible on an URL of its own, eg. “<a class="reference external" href="https://api.ntg.uni-muenster.de/">https://api.ntg.uni-muenster.de/</a>”
+but that would require an extra DNS entry and certificate.</p>
+</div>
+</div>
+<div class="section" id="users">
+<h2>Users<a class="headerlink" href="#users" title="Permalink to this headline">¶</a></h2>
+<p>The user “ntg” owns:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>the API server and has sudo rights to restart it,</p></li>
+<li><p>all Postgres databases shown above,</p></li>
+<li><p>the <code class="file docutils literal notranslate"><span class="pre">/var/www/ntg</span></code> directory where the JS client files reside.</p></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="technologies.html" class="btn btn-neutral float-right" title="Technologies Used" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ntg_common.html" class="btn btn-neutral float-left" title="Various Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-20 CCeH - Licensed under the GNU GPL v3 or later
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

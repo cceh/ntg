@@ -233,6 +233,10 @@
 <li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">ntg_common.tools</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="vm.html">ntg.uni-muenster.de</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vm.html#users">Users</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="technologies.html">Technologies Used</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="technologies.html#server">Server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="technologies.html#client">Client</a></li>
@@ -334,6 +338,7 @@ Werkzeug Serving WSGI Applications <a class="footnote-reference brackets" href="
 <dd><p>The api entrypoint. <a class="footnote-reference brackets" href="#f2" id="id3">2</a> eg. “acts/ph5/”.</p>
 <p>This value is appended to the APPLICATION_ROOT configured in the global
 configuration file to yield the API entry point for this application.</p>
+<p>This value must have exactly 2 segments, eg. “&lt;project&gt;/&lt;phase&gt;/”.</p>
 <p>With the example values the API entrypoint for this application would be
 “<a class="reference external" href="http://localhost:5000/api/acts/ph5/">http://localhost:5000/api/acts/ph5/</a>”.  The API entrypoint is typically
 proxied through an Apache or nginx server that does the TLS handling.</p>

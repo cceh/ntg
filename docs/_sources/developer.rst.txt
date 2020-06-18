@@ -12,4 +12,5 @@ Developer Manual
    scripts_dev
    database
    ntg_common
+   vm
    technologies
