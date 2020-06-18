@@ -1,1 +1,0 @@
-python3 -m scripts.cceh.cbgm -vvv server/instance/mark_ph1.conf

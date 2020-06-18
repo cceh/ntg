@@ -257,7 +257,7 @@ upload_server:
 	$(RSYNCPY) server       $(NTG_PRJ)/
 
 upload_scripts:
-	$(RSYNCPY) scripts/cceh $(NTG_PRJ)/scripts/
+	$(RSYNCPY) --exclude "active_databases" scripts/cceh $(NTG_PRJ)/scripts/
 	$(RSYNC)   Makefile     $(NTG_PRJ)/
 
 get_remote_backups:
