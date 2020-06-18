@@ -235,7 +235,7 @@ See: :ref:`api-server-config-files`.
 
    emacs mark_ph23.conf
 
-Put the old database in read-only mode:
+Put the old database in read-only mode (set WRITE_ACCESS="nobody"):
 
 .. code:: bash
 
@@ -278,6 +278,13 @@ using a new apparatus.
 
 First follow the steps in :ref:`cbgm-new-project` above, until you reach the
 CBGM step.
+
+Put the old database in read-only mode (set WRITE_ACCESS="nobody"):
+
+.. code:: bash
+
+   cd ~/prj/ntg/ntg/instance
+   emacs mark_ph22.conf
 
 Then use the `save_edits.py` script to save the editorial decisions
 of the previous phase and the `load_edits.py` script to load them

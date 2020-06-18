@@ -234,13 +234,14 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="vm.html">ntg.uni-muenster.de</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vm.html#overview">Overview</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vm.html#users">Users</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="technologies.html">Technologies Used</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="technologies.html#server">Server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="technologies.html#client">Client</a></li>
-<li class="toctree-l3"><a class="reference internal" href="technologies.html#common">Common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technologies.html#scripts">Scripts</a></li>
 </ul>
 </li>
 </ul>
@@ -542,7 +543,7 @@ See: <a class="reference internal" href="server_config.html#api-server-config-fi
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emacs mark_ph23.conf
 </pre></div>
 </div>
-<p>Put the old database in read-only mode:</p>
+<p>Put the old database in read-only mode (set WRITE_ACCESS=”nobody”):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emacs mark_ph22.conf
 </pre></div>
 </div>
@@ -575,6 +576,11 @@ python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
 using a new apparatus.</p>
 <p>First follow the steps in <a class="reference internal" href="#cbgm-new-project"><span class="std std-ref">Starting a New Project</span></a> above, until you reach the
 CBGM step.</p>
+<p>Put the old database in read-only mode (set WRITE_ACCESS=”nobody”):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> ~/prj/ntg/ntg/instance
+emacs mark_ph22.conf
+</pre></div>
+</div>
 <p>Then use the <a class="reference internal" href="scripts_user.html#save-edits-py"><span class="std std-ref">scripts/cceh/save_edits.py</span></a> script to save the editorial decisions
 of the previous phase and the <a class="reference internal" href="scripts_user.html#load-edits-py"><span class="std std-ref">scripts/cceh/load_edits.py</span></a> script to load them
 into the new instance:</p>

@@ -17,6 +17,8 @@ Server
   - numpy
   - sqlalchemy
 
+- postgres
+- apache
 - graphviz
 
 
@@ -32,9 +34,14 @@ Client
 - webpack
 
 
-Common
-======
+Scripts
+=======
 
-- apache
-- mysql (for data conversion only)
+- python
+
+  - numpy
+  - sqlalchemy
+  - lxml
+
 - postgres
+- mysql (for data conversion only)

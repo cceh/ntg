@@ -30,20 +30,24 @@ Overview
    database  "John\nPh 1"      as db6
    database  "John Fam\nPh 1"  as db7
    database  "2Sam\nPh 1"      as db8
-   database  "CL\nPh 2"        as db9
+   database  "2Sam\nPh 2"      as db9
+   database  "CL\nPh 2"        as db10
 
-   database  "JS Client"       as client
+   database  "JS Client\nFiles"  as client
+   database  "Config\nFiles"     as config
 
-   note left  of https:   "https://ntg.uni-muenster.de/"
-   note right of pubapi:  "https://ntg.uni-muenster.de/api/"
-   note left  of client:  "/var/www/ntg"
-   note right of api:     "http://localhost:5000/api/"
+   note left  of https:   https://ntg.uni-muenster.de/
+   note right of pubapi:  https://ntg.uni-muenster.de/api/
+   note left  of client:  /var/www/ntg
+   note right of api:     http://localhost:5000/api/
+   note left  of config:  ~ntg/prj/ntg/ntg/instance/*.conf
 
    https   --> apache
    pubapi  --> apache
    client  <-  apache
    apache  --> api
    api     --> app
+   config  <-  app
    app     --> pg
 
    pg      --> dba
@@ -57,6 +61,7 @@ Overview
    pg      --> db7
    pg      --> db8
    pg      --> db9
+   pg      --> db10
 
 The Apache server has 2 functions:
 
@@ -82,6 +87,11 @@ Apache does all SSL stuff.
    world-visible on an URL of its own, eg. "https://api.ntg.uni-muenster.de/"
    but that would require an extra DNS entry and certificate.
 
+The API server loads its configuration from the :file:`~ntg/prj/ntg/ntg/instance/`
+directory, one config file for each project. See :ref:`api-server-config-files`.
+
+The Postgres server holds one database for each project.
+
 
 Users
 =====
@@ -91,3 +101,10 @@ The user "ntg" owns:
  - the API server and has sudo rights to restart it,
  - all Postgres databases shown above,
  - the :file:`/var/www/ntg` directory where the JS client files reside.
+
+The user "postgres" is the database superuser.
+
+.. note::
+
+   You have to be a database superuser to create new project databases
+   because the mysql_fdw extension says so.
