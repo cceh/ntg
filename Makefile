@@ -157,10 +157,10 @@ import_nestle:
 import_2sam:
 	-$(MYSQL) -e "DROP DATABASE 2Sam_Ph1"
 	$(MYSQL) -e "CREATE DATABASE 2Sam_Ph1"
-	cat ../dumps/2Sam_apparat_20200430.dump | $(MYSQL) -D 2Sam_Ph1
+	bzcat ../dumps/2Sam_apparat_20200618.dump.bz2 | $(MYSQL) -D 2Sam_Ph1
 	-$(MYSQL) -e "DROP DATABASE LXX_Leitzeile"
 	$(MYSQL) -e "CREATE DATABASE LXX_Leitzeile"
-	cat ../dumps/LXX.dump | $(MYSQL) -D LXX_Leitzeile
+	bzcat ../dumps/LXX.dump.bz2 | $(MYSQL) -D LXX_Leitzeile
 	python3 -m scripts.cceh.import -vvv instance/2sam_ph1.conf
 
 acts_ph4:
