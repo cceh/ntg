@@ -1,0 +1,9 @@
+[submodule "sphinxcontrib/sphinxcontrib-pic"]
+	path = sphinxcontrib/sphinxcontrib-pic
+	url = https://github.com/MarcelloPerathoner/sphinxcontrib-pic
+[submodule "sphinxcontrib/sphinxcontrib-autojsdoc"]
+	path = sphinxcontrib/sphinxcontrib-autojsdoc
+	url = https://github.com/MarcelloPerathoner/sphinxcontrib-autojsdoc
+[submodule "sphinxcontrib/sphinxcontrib-sqlalchemy-uml"]
+	path = sphinxcontrib/sphinxcontrib-sqlalchemy-uml
+	url = https://github.com/MarcelloPerathoner/sphinxcontrib-sqlalchemy-uml

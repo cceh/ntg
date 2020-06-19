@@ -26,9 +26,13 @@ sys.path.insert (0, os.path.join (root, 'server'))
 sys.path.insert (0, os.path.join (root, 'client'))
 sys.path.insert (0, os.path.join (root, 'scripts/cceh'))
 
-sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-autojsdoc/sphinxcontrib'))
-sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-pic/sphinxcontrib'))
-sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-sqlalchemy-uml/sphinxcontrib'))
+sys.path.insert (0, os.path.join (root, 'sphinxcontrib/sphinxcontrib-autojsdoc/sphinxcontrib'))
+sys.path.insert (0, os.path.join (root, 'sphinxcontrib/sphinxcontrib-pic/sphinxcontrib'))
+sys.path.insert (0, os.path.join (root, 'sphinxcontrib/sphinxcontrib-sqlalchemy-uml/sphinxcontrib'))
+
+#sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-autojsdoc/sphinxcontrib'))
+#sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-pic/sphinxcontrib'))
+#sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-sqlalchemy-uml/sphinxcontrib'))
 
 
 # -- General configuration ------------------------------------------------
