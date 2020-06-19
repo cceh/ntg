@@ -21,11 +21,14 @@ import os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 root = os.path.abspath ('..')
-sys.path.insert (0, '/home/highlander/uni/prj/suffix_tree/suffix_tree')
 sys.path.insert (0, root)
 sys.path.insert (0, os.path.join (root, 'server'))
 sys.path.insert (0, os.path.join (root, 'client'))
 sys.path.insert (0, os.path.join (root, 'scripts/cceh'))
+
+sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-autojsdoc/sphinxcontrib'))
+sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-pic/sphinxcontrib'))
+sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-sqlalchemy-uml/sphinxcontrib'))
 
 
 # -- General configuration ------------------------------------------------
@@ -39,26 +42,19 @@ sys.path.insert (0, os.path.join (root, 'scripts/cceh'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
-    'sphinx.ext.graphviz',
     'sphinx.ext.mathjax',
     'sphinx.ext.imgconverter',
     'sphinxcontrib.autoprogram',
     'sphinxcontrib.httpdomain',
-    'sphinxcontrib.plantuml',
 
-    'autojsdoc.autojsdoc',
-
-    'sqlalchemy-uml.sqlalchemy-uml',
-
-    'sphinxcontrib-pic.pic',
+    'autojsdoc',
+    'pic',
+    'sqlalchemy-uml',
 ]
 
 autojsdoc_structure_json = 'jsdoc/structure.json'
 autojsdoc_members = True
 autojsdoc_title = True
-
-sauml_arguments = ['postgresql+psycopg2://ntg@localhost:5432/acts_ph4']
-sauml_dot_table = 'bgcolor=#e7f2fa&color=#2980B9'
 
 pic_options = {
     'pic' : {
@@ -91,10 +87,33 @@ copy "config.pic";
 """,
     },
     'dot' : {
-        'program' : ["dot", "-Tsvg"],
-        'align'   : "center",
-        'prolog'  : "",
-        'epilog'  : "",
+        'program' : ['dot', '-Tsvg'],
+        'align'   : 'center',
+        'prolog'  : '',
+        'epilog'  : '',
+    },
+}
+
+sauml_options = {
+    'program'   : ['dot', '-Tsvg'],
+    'arguments' : ['postgresql+psycopg2://ntg@localhost:5432/acts_ph4'],
+    'dot-table' : {
+        'bgcolor'            : '#e7f2fa',
+        'color'              : '#2980B9',
+
+        'bgcolor.ms_cliques' : '#b2df8a',
+        'bgcolor.locstem'    : '#b2df8a',
+        'bgcolor.notes'      : '#b2df8a',
+        'bgcolor.cliques'    : '#b2df8a',
+        'color.ms_cliques'   : '#33a02c',
+        'color.locstem'      : '#33a02c',
+        'color.notes'        : '#33a02c',
+        'color.cliques'      : '#33a02c',
+
+        'bgcolor.affinity'   : '#fb9a99',
+        'bgcolor.ms_ranges'  : '#fb9a99',
+        'color.affinity'     : '#e31a1c',
+        'color.ms_ranges'    : '#e31a1c',
     },
 }
 
@@ -192,9 +211,6 @@ html_theme_options = {
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
-def setup (app):
-    app.add_stylesheet ('my_theme.css')
-
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #html_title = 'NTG v0.1.1'
@@ -214,7 +230,8 @@ def setup (app):
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['doc_src/_static']
+html_static_path = ['_static']
+html_css_files = ['my_theme.css']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied

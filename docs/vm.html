@@ -34,7 +34,6 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -82,8 +81,6 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#web-application">Web Application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#scripts">Scripts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
@@ -234,7 +231,9 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">ntg.uni-muenster.de</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#apache">Apache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api-server">API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#postgres">Postgres</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#users">Users</a></li>
 </ul>
 </li>
@@ -314,11 +313,12 @@
             
   <div class="section" id="ntg-uni-muenster-de">
 <span id="vm"></span><h1>ntg.uni-muenster.de<a class="headerlink" href="#ntg-uni-muenster-de" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This page describes the VM <code class="code docutils literal notranslate"><span class="pre">ntg.uni-muenster.de</span></code> where the main project is
+hosted.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">ntg.uni-muenster.de</span></code> is a Debian stable VM in the WWU cloud.</p>
 <div class="figure align-center" id="id1">
-<div  class="pic pic-format-dot">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="591px" preserveAspectRatio="none" style="width:1008px;height:591px;" version="1.1" viewBox="0 0 1008 591" width="1008px" zoomAndPan="magnify"><defs><filter height="300%" id="f13ggur05uf1he" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[93a731d9655d31a24a7a13887cfdd628]
+<div  class="pic pic-format-dot pic-w100">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="591px" preserveAspectRatio="none"  version="1.1" viewBox="0 0 1008 591" width="1008px" zoomAndPan="magnify"><defs><filter height="300%" id="f13ggur05uf1he" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[93a731d9655d31a24a7a13887cfdd628]
 entity https--><ellipse cx="459" cy="20.5" fill="#FEFECE" filter="url(#f13ggur05uf1he)" rx="8" ry="8" style="stroke: #A80036; stroke-width: 2.0;"/><!--MD5=[b5654460cbaf38336751f5f23441241e]
 entity pubapi--><ellipse cx="512" cy="20.5" fill="#FEFECE" filter="url(#f13ggur05uf1he)" rx="8" ry="8" style="stroke: #A80036; stroke-width: 2.0;"/><!--MD5=[ed9702f7e4f8c03b92d9e03bb4685cf3]
 entity apache--><rect fill="#FEFECE" filter="url(#f13ggur05uf1he)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="72" x="450" y="106"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="445" y="111"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="445" y="132.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="52" x="460" y="128.9951">Apache</text><!--MD5=[e2307af040e3f87d22824e7603ca28ec]
@@ -422,6 +422,8 @@ Country: US
 --></g></svg></div>
 <p class="caption"><span class="caption-text">Overview of VM</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </div>
+<div class="section" id="apache">
+<h2>Apache<a class="headerlink" href="#apache" title="Permalink to this headline">¶</a></h2>
 <p>The Apache server has 2 functions:</p>
 <ul class="simple">
 <li><p>to serve the javascript client files and</p></li>
@@ -443,8 +445,25 @@ Apache does all SSL stuff.</p>
 world-visible on an URL of its own, eg. “<a class="reference external" href="https://api.ntg.uni-muenster.de/">https://api.ntg.uni-muenster.de/</a>”
 but that would require an extra DNS entry and certificate.</p>
 </div>
+</div>
+<div class="section" id="api-server">
+<h2>API Server<a class="headerlink" href="#api-server" title="Permalink to this headline">¶</a></h2>
 <p>The API server loads its configuration from the <code class="file docutils literal notranslate"><span class="pre">~ntg/prj/ntg/ntg/instance/</span></code>
 directory, one config file for each project. See <a class="reference internal" href="server_config.html#api-server-config-files"><span class="std std-ref">API Server Configuration Files</span></a>.</p>
+<p>The API server runs as systemd service, owned by the user ‘ntg’ and controlled
+by the file: <code class="file docutils literal notranslate"><span class="pre">/etc/systemd/system/ntg.service</span></code>.</p>
+<p>The user ‘ntg’ has sudo rights to control the API server:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo /bin/systemctl start ntg
+sudo /bin/systemctl stop ntg
+sudo /bin/systemctl restart ntg
+sudo /bin/systemctl status ntg
+sudo /bin/journalctl -u ntg
+</pre></div>
+</div>
+</div>
+<div class="section" id="postgres">
+<h2>Postgres<a class="headerlink" href="#postgres" title="Permalink to this headline">¶</a></h2>
+<p>A standard PostgreSQL installation.</p>
 <p>The Postgres server holds one database for each project.</p>
 </div>
 <div class="section" id="users">
@@ -462,6 +481,18 @@ directory, one config file for each project. See <a class="reference internal" h
 <p class="admonition-title">Note</p>
 <p>You have to be a database superuser to create new project databases
 because the mysql_fdw extension says so.</p>
+</div>
+<div class="section" id="developers">
+<h3>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h3>
+<p>Developers have sudo rights on this VM, so they can gain user “ntg” or “postgres”.
+To give sudo rights to a user add their public key to the <code class="file docutils literal notranslate"><span class="pre">/etc/security/authorized_keys</span></code>.</p>
+<p>Ideally login should always happen using SSH public key authentication and no
+user password should be set at all.  To be able to sudo without a password you
+must forward your authentication agent when you ssh into this machine:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ssh -A username@ntg.uni-muenster.de
+</pre></div>
+</div>
+<p>Then, if everything works, sudo should not ask you for a password.</p>
 </div>
 </div>
 </div>

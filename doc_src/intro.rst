@@ -21,54 +21,39 @@ manuscripts as the parent manuscript.
 
 The program suite consists of:
 
-1. a web application, and
-2. a set of scripts to manipulate the CBGM database.
-
-
-Web Application
-===============
-
-The web application consists of a :mod:`web client <client>` and an :mod:`API
-server <server>`. The client runs in the user's browser.  The API server is
-written in Python.  The server can manage multiple databases.
+#. a :mod:`web client <client>`,
+#. an :mod:`API server <server>`, and
+#. a set of :mod:`scripts` to manipulate the CBGM database.
 
 .. pic:: uml
-   :caption: Web Application
+   :caption: Overview of the program suite
 
    skinparam backgroundColor transparent
 
    component "Web Client" as client
    note left of client: javascript
+
    component "API Server" as api
    note left of api: python
-   database "Acts\nPhase 4" as db1
-   note top of db1: Postgres
-   database "Acts\nPhase 5" as db2
-   database "John\nPhase 1" as db3
-   database "Mark\nPhase 1" as db4
-   database "Mark\nPhase 2" as db5
-   database "..."  as db6
 
+   component "Scripts" as scripts
+   note right of scripts: python
 
-   client <--> api
-   api <--> db1
-   api <--> db2
-   api <--> db3
-   api <--> db4
-   api <--> db5
-   api <--> db6
+   database "Database" as db
+   note left of db: postgres
 
+   client --> api
+   api --> db
+   scripts --> db
+   api -[hidden]> scripts
 
-Currently we host the CBGM for three books, namely Acts, John and Mark, by
-different editorial teams and in different stages of completion.
+The web client runs in the browser.
+
+The API server can manage multiple databases.
 Each book and phase gets its own database.
 
-
-Scripts
-=======
-
-This is a set of scripts that the user can run manually on the server to
-manage the whole :ref:`cbgm` process, that is:
+The scripts can be run manually on the VM to
+manage the whole :ref:`CBGM process <cbgm>`, that is:
 
 - importing new books,
 - doing the CBGM (passing from one phase to the next),
@@ -81,5 +66,7 @@ Links
 The application is online at: http://ntg.cceh.uni-koeln.de/acts/ph4/
 
 The source code is online at: https://github.com/cceh/ntg
+
+An introductory presentation to the CBGM: https://www.uni-muenster.de/INTF/cbgm_presentation/download.html
 
 Author: Marcello Perathoner <marcello.perathoner@uni-koeln.de>

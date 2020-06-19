@@ -31,8 +31,8 @@ The `server` uses all these tables.
 .. sauml::
    :include: books passages ranges readings cliques manuscripts ms_cliques locstem notes apparatus ms_ranges affinity
    :caption: Work database structure
+   :html-classes: pic-w100
    :align: center
-   :dot-table: bgcolor.ms_cliques=#b2df8a&color.ms_cliques=#33a02c&bgcolor.locstem=#b2df8a&color.locstem=#33a02c&bgcolor.notes=#b2df8a&color.notes=#33a02c&bgcolor.cliques=#b2df8a&color.cliques=#33a02c&bgcolor.affinity=#fb9a99&color.affinity=#e31a1c&bgcolor.ms_ranges=#fb9a99&color.ms_ranges=#e31a1c
 
    { rank=same; passages, ranges }
 
@@ -72,13 +72,15 @@ There are 28 instances of each table, one for each chapter of Acts.
 These tables are only used once for building the :mod:`CBGM database <ntg_common.db>`.
 The database system is MySQL.
 
-.. sauml:: mysql:///ECM_ActsPh4?read_default_group=ntg
+.. sauml:: mysql:///ECM_ActsPh4?read_default_group=client
    :include: Acts01GVZ Acts01GVZlac
+   :html-classes: pic-w100
    :align: center
 
-.. sauml:: mysql:///VarGenAtt_ActPh4?read_default_group=ntg
+.. sauml:: mysql:///VarGenAtt_ActPh4?read_default_group=client
    :include: LocStemEdAct01 RdgAct01 VarGenAttAct01
    :caption: Source database structure
+   :html-classes: pic-w100
    :align: center
 
 

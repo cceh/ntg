@@ -4,12 +4,14 @@
  ntg.uni-muenster.de
 =====================
 
+This page describes the VM :code:`ntg.uni-muenster.de` where the main project is
+hosted.
 
-Overview
-========
+:code:`ntg.uni-muenster.de` is a Debian stable VM in the WWU cloud.
 
 .. pic:: uml
    :caption: Overview of VM
+   :html-classes: pic-w100
 
    skinparam backgroundColor transparent
 
@@ -63,6 +65,10 @@ Overview
    pg      --> db9
    pg      --> db10
 
+
+Apache
+======
+
 The Apache server has 2 functions:
 
 - to serve the javascript client files and
@@ -87,8 +93,31 @@ Apache does all SSL stuff.
    world-visible on an URL of its own, eg. "https://api.ntg.uni-muenster.de/"
    but that would require an extra DNS entry and certificate.
 
+
+API Server
+==========
+
 The API server loads its configuration from the :file:`~ntg/prj/ntg/ntg/instance/`
 directory, one config file for each project. See :ref:`api-server-config-files`.
+
+The API server runs as systemd service, owned by the user 'ntg' and controlled
+by the file: :file:`/etc/systemd/system/ntg.service`.
+
+The user 'ntg' has sudo rights to control the API server:
+
+.. code:: bash
+
+   sudo /bin/systemctl start ntg
+   sudo /bin/systemctl stop ntg
+   sudo /bin/systemctl restart ntg
+   sudo /bin/systemctl status ntg
+   sudo /bin/journalctl -u ntg
+
+
+Postgres
+========
+
+A standard PostgreSQL installation.
 
 The Postgres server holds one database for each project.
 
@@ -108,3 +137,20 @@ The user "postgres" is the database superuser.
 
    You have to be a database superuser to create new project databases
    because the mysql_fdw extension says so.
+
+
+Developers
+----------
+
+Developers have sudo rights on this VM, so they can gain user "ntg" or "postgres".
+To give sudo rights to a user add their public key to the :file:`/etc/security/authorized_keys`.
+
+Ideally login should always happen using SSH public key authentication and no
+user password should be set at all.  To be able to sudo without a password you
+must forward your authentication agent when you ssh into this machine:
+
+.. code:: bash
+
+   ssh -A username@ntg.uni-muenster.de
+
+Then, if everything works, sudo should not ask you for a password.

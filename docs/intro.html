@@ -34,7 +34,6 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
   <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -82,8 +81,6 @@
             
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#web-application">Web Application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#scripts">Scripts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#links">Links</a></li>
 </ul>
 </li>
@@ -234,13 +231,14 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="vm.html">ntg.uni-muenster.de</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vm.html#overview">Overview</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vm.html#users">Users</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="technologies.html">Technologies Used</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="technologies.html#server">Server</a></li>
 <li class="toctree-l3"><a class="reference internal" href="technologies.html#client">Client</a></li>
-<li class="toctree-l3"><a class="reference internal" href="technologies.html#common">Common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="technologies.html#scripts">Scripts</a></li>
 </ul>
 </li>
 </ul>
@@ -481,55 +479,40 @@ we build a global stemma of manuscripts by using the most similar prior
 manuscripts as the parent manuscript.</p>
 <p>The program suite consists of:</p>
 <ol class="arabic simple">
-<li><p>a web application, and</p></li>
-<li><p>a set of scripts to manipulate the CBGM database.</p></li>
+<li><p>a <a class="reference internal" href="client_dev.html#module-client" title="client: Web Client"><code class="xref py py-mod docutils literal notranslate"><span class="pre">web</span> <span class="pre">client</span></code></a>,</p></li>
+<li><p>an <a class="reference internal" href="server_dev.html#module-server" title="server: Flask Driver Module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span> <span class="pre">server</span></code></a>, and</p></li>
+<li><p>a set of <a class="reference internal" href="scripts_dev.html#module-scripts" title="scripts: Scripts"><code class="xref py py-mod docutils literal notranslate"><span class="pre">scripts</span></code></a> to manipulate the CBGM database.</p></li>
 </ol>
-<div class="section" id="web-application">
-<h2>Web Application<a class="headerlink" href="#web-application" title="Permalink to this headline">¶</a></h2>
-<p>The web application consists of a <a class="reference internal" href="client_dev.html#module-client" title="client: Web Client"><code class="xref py py-mod docutils literal notranslate"><span class="pre">web</span> <span class="pre">client</span></code></a> and an <a class="reference internal" href="server_dev.html#module-server" title="server: Flask Driver Module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span>
-<span class="pre">server</span></code></a>. The client runs in the user’s browser.  The API server is
-written in Python.  The server can manage multiple databases.</p>
 <div class="figure align-center" id="id2">
 <div  class="pic pic-format-dot">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="273px" preserveAspectRatio="none" style="width:605px;height:273px;" version="1.1" viewBox="0 0 605 273" width="605px" zoomAndPan="magnify"><defs><filter height="300%" id="fq5yx5dyrxuqy" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[4a65e84059005d12693a083370a06717]
-entity client--><rect fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="94" x="274.5" y="8"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="269.5" y="13"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="269.5" y="34.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="74" x="284.5" y="30.9951">Web Client</text><path d="M157.5,13.5 L157.5,38.6328 A0,0 0 0 0 157.5,38.6328 L239.5,38.6328 A0,0 0 0 0 239.5,38.6328 L239.5,31.5 L274.28,26 L239.5,23.5 L239.5,23.5 L229.5,13.5 L157.5,13.5 A0,0 0 0 0 157.5,13.5 " fill="#FBFB77" filter="url(#fq5yx5dyrxuqy)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M229.5,13.5 L229.5,23.5 L239.5,23.5 L229.5,13.5 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="61" x="163.5" y="30.5669">javascript</text><!--MD5=[e2307af040e3f87d22824e7603ca28ec]
-entity api--><rect fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="89" x="277" y="104"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="272" y="109"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="272" y="130.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="69" x="287" y="126.9951">API Server</text><path d="M177,109.5 L177,134.6328 A0,0 0 0 0 177,134.6328 L242,134.6328 A0,0 0 0 0 242,134.6328 L242,127.5 L276.96,122 L242,119.5 L242,119.5 L232,109.5 L177,109.5 A0,0 0 0 0 177,109.5 " fill="#FBFB77" filter="url(#fq5yx5dyrxuqy)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M232,109.5 L232,119.5 L242,119.5 L232,109.5 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="44" x="183" y="126.5669">python</text><!--MD5=[7aa9c583cf047545838c264d3047b712]
-entity db1--><path d="M6.5,210 C6.5,200 44.5,200 44.5,200 C44.5,200 82.5,200 82.5,210 L82.5,251.5938 C82.5,261.5938 44.5,261.5938 44.5,261.5938 C44.5,261.5938 6.5,261.5938 6.5,251.5938 L6.5,210 " fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M6.5,210 C6.5,220 44.5,220 44.5,220 C44.5,220 82.5,220 82.5,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="16.5" y="236.9951">Acts</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="56" x="16.5" y="253.292">Phase 4</text><path d="M6,109.5 L6,134.6328 A0,0 0 0 0 6,134.6328 L40.5,134.6328 L44.5,199.85 L48.5,134.6328 L83,134.6328 A0,0 0 0 0 83,134.6328 L83,119.5 L73,109.5 L6,109.5 A0,0 0 0 0 6,109.5 " fill="#FBFB77" filter="url(#fq5yx5dyrxuqy)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M73,109.5 L73,119.5 L83,119.5 L73,109.5 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="56" x="12" y="126.5669">Postgres</text><!--MD5=[2331507006b4b8bee4c616015350b23c]
-entity db2--><path d="M117.5,210 C117.5,200 155.5,200 155.5,200 C155.5,200 193.5,200 193.5,210 L193.5,251.5938 C193.5,261.5938 155.5,261.5938 155.5,261.5938 C155.5,261.5938 117.5,261.5938 117.5,251.5938 L117.5,210 " fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M117.5,210 C117.5,220 155.5,220 155.5,220 C155.5,220 193.5,220 193.5,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="127.5" y="236.9951">Acts</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="56" x="127.5" y="253.292">Phase 5</text><!--MD5=[7a84b64b0b7b7d5ec450ed14b904bacb]
-entity db3--><path d="M228.5,210 C228.5,200 266.5,200 266.5,200 C266.5,200 304.5,200 304.5,210 L304.5,251.5938 C304.5,261.5938 266.5,261.5938 266.5,261.5938 C266.5,261.5938 228.5,261.5938 228.5,251.5938 L228.5,210 " fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M228.5,210 C228.5,220 266.5,220 266.5,220 C266.5,220 304.5,220 304.5,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="30" x="238.5" y="236.9951">John</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="56" x="238.5" y="253.292">Phase 1</text><!--MD5=[c176c1dae556a162e5c35d6dd4bfcf34]
-entity db4--><path d="M339.5,210 C339.5,200 377.5,200 377.5,200 C377.5,200 415.5,200 415.5,210 L415.5,251.5938 C415.5,261.5938 377.5,261.5938 377.5,261.5938 C377.5,261.5938 339.5,261.5938 339.5,251.5938 L339.5,210 " fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M339.5,210 C339.5,220 377.5,220 377.5,220 C377.5,220 415.5,220 415.5,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="33" x="349.5" y="236.9951">Mark</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="56" x="349.5" y="253.292">Phase 1</text><!--MD5=[1fe7a992e89c10c5f2c27a23fb1e129d]
-entity db5--><path d="M450.5,210 C450.5,200 488.5,200 488.5,200 C488.5,200 526.5,200 526.5,210 L526.5,251.5938 C526.5,261.5938 488.5,261.5938 488.5,261.5938 C488.5,261.5938 450.5,261.5938 450.5,251.5938 L450.5,210 " fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M450.5,210 C450.5,220 488.5,220 488.5,220 C488.5,220 526.5,220 526.5,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="33" x="460.5" y="236.9951">Mark</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="56" x="460.5" y="253.292">Phase 2</text><!--MD5=[7c123ab891f61afa165271fa88b5c437]
-entity db6--><path d="M561.5,218.5 C561.5,208.5 577.5,208.5 577.5,208.5 C577.5,208.5 593.5,208.5 593.5,218.5 L593.5,243.7969 C593.5,253.7969 577.5,253.7969 577.5,253.7969 C577.5,253.7969 561.5,253.7969 561.5,243.7969 L561.5,218.5 " fill="#FEFECE" filter="url(#fq5yx5dyrxuqy)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M561.5,218.5 C561.5,228.5 577.5,228.5 577.5,228.5 C577.5,228.5 593.5,228.5 593.5,218.5 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="12" x="571.5" y="245.4951">...</text><!--MD5=[d4ad1d5275391ca8d3acb292d4b26dc5]
-link client to api--><path d="M321.5,49.66 C321.5,64.52 321.5,83.85 321.5,98.64 " fill="none" id="client-api" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="321.5,103.87,325.5,94.87,321.5,98.87,317.5,94.87,321.5,103.87" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="321.5,44.24,317.5,53.24,321.5,49.24,325.5,53.24,321.5,44.24" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[e103e8664999dd9756eff2c32e1de5b6]
-link api to db1--><path d="M271.98,137.59 C226.38,151.62 157.27,174.44 99.5,200 C95.41,201.81 91.21,203.81 87.05,205.9 " fill="none" id="api-db1" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="82.56,208.19,92.395,207.6674,87.0149,205.9197,88.7626,200.5396,82.56,208.19" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="276.86,136.09,267.0819,134.9116,272.0808,137.5594,269.433,142.5583,276.86,136.09" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c945a0638e97c8d85bbaa16159667354]
-link api to db2--><path d="M290.54,142.96 C264.49,159.75 226.99,183.92 198.11,202.54 " fill="none" id="api-db2" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="193.55,205.47,203.2823,203.9596,197.7536,202.7626,198.9505,197.2338,193.55,205.47" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="294.83,140.19,285.0964,141.6921,290.6241,142.8938,289.4224,148.4215,294.83,140.19" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[3c7e9365bf194672ba40a7ba5071302f]
-link api to db3--><path d="M310.23,144.92 C302.78,159.42 292.85,178.74 284.34,195.3 " fill="none" id="api-db3" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="281.98,199.89,289.6698,193.7364,284.2787,195.4497,282.5654,190.0586,281.98,199.89" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="312.66,140.19,304.9858,146.3631,310.3726,144.6361,312.0996,150.0229,312.66,140.19" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[eaec4da83caf75e3bf23f71b58a53993]
-link api to db4--><path d="M332.97,144.92 C340.56,159.42 350.67,178.74 359.34,195.3 " fill="none" id="api-db4" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="361.74,199.89,361.1167,190.0609,359.4242,195.4586,354.0265,193.7661,361.74,199.89" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="330.5,140.19,331.1233,150.0191,332.8158,144.6214,338.2135,146.3139,330.5,140.19" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c9ae675fabfaa8d7ce5b4fa98ffa6990]
-link api to db5--><path d="M352.65,142.96 C378.96,159.82 416.89,184.12 445.99,202.77 " fill="none" id="api-db5" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="450.22,205.47,444.7997,197.2468,446.0099,202.7727,440.4841,203.9829,450.22,205.47" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="348.33,140.19,353.7376,148.4215,352.5359,142.8938,358.0636,141.6921,348.33,140.19" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[e34d9993e7729f5b16c19447e2bb412d]
-link api to db6--><path d="M371.13,133.97 C418.04,145.73 489.26,167.25 544.5,200 C549,202.67 553.41,206.01 557.49,209.49 " fill="none" id="api-db6" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="561.43,213,557.3799,204.0224,557.7001,209.6702,552.0523,209.9903,561.43,213" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="366.1,132.73,373.8611,138.7934,370.9507,133.9427,375.8014,131.0323,366.1,132.73" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[c0488591b809ede7f813439c51749aea]
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="257px" preserveAspectRatio="none"  version="1.1" viewBox="0 0 428 257" width="428px" zoomAndPan="magnify"><defs><filter height="300%" id="fr1dwn7t3wyt9" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[4a65e84059005d12693a083370a06717]
+entity client--><rect fill="#FEFECE" filter="url(#fr1dwn7t3wyt9)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="94" x="123" y="8"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="118" y="13"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="118" y="34.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="74" x="133" y="30.9951">Web Client</text><path d="M6,13.5 L6,38.6328 A0,0 0 0 0 6,38.6328 L88,38.6328 A0,0 0 0 0 88,38.6328 L88,31.5 L122.78,26 L88,23.5 L88,23.5 L78,13.5 L6,13.5 A0,0 0 0 0 6,13.5 " fill="#FBFB77" filter="url(#fr1dwn7t3wyt9)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M78,13.5 L78,23.5 L88,23.5 L78,13.5 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="61" x="12" y="30.5669">javascript</text><!--MD5=[e2307af040e3f87d22824e7603ca28ec]
+entity api--><rect fill="#FEFECE" filter="url(#fr1dwn7t3wyt9)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="89" x="125.5" y="104"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="120.5" y="109"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="120.5" y="130.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="69" x="135.5" y="126.9951">API Server</text><path d="M25.5,109.5 L25.5,134.6328 A0,0 0 0 0 25.5,134.6328 L90.5,134.6328 A0,0 0 0 0 90.5,134.6328 L90.5,127.5 L125.46,122 L90.5,119.5 L90.5,119.5 L80.5,109.5 L25.5,109.5 A0,0 0 0 0 25.5,109.5 " fill="#FBFB77" filter="url(#fr1dwn7t3wyt9)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M80.5,109.5 L80.5,119.5 L90.5,119.5 L80.5,109.5 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="44" x="31.5" y="126.5669">python</text><!--MD5=[d7f85479b11e81629d6db8aaff2361ac]
+entity scripts--><rect fill="#FEFECE" filter="url(#fr1dwn7t3wyt9)" height="36.2969" style="stroke: #A80036; stroke-width: 1.5;" width="67" x="249.5" y="104"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="244.5" y="109"/><rect fill="#FEFECE" height="5" style="stroke: #A80036; stroke-width: 1.5;" width="10" x="244.5" y="130.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="47" x="259.5" y="126.9951">Scripts</text><path d="M351.5,109.5 L351.5,118 L316.54,122 L351.5,126 L351.5,134.6328 A0,0 0 0 0 351.5,134.6328 L416.5,134.6328 A0,0 0 0 0 416.5,134.6328 L416.5,119.5 L406.5,109.5 L351.5,109.5 A0,0 0 0 0 351.5,109.5 " fill="#FBFB77" filter="url(#fr1dwn7t3wyt9)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M406.5,109.5 L406.5,119.5 L416.5,119.5 L406.5,109.5 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="44" x="357.5" y="126.5669">python</text><!--MD5=[7468467f3b6b392f1d176d828c753b77]
+entity db--><path d="M184,210 C184,200 227,200 227,200 C227,200 270,200 270,210 L270,235.2969 C270,245.2969 227,245.2969 227,245.2969 C227,245.2969 184,245.2969 184,235.2969 L184,210 " fill="#FEFECE" filter="url(#fr1dwn7t3wyt9)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M184,210 C184,220 227,220 227,220 C227,220 270,220 270,210 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="66" x="194" y="236.9951">Database</text><path d="M71.5,210 L71.5,235.1328 A0,0 0 0 0 71.5,235.1328 L148.5,235.1328 A0,0 0 0 0 148.5,235.1328 L148.5,228 L183.96,222.5 L148.5,220 L148.5,220 L138.5,210 L71.5,210 A0,0 0 0 0 71.5,210 " fill="#FBFB77" filter="url(#fr1dwn7t3wyt9)" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M138.5,210 L138.5,220 L148.5,220 L138.5,210 " fill="#FBFB77" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="56" x="77.5" y="227.0669">postgres</text><!--MD5=[d4ad1d5275391ca8d3acb292d4b26dc5]
+link client to api--><path d="M170,44.24 C170,59.48 170,81.81 170,98.46 " fill="none" id="client-&gt;api" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="170,103.87,174,94.87,170,98.87,166,94.87,170,103.87" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[1b9dbcfdb69d97b7ce5f2d963fc4ed75]
+link api to db--><path d="M179.93,140.16 C188.75,155.4 201.78,177.91 211.89,195.39 " fill="none" id="api-&gt;db" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="214.39,199.72,213.3385,189.9274,211.8831,195.3938,206.4167,193.9384,214.39,199.72" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[81951367131965840633d4fadc19df84]
+link scripts to db--><path d="M273.25,140.16 C264.65,155.27 252,177.53 242.1,194.94 " fill="none" id="scripts-&gt;db" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="239.38,199.72,247.2996,193.8651,241.8469,195.3709,240.3411,189.9181,239.38,199.72" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[43df746566660c7146b1f9d5906f213a]
+link api to scripts--><!--MD5=[d985d7db66dd96620c5a596e302093b3]
 @startuml
 skinparam backgroundColor transparent
 
 component "Web Client" as client
 note left of client: javascript
+
 component "API Server" as api
 note left of api: python
-database "Acts\nPhase 4" as db1
-note top of db1: Postgres
-database "Acts\nPhase 5" as db2
-database "John\nPhase 1" as db3
-database "Mark\nPhase 1" as db4
-database "Mark\nPhase 2" as db5
-database "..."  as db6
 
+component "Scripts" as scripts
+note right of scripts: python
 
-client <- -> api
-api <- -> db1
-api <- -> db2
-api <- -> db3
-api <- -> db4
-api <- -> db5
-api <- -> db6
+database "Database" as db
+note left of db: postgres
+
+client - -> api
+api - -> db
+scripts - -> db
+api -[hidden]> scripts
 @enduml
 
 PlantUML version 1.2020.02(Sun Mar 01 11:22:07 CET 2020)
@@ -542,26 +525,23 @@ Default Encoding: UTF-8
 Language: en
 Country: US
 --></g></svg></div>
-<p class="caption"><span class="caption-text">Web Application</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">Overview of the program suite</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
-<p>Currently we host the CBGM for three books, namely Acts, John and Mark, by
-different editorial teams and in different stages of completion.
+<p>The web client runs in the browser.</p>
+<p>The API server can manage multiple databases.
 Each book and phase gets its own database.</p>
-</div>
-<div class="section" id="scripts">
-<h2>Scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h2>
-<p>This is a set of scripts that the user can run manually on the server to
-manage the whole <a class="reference internal" href="cbgm.html#cbgm"><span class="std std-ref">CBGM</span></a> process, that is:</p>
+<p>The scripts can be run manually on the VM to
+manage the whole <a class="reference internal" href="cbgm.html#cbgm"><span class="std std-ref">CBGM process</span></a>, that is:</p>
 <ul class="simple">
 <li><p>importing new books,</p></li>
 <li><p>doing the CBGM (passing from one phase to the next),</p></li>
 <li><p>and eventually updating the apparatus.</p></li>
 </ul>
-</div>
 <div class="section" id="links">
 <h2>Links<a class="headerlink" href="#links" title="Permalink to this headline">¶</a></h2>
 <p>The application is online at: <a class="reference external" href="http://ntg.cceh.uni-koeln.de/acts/ph4/">http://ntg.cceh.uni-koeln.de/acts/ph4/</a></p>
 <p>The source code is online at: <a class="reference external" href="https://github.com/cceh/ntg">https://github.com/cceh/ntg</a></p>
+<p>An introductory presentation to the CBGM: <a class="reference external" href="https://www.uni-muenster.de/INTF/cbgm_presentation/download.html">https://www.uni-muenster.de/INTF/cbgm_presentation/download.html</a></p>
 <p>Author: Marcello Perathoner &lt;<a class="reference external" href="mailto:marcello&#46;perathoner&#37;&#52;&#48;uni-koeln&#46;de">marcello<span>&#46;</span>perathoner<span>&#64;</span>uni-koeln<span>&#46;</span>de</a>&gt;</p>
 </div>
 </div>
