@@ -81,7 +81,6 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#scripts">Scripts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
@@ -232,8 +231,11 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="vm.html">ntg.uni-muenster.de</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="vm.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vm.html#apache">Apache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vm.html#api-server">API Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vm.html#postgres">Postgres</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vm.html#users">Users</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vm.html#cron">Cron</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="technologies.html">Technologies Used</a><ul>
@@ -322,10 +324,11 @@
 <div class="section" id="manual-user-management">
 <h2>Manual User Management<a class="headerlink" href="#manual-user-management" title="Permalink to this headline">¶</a></h2>
 <p>New user must first register themselves through the web interface at:
-<a class="reference external" href="https://ntg.uni-muenster.de/user/register">https://ntg.uni-muenster.de/user/register</a></p>
-<p>After they have succesfully registered, their roles must be set manually.  SSH
-into the NTG VM as user ntg and:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>psql -d ntg_user
+<a class="reference external" href="https://ntg.uni-muenster.de/user/register">https://ntg.uni-muenster.de/user/register</a>
+After they have succesfully registered, their roles must be set manually.</p>
+<p>User credentials are held in the <code class="code docutils literal notranslate"><span class="pre">ntg_user</span></code> database.</p>
+<p>ssh into the VM and:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -u ntg psql -d ntg_user
 </pre></div>
 </div>
 <p>To see current users and roles and their ids:</p>

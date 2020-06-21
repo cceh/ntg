@@ -119,7 +119,10 @@ Postgres
 
 A standard PostgreSQL installation.
 
-The Postgres server holds one database for each project.
+The Postgres server has one database for each project,
+plus the :code:`ntg_user` database for :ref:`user credentials <user-management>`.
+
+Postgres data resides in its own filesystem mounted at :file:`/var/lib/postgresql`.
 
 
 Users
@@ -143,14 +146,61 @@ Developers
 ----------
 
 Developers have sudo rights on this VM, so they can gain user "ntg" or "postgres".
-To give sudo rights to a user add their public key to the :file:`/etc/security/authorized_keys`.
 
-Ideally login should always happen using SSH public key authentication and no
-user password should be set at all.  To be able to sudo without a password you
-must forward your authentication agent when you ssh into this machine:
+Ideally you should always login using SSH public key authentication and no user
+password should be set on your account at all.  To be able to sudo without a
+password you must forward your authentication agent when you ssh into this
+machine:
 
 .. code:: bash
 
    ssh -A username@ntg.uni-muenster.de
 
 Then, if everything works, sudo should not ask you for a password.
+
+
+Add a new developer to the VM
+-----------------------------
+
+You need the new developer to send you their public SSH key and
+store it in the file :file:`/tmp/id_rsa.pub` on your local machine.
+Then ssh into the VM and add the new user $NEWUSER
+setting a temporary password:
+
+.. code:: bash
+
+   sudo adduser $NEWUSER
+
+Open another shell on your local machine and say:
+
+.. code:: bash
+
+   ssh-copy-id -i /tmp/id_rsa.pub $NEWUSER@ntg.uni-muenster.de
+
+Close this shell and on the VM again, disable the temp password and add the
+developer to the sudoers.  To give sudo rights to a user without password add
+their public key to the file :file:`/etc/security/authorized_keys`.
+
+.. code:: bash
+
+   sudo passwd -d -l $NEWUSER
+   sudo usermod -aG sudo $NEWUSER
+   sudo bash -c "cat ~$NEWUSER/.ssh/authorized_keys >> /etc/security/authorized_keys"
+
+
+Cron
+====
+
+The editorial decisions for all active databases are backed up every night and
+the active databases are backed up weekly. See:
+
+.. code:: bash
+
+   sudo -u ntg crontab -l
+
+Active databases are those that are not set read-only.
+The active databases are configured in the file :file:`scripts/cceh/active_databases`.
+
+Also full server backups are scheduled with backup2l. See: :file:`/etc/backup2l.conf`.
+
+Backups reside in their own filesystem mounted at :file:`/backup`.

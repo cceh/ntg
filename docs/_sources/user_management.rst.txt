@@ -20,13 +20,15 @@ Manual User Management
 
 New user must first register themselves through the web interface at:
 https://ntg.uni-muenster.de/user/register
+After they have succesfully registered, their roles must be set manually.
 
-After they have succesfully registered, their roles must be set manually.  SSH
-into the NTG VM as user ntg and:
+User credentials are held in the :code:`ntg_user` database.
 
-.. code:: shell
+ssh into the VM and:
 
-   psql -d ntg_user
+.. code:: bash
+
+   sudo -u ntg psql -d ntg_user
 
 To see current users and roles and their ids:
 
