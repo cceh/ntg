@@ -8,7 +8,7 @@ The CBGM is a method for inferring global manuscript stemmata from local
 stemmata in the manuscripts' texts.
 
 ..
-   http://ntg.cceh.uni-koeln.de/ph4/coherence#51528030-4
+   http://ntg.uni-muenster.de/ph4/coherence#51528030-4
 
 .. pic:: dot local-stemma-example.dot
    :align: center
@@ -63,7 +63,7 @@ manage the whole :ref:`CBGM process <cbgm>`, that is:
 Links
 =====
 
-The application is online at: http://ntg.cceh.uni-koeln.de/acts/ph4/
+The application is online at: http://ntg.uni-muenster.de/acts/ph4/
 
 The source code is online at: https://github.com/cceh/ntg
 

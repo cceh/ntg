@@ -16,6 +16,6 @@ Ziele:
 
 - Fernziel: Interaktivität auch für externe Nutzer.
 
-Website:  http://ntg.cceh.uni-koeln.de/
+Website:  http://ntg.uni-muenster.de/
 
 Developer documentation: https://cceh.github.io/ntg/
