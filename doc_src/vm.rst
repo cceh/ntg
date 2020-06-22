@@ -7,7 +7,7 @@
 This page describes the VM :code:`ntg.uni-muenster.de` where the main project is
 hosted.
 
-:code:`ntg.uni-muenster.de` is a Debian stable VM in the WWU cloud.
+:code:`ntg.uni-muenster.de` is a Debian stable VM in the WWU OpenStack cloud.
 
 .. pic:: uml
    :caption: Overview of VM
@@ -175,7 +175,7 @@ Open another shell on your local machine and say:
 
 .. code:: bash
 
-   ssh-copy-id -i /tmp/id_rsa.pub $NEWUSER@ntg.uni-muenster.de
+   ssh-copy-id -f -i /tmp/id_rsa.pub $NEWUSER@ntg.uni-muenster.de
 
 Close this shell and on the VM again, disable the temp password and add the
 developer to the sudoers.  To give sudo rights to a user without password add
@@ -188,8 +188,8 @@ their public key to the file :file:`/etc/security/authorized_keys`.
    sudo bash -c "cat ~$NEWUSER/.ssh/authorized_keys >> /etc/security/authorized_keys"
 
 
-Cron
-====
+Backups
+=======
 
 The editorial decisions for all active databases are backed up every night and
 the active databases are backed up weekly. See:
@@ -204,3 +204,34 @@ The active databases are configured in the file :file:`scripts/cceh/active_datab
 Also full server backups are scheduled with backup2l. See: :file:`/etc/backup2l.conf`.
 
 Backups reside in their own filesystem mounted at :file:`/backup`.
+
+
+OpenStack Cloud
+===============
+
+To administer the VM in the cloud: add disks, memory, CPUs, snapshots, disaster recovery etc.
+
+Point your browser to:
+
+  https://openstack.wwu.de/
+
+Select: :guilabel:`DFN AAI Single Sign-On` and go through the login process.
+
+Then go to:
+
+  :guilabel:`Project | Compute |  Instances`
+
+You van now manage the VM.
+
+For disaster recovery select :guilabel:`Console` from the :guilabel:`Actions` dropdown
+and login using the 'debian' user.
+
+.. note::
+
+   There are issues with keyboard layout. It works best if you select the
+   English (US) layout for your browser window.  Some keys (<>|) still don't
+   work though.
+
+Help chat:
+
+  https://zivmattermost.uni-muenster.de/wwu/channels/wwucloud

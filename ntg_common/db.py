@@ -1649,7 +1649,7 @@ Base4 = declarative_base ()
 Base4.metadata.schema = 'ntg'
 
 class Nestle (Base4):
-    """The Leitzeile from the Nestle-Aland
+    """The Leitzeile.  Usually from the Nestle-Aland
 
     Dient der Darstellung der Leitzeile im Navigator.
 
@@ -1694,6 +1694,8 @@ Base3 = declarative_base ()
 Base3.metadata.schema = 'ntg'
 
 class _User ():
+    """ Users credentials. """
+
     __tablename__ = 'user'
 
     id           = Column (Integer,      primary_key = True)
@@ -1707,6 +1709,8 @@ class _User ():
 
 
 class _Role ():
+    """ Roles known to the system. """
+
     __tablename__ = 'role'
 
     id          = Column (Integer,      primary_key = True)
@@ -1715,6 +1719,8 @@ class _Role ():
 
 
 class _Roles_Users ():
+    """ Mapping of users to roles. """
+
     __tablename__ = 'roles_users'
 
     id      = Column (Integer, primary_key = True)

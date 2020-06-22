@@ -243,3 +243,23 @@ class VarGenAttAct01 (Base):
     __table_args__ = (
         PrimaryKeyConstraint (BEGADR, ENDADR, MS),
     )
+
+
+class Nestle29 (Base):
+    """The Leitzeile.
+
+    .. sauml:: mysql:///Nestle29?read_default_group=client
+       :include: Nestle29
+
+    """
+
+    __tablename__ = 'Nestle29'
+
+    book     = Column (Integer,      nullable=False)
+    chapter  = Column (Integer,      nullable=False)
+    verse    = Column (Integer,      nullable=False)
+    word     = Column (Integer,      nullable=False)
+    content  = Column (String (255), nullable=False)
+    prev     = Column (Integer,      nullable=False,   server_default=text ("'0'"))
+    adr      = Column (Integer,      primary_key=True, server_default=text ("'0'"))
+    next     = Column (Integer,      nullable=False,   server_default=text ("'0'"))

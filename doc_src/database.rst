@@ -64,24 +64,30 @@ Tables
 
 .. _source-db:
 
-Source Database
-===============
+Source Databases
+================
 
-This is the legacy database used in Münster.
-There are 28 instances of each table, one for each chapter of Acts.
+These are the databases output by the NTVMR.
+There is one instances of each table for every chapter,
+eg. in Acts there are 28 instances of each table.
 These tables are only used once for building the :mod:`CBGM database <ntg_common.db>`.
 The database system is MySQL.
 
 .. sauml:: mysql:///ECM_ActsPh4?read_default_group=client
    :include: Acts01GVZ Acts01GVZlac
+   :caption: ECM database structure
    :html-classes: pic-w100
    :align: center
 
 .. sauml:: mysql:///VarGenAtt_ActPh4?read_default_group=client
    :include: LocStemEdAct01 RdgAct01 VarGenAttAct01
-   :caption: Source database structure
+   :caption: VarGen database structure
    :html-classes: pic-w100
    :align: center
+
+.. sauml:: mysql:///Nestle29?read_default_group=client
+   :include: Nestle29
+   :caption: Leitzeile database structure
 
 
 Tables
@@ -100,6 +106,9 @@ Tables
    :members:
 
 .. autoclass:: ntg_common.src_db.VarGenAttAct01
+   :members:
+
+.. autoclass:: ntg_common.src_db.Nestle29
    :members:
 
 
