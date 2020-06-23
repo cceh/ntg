@@ -100,10 +100,10 @@ API Server
 The API server loads its configuration from the :file:`~ntg/prj/ntg/ntg/instance/`
 directory, one config file for each project. See :ref:`api-server-config-files`.
 
-The API server runs as systemd service, owned by the user 'ntg' and controlled
+The API server runs as systemd service, owned by the user "ntg" and controlled
 by the file: :file:`/etc/systemd/system/ntg.service`.
 
-The user 'ntg' has sudo rights to control the API server:
+The user "ntg" has sudo rights to control the API server:
 
 .. code:: bash
 
@@ -206,6 +206,14 @@ Also full server backups are scheduled with backup2l. See: :file:`/etc/backup2l.
 Backups reside in their own filesystem mounted at :file:`/backup`.
 
 
+Icinga
+======
+
+Icinga is a monitoring software.  The VM is configured as Icinga satellite.
+
+See under: :file:`/etc/icinga2/`
+
+
 OpenStack Cloud
 ===============
 
@@ -221,7 +229,7 @@ Then go to:
 
   :guilabel:`Project | Compute |  Instances`
 
-You van now manage the VM.
+You can now manage the VM.
 
 For disaster recovery select :guilabel:`Console` from the :guilabel:`Actions` dropdown
 and login using the 'debian' user.

@@ -38,7 +38,7 @@ All input data must be converted and imported into one Postgres database.
    database  "Acts"       as db2
    note left of db1: Postgres
    note right of import: copies mysql\nto Postgres
-   note right of prepare: normalizes and\nchecks for integrity
+   note right of prepare: normalizes and\nchecks data integrity
 
    dbsrc1  --> import
    dbsrc2  --> import

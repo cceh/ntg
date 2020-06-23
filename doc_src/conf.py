@@ -93,8 +93,12 @@ copy "config.pic";
     'dot' : {
         'program' : ['dot', '-Tsvg'],
         'align'   : 'center',
-        'prolog'  : '',
-        'epilog'  : '',
+    },
+    'tree' : {
+        'program'     : ['xargs', 'tree', '-l', '--noreport', '-I', '*~', '-I', '__pycache__'],
+        'format'      : 'text/plain',
+        'html-prolog' : '<div class="highlight"><div class="highlight"><pre>',
+        'html-epilog' : '</pre></div></div>',
     },
 }
 

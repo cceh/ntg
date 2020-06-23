@@ -7,11 +7,6 @@
  Web Client
 ============
 
-.. contents::
-   :local:
-
-.. default-domain:: js
-
 The web client runs on the user's browser.
 
 The web client is written in Javascript with Vue.js, D3.js, and bootstrap.  It
@@ -20,5 +15,19 @@ components.
 
 You probably want to start looking at the :js:mod:`client/coherence` or
 :js:mod:`client/comparison` components.
+
+.. pic:: tree
+   :caption: Client directory structure
+
+   ../client/src
+
+.. contents::
+   :local:
+
+.. default-domain:: js
+
+
+Modules
+=======
 
 .. js:automodule:: client/app client/(?!widgets/) client/

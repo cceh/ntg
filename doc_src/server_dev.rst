@@ -2,7 +2,17 @@
  API Server
 ============
 
-The API server is written in Python using the Flask framework.
+The API server is written in Python using the
+`Flask framework <https://flask.palletsprojects.com/>`_.
+
+.. pic:: tree
+   :caption: Server directory structure
+
+   ../server
+
+
+.. contents::
+   :local:
 
 
 server
