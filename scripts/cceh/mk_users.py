@@ -72,5 +72,5 @@ if __name__ == '__main__':
                      "INSERT INTO \"user\" (id, username, email, password, active, confirmed_at) " +
                      "VALUES (1, :username, :email, :password, :active, :confirmed_at)",
                      params)
-            execute (src, "INSERT INTO roles_users (id, user_id, role_id) VALUES (1, 1, 1)", {})
-            execute (src, "INSERT INTO roles_users (id, user_id, role_id) VALUES (2, 1, 2)", {})
+            execute (src, "INSERT INTO roles_users (id, user_id, role_id) VALUES (DEFAULT, 1, 1)", {})
+            execute (src, "INSERT INTO roles_users (id, user_id, role_id) VALUES (DEFAULT, 1, 2)", {})
