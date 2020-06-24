@@ -336,6 +336,12 @@ def copy_att (dba, parameters):
             WHERE labez ~ '^zw[a-y]';
             """, parameters)
 
+            # fix an ambiguous labez 'a'
+            execute (conn, """
+            UPDATE att SET lesart = 'εισελθειν'
+            WHERE begadr = 21025018 AND hs = 'A';
+            """, parameters)
+
 
         if book == 'John':
             for t in ('att', 'lac'):
