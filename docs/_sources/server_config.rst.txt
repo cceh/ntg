@@ -6,6 +6,14 @@
 
 .. _app-config-files:
 
+The server configuration files found are in the :file:`instance/` directory.
+There is one configuration file for each application and one global
+configuration file for the whole server.
+
+.. pic:: tree -P *.conf ../instance
+   :caption: Example of instance directory
+
+
 Per-Application Configuration Files
 ===================================
 
