@@ -37,8 +37,8 @@
   <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Scripts" href="scripts_dev.html" />
-    <link rel="prev" title="API Server Configuration Files" href="server_config.html" /> 
+    <link rel="next" title="Technologies Used" href="technologies.html" />
+    <link rel="prev" title="CBGM" href="cbgm.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -82,23 +82,6 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="cbgm.html">CBGM</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#applying-the-cbgm">Applying the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-project">Starting a New Project</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#worked-example">Worked Example</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-phase">Starting a New Phase</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id2">Worked Example</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-phase-with-apparatus-update">Starting a New Phase With Apparatus Update</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id3">Worked Example</a></li>
-</ul>
-</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
@@ -169,10 +152,6 @@
 <li class="toctree-l3"><a class="reference internal" href="server_config.html#footnotes">Footnotes</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">User Management</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#manual-user-management">Manual User Management</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import">scripts.cceh.import</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare">scripts.cceh.prepare</a></li>
@@ -201,6 +180,18 @@
 <li class="toctree-l3"><a class="reference internal" href="vm.html#backups">Backups</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vm.html#icinga">Icinga</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vm.html#openstack-cloud">OpenStack Cloud</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html">CBGM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#applying-the-cbgm">Applying the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#starting-a-new-project">Starting a New Project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#starting-a-new-phase">Starting a New Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#starting-a-new-phase-with-apparatus-update">Starting a New Phase With Apparatus Update</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">User Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#manual-user-management">Manual User Management</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="technologies.html">Technologies Used</a><ul>
@@ -307,12 +298,12 @@ After they have succesfully registered, their roles must be set manually.</p>
 </pre></div>
 </div>
 <p>To give a user a new role:</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">roles_users</span> <span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">role_id</span><span class="p">)</span> <span class="k">VALUES</span> <span class="p">(</span><span class="k">DEFAULT</span><span class="p">,</span> <span class="p">:</span><span class="n">user_id</span><span class="p">,</span> <span class="p">:</span><span class="n">role_id</span><span class="p">)</span>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">roles_users</span> <span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">role_id</span><span class="p">)</span> <span class="k">VALUES</span> <span class="p">(</span><span class="k">DEFAULT</span><span class="p">,</span> <span class="p">:</span><span class="n">user_id</span><span class="p">,</span> <span class="p">:</span><span class="n">role_id</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Replace :user_id and :role_id with the actual user id and role id.</p>
 <p>To revoke a role:</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">DELETE</span> <span class="k">FROM</span> <span class="n">roles_users</span> <span class="k">WHERE</span> <span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">role_id</span><span class="p">)</span> <span class="o">=</span> <span class="p">(:</span><span class="n">user_id</span><span class="p">,</span> <span class="p">:</span><span class="n">role_id</span><span class="p">)</span>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">DELETE</span> <span class="k">FROM</span> <span class="n">roles_users</span> <span class="k">WHERE</span> <span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">role_id</span><span class="p">)</span> <span class="o">=</span> <span class="p">(:</span><span class="n">user_id</span><span class="p">,</span> <span class="p">:</span><span class="n">role_id</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>The role names are arbitrary strings.  They must match the roles configured in
@@ -328,10 +319,10 @@ the <a class="reference internal" href="server_config.html#app-config-files"><sp
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="scripts_dev.html" class="btn btn-neutral float-right" title="Scripts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="technologies.html" class="btn btn-neutral float-right" title="Technologies Used" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="server_config.html" class="btn btn-neutral float-left" title="API Server Configuration Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="cbgm.html" class="btn btn-neutral float-left" title="CBGM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

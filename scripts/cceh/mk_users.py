@@ -1,7 +1,11 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-"""Initialize the database for user authentication and authorization."""
+"""Initialize the database for user authentication and authorization.
+
+Creates the tables and inserts the admin user.
+
+"""
 
 import argparse
 import datetime
@@ -50,9 +54,11 @@ if __name__ == '__main__':
     pwd_context = CryptContext (schemes = [ config['USER_PASSWORD_HASH'] ])
 
     with dba.engine.begin () as src:
+        # create the basic roles
         execute (src, "INSERT INTO role (id, name, description) VALUES (1, 'admin',  'Administrator')", {})
         execute (src, "INSERT INTO role (id, name, description) VALUES (2, 'editor', 'Editor')", {})
 
+        # create the admin user
         if args.email:
             params = {
                 "username"     : args.username,

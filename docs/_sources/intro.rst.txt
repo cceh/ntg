@@ -10,7 +10,8 @@ stemmata in the manuscripts' texts.
 ..
    http://ntg.uni-muenster.de/ph4/coherence#51528030-4
 
-.. pic:: dot local-stemma-example.dot
+.. pic:: dot
+   :file: local-stemma-example.dot
    :align: center
    :caption: An example of a local stemma
 

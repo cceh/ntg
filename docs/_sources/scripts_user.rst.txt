@@ -2,6 +2,8 @@
  Scripts
 =========
 
+.. contents::
+   :local:
 
 .. _import.py:
 

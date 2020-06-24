@@ -16,13 +16,13 @@ components.
 You probably want to start looking at the :js:mod:`client/coherence` or
 :js:mod:`client/comparison` components.
 
-.. pic:: tree
+.. pic:: tree ../client/src
    :caption: Client directory structure
 
-   ../client/src
 
 .. contents::
    :local:
+
 
 .. default-domain:: js
 

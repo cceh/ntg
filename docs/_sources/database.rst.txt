@@ -28,8 +28,9 @@ The `server` uses all these tables.
 
 .. Palette https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Paired.js
 
-.. sauml::
-   :include: books passages ranges readings cliques manuscripts ms_cliques locstem notes apparatus ms_ranges affinity
+.. pic:: sauml -i books -i passages -i ranges -i readings -i cliques -i manuscripts
+               -i ms_cliques -i locstem -i notes -i apparatus -i ms_ranges -i affinity
+               postgresql+psycopg2://ntg@localhost:5432/acts_ph4
    :caption: Work database structure
    :html-classes: pic-w100
    :align: center
@@ -73,20 +74,22 @@ eg. in Acts there are 28 instances of each table.
 These tables are only used once for building the :mod:`CBGM database <ntg_common.db>`.
 The database system is MySQL.
 
-.. sauml:: mysql:///ECM_ActsPh4?read_default_group=client
-   :include: Acts01GVZ Acts01GVZlac
+.. pic:: sauml -i Acts01GVZ -i Acts01GVZlac
+               mysql:///ECM_ActsPh4?read_default_group=client
    :caption: ECM database structure
    :html-classes: pic-w100
    :align: center
 
-.. sauml:: mysql:///VarGenAtt_ActPh4?read_default_group=client
-   :include: LocStemEdAct01 RdgAct01 VarGenAttAct01
+
+.. pic:: sauml -i LocStemEdAct01 -i RdgAct01 -i VarGenAttAct01
+               mysql:///VarGenAtt_ActPh4?read_default_group=client
    :caption: VarGen database structure
    :html-classes: pic-w100
    :align: center
 
-.. sauml:: mysql:///Nestle29?read_default_group=client
-   :include: Nestle29
+
+.. pic:: sauml -i Nestle29
+               mysql:///Nestle29?read_default_group=client
    :caption: Leitzeile database structure
 
 

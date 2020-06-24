@@ -159,8 +159,8 @@ class Att (Base):
     manuscripts.  For the CBGM the data in this table has to be normalised into
     our database structure and converted into a positive apparatus.
 
-    .. sauml::
-       :include: att
+    .. pic:: sauml -i att
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. _att:
 
@@ -352,8 +352,8 @@ class Lac (Base):
     This table has the same structure as table Att.  For the description of the
     columns see :ref:`table Att <att>`.
 
-    .. sauml::
-       :include: lac
+    .. pic:: sauml -i lac
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     """
 
@@ -432,8 +432,8 @@ class Manuscripts (Base2):
     This table lists all the manuscripts of New Testament that we have collated
     for the edition.
 
-    .. sauml::
-       :include: manuscripts
+    .. pic:: sauml -i manuscripts
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. attribute:: ms_id
 
@@ -474,8 +474,8 @@ class Books (Base2):
 
     This table lists all the books of the NT and the book id given to them.
 
-    .. sauml::
-       :include: books
+    .. pic:: sauml -i books
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. attribute:: bk_id
 
@@ -517,8 +517,8 @@ class Passages (Base2):
     manuscripts.  Passages that are the same in all manuscripts (invariant) are
     purged because they are irrelevant to the CBGM.
 
-    .. sauml::
-       :include: passages
+    .. pic:: sauml -i passages
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. attribute:: pass_id
 
@@ -590,8 +590,8 @@ class Readings (Base2):
     normalized, then equal readings are grouped.  Each group of readings is
     assigned an id, the 'labez'.
 
-    .. sauml::
-       :include: readings
+    .. pic:: sauml -i readings
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. _labez:
 
@@ -670,8 +670,8 @@ class Readings (Base2):
 class Apparatus (Base2):
     """A table that contains the `positive apparatus <transform-positive>`.
 
-    .. sauml::
-       :include: apparatus
+    .. pic:: sauml -i apparatus
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. attribute:: cbgm
 
@@ -803,8 +803,8 @@ class Cliques (Cliques_Mixin, Base2):
     :class:`Cliques_TTS` is the table that contains the past rows.  See
     :ref:`transaction-time state tables<tts>`.
 
-    .. sauml::
-       :include: cliques
+    .. pic:: sauml -i cliques
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. attribute:: clique
 
@@ -870,8 +870,8 @@ class MsCliques (MsCliques_Mixin, Base2):
     :class:`MsCliques_TTS` is the table that contains the past rows.  See
     :ref:`transaction-time state tables<tts>`.
 
-    .. sauml::
-       :include: ms_cliques
+    .. pic:: sauml -i ms_cliques
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. attribute:: labez, clique
 
@@ -945,8 +945,8 @@ class LocStem (LocStem_Mixin, Base2):
     :ref:`transaction-time state tables<tts>`.
 
 
-    .. sauml::
-       :include: locstem
+    .. pic:: sauml -i locstem
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. attribute:: labez, clique
 
@@ -1125,8 +1125,8 @@ class Ranges (Base2):
     ranges corresponding to chapters are named by the chapter number, '1', '2',
     ...  The whole book range is called 'All'.
 
-    .. sauml::
-       :include: ranges
+    .. pic:: sauml -i ranges
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. attribute:: range
 
@@ -1159,8 +1159,8 @@ class Ms_Ranges (Base2):
 
     Here we hold values that are calculated by CBGM related to one manuscript.
 
-    .. sauml::
-       :include: ms_ranges
+    .. pic:: sauml -i ms_ranges
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. attribute:: length
 
@@ -1193,8 +1193,8 @@ class Affinity (Base2):
     locstem data, and one for the backward-compatible non-recurisve
     interpretation (with 'p\_' prefix).
 
-    .. sauml::
-       :include: affinity
+    .. pic:: sauml -i affinity
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. attribute:: common
 
@@ -1653,8 +1653,8 @@ class Nestle (Base4):
 
     Dient der Darstellung der Leitzeile im Navigator.
 
-    .. sauml::
-       :include: nestle
+    .. pic:: sauml -i nestle
+             postgresql+psycopg2://ntg@localhost:5432/acts_ph4
 
     .. _nestle_table:
 

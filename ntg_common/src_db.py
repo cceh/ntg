@@ -17,8 +17,7 @@ Base = declarative_base ()
 class Acts01GVZ (Base):
     """This table contains a negative apparatus.
 
-    .. sauml:: mysql:///ECM_ActsPh4?read_default_group=client
-       :include: Acts01GVZ
+    .. pic:: sauml -i Acts01GVZ mysql:///ECM_ActsPh4?read_default_group=client
 
     """
 
@@ -67,8 +66,7 @@ class Acts01GVZ (Base):
 class Acts01GVZlac (Base):
     """This table contains a list of lacunae.
 
-    .. sauml:: mysql:///ECM_ActsPh4?read_default_group=client
-       :include: Acts01GVZlac
+    .. pic:: sauml -i Acts01GVZlac mysql:///ECM_ActsPh4?read_default_group=client
 
     """
 
@@ -121,8 +119,7 @@ class LocStemEdAct01 (Base):
     This table contains the main output of the editors.  The editors decide
     which reading is derived from which other reading(s) at each passage.
 
-    .. sauml:: mysql:///VarGenAtt_ActPh4?read_default_group=client
-       :include: LocStemEdAct01
+    .. pic:: sauml -i LocStemEdAct01 mysql:///VarGenAtt_ActPh4?read_default_group=client
 
     .. attribute:: id
 
@@ -173,8 +170,7 @@ class LocStemEdAct01 (Base):
 class RdgAct01 (Base):
     """This table contains readings.
 
-    .. sauml:: mysql:///VarGenAtt_ActPh4?read_default_group=client
-       :include: RdgAct01
+    .. pic:: sauml -i RdgAct01 mysql:///VarGenAtt_ActPh4?read_default_group=client
 
     """
 
@@ -210,8 +206,7 @@ class RdgAct01 (Base):
 class VarGenAttAct01 (Base):
     """This table relates splits to manuscripts.
 
-    .. sauml:: mysql:///VarGenAtt_ActPh4?read_default_group=client
-       :include: VarGenAttAct01
+    .. pic:: sauml -i VarGenAttAct01 mysql:///VarGenAtt_ActPh4?read_default_group=client
 
     """
 
@@ -248,8 +243,7 @@ class VarGenAttAct01 (Base):
 class Nestle29 (Base):
     """The Leitzeile.
 
-    .. sauml:: mysql:///Nestle29?read_default_group=client
-       :include: Nestle29
+    .. pic:: sauml -i Nestle29 mysql:///Nestle29?read_default_group=client
 
     """
 

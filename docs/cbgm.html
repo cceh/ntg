@@ -37,8 +37,8 @@
   <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation" href="install.html" />
-    <link rel="prev" title="Introduction" href="intro.html" /> 
+    <link rel="next" title="User Management" href="user_management.html" />
+    <link rel="prev" title="ntg.uni-muenster.de" href="vm.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -84,23 +84,6 @@
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">CBGM</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#applying-the-cbgm">Applying the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#starting-a-new-project">Starting a New Project</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#worked-example">Worked Example</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#starting-a-new-phase">Starting a New Phase</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id2">Worked Example</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#starting-a-new-phase-with-apparatus-update">Starting a New Phase With Apparatus Update</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id3">Worked Example</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="install-linux.html">Installation on Linux</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install-linux.html#install-prerequisites">Install Prerequisites</a></li>
@@ -137,7 +120,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer Manual</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="developer.html">Developer Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="domain.html">Introduction to the Problem Domain (German)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="domain.html#das-neue-testament">Das Neue Testament</a></li>
 <li class="toctree-l3"><a class="reference internal" href="domain.html#editionen">Editionen</a></li>
@@ -169,10 +152,6 @@
 <li class="toctree-l3"><a class="reference internal" href="server_config.html#footnotes">Footnotes</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="user_management.html">User Management</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="user_management.html#manual-user-management">Manual User Management</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import">scripts.cceh.import</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare">scripts.cceh.prepare</a></li>
@@ -201,6 +180,18 @@
 <li class="toctree-l3"><a class="reference internal" href="vm.html#backups">Backups</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vm.html#icinga">Icinga</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vm.html#openstack-cloud">OpenStack Cloud</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">CBGM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#applying-the-cbgm">Applying the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starting-a-new-project">Starting a New Project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starting-a-new-phase">Starting a New Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starting-a-new-phase-with-apparatus-update">Starting a New Phase With Apparatus Update</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="user_management.html">User Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user_management.html#manual-user-management">Manual User Management</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="technologies.html">Technologies Used</a><ul>
@@ -256,6 +247,8 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
+          <li><a href="developer.html">Developer Manual</a> &raquo;</li>
+        
       <li>CBGM</li>
     
     
@@ -277,8 +270,18 @@
             
   <div class="section" id="cbgm">
 <span id="id1"></span><h1>CBGM<a class="headerlink" href="#cbgm" title="Permalink to this headline">¶</a></h1>
+<p>This page describes how to do the CBGM directly on the VM <a class="reference internal" href="vm.html#vm"><span class="std std-ref">ntg.uni-muenster.de</span></a>.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#preparing-the-database-for-the-cbgm" id="id6">Preparing the Database for the CBGM</a></p></li>
+<li><p><a class="reference internal" href="#applying-the-cbgm" id="id7">Applying the CBGM</a></p></li>
+<li><p><a class="reference internal" href="#starting-a-new-project" id="id8">Starting a New Project</a></p></li>
+<li><p><a class="reference internal" href="#starting-a-new-phase" id="id9">Starting a New Phase</a></p></li>
+<li><p><a class="reference internal" href="#starting-a-new-phase-with-apparatus-update" id="id10">Starting a New Phase With Apparatus Update</a></p></li>
+</ul>
+</div>
 <div class="section" id="preparing-the-database-for-the-cbgm">
-<h2>Preparing the Database for the CBGM<a class="headerlink" href="#preparing-the-database-for-the-cbgm" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6">Preparing the Database for the CBGM</a><a class="headerlink" href="#preparing-the-database-for-the-cbgm" title="Permalink to this headline">¶</a></h2>
 <p>All input data must be converted and imported into one Postgres database.</p>
 <ul class="simple">
 <li><p>The mysql database <code class="code docutils literal notranslate"><span class="pre">ECM</span></code> contains the apparatus of the <em>Editio
@@ -361,7 +364,7 @@ source data with the aid of the NTVMR people.  Then the source data must be
 imported again. This is an iterative and often very time-consuming process.</p>
 </div>
 <div class="section" id="applying-the-cbgm">
-<h2>Applying the CBGM<a class="headerlink" href="#applying-the-cbgm" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7">Applying the CBGM</a><a class="headerlink" href="#applying-the-cbgm" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script applies the CBGM method.
 The CBGM is applied at the start of every new project phase.
 It must also be applied immediately after the <a class="reference internal" href="scripts_user.html#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> script.</p>
@@ -399,7 +402,7 @@ Country: US
 </div>
 </div>
 <div class="section" id="starting-a-new-project">
-<span id="cbgm-new-project"></span><h2>Starting a New Project<a class="headerlink" href="#starting-a-new-project" title="Permalink to this headline">¶</a></h2>
+<span id="cbgm-new-project"></span><h2><a class="toc-backref" href="#id8">Starting a New Project</a><a class="headerlink" href="#starting-a-new-project" title="Permalink to this headline">¶</a></h2>
 <p>To start a new project:</p>
 <ul class="simple">
 <li><p>create a new Postgres database,</p></li>
@@ -411,34 +414,34 @@ Country: US
 </ul>
 <div class="section" id="worked-example">
 <h3>Worked Example<a class="headerlink" href="#worked-example" title="Permalink to this headline">¶</a></h3>
-<p>As an example we will create a new project: Mark Phase 9.9.</p>
-<p>The name of the new Postgres database is: <code class="code docutils literal notranslate"><span class="pre">mark_ph99</span></code>.</p>
+<p>As an example we will create a new project: Mark Phase 2.3.</p>
+<p>The name of the new Postgres database is: <code class="code docutils literal notranslate"><span class="pre">mark_ph23</span></code>.</p>
 <p>We assume having obtained two mysql database dumps from the NTVMR people:
-<code class="file docutils literal notranslate"><span class="pre">ECM_Mk_Apparat_6.dump.bz2</span></code> and <code class="file docutils literal notranslate"><span class="pre">Nestle29-2.dump.bz2</span></code>.</p>
+<code class="file docutils literal notranslate"><span class="pre">ECM_Mark_20200624.dump.bz2</span></code> and <code class="file docutils literal notranslate"><span class="pre">Nestle29-2.dump.bz2</span></code>.</p>
 <p>ssh into the server.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You need to have permission to sudo postgres and sudo ntg.</p>
+<p>You need to have permission to <code class="code docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">-u</span> <span class="pre">postgres</span></code> and <code class="code docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">-u</span> <span class="pre">ntg</span></code>.</p>
 </div>
 <p>First create a new Postgres database:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -u postgres ~ntg/prj/ntg/ntg/scripts/cceh/create_database.sh mark_ph99
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -u postgres ~ntg/prj/ntg/ntg/scripts/cceh/create_database.sh mark_ph23
 </pre></div>
 </div>
-<p>Then import the database dumps into three local mysql databases:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -u ntg bash
+<p>Then import the database dumps into the local mysql databases:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -iu ntg
 
-mysql -e <span class="s2">&quot;CREATE DATABASE ECM_Mark_Ph99&quot;</span>
+mysql -e <span class="s2">&quot;CREATE DATABASE ECM_Mark_Ph23&quot;</span>
 mysql -e <span class="s2">&quot;CREATE DATABASE Nestle29&quot;</span>
 
-bzcat ECM_Mk_Apparat_6.dump.bz2 <span class="p">|</span> mysql -D ECM_Mark_Ph99
-bzcat Nestle29-2.dump.bz2       <span class="p">|</span> mysql -D Nestle29
+bzcat ECM_Mark_20200624.dump.bz2 <span class="p">|</span> mysql -D ECM_Mark_Ph23
+bzcat Nestle29-2.dump.bz2        <span class="p">|</span> mysql -D Nestle29
 </pre></div>
 </div>
 <p>Then create a new server instance.
 The fastest way is to just copy an old instance configuration file and edit it:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> ~/prj/ntg/ntg/instance
-cp mark_ph22.conf mark_ph99.conf
-emacs mark_ph99.conf
+cp mark_ph22.conf mark_ph23.conf
+emacs mark_ph23.conf
 </pre></div>
 </div>
 <p>Change all relevant parts of the instance configuration file.
@@ -446,12 +449,13 @@ See: <a class="reference internal" href="server_config.html#api-server-config-fi
 <p>Use the <a class="reference internal" href="scripts_user.html#import-py"><span class="std std-ref">scripts/cceh/import.py</span></a> and <a class="reference internal" href="scripts_user.html#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> scripts to import
 the mysql databases into Postgres and prepare them for CBGM:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> ~/prj/ntg/ntg
-python3 -m scripts.cceh.import  -vvv instance/mark_ph99.conf
-python3 -m scripts.cceh.prepare -vvv instance/mark_ph99.conf
+python3 -m scripts.cceh.import  -vvv instance/mark_ph23.conf
+python3 -m scripts.cceh.prepare -vvv instance/mark_ph23.conf
 </pre></div>
 </div>
+<p>(Note: If you came from <a class="reference internal" href="#new-phase-update"><span class="std std-ref">Starting a New Phase With Apparatus Update</span></a> continue there.)</p>
 <p>Then run the CBGM with the <a class="reference internal" href="scripts_user.html#cbgm-py"><span class="std std-ref">scripts/cceh/cbgm.py</span></a> script:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.cbgm -vvv instance/mark_ph99.conf
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
 </pre></div>
 </div>
 <p>Last, restart the application server:</p>
@@ -465,14 +469,14 @@ python3 -m scripts.cceh.prepare -vvv instance/mark_ph99.conf
 <p>If you are satisfied with the new project,
 you may drop the mysql databases.
 The application server uses the Postgres database only.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mysql -e <span class="s2">&quot;DROP DATABASE ECM_Mark_Ph99&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mysql -e <span class="s2">&quot;DROP DATABASE ECM_Mark_Ph23&quot;</span>
 mysql -e <span class="s2">&quot;DROP DATABASE Nestle29&quot;</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="section" id="starting-a-new-phase">
-<h2>Starting a New Phase<a class="headerlink" href="#starting-a-new-phase" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id9">Starting a New Phase</a><a class="headerlink" href="#starting-a-new-phase" title="Permalink to this headline">¶</a></h2>
 <p>A new phase of the project is entered after the editors have completed a pass
 over the whole text.
 All editorial decisions taken during this pass are used to recalculate
@@ -498,7 +502,7 @@ sudo -u ntg sudo /bin/systemctl start ntg
 </pre></div>
 </div>
 <p>Then create a new server instance:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -u ntg bash
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -iu ntg
 <span class="nb">cd</span> ~/prj/ntg/ntg/instance
 cp mark_ph22.conf mark_ph23.conf
 </pre></div>
@@ -524,7 +528,7 @@ python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
 </div>
 </div>
 <div class="section" id="starting-a-new-phase-with-apparatus-update">
-<h2>Starting a New Phase With Apparatus Update<a class="headerlink" href="#starting-a-new-phase-with-apparatus-update" title="Permalink to this headline">¶</a></h2>
+<span id="new-phase-update"></span><h2><a class="toc-backref" href="#id10">Starting a New Phase With Apparatus Update</a><a class="headerlink" href="#starting-a-new-phase-with-apparatus-update" title="Permalink to this headline">¶</a></h2>
 <p>Sometimes a new phase goes hand in hand with a change in the apparatus.</p>
 <p>To update the apparatus while maintaining (most) editorial decisions:</p>
 <ul class="simple">
@@ -577,10 +581,10 @@ in the file <code class="file docutils literal notranslate"><span class="pre">lo
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="install.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="user_management.html" class="btn btn-neutral float-right" title="User Management" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="intro.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="vm.html" class="btn btn-neutral float-left" title="ntg.uni-muenster.de" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

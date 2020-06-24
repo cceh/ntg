@@ -8,9 +8,10 @@ Developer Manual
    client_dev
    server_dev
    server_config
-   user_management
    scripts_dev
    database
    ntg_common
    vm
+   cbgm
+   user_management
    technologies

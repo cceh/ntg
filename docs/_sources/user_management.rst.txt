@@ -26,13 +26,13 @@ User credentials are held in the :code:`ntg_user` database.
 
 ssh into the VM and:
 
-.. code:: bash
+.. code-block:: bash
 
    sudo -u ntg psql -d ntg_user
 
 To see current users and roles and their ids:
 
-.. code:: sql
+.. code-block:: sql
 
    SELECT id, username, email FROM "user" ORDER BY username;
 
@@ -40,23 +40,23 @@ To see current users and roles and their ids:
 
 To see current permissions:
 
-.. code:: sql
+.. code-block:: sql
 
    SELECT * FROM role_view;
 
 To give a user a new role:
 
-.. code:: sql
+.. code-block:: sql
 
-   INSERT INTO roles_users (id, user_id, role_id) VALUES (DEFAULT, :user_id, :role_id)
+   INSERT INTO roles_users (id, user_id, role_id) VALUES (DEFAULT, :user_id, :role_id);
 
 Replace :user_id and :role_id with the actual user id and role id.
 
 To revoke a role:
 
-.. code:: sql
+.. code-block:: sql
 
-   DELETE FROM roles_users WHERE (user_id, role_id) = (:user_id, :role_id)
+   DELETE FROM roles_users WHERE (user_id, role_id) = (:user_id, :role_id);
 
 
 The role names are arbitrary strings.  They must match the roles configured in

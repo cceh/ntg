@@ -105,7 +105,7 @@ by the file: :file:`/etc/systemd/system/ntg.service`.
 
 The user "ntg" has sudo rights to control the API server:
 
-.. code:: bash
+.. code-block:: bash
 
    sudo /bin/systemctl start ntg
    sudo /bin/systemctl stop ntg
@@ -152,7 +152,7 @@ password should be set on your account at all.  To be able to sudo without a
 password you must forward your authentication agent when you ssh into this
 machine:
 
-.. code:: bash
+.. code-block:: bash
 
    ssh -A username@ntg.uni-muenster.de
 
@@ -167,13 +167,13 @@ store it in the file :file:`/tmp/id_rsa.pub` on your local machine.
 Then ssh into the VM and add the new user $NEWUSER
 setting a temporary password:
 
-.. code:: bash
+.. code-block:: bash
 
    sudo adduser $NEWUSER
 
 Open another shell on your local machine and say:
 
-.. code:: bash
+.. code-block:: bash
 
    ssh-copy-id -f -i /tmp/id_rsa.pub $NEWUSER@ntg.uni-muenster.de
 
@@ -181,7 +181,7 @@ Close this shell and on the VM again, disable the temp password and add the
 developer to the sudoers.  To give sudo rights to a user without password add
 their public key to the file :file:`/etc/security/authorized_keys`.
 
-.. code:: bash
+.. code-block:: bash
 
    sudo passwd -d -l $NEWUSER
    sudo usermod -aG sudo $NEWUSER
@@ -194,7 +194,7 @@ Backups
 The editorial decisions for all active databases are backed up every night and
 the active databases are backed up weekly. See:
 
-.. code:: bash
+.. code-block:: bash
 
    sudo -u ntg crontab -l
 

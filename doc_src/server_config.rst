@@ -108,7 +108,7 @@ The following entries are used by the `import.py` script only:
    and never to the mysql server.
    Example of file contents:
 
-   .. code:: ini
+   .. code-block:: ini
 
       [mysql]
       host="localhost"

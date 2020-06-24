@@ -4,6 +4,12 @@
  CBGM
 ======
 
+This page describes how to do the CBGM directly on the VM :ref:`vm`.
+
+.. contents::
+   :local:
+   :depth: 1
+
 
 Preparing the Database for the CBGM
 ===================================
@@ -106,45 +112,45 @@ To start a new project:
 Worked Example
 --------------
 
-As an example we will create a new project: Mark Phase 9.9.
+As an example we will create a new project: Mark Phase 2.3.
 
-The name of the new Postgres database is: :code:`mark_ph99`.
+The name of the new Postgres database is: :code:`mark_ph23`.
 
 We assume having obtained two mysql database dumps from the NTVMR people:
-:file:`ECM_Mk_Apparat_6.dump.bz2` and :file:`Nestle29-2.dump.bz2`.
+:file:`ECM_Mark_20200624.dump.bz2` and :file:`Nestle29-2.dump.bz2`.
 
 ssh into the server.
 
 .. note::
 
-   You need to have permission to sudo postgres and sudo ntg.
+   You need to have permission to :code:`sudo -u postgres` and :code:`sudo -u ntg`.
 
 First create a new Postgres database:
 
-.. code:: bash
+.. code-block:: bash
 
-   sudo -u postgres ~ntg/prj/ntg/ntg/scripts/cceh/create_database.sh mark_ph99
+   sudo -u postgres ~ntg/prj/ntg/ntg/scripts/cceh/create_database.sh mark_ph23
 
-Then import the database dumps into three local mysql databases:
+Then import the database dumps into the local mysql databases:
 
-.. code:: bash
+.. code-block:: bash
 
-   sudo -u ntg bash
+   sudo -iu ntg
 
-   mysql -e "CREATE DATABASE ECM_Mark_Ph99"
+   mysql -e "CREATE DATABASE ECM_Mark_Ph23"
    mysql -e "CREATE DATABASE Nestle29"
 
-   bzcat ECM_Mk_Apparat_6.dump.bz2 | mysql -D ECM_Mark_Ph99
-   bzcat Nestle29-2.dump.bz2       | mysql -D Nestle29
+   bzcat ECM_Mark_20200624.dump.bz2 | mysql -D ECM_Mark_Ph23
+   bzcat Nestle29-2.dump.bz2        | mysql -D Nestle29
 
 Then create a new server instance.
 The fastest way is to just copy an old instance configuration file and edit it:
 
-.. code:: bash
+.. code-block:: bash
 
    cd ~/prj/ntg/ntg/instance
-   cp mark_ph22.conf mark_ph99.conf
-   emacs mark_ph99.conf
+   cp mark_ph22.conf mark_ph23.conf
+   emacs mark_ph23.conf
 
 Change all relevant parts of the instance configuration file.
 See: :ref:`api-server-config-files`.
@@ -152,27 +158,29 @@ See: :ref:`api-server-config-files`.
 Use the `import.py` and `prepare.py` scripts to import
 the mysql databases into Postgres and prepare them for CBGM:
 
-.. code:: bash
+.. code-block:: bash
 
    cd ~/prj/ntg/ntg
-   python3 -m scripts.cceh.import  -vvv instance/mark_ph99.conf
-   python3 -m scripts.cceh.prepare -vvv instance/mark_ph99.conf
+   python3 -m scripts.cceh.import  -vvv instance/mark_ph23.conf
+   python3 -m scripts.cceh.prepare -vvv instance/mark_ph23.conf
+
+(Note: If you came from :ref:`new-phase-update` continue there.)
 
 Then run the CBGM with the `cbgm.py` script:
 
-.. code:: bash
+.. code-block:: bash
 
-   python3 -m scripts.cceh.cbgm -vvv instance/mark_ph99.conf
+   python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
 
 Last, restart the application server:
 
-.. code:: bash
+.. code-block:: bash
 
    sudo /bin/systemctl restart ntg
 
 If the server doesn't start, check for configuration errors:
 
-.. code:: bash
+.. code-block:: bash
 
    sudo /bin/journalctl -u ntg
 
@@ -180,9 +188,9 @@ If you are satisfied with the new project,
 you may drop the mysql databases.
 The application server uses the Postgres database only.
 
-.. code:: bash
+.. code-block:: bash
 
-   mysql -e "DROP DATABASE ECM_Mark_Ph99"
+   mysql -e "DROP DATABASE ECM_Mark_Ph23"
    mysql -e "DROP DATABASE Nestle29"
 
 
@@ -214,7 +222,7 @@ ssh into the server.
 
 First stop the application server and make a copy of the mark_ph22 database:
 
-.. code:: bash
+.. code-block:: bash
 
    sudo -u ntg sudo /bin/systemctl stop ntg
    sudo -u postgres psql -c "CREATE DATABASE mark_ph23 TEMPLATE mark_ph22 OWNER ntg"
@@ -222,38 +230,39 @@ First stop the application server and make a copy of the mark_ph22 database:
 
 Then create a new server instance:
 
-.. code:: bash
+.. code-block:: bash
 
-   sudo -u ntg bash
+   sudo -iu ntg
    cd ~/prj/ntg/ntg/instance
    cp mark_ph22.conf mark_ph23.conf
 
 Change all relevant parts of the instance configuration file.
 See: :ref:`api-server-config-files`.
 
-.. code:: bash
+.. code-block:: bash
 
    emacs mark_ph23.conf
 
 Put the old database in read-only mode (set WRITE_ACCESS="nobody"):
 
-.. code:: bash
+.. code-block:: bash
 
    emacs mark_ph22.conf
 
 Then run the CBGM on the *new* instance:
 
-.. code:: bash
+.. code-block:: bash
 
    cd ~/prj/ntg/ntg
    python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
 
 Last, restart the application server:
 
-.. code:: bash
+.. code-block:: bash
 
    sudo /bin/systemctl restart ntg
 
+.. _new-phase-update:
 
 Starting a New Phase With Apparatus Update
 ==========================================
@@ -281,7 +290,7 @@ CBGM step.
 
 Put the old database in read-only mode (set WRITE_ACCESS="nobody"):
 
-.. code:: bash
+.. code-block:: bash
 
    cd ~/prj/ntg/ntg/instance
    emacs mark_ph22.conf
@@ -290,7 +299,7 @@ Then use the `save_edits.py` script to save the editorial decisions
 of the previous phase and the `load_edits.py` script to load them
 into the new instance:
 
-.. code:: bash
+.. code-block:: bash
 
    cd ~/prj/ntg/ntg
    python3 -m scripts.cceh.save_edits -vvv -o saved_edits.xml instance/mark_ph22.conf
@@ -302,12 +311,12 @@ in the file :file:`load_edits.log`.
 
 Then run the `cbgm.py` script on the *new* instance to apply the CBGM method:
 
-.. code:: bash
+.. code-block:: bash
 
    python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
 
 Last, restart the application server:
 
-.. code:: bash
+.. code-block:: bash
 
    sudo /bin/systemctl restart ntg

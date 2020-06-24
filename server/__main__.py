@@ -8,6 +8,11 @@ The main Flask driver.
 This module sets up the main Flask application for user authentication and the
 sub-apps for each book.
 
+To start the server go to the parent directory and say::
+
+  python3 -m server
+
+
 """
 
 import argparse
@@ -55,7 +60,7 @@ class Config ():
     APPLICATION_HOST    = 'localhost'
     APPLICATION_PORT    = 5000
     APPLICATION_DESCRIPTION = ''
-    CONFIG_FILE         = '_global.conf' # default relative to /instance
+    CONFIG_FILE         = '_global.conf' # default = ./instance/_global.conf
     STATIC_FOLDER       = 'static'
     STATIC_URL_PATH     = 'static'
     AFTER_LOGIN_URL     = None

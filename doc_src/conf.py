@@ -28,10 +28,10 @@ sys.path.insert (0, os.path.join (root, 'scripts/cceh'))
 
 sys.path.insert (0, os.path.join (root, 'sphinxcontrib/sphinxcontrib-autojsdoc/sphinxcontrib'))
 sys.path.insert (0, os.path.join (root, 'sphinxcontrib/sphinxcontrib-pic/sphinxcontrib'))
-sys.path.insert (0, os.path.join (root, 'sphinxcontrib/sphinxcontrib-sqlalchemy-uml/sphinxcontrib'))
+#sys.path.insert (0, os.path.join (root, 'sphinxcontrib/sphinxcontrib-sqlalchemy-uml/sphinxcontrib'))
 
-#sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-autojsdoc/sphinxcontrib'))
-#sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-pic/sphinxcontrib'))
+sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-autojsdoc/sphinxcontrib'))
+sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-pic/sphinxcontrib'))
 #sys.path.insert (0, os.path.join (root, '../../sphinxcontrib/sphinxcontrib-sqlalchemy-uml/sphinxcontrib'))
 
 
@@ -53,7 +53,6 @@ extensions = [
 
     'autojsdoc',
     'pic',
-    'sqlalchemy-uml',
 ]
 
 autojsdoc_structure_json = 'jsdoc/structure.json'
@@ -95,33 +94,14 @@ copy "config.pic";
         'align'   : 'center',
     },
     'tree' : {
-        'program'     : ['xargs', 'tree', '-l', '--noreport', '-I', '*~', '-I', '__pycache__'],
+        'program'     : ['tree', '-l', '--noreport', '-I', '*~', '-I', '__pycache__', '{arguments}'],
         'format'      : 'text/plain',
         'html-prolog' : '<div class="highlight"><div class="highlight"><pre>',
         'html-epilog' : '</pre></div></div>',
     },
-}
-
-sauml_options = {
-    'program'   : ['dot', '-Tsvg'],
-    'arguments' : ['postgresql+psycopg2://ntg@localhost:5432/acts_ph4'],
-    'dot-table' : {
-        'bgcolor'            : '#e7f2fa',
-        'color'              : '#2980B9',
-
-        'bgcolor.ms_cliques' : '#b2df8a',
-        'bgcolor.locstem'    : '#b2df8a',
-        'bgcolor.notes'      : '#b2df8a',
-        'bgcolor.cliques'    : '#b2df8a',
-        'color.ms_cliques'   : '#33a02c',
-        'color.locstem'      : '#33a02c',
-        'color.notes'        : '#33a02c',
-        'color.cliques'      : '#33a02c',
-
-        'bgcolor.affinity'   : '#fb9a99',
-        'bgcolor.ms_ranges'  : '#fb9a99',
-        'color.affinity'     : '#e31a1c',
-        'color.ms_ranges'    : '#e31a1c',
+    'sauml' : {
+        'program'   : 'sagraph.py {arguments} @sagraph.conf | dot -Tsvg',
+        'shell'     : True,
     },
 }
 

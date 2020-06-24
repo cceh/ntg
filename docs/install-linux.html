@@ -84,23 +84,6 @@
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="cbgm.html">CBGM</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#applying-the-cbgm">Applying the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-project">Starting a New Project</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#worked-example">Worked Example</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-phase">Starting a New Phase</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id2">Worked Example</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-phase-with-apparatus-update">Starting a New Phase With Apparatus Update</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id3">Worked Example</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l1 current"><a class="reference internal" href="install.html">Installation</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Installation on Linux</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#install-prerequisites">Install Prerequisites</a></li>
@@ -169,10 +152,6 @@
 <li class="toctree-l3"><a class="reference internal" href="server_config.html#footnotes">Footnotes</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="user_management.html">User Management</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="user_management.html#manual-user-management">Manual User Management</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import">scripts.cceh.import</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare">scripts.cceh.prepare</a></li>
@@ -201,6 +180,18 @@
 <li class="toctree-l3"><a class="reference internal" href="vm.html#backups">Backups</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vm.html#icinga">Icinga</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vm.html#openstack-cloud">OpenStack Cloud</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html">CBGM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#applying-the-cbgm">Applying the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#starting-a-new-project">Starting a New Project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#starting-a-new-phase">Starting a New Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#starting-a-new-phase-with-apparatus-update">Starting a New Phase With Apparatus Update</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="user_management.html">User Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user_management.html#manual-user-management">Manual User Management</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="technologies.html">Technologies Used</a><ul>
@@ -335,9 +326,10 @@ make install-prerequisites
 <p>Make sure <code class="file docutils literal notranslate"><span class="pre">~/.my.cnf</span></code> is readable only by yourself!</p>
 </div>
 </li>
-<li><p>Create databases for ECM and VarGenAtt:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo mysql -e <span class="s2">&quot;CREATE DATABASE VarGenAtt_ActPh4&quot;</span>
-sudo mysql -e <span class="s2">&quot;CREATE DATABASE ECM_ActsPh4&quot;</span>
+<li><p>Create databases for ECM, Leitzeile and VarGenAtt:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo mysql -e <span class="s2">&quot;CREATE DATABASE ECM_ActsPh4&quot;</span>
+sudo mysql -e <span class="s2">&quot;CREATE DATABASE Nestle29&quot;</span>
+sudo mysql -e <span class="s2">&quot;CREATE DATABASE VarGenAtt_ActPh4&quot;</span>
 </pre></div>
 </div>
 </li>
@@ -363,16 +355,13 @@ Postgres to access the MySQL databases.</p>
 </div>
 <div class="highlight-psql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">USER</span> <span class="n">ntg</span> <span class="n">CREATEDB</span> <span class="k">PASSWORD</span> <span class="s1">&#39;&lt;password&gt;&#39;</span><span class="p">;</span>
 <span class="go">CREATE DATABASE ntg_user OWNER ntg;</span>
-<span class="go">CREATE DATABASE acts_ph4 OWNER ntg;</span>
-<span class="go">\c acts_ph4</span>
-<span class="go">CREATE SCHEMA ntg AUTHORIZATION ntg;</span>
-<span class="go">ALTER DATABASE acts_ph4 SET search_path = ntg, public;</span>
-<span class="go">CREATE EXTENSION mysql_fdw;</span>
-<span class="go">GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;</span>
 <span class="go">\q</span>
 </pre></div>
 </div>
 <p>Replace &lt;password&gt; with a real password.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -u postgres ~ntg/prj/ntg/ntg/scripts/cceh/create_database.sh acts_ph4
+</pre></div>
+</div>
 <p>Logout.</p>
 </li>
 <li><p>Edit (or create) your <code class="file docutils literal notranslate"><span class="pre">~/.pgpass</span></code> and add this line:</p>
@@ -388,7 +377,7 @@ Postgres to access the MySQL databases.</p>
 <p class="admonition-title">Note</p>
 <p>You can now login to the Postgres database as user ntg without having
 to enter your password:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>psql -h localhost -U ntg -d acts_ph4
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>psql acts_ph4
 </pre></div>
 </div>
 </div>

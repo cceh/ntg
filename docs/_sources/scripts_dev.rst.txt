@@ -5,6 +5,9 @@
  Scripts
 =========
 
+.. contents::
+   :local:
+
 
 scripts.cceh.import
 ===================

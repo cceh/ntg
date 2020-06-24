@@ -71,12 +71,13 @@ MySQL database
 
       Make sure :file:`~/.my.cnf` is readable only by yourself!
 
-2. Create databases for ECM and VarGenAtt:
+2. Create databases for ECM, Leitzeile and VarGenAtt:
 
    .. code-block:: shell
 
-      sudo mysql -e "CREATE DATABASE VarGenAtt_ActPh4"
       sudo mysql -e "CREATE DATABASE ECM_ActsPh4"
+      sudo mysql -e "CREATE DATABASE Nestle29"
+      sudo mysql -e "CREATE DATABASE VarGenAtt_ActPh4"
 
 
 
@@ -107,15 +108,13 @@ Postgres database
 
       CREATE USER ntg CREATEDB PASSWORD '<password>';
       CREATE DATABASE ntg_user OWNER ntg;
-      CREATE DATABASE acts_ph4 OWNER ntg;
-      \c acts_ph4
-      CREATE SCHEMA ntg AUTHORIZATION ntg;
-      ALTER DATABASE acts_ph4 SET search_path = ntg, public;
-      CREATE EXTENSION mysql_fdw;
-      GRANT USAGE ON FOREIGN DATA WRAPPER mysql_fdw TO ntg;
       \q
 
    Replace <password> with a real password.
+
+   .. code-block:: bash
+
+      sudo -u postgres ~ntg/prj/ntg/ntg/scripts/cceh/create_database.sh acts_ph4
 
    Logout.
 
@@ -136,9 +135,9 @@ Postgres database
       You can now login to the Postgres database as user ntg without having
       to enter your password:
 
-      .. code-block:: shell
+      .. code-block:: bash
 
-         psql -h localhost -U ntg -d acts_ph4
+         psql acts_ph4
 
    Logout.
 

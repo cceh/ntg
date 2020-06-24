@@ -84,23 +84,6 @@
 <li class="toctree-l2"><a class="reference internal" href="intro.html#links">Links</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="cbgm.html">CBGM</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#applying-the-cbgm">Applying the CBGM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-project">Starting a New Project</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#worked-example">Worked Example</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-phase">Starting a New Phase</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id2">Worked Example</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="cbgm.html#starting-a-new-phase-with-apparatus-update">Starting a New Phase With Apparatus Update</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cbgm.html#id3">Worked Example</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="install-linux.html">Installation on Linux</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="install-linux.html#install-prerequisites">Install Prerequisites</a></li>
@@ -169,10 +152,6 @@
 <li class="toctree-l3"><a class="reference internal" href="server_config.html#footnotes">Footnotes</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="user_management.html">User Management</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="user_management.html#manual-user-management">Manual User Management</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="scripts_dev.html">Scripts</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import">scripts.cceh.import</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare">scripts.cceh.prepare</a></li>
@@ -201,6 +180,18 @@
 <li class="toctree-l3"><a class="reference internal" href="vm.html#backups">Backups</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vm.html#icinga">Icinga</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vm.html#openstack-cloud">OpenStack Cloud</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cbgm.html">CBGM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#preparing-the-database-for-the-cbgm">Preparing the Database for the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#applying-the-cbgm">Applying the CBGM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#starting-a-new-project">Starting a New Project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#starting-a-new-phase">Starting a New Phase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cbgm.html#starting-a-new-phase-with-apparatus-update">Starting a New Phase With Apparatus Update</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="user_management.html">User Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user_management.html#manual-user-management">Manual User Management</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="technologies.html">Technologies Used</a><ul>
@@ -279,8 +270,18 @@
             
   <div class="section" id="scripts">
 <h1>Scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#scripts-cceh-import-py" id="id1">scripts/cceh/import.py</a></p></li>
+<li><p><a class="reference internal" href="#scripts-cceh-prepare-py" id="id2">scripts/cceh/prepare.py</a></p></li>
+<li><p><a class="reference internal" href="#scripts-cceh-cbgm-py" id="id3">scripts/cceh/cbgm.py</a></p></li>
+<li><p><a class="reference internal" href="#scripts-cceh-save-edits-py" id="id4">scripts/cceh/save_edits.py</a></p></li>
+<li><p><a class="reference internal" href="#scripts-cceh-load-edits-py" id="id5">scripts/cceh/load_edits.py</a></p></li>
+<li><p><a class="reference internal" href="#scripts-cceh-mk-users-py" id="id6">scripts/cceh/mk_users.py</a></p></li>
+</ul>
+</div>
 <div class="section" id="scripts-cceh-import-py">
-<span id="import-py"></span><h2>scripts/cceh/import.py<a class="headerlink" href="#scripts-cceh-import-py" title="Permalink to this headline">¶</a></h2>
+<span id="import-py"></span><h2><a class="toc-backref" href="#id1">scripts/cceh/import.py</a><a class="headerlink" href="#scripts-cceh-import-py" title="Permalink to this headline">¶</a></h2>
 <p>Import databases from mysql.</p>
 <p>This script initializes the postgres database and then imports data from one or
 more mysql databases.</p>
@@ -291,15 +292,15 @@ more mysql databases.</p>
 <p>The source databases are:</p>
 <ol class="arabic simple">
 <li><p>a database containing the apparatus of the <em>Editio Critica Maior</em>
-publication (ECM).</p></li>
-<li><p>a database containing the editorial decisions regarding the priority of the
-readings (VarGen).</p></li>
-<li><p>a database containing the “Leitzeile” (Nestle).</p></li>
+publication (ECM),</p></li>
+<li><p>a database containing the <em>Leitzeile</em>, and</p></li>
+<li><p>optionally a database containing the editorial decisions regarding the
+priority of the readings (VarGen).</p></li>
 </ol>
 <p>The source tables for Acts are partitioned into 28 chapters.  This is a
 historical incident: The software used when the CBGM was first implemented could
-not handle big tables.  The import script is able to join partitioned tables.</p>
-<p>After running this script should run the <a class="reference internal" href="#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> script.</p>
+not handle big tables.  The import script joins partitioned tables into one.</p>
+<p>After running this script you should run the <a class="reference internal" href="#prepare-py"><span class="std std-ref">scripts/cceh/prepare.py</span></a> script.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/import.py [-h] [-v] path/to/file.conf</span>
 </pre></div>
 </div>
@@ -323,7 +324,7 @@ not handle big tables.  The import script is able to join partitioned tables.</p
 
 </div>
 <div class="section" id="scripts-cceh-prepare-py">
-<span id="prepare-py"></span><h2>scripts/cceh/prepare.py<a class="headerlink" href="#scripts-cceh-prepare-py" title="Permalink to this headline">¶</a></h2>
+<span id="prepare-py"></span><h2><a class="toc-backref" href="#id2">scripts/cceh/prepare.py</a><a class="headerlink" href="#scripts-cceh-prepare-py" title="Permalink to this headline">¶</a></h2>
 <p>Initialize a CBGM database.</p>
 <p>This script converts the databases structure used in the production of the <em>ECM</em>
 into a database structure suitable for doing CBGM. It</p>
@@ -390,7 +391,7 @@ für die CBGM ignoriert.</p>
 
 </div>
 <div class="section" id="scripts-cceh-cbgm-py">
-<span id="cbgm-py"></span><h2>scripts/cceh/cbgm.py<a class="headerlink" href="#scripts-cceh-cbgm-py" title="Permalink to this headline">¶</a></h2>
+<span id="cbgm-py"></span><h2><a class="toc-backref" href="#id3">scripts/cceh/cbgm.py</a><a class="headerlink" href="#scripts-cceh-cbgm-py" title="Permalink to this headline">¶</a></h2>
 <p>Perform the CBGM.</p>
 <p>This script</p>
 <ul class="simple">
@@ -423,7 +424,7 @@ It also updates the Apparatus table where manuscript ‘A is concerned.</p>
 
 </div>
 <div class="section" id="scripts-cceh-save-edits-py">
-<span id="save-edits-py"></span><h2>scripts/cceh/save_edits.py<a class="headerlink" href="#scripts-cceh-save-edits-py" title="Permalink to this headline">¶</a></h2>
+<span id="save-edits-py"></span><h2><a class="toc-backref" href="#id4">scripts/cceh/save_edits.py</a><a class="headerlink" href="#scripts-cceh-save-edits-py" title="Permalink to this headline">¶</a></h2>
 <p>Save the state of the editor tables.</p>
 <p>This script saves the tables containing the editorial decisions.  It does not
 save the apparatus tables.</p>
@@ -456,7 +457,7 @@ save the apparatus tables.</p>
 
 </div>
 <div class="section" id="scripts-cceh-load-edits-py">
-<span id="load-edits-py"></span><h2>scripts/cceh/load_edits.py<a class="headerlink" href="#scripts-cceh-load-edits-py" title="Permalink to this headline">¶</a></h2>
+<span id="load-edits-py"></span><h2><a class="toc-backref" href="#id5">scripts/cceh/load_edits.py</a><a class="headerlink" href="#scripts-cceh-load-edits-py" title="Permalink to this headline">¶</a></h2>
 <p>Load a saved state of the editor tables.</p>
 <p>This script loads the state of the tables with the editorial decisions as saved
 by the save_edits.py script.  It does not touch the apparatus tables.</p>
@@ -493,8 +494,9 @@ from ‘a’.</p>
 
 </div>
 <div class="section" id="scripts-cceh-mk-users-py">
-<span id="mk-users-py"></span><h2>scripts/cceh/mk_users.py<a class="headerlink" href="#scripts-cceh-mk-users-py" title="Permalink to this headline">¶</a></h2>
+<span id="mk-users-py"></span><h2><a class="toc-backref" href="#id6">scripts/cceh/mk_users.py</a><a class="headerlink" href="#scripts-cceh-mk-users-py" title="Permalink to this headline">¶</a></h2>
 <p>Initialize the database for user authentication and authorization.</p>
+<p>Creates the tables and inserts the admin user.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">usage: scripts/cceh/mk_users.py [-h] -e EMAIL [-u USERNAME] [-p PASSWORD] [-v] path/to/_global.conf</span>
 </pre></div>
 </div>

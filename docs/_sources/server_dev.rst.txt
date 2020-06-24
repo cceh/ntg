@@ -5,10 +5,8 @@
 The API server is written in Python using the
 `Flask framework <https://flask.palletsprojects.com/>`_.
 
-.. pic:: tree
+.. pic:: tree ../server
    :caption: Server directory structure
-
-   ../server
 
 
 .. contents::

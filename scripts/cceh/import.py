@@ -12,18 +12,18 @@ more mysql databases.
 The source databases are:
 
 1. a database containing the apparatus of the *Editio Critica Maior*
-   publication (ECM).
+   publication (ECM),
 
-2. a database containing the editorial decisions regarding the priority of the
-   readings (VarGen).
+2. a database containing the *Leitzeile*, and
 
-3. a database containing the “Leitzeile” (Nestle).
+3. optionally a database containing the editorial decisions regarding the
+   priority of the readings (VarGen).
 
 The source tables for Acts are partitioned into 28 chapters.  This is a
 historical incident: The software used when the CBGM was first implemented could
-not handle big tables.  The import script is able to join partitioned tables.
+not handle big tables.  The import script joins partitioned tables into one.
 
-After running this script should run the `prepare.py` script.
+After running this script you should run the `prepare.py` script.
 
 """
 
