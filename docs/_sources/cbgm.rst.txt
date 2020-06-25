@@ -112,9 +112,9 @@ To start a new project:
 Worked Example
 --------------
 
-As an example we will create a new project: Mark Phase 2.3.
+As an example we will create a new project: Mark Phase 3.
 
-The name of the new Postgres database is: :code:`mark_ph23`.
+The name of the new Postgres database is: :code:`mark_ph3`.
 
 We assume having obtained two mysql database dumps from the NTVMR people:
 :file:`ECM_Mark_20200624.dump.bz2` and :file:`Nestle29-2.dump.bz2`.
@@ -129,7 +129,7 @@ First create a new Postgres database:
 
 .. code-block:: bash
 
-   sudo -u postgres ~ntg/prj/ntg/ntg/scripts/cceh/create_database.sh mark_ph23
+   sudo -u postgres ~ntg/prj/ntg/ntg/scripts/cceh/create_database.sh mark_ph3
 
 Then import the database dumps into the local mysql databases:
 
@@ -137,10 +137,10 @@ Then import the database dumps into the local mysql databases:
 
    sudo -iu ntg
 
-   mysql -e "CREATE DATABASE ECM_Mark_Ph23"
+   mysql -e "CREATE DATABASE ECM_Mark_Ph3"
    mysql -e "CREATE DATABASE Nestle29"
 
-   bzcat ECM_Mark_20200624.dump.bz2 | mysql -D ECM_Mark_Ph23
+   bzcat ECM_Mark_20200624.dump.bz2 | mysql -D ECM_Mark_Ph3
    bzcat Nestle29-2.dump.bz2        | mysql -D Nestle29
 
 Then create a new server instance.
@@ -149,8 +149,8 @@ The fastest way is to just copy an old instance configuration file and edit it:
 .. code-block:: bash
 
    cd ~/prj/ntg/ntg/instance
-   cp mark_ph22.conf mark_ph23.conf
-   emacs mark_ph23.conf
+   cp mark_ph22.conf mark_ph3.conf
+   emacs mark_ph3.conf
 
 Change all relevant parts of the instance configuration file.
 See: :ref:`api-server-config-files`.
@@ -161,8 +161,8 @@ the mysql databases into Postgres and prepare them for CBGM:
 .. code-block:: bash
 
    cd ~/prj/ntg/ntg
-   python3 -m scripts.cceh.import  -vvv instance/mark_ph23.conf
-   python3 -m scripts.cceh.prepare -vvv instance/mark_ph23.conf
+   python3 -m scripts.cceh.import  -vvv instance/mark_ph3.conf
+   python3 -m scripts.cceh.prepare -vvv instance/mark_ph3.conf
 
 (Note: If you came from :ref:`new-phase-update` continue there.)
 
@@ -170,7 +170,7 @@ Then run the CBGM with the `cbgm.py` script:
 
 .. code-block:: bash
 
-   python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
+   python3 -m scripts.cceh.cbgm -vvv instance/mark_ph3.conf
 
 Last, restart the application server:
 
@@ -190,7 +190,7 @@ The application server uses the Postgres database only.
 
 .. code-block:: bash
 
-   mysql -e "DROP DATABASE ECM_Mark_Ph23"
+   mysql -e "DROP DATABASE ECM_Mark_Ph3"
    mysql -e "DROP DATABASE Nestle29"
 
 
@@ -212,7 +212,7 @@ To start a new phase:
 Worked Example
 --------------
 
-As an example let us create a new Mark Phase 2.3 from an existing Mark Phase 2.2.
+As an example let us create a new Mark Phase 3 from an existing Mark Phase 2.2.
 
 ssh into the server.
 
@@ -225,7 +225,7 @@ First stop the application server and make a copy of the mark_ph22 database:
 .. code-block:: bash
 
    sudo -u ntg sudo /bin/systemctl stop ntg
-   sudo -u postgres psql -c "CREATE DATABASE mark_ph23 TEMPLATE mark_ph22 OWNER ntg"
+   sudo -u postgres psql -c "CREATE DATABASE mark_ph3 TEMPLATE mark_ph22 OWNER ntg"
    sudo -u ntg sudo /bin/systemctl start ntg
 
 Then create a new server instance:
@@ -234,14 +234,14 @@ Then create a new server instance:
 
    sudo -iu ntg
    cd ~/prj/ntg/ntg/instance
-   cp mark_ph22.conf mark_ph23.conf
+   cp mark_ph22.conf mark_ph3.conf
 
 Change all relevant parts of the instance configuration file.
 See: :ref:`api-server-config-files`.
 
 .. code-block:: bash
 
-   emacs mark_ph23.conf
+   emacs mark_ph3.conf
 
 Put the old database in read-only mode (set WRITE_ACCESS="nobody"):
 
@@ -254,7 +254,7 @@ Then run the CBGM on the *new* instance:
 .. code-block:: bash
 
    cd ~/prj/ntg/ntg
-   python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
+   python3 -m scripts.cceh.cbgm -vvv instance/mark_ph3.conf
 
 Last, restart the application server:
 
@@ -282,7 +282,7 @@ To update the apparatus while maintaining (most) editorial decisions:
 Worked Example
 --------------
 
-As an example let us create a new Mark Phase 2.3 from an existing Mark Phase 2.2
+As an example let us create a new Mark Phase 3 from an existing Mark Phase 2.2
 using a new apparatus.
 
 First follow the steps in :ref:`cbgm-new-project` above, until you reach the
@@ -303,7 +303,7 @@ into the new instance:
 
    cd ~/prj/ntg/ntg
    python3 -m scripts.cceh.save_edits -vvv -o saved_edits.xml instance/mark_ph22.conf
-   python3 -m scripts.cceh.load_edits -vvv -i saved_edits.xml instance/mark_ph23.conf
+   python3 -m scripts.cceh.load_edits -vvv -i saved_edits.xml instance/mark_ph3.conf
 
 The last command will also output a list of passages in the old apparatus
 that are missing or different in the new apparatus and store them
@@ -313,7 +313,7 @@ Then run the `cbgm.py` script on the *new* instance to apply the CBGM method:
 
 .. code-block:: bash
 
-   python3 -m scripts.cceh.cbgm -vvv instance/mark_ph23.conf
+   python3 -m scripts.cceh.cbgm -vvv instance/mark_ph3.conf
 
 Last, restart the application server:
 
