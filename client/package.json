@@ -43,7 +43,7 @@
         "babel-eslint": "*",
         "babel-loader": "*",
         "babel-plugin-lodash": "*",
-        "css-loader": "*",
+        "css-loader": "^3",
         "eslint": "*",
         "eslint-config-airbnb": "*",
         "eslint-config-standard": "*",
@@ -76,8 +76,8 @@
         "vue-eslint-parser": "*",
         "vue-loader": "*",
         "webpack": "^4",
-        "webpack-bundle-analyzer": "^3.5.2",
-        "webpack-cli": "^3.3.9",
+        "webpack-bundle-analyzer": "*",
+        "webpack-cli": "*",
         "webpack-dev-server": "*",
         "webpack-merge": "*"
     }
