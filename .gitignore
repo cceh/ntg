@@ -1,5 +1,6 @@
 *~
 \#*\#
+*.bak
 backups/
 node_modules/
 jsdoc/

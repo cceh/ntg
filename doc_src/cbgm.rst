@@ -117,7 +117,7 @@ As an example we will create a new project: Mark Phase 3.
 The name of the new Postgres database is: :code:`mark_ph3`.
 
 We assume having obtained two mysql database dumps from the NTVMR people:
-:file:`ECM_Mark_20200624.dump.bz2` and :file:`Nestle29-2.dump.bz2`.
+:file:`ECM_Mark_Ph3.dump.bz2` and :file:`Nestle29.dump.bz2`.
 
 ssh into the server.
 
@@ -140,8 +140,8 @@ Then import the database dumps into the local mysql databases:
    mysql -e "CREATE DATABASE ECM_Mark_Ph3"
    mysql -e "CREATE DATABASE Nestle29"
 
-   bzcat ECM_Mark_20200624.dump.bz2 | mysql -D ECM_Mark_Ph3
-   bzcat Nestle29-2.dump.bz2        | mysql -D Nestle29
+   bzcat ECM_Mark_Ph3.dump.bz2 | mysql -D ECM_Mark_Ph3
+   bzcat Nestle29.dump.bz2 | mysql -D Nestle29
 
 Then create a new server instance.
 The fastest way is to just copy an old instance configuration file and edit it:
@@ -183,6 +183,14 @@ If the server doesn't start, check for configuration errors:
 .. code-block:: bash
 
    sudo /bin/journalctl -u ntg
+
+
+Add the database to the file :file:`scripts/cceh/active_databases`.
+This file controls :ref:`nightly and weekly backups<vm-backups>`.
+
+.. code-block:: bash
+
+   emacs scripts/cceh/active_databases
 
 If you are satisfied with the new project,
 you may drop the mysql databases.
@@ -315,8 +323,24 @@ Then run the `cbgm.py` script on the *new* instance to apply the CBGM method:
 
    python3 -m scripts.cceh.cbgm -vvv instance/mark_ph3.conf
 
-Last, restart the application server:
+Restart the application server:
 
 .. code-block:: bash
 
    sudo /bin/systemctl restart ntg
+
+Add the database to the file :file:`scripts/cceh/active_databases`.
+This file controls :ref:`nightly and weekly backups<vm-backups>`.
+
+.. code-block:: bash
+
+   emacs scripts/cceh/active_databases
+
+If you are satisfied with the new project,
+you may drop the mysql databases.
+The application server uses the Postgres database only.
+
+.. code-block:: bash
+
+   mysql -e "DROP DATABASE ECM_Mark_Ph3"
+   mysql -e "DROP DATABASE Nestle29"

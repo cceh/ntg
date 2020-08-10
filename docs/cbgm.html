@@ -417,7 +417,7 @@ Country: US
 <p>As an example we will create a new project: Mark Phase 3.</p>
 <p>The name of the new Postgres database is: <code class="code docutils literal notranslate"><span class="pre">mark_ph3</span></code>.</p>
 <p>We assume having obtained two mysql database dumps from the NTVMR people:
-<code class="file docutils literal notranslate"><span class="pre">ECM_Mark_20200624.dump.bz2</span></code> and <code class="file docutils literal notranslate"><span class="pre">Nestle29-2.dump.bz2</span></code>.</p>
+<code class="file docutils literal notranslate"><span class="pre">ECM_Mark.dump</span></code> and <code class="file docutils literal notranslate"><span class="pre">Nestle29.dump</span></code>.</p>
 <p>ssh into the server.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -433,8 +433,8 @@ Country: US
 mysql -e <span class="s2">&quot;CREATE DATABASE ECM_Mark_Ph3&quot;</span>
 mysql -e <span class="s2">&quot;CREATE DATABASE Nestle29&quot;</span>
 
-bzcat ECM_Mark_20200624.dump.bz2 <span class="p">|</span> mysql -D ECM_Mark_Ph3
-bzcat Nestle29-2.dump.bz2        <span class="p">|</span> mysql -D Nestle29
+cat ECM_Mark.dump <span class="p">|</span> mysql -D ECM_Mark_Ph3
+cat Nestle29.dump <span class="p">|</span> mysql -D Nestle29
 </pre></div>
 </div>
 <p>Then create a new server instance.
@@ -464,6 +464,11 @@ python3 -m scripts.cceh.prepare -vvv instance/mark_ph3.conf
 </div>
 <p>If the server doesn’t start, check for configuration errors:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo /bin/journalctl -u ntg
+</pre></div>
+</div>
+<p>Update the file <code class="file docutils literal notranslate"><span class="pre">scripts/cceh/active_databases</span></code>.
+This file controls <a class="reference internal" href="vm.html#vm-backups"><span class="std std-ref">nightly and weekly backups</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emacs scripts/cceh/active_databases
 </pre></div>
 </div>
 <p>If you are satisfied with the new project,
@@ -565,8 +570,20 @@ in the file <code class="file docutils literal notranslate"><span class="pre">lo
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 -m scripts.cceh.cbgm -vvv instance/mark_ph3.conf
 </pre></div>
 </div>
-<p>Last, restart the application server:</p>
+<p>Restart the application server:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo /bin/systemctl restart ntg
+</pre></div>
+</div>
+<p>Update the file <code class="file docutils literal notranslate"><span class="pre">scripts/cceh/active_databases</span></code>.
+This file controls <a class="reference internal" href="vm.html#vm-backups"><span class="std std-ref">nightly and weekly backups</span></a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emacs scripts/cceh/active_databases
+</pre></div>
+</div>
+<p>If you are satisfied with the new project,
+you may drop the mysql databases.
+The application server uses the Postgres database only.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mysql -e <span class="s2">&quot;DROP DATABASE ECM_Mark_Ph3&quot;</span>
+mysql -e <span class="s2">&quot;DROP DATABASE Nestle29&quot;</span>
 </pre></div>
 </div>
 </div>

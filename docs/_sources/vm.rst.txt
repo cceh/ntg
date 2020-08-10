@@ -187,6 +187,7 @@ their public key to the file :file:`/etc/security/authorized_keys`.
    sudo usermod -aG sudo $NEWUSER
    sudo bash -c "cat ~$NEWUSER/.ssh/authorized_keys >> /etc/security/authorized_keys"
 
+.. _vm-backups:
 
 Backups
 =======

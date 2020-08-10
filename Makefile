@@ -149,19 +149,25 @@ import_mark_ph22:
 	bzcat ../dumps/ECM_Mk_Apparat_6.dump.bz2 | $(MYSQL) -D ECM_Mark_Ph2
 	python3 -m scripts.cceh.import -vvv instance/mark_ph22.conf
 
+import_mark_ph3:
+	-$(MYSQL) -e "DROP DATABASE ECM_Mark_Ph3"
+	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph3"
+	bzcat ../dumps/ECM_Mark_20200810.dump.bz2 | $(MYSQL) -D ECM_Mark_Ph3
+	python3 -m scripts.cceh.import -vvv instance/mark_ph3.conf
+
 import_nestle:
 	-$(MYSQL) -e "DROP DATABASE Nestle29"
 	$(MYSQL) -e "CREATE DATABASE Nestle29"
-	bzcat ../dumps/Nestle29-2.dump.bz2 | $(MYSQL) -D Nestle29
+	bzcat ../dumps/Nestle29-4.dump.bz2 | $(MYSQL) -D Nestle29
 
 import_2sam:
-	-$(MYSQL) -e "DROP DATABASE 2Sam_Ph1"
-	$(MYSQL) -e "CREATE DATABASE 2Sam_Ph1"
-	bzcat ../dumps/2Sam_apparat_20200618.dump.bz2 | $(MYSQL) -D 2Sam_Ph1
+	-$(MYSQL) -e "DROP DATABASE 2Sam_Ph21"
+	$(MYSQL) -e "CREATE DATABASE 2Sam_Ph21"
+	bzcat ../dumps/2Sam_apparat_20200628.dump.bz2 | $(MYSQL) -D 2Sam_Ph21
 	-$(MYSQL) -e "DROP DATABASE LXX_Leitzeile"
 	$(MYSQL) -e "CREATE DATABASE LXX_Leitzeile"
 	bzcat ../dumps/LXX.dump.bz2 | $(MYSQL) -D LXX_Leitzeile
-	python3 -m scripts.cceh.import -vvv instance/2sam_ph1.conf
+	python3 -m scripts.cceh.import -vvv instance/2sam_ph21.conf
 
 acts_ph4:
 	python3 -m scripts.cceh.prepare -vvv instance/acts_ph4.conf
@@ -196,11 +202,15 @@ mark_ph22:
 	python3 -m scripts.cceh.prepare -vvv instance/mark_ph22.conf
 	python3 -m scripts.cceh.cbgm    -vvv instance/mark_ph22.conf
 
-2sam_ph1:
-	python3 -m scripts.cceh.prepare -vvv instance/2sam_ph1.conf
-	python3 -m scripts.cceh.cbgm    -vvv instance/2sam_ph1.conf
+mark_ph3:
+	python3 -m scripts.cceh.prepare -vvv instance/mark_ph3.conf
+	python3 -m scripts.cceh.cbgm    -vvv instance/mark_ph3.conf
 
-DBS := acts_ph3 acts_ph4 acts_ph5 john_ph1 john_f1_ph1 mark_ph1 mark_ph12 mark_ph2 mark_ph22 cl_ph2 2sam_ph1
+2sam_ph21:
+	python3 -m scripts.cceh.prepare -vvv instance/2sam_ph21.conf
+	python3 -m scripts.cceh.cbgm    -vvv instance/2sam_ph21.conf
+
+DBS := acts_ph3 acts_ph4 acts_ph5 john_ph1 john_f1_ph1 mark_ph1 mark_ph12 mark_ph2 mark_ph22 cl_ph2 2sam_ph21
 
 
 #################
