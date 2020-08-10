@@ -117,7 +117,7 @@ As an example we will create a new project: Mark Phase 3.
 The name of the new Postgres database is: :code:`mark_ph3`.
 
 We assume having obtained two mysql database dumps from the NTVMR people:
-:file:`ECM_Mark.dump` and :file:`Nestle29.dump`.
+:file:`ECM_Mark_Ph3.dump.bz2` and :file:`Nestle29.dump.bz2`.
 
 ssh into the server.
 
@@ -140,8 +140,8 @@ Then import the database dumps into the local mysql databases:
    mysql -e "CREATE DATABASE ECM_Mark_Ph3"
    mysql -e "CREATE DATABASE Nestle29"
 
-   cat ECM_Mark.dump | mysql -D ECM_Mark_Ph3
-   cat Nestle29.dump | mysql -D Nestle29
+   bzcat ECM_Mark_Ph3.dump.bz2 | mysql -D ECM_Mark_Ph3
+   bzcat Nestle29.dump.bz2 | mysql -D Nestle29
 
 Then create a new server instance.
 The fastest way is to just copy an old instance configuration file and edit it:
@@ -185,7 +185,7 @@ If the server doesn't start, check for configuration errors:
    sudo /bin/journalctl -u ntg
 
 
-Update the file :file:`scripts/cceh/active_databases`.
+Add the database to the file :file:`scripts/cceh/active_databases`.
 This file controls :ref:`nightly and weekly backups<vm-backups>`.
 
 .. code-block:: bash
@@ -329,7 +329,7 @@ Restart the application server:
 
    sudo /bin/systemctl restart ntg
 
-Update the file :file:`scripts/cceh/active_databases`.
+Add the database to the file :file:`scripts/cceh/active_databases`.
 This file controls :ref:`nightly and weekly backups<vm-backups>`.
 
 .. code-block:: bash
