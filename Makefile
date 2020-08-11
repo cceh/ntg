@@ -1,14 +1,12 @@
 PRJ_DIR     := prj/ntg/ntg
 ROOT        := $(UNI_DIR)/$(PRJ_DIR)
 
-#NTG_HOST    := ntg.cceh.uni-koeln.de
 NTG_HOST    := ntg.uni-muenster.de
 NTG_USER    := ntg
 
 NTG         := $(NTG_USER)@$(NTG_HOST)
 NTG_PRJ     := $(NTG):/home/$(NTG_USER)/prj/ntg/ntg
 NTG_SERVER  := $(NTG_PRJ)/server
-#NTG_CLIENT  := $(NTG):/var/www/ntg.cceh.uni-koeln.de
 NTG_CLIENT  := $(NTG):/var/www/ntg
 
 RSYNC       := /usr/bin/rsync -azv --exclude '*~'
@@ -149,7 +147,7 @@ import_mark_ph22:
 	bzcat ../dumps/ECM_Mk_Apparat_6.dump.bz2 | $(MYSQL) -D ECM_Mark_Ph2
 	python3 -m scripts.cceh.import -vvv instance/mark_ph22.conf
 
-import_mark_ph3:
+import_mark_ph3: import_nestle
 	-$(MYSQL) -e "DROP DATABASE ECM_Mark_Ph3"
 	$(MYSQL) -e "CREATE DATABASE ECM_Mark_Ph3"
 	bzcat ../dumps/ECM_Mark_20200810.dump.bz2 | $(MYSQL) -D ECM_Mark_Ph3
