@@ -187,6 +187,7 @@ their public key to the file :file:`/etc/security/authorized_keys`.
    sudo usermod -aG sudo $NEWUSER
    sudo bash -c "cat ~$NEWUSER/.ssh/authorized_keys >> /etc/security/authorized_keys"
 
+
 .. _vm-backups:
 
 Backups
@@ -205,6 +206,33 @@ The active databases are configured in the file :file:`scripts/cceh/active_datab
 Also full server backups are scheduled with backup2l. See: :file:`/etc/backup2l.conf`.
 
 Backups reside in their own filesystem mounted at :file:`/backup`.
+
+Manual Backups
+--------------
+
+Do a manual backup of all editorial decisions:
+
+.. code-block:: bash
+
+   sudo -u ntg ~ntg/prj/ntg/ntg/scripts/cceh/backup_active_edits.sh
+
+Destination directory :file:`/backup/saved_edits/`.
+
+Do a manual backup of all active databases:
+
+.. code-block:: bash
+
+   sudo -u ntg ~ntg/prj/ntg/ntg/scripts/cceh/backup_active_databases.sh
+
+Destination directory :file:`/backup/saved_databases/`.
+
+Do a manual backup of all databases inclusive user database:
+
+.. code-block:: bash
+
+   sudo -u postgres ~ntg/prj/ntg/ntg/scripts/cceh/backup_all_databases.sh
+
+Destination directory :file:`/backup/postgres/`.
 
 
 Icinga

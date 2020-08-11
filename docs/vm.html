@@ -312,7 +312,7 @@ link pg to db6--><path d="M500.94,458.19 C514.02,473.24 533.41,495.54 549.59,514
 link pg to db7--><path d="M517.33,458.19 C548.96,475.55 598.19,502.56 634.4,522.43 " fill="none" id="pg-&gt;db7" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="639.19,525.06,633.2151,517.2306,634.8038,522.6597,629.3746,524.2485,639.19,525.06" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[1366877536a899643c19a81afe7707e9]
 link pg to db8--><path d="M527.29,449.83 C578.61,461.64 668.21,484.97 740,518 C744.26,519.96 748.6,522.26 752.82,524.69 " fill="none" id="pg-&gt;db8" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="757.35,527.37,751.6276,519.3541,753.0425,524.8312,747.5655,526.2461,757.35,527.37" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[eba01aae846f56940ba4403ae89a9449]
 link pg to db9--><path d="M527.05,445.37 C593.6,453.48 728.25,474.17 834,518 C838.27,519.77 842.58,521.92 846.77,524.25 " fill="none" id="pg-&gt;db9" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="851.26,526.84,845.467,518.875,846.9303,524.3393,841.4659,525.8026,851.26,526.84" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[8b6326868007b286e84b36293eee2e4b]
-link pg to db10--><path d="M527.25,442.26 C607.43,445.97 788.64,460.58 928,518 C932.33,519.78 936.65,522.06 940.8,524.56 " fill="none" id="pg-&gt;db10" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="945.22,527.35,939.7476,519.1614,940.9929,524.6795,935.4748,525.9248,945.22,527.35" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[eafe9e306423a510912c4bfd40e36f30]
+link pg to db10--><path d="M527.25,442.26 C607.43,445.97 788.64,460.58 928,518 C932.33,519.78 936.65,522.06 940.8,524.56 " fill="none" id="pg-&gt;db10" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="945.22,527.35,939.7476,519.1614,940.9929,524.6795,935.4748,525.9248,945.22,527.35" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[f413da86daadded5144425351a0d4873]
 @startuml
 skinparam backgroundColor transparent
 
@@ -371,7 +371,7 @@ PlantUML version 1.2020.02(Sun Mar 01 11:22:07 CET 2020)
 (GPL source distribution)
 Java Runtime: OpenJDK Runtime Environment
 JVM: OpenJDK 64-Bit Server VM
-Java Version: 11.0.7+10-post-Debian-3
+Java Version: 11.0.8+10-post-Debian-1
 Operating System: Linux
 Default Encoding: UTF-8
 Language: en
@@ -487,6 +487,24 @@ the active databases are backed up weekly. See:</p>
 The active databases are configured in the file <code class="file docutils literal notranslate"><span class="pre">scripts/cceh/active_databases</span></code>.</p>
 <p>Also full server backups are scheduled with backup2l. See: <code class="file docutils literal notranslate"><span class="pre">/etc/backup2l.conf</span></code>.</p>
 <p>Backups reside in their own filesystem mounted at <code class="file docutils literal notranslate"><span class="pre">/backup</span></code>.</p>
+<div class="section" id="manual-backups">
+<h3>Manual Backups<a class="headerlink" href="#manual-backups" title="Permalink to this headline">¶</a></h3>
+<p>Do a manual backup of all editorial decisions:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -u ntg ~ntg/prj/ntg/ntg/scripts/cceh/backup_active_edits.sh
+</pre></div>
+</div>
+<p>Destination directory <code class="file docutils literal notranslate"><span class="pre">/backup/saved_edits/</span></code>.</p>
+<p>Do a manual backup of all active databases:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -u ntg ~ntg/prj/ntg/ntg/scripts/cceh/backup_active_databases.sh
+</pre></div>
+</div>
+<p>Destination directory <code class="file docutils literal notranslate"><span class="pre">/backup/saved_databases/</span></code>.</p>
+<p>Do a manual backup of all databases inclusive user database:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo -u postgres ~ntg/prj/ntg/ntg/scripts/cceh/backup_all_databases.sh
+</pre></div>
+</div>
+<p>Destination directory <code class="file docutils literal notranslate"><span class="pre">/backup/postgres/</span></code>.</p>
+</div>
 </div>
 <div class="section" id="icinga">
 <h2>Icinga<a class="headerlink" href="#icinga" title="Permalink to this headline">¶</a></h2>
