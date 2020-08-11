@@ -35,6 +35,7 @@ import checks_list    from 'checks_list.vue';
 import opt_stemma     from 'optimal_substemma.vue';
 import set_cover      from 'set_cover.vue';
 
+
 Vue.use (Vuex);
 Vue.use (VueRouter);
 
@@ -385,7 +386,7 @@ window.addEventListener ('hashchange', function () {
 /* bootstrap */
 
 /* FIXME: this file is huge, maybe pick only the things we use */
-@import "../../node_modules/bootstrap/scss/bootstrap";
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";
 
 /* List of icons at: http://astronautweb.co/snippet/font-awesome/ */
 

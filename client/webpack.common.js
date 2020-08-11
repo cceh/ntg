@@ -1,7 +1,5 @@
 const path            = require ('path');
 const VueLoaderPlugin = require ('vue-loader/lib/plugin');
-const precss          = require ('precss');
-const autoprefixer    = require ('autoprefixer');
 
 module.exports = {
     entry : {
@@ -38,16 +36,20 @@ module.exports = {
                 test: /\.scss$/,
                 use: [
                     'vue-style-loader',
-                    'css-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 2,  // postcss-loader, sass-loader
+                            esModule: false,   // css-loader v3->v4 upgrade broke this
+                        },
+                    },
                     {
                         loader: 'postcss-loader',
                         options: {
-                            plugins: function () { // post css plugins, can be exported to postcss.config.js
-                                return [
-                                    precss,
-                                    autoprefixer,
-                                ];
-                            },
+                            ident: 'postcss',
+                            plugins: [
+                                require ('autoprefixer') ({}),
+                            ],
                         },
                     },
                     'sass-loader',
