@@ -177,7 +177,7 @@ export default {
 
 <style lang="scss">
 /* optimal_substemma_table.vue */
-@import "bootstrap-custom";
+@import "bootstrap-custom.scss";
 
 div.vm-optimal-substemma-table {
     table.table-optimal-substemma {

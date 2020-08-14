@@ -123,7 +123,6 @@ export default {
 
 <style lang="scss">
 /* checks_list.vue */
-@import "bootstrap-custom";
 
 div.vm-checks-list {
     .prewrap {

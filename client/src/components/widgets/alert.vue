@@ -54,7 +54,6 @@ export default {
 
 <style lang="scss">
 /* widgets/alert.vue */
-@import "bootstrap-custom";
 
 div.vm-alert {
     height: 0;

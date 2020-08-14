@@ -205,7 +205,7 @@ export default {
 
 <style lang="scss">
 /* set_cover.vue */
-@import "bootstrap-custom";
+@import "bootstrap-custom.scss";
 
 div.vm-set-cover {
     div.navigator {

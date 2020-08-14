@@ -68,7 +68,7 @@ export default {
 
 <style lang="scss">
 /* comparison_table.vue */
-@import "bootstrap-custom";
+@import "bootstrap-custom.scss";
 
 table.table-sortable {
     thead {

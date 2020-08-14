@@ -71,7 +71,7 @@ export default {
 
 <style lang="scss">
 /* page_header.vue */
-@import "bootstrap-custom";
+@import "bootstrap-custom.scss";
 
 div.vm-page-header {
     div.bs-docs-header {

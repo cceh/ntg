@@ -92,7 +92,6 @@ export default {
 
 <style lang="scss">
 /* widgets/range.vue */
-@import "bootstrap-custom";
 
 div.vm-range {
     .dropdown-menu {

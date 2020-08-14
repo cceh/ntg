@@ -187,7 +187,7 @@ export default {
 
 <style lang="scss">
 /* apparatus.vue */
-@import "bootstrap-custom";
+@import "bootstrap-custom.scss";
 
 div.vm-apparatus {
     a:not([href]):not([tabindex]) {

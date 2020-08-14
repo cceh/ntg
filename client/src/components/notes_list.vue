@@ -107,7 +107,6 @@ export default {
 
 <style lang="scss">
 /* notes_list.vue */
-@import "bootstrap-custom";
 
 div.vm-notes-list {
     .prewrap {

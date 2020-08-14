@@ -155,7 +155,6 @@ export default {
 
 <style lang="scss">
 /* widgets/card.vue */
-@import "bootstrap-custom";
 
 .vm-card {
     .card-slidable {

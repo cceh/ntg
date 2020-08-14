@@ -99,7 +99,6 @@ export default {
 
 <style lang="scss">
 /* relatives.vue */
-@import "bootstrap-custom";
 
 div.vm-relatives {
     position: relative;

@@ -149,7 +149,7 @@ export default {
 
 <style lang="scss">
 /* comparison_table_details.vue */
-@import "bootstrap-custom";
+@import "bootstrap-custom.scss";
 
 div.vm-comparison-details {
     height: 0;

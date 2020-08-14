@@ -128,7 +128,7 @@ export default {
 
 <style lang="scss">
 /* notes.vue */
-@import "bootstrap-custom";
+@import "bootstrap-custom.scss";
 
 .vm-notes {
     textarea {

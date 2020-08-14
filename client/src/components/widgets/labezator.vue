@@ -103,7 +103,6 @@ export default {
 
 <style lang="scss">
 /* widgets/labezator.vue */
-@import "bootstrap-custom";
 
 div.vm-labezator {
     .dropdown-menu {

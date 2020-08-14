@@ -420,7 +420,6 @@ export default {
 
 <style lang="scss">
 /* local_stemma.vue */
-@import "bootstrap-custom";
 
 div.vm-local-stemma {
     marker.link {

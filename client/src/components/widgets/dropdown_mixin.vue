@@ -107,7 +107,7 @@ export default {
 
 <style lang="scss">
 /* widgets/dropdown_mixin.vue */
-@import "bootstrap-custom";
+@import "bootstrap-custom.scss";
 
 div.vm-dropdown-mixin {
     position: relative;

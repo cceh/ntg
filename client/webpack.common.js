@@ -1,23 +1,16 @@
 const path            = require ('path');
-const VueLoaderPlugin = require ('vue-loader/lib/plugin');
+const VueLoaderPlugin = require ('vue-loader/lib/plugin'); // loads vue single-file components
 
 module.exports = {
     entry : {
-        app : 'js/app.js', // in app.bundle.js
+        app : 'app.js', // entrypoint in app.bundle.js
     },
     output : {
-        filename : 'js/[name].bundle.js',
-        path : path.resolve (__dirname, 'build'),
+        filename : 'js/[name].bundle.js',         // make 3 bundles
+        path : path.resolve (__dirname, 'build'), // in the build directory
     },
     module : {
         rules : [
-            {
-                test : /\.js$/,
-                exclude : /node_modules/,
-                use : [
-                    'babel-loader',
-                ],
-            },
             {
                 test: /\.vue$/,
                 exclude: /node_modules/,
@@ -26,33 +19,27 @@ module.exports = {
                 ],
             },
             {
-                test: /\.css$/,
-                use: [
-                    'vue-style-loader',
-                    'css-loader',
+                test : /\.js$/,
+                exclude : /node_modules/,
+                use : [
+                    'babel-loader',
                 ],
             },
             {
                 test: /\.scss$/,
                 use: [
-                    'vue-style-loader',
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            importLoaders: 2,  // postcss-loader, sass-loader
-                            esModule: false,   // css-loader v3->v4 upgrade broke this
-                        },
-                    },
-                    {
-                        loader: 'postcss-loader',
-                        options: {
-                            ident: 'postcss',
-                            plugins: [
-                                require ('autoprefixer') ({}),
-                            ],
-                        },
-                    },
+                    'style-loader',
+                    'css-loader',
+                    'postcss-loader',
                     'sass-loader',
+                ],
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    'css-loader',
+                    'postcss-loader',
                 ],
             },
             {
@@ -84,6 +71,14 @@ module.exports = {
                     'pegjs-loader',
                 ],
             },
+        ],
+    },
+    resolve: {
+        modules: [
+            path.resolve (__dirname, 'src/components'),
+            path.resolve (__dirname, 'src/css'),
+            path.resolve (__dirname, 'src/js'),
+            'node_modules',
         ],
     },
     plugins: [
@@ -118,21 +113,5 @@ module.exports = {
             },
         },
         runtimeChunk: 'single',
-    },
-    resolve: {
-        modules: [
-            path.resolve (__dirname, 'src'),
-            path.resolve (__dirname, 'src/components'),
-            path.resolve (__dirname, 'src/css'),
-            path.resolve (__dirname, 'src/js'),
-            'node_modules',
-        ],
-        mainFields: ['module', 'main'],
-        alias: {
-            /* See: https://webpack.js.org/configuration/resolve/#resolve-alias */
-            'bootstrap-custom' : path.resolve (
-                __dirname, 'src/css/bootstrap-custom.scss'
-            ),
-        },
     },
 };

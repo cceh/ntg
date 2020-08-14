@@ -125,7 +125,7 @@ export default {
 
 <style lang="scss">
 /* optimal_substemma.vue */
-@import "bootstrap-custom";
+@import "bootstrap-custom.scss";
 
 div.vm-optimal-substemma {
     div.navigator {

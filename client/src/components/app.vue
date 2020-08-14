@@ -381,17 +381,18 @@ window.addEventListener ('hashchange', function () {
 <style lang="scss">
 /* app.vue */
 
-@import "../css/bootstrap-custom.scss";
+@import "bootstrap-custom.scss";
 
 /* bootstrap */
-
 /* FIXME: this file is huge, maybe pick only the things we use */
-@import "../../node_modules/bootstrap/scss/bootstrap.scss";
+@import "~bootstrap";
 
+/* font-awesome */
 /* List of icons at: http://astronautweb.co/snippet/font-awesome/ */
 
+$fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
 /* FIXME: this file is huge, maybe pick only the icons we use */
-@import "../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
-@import "../../node_modules/@fortawesome/fontawesome-free/css/solid.css";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "~@fortawesome/fontawesome-free/scss/solid.scss";
 
 </style>

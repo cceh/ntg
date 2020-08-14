@@ -245,7 +245,7 @@ export default {
 
 <style lang="scss">
 /* coherence.vue */
-@import "bootstrap-custom";
+@import "bootstrap-custom.scss";
 
 div.vm-coherence {
     div.card-wide {

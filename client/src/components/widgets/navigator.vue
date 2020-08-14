@@ -130,7 +130,6 @@ export default {
 
 <style lang="scss">
 /* navigator.vue */
-@import "bootstrap-custom";
 
 .vm-navigator {
     @media print {
