@@ -37,7 +37,7 @@
   <link rel="stylesheet" href="_static/my_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Various Functions" href="ntg_common.html" />
+    <link rel="next" title="Common Functions" href="ntg_common.html" />
     <link rel="prev" title="Scripts" href="scripts_dev.html" /> 
 </head>
 
@@ -167,8 +167,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#literature">Literature</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="ntg_common.html">Various Functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ntg_common.html">Common Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.cbgm_common">ntg_common.cbgm_common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.config">ntg_common.config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools">ntg_common.db_tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.exceptions">ntg_common.exceptions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">ntg_common.tools</a></li>
 </ul>
 </li>
@@ -272,16 +275,19 @@
 <h1>Database Structure<a class="headerlink" href="#database-structure" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="cbgm-database">
 <span id="cbgm-db"></span><h2>CBGM Database<a class="headerlink" href="#cbgm-database" title="Permalink to this headline">¶</a></h2>
-<p>The CBGM database is built from the <a class="reference internal" href="#source-db"><span class="std std-ref">Source Databases</span></a> by the <a class="reference internal" href="scripts_dev.html#module-scripts.cceh.import" title="scripts.cceh.import: Import mysql databases"><code class="xref py py-mod docutils literal notranslate"><span class="pre">import</span></code></a> script.  The <a class="reference internal" href="server_dev.html#module-server" title="server: Flask Driver Module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span> <span class="pre">server</span></code></a> uses this
+<p>The CBGM database is built from the <a class="reference internal" href="#source-db"><span class="std std-ref">Source Databases</span></a> by the <a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare" title="scripts.cceh.prepare: Prepare a database for CBGM"><code class="xref py py-mod docutils literal notranslate"><span class="pre">prepare</span></code></a> script.  The <a class="reference internal" href="server_dev.html#module-server" title="server: Flask Driver Module"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span> <span class="pre">server</span></code></a> uses this
 database.</p>
+<p>Blue: initialized by the <a class="reference internal" href="scripts_dev.html#module-scripts.cceh.prepare" title="scripts.cceh.prepare: Prepare a database for CBGM"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">scripts.cceh.prepare</span></code></a> script.  These tables change
+only between phases.  The Apparatus table is also updated by the
+<a class="reference internal" href="scripts_dev.html#module-scripts.cceh.cbgm" title="scripts.cceh.cbgm: Recalculate the CBGM coefficients."><code class="xref any py py-mod docutils literal notranslate"><span class="pre">scripts.cceh.cbgm</span></code></a> script where manuscript ‘A’ is concerned.</p>
+<p>Green: updated by the <a class="reference internal" href="server_dev.html#module-server" title="server: Flask Driver Module"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">server</span></code></a>.  Backed up by <a class="reference internal" href="scripts_dev.html#module-scripts.cceh.save_edits" title="scripts.cceh.save_edits: Save the editorial decisions to an external file."><code class="xref any py py-mod docutils literal notranslate"><span class="pre">scripts.cceh.save_edits</span></code></a>.
+Restored by <a class="reference internal" href="scripts_dev.html#module-scripts.cceh.load_edits" title="scripts.cceh.load_edits: Load the editorial decisions from an external file."><code class="xref any py py-mod docutils literal notranslate"><span class="pre">scripts.cceh.load_edits</span></code></a>.  The editors update these tables through
+a graph editor.  These tables are <a class="reference internal" href="#tts"><span class="std std-ref">journalled</span></a> to eventually provide undo
+functionality.</p>
+<p>Red: updated by the <a class="reference internal" href="scripts_dev.html#module-scripts.cceh.cbgm" title="scripts.cceh.cbgm: Recalculate the CBGM coefficients."><code class="xref any py py-mod docutils literal notranslate"><span class="pre">scripts.cceh.cbgm</span></code></a> script.</p>
 <div class="figure align-center" id="id3">
 <span id="db-overwiew"></span><img alt="_images/uml.svg" src="_images/uml.svg" /><p class="caption"><span class="caption-text">Overview of the CBGM database (some columns omitted)</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </div>
-<p>The editors update the tables shown in green through a graphical editor.  These
-tables are <a class="reference internal" href="#tts"><span class="std std-ref">journalled</span></a> to provide undo functionality.</p>
-<p>The CBGM process updates the tables shown in red and the Apparatus table where
-manuscript ‘A’ is concerned.</p>
-<p>The <a class="reference internal" href="server_dev.html#module-server" title="server: Flask Driver Module"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">server</span></code></a> uses all these tables.</p>
 <div class="figure align-center" id="id4">
 <div  class="pic pic-format-text-xml pic-language-sauml pic-w100">
 
@@ -2884,44 +2890,47 @@ The database system is MySQL.</p>
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: G Pages: 1 -->
-<svg width="283pt" height="147pt"
- viewBox="0.00 0.00 283.00 147.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(0 147)">
+<svg width="283pt" height="162pt"
+ viewBox="0.00 0.00 283.00 162.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(0 162)">
 <title>G</title>
-<polygon fill="white" stroke="transparent" points="0,0 0,-147 283,-147 283,0 0,0"/>
+<polygon fill="white" stroke="transparent" points="0,0 0,-162 283,-162 283,0 0,0"/>
 <!-- Nestle29 -->
 <g id="node1" class="node">
 <title>Nestle29</title>
-<polygon fill="#e7f2fa" stroke="transparent" points="0,0 0,-147 283,-147 283,0 0,0"/>
-<polyline fill="none" stroke="#2980b9" stroke-width="2" points="3.5,-122.5 280.5,-122.5 "/>
-<text text-anchor="start" x="50.5" y="-131.5" font-family="DejaVu Sans Mono" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="123.5" y="-131.5" font-family="DejaVu Sans Mono" font-weight="bold" font-size="10.00">Nestle29</text>
-<text text-anchor="start" x="172.5" y="-131.5" font-family="DejaVu Sans Mono" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="4.5" y="-111.5" font-family="DejaVu Sans Mono" font-size="10.00">book</text>
-<text text-anchor="start" x="51.5" y="-111.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-111.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<text text-anchor="start" x="4.5" y="-96.5" font-family="DejaVu Sans Mono" font-size="10.00">chapter</text>
-<text text-anchor="start" x="51.5" y="-96.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-96.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<text text-anchor="start" x="4.5" y="-81.5" font-family="DejaVu Sans Mono" font-size="10.00">verse</text>
-<text text-anchor="start" x="51.5" y="-81.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-81.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<text text-anchor="start" x="4.5" y="-66.5" font-family="DejaVu Sans Mono" font-size="10.00">word</text>
-<text text-anchor="start" x="51.5" y="-66.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-66.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<text text-anchor="start" x="4.5" y="-51.5" font-family="DejaVu Sans Mono" font-size="10.00">content</text>
-<text text-anchor="start" x="51.5" y="-51.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-51.5" font-family="DejaVu Sans Mono" font-size="10.00">VARCHAR(255) COLLATE utf8_unicode_ci</text>
-<text text-anchor="start" x="4.5" y="-36.5" font-family="DejaVu Sans Mono" font-size="10.00">prev</text>
-<text text-anchor="start" x="51.5" y="-36.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-36.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<text text-anchor="start" x="4.5" y="-21.5" font-family="DejaVu Sans Mono" font-size="10.00">adr</text>
-<text text-anchor="start" x="51.5" y="-21.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-21.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<text text-anchor="start" x="4.5" y="-6.5" font-family="DejaVu Sans Mono" font-size="10.00">next</text>
-<text text-anchor="start" x="51.5" y="-6.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-6.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<polygon fill="none" stroke="#2980b9" stroke-width="2" points="1,-1 1,-146 282,-146 282,-1 1,-1"/>
+<polygon fill="#e7f2fa" stroke="transparent" points="0,0 0,-162 283,-162 283,0 0,0"/>
+<polyline fill="none" stroke="#2980b9" stroke-width="2" points="3.5,-138 280.5,-138 "/>
+<text text-anchor="start" x="50.5" y="-147" font-family="DejaVu Sans Mono" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="123.5" y="-147" font-family="DejaVu Sans Mono" font-weight="bold" font-size="10.00">Nestle29</text>
+<text text-anchor="start" x="172.5" y="-147" font-family="DejaVu Sans Mono" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="4.5" y="-127" font-family="DejaVu Sans Mono" font-size="10.00">id</text>
+<text text-anchor="start" x="51.5" y="-127" font-family="DejaVu Sans Mono" font-size="10.00">★</text>
+<text text-anchor="start" x="62.5" y="-127" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-112" font-family="DejaVu Sans Mono" font-size="10.00">book</text>
+<text text-anchor="start" x="51.5" y="-112" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-112" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-97" font-family="DejaVu Sans Mono" font-size="10.00">chapter</text>
+<text text-anchor="start" x="51.5" y="-97" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-97" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-82" font-family="DejaVu Sans Mono" font-size="10.00">verse</text>
+<text text-anchor="start" x="51.5" y="-82" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-82" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-67" font-family="DejaVu Sans Mono" font-size="10.00">word</text>
+<text text-anchor="start" x="51.5" y="-67" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-67" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-52" font-family="DejaVu Sans Mono" font-size="10.00">content</text>
+<text text-anchor="start" x="51.5" y="-52" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-52" font-family="DejaVu Sans Mono" font-size="10.00">VARCHAR(255) COLLATE utf8_unicode_ci</text>
+<text text-anchor="start" x="4.5" y="-37" font-family="DejaVu Sans Mono" font-size="10.00">prev</text>
+<text text-anchor="start" x="51.5" y="-37" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-37" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-22" font-family="DejaVu Sans Mono" font-size="10.00">adr</text>
+<text text-anchor="start" x="51.5" y="-22" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-22" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-7" font-family="DejaVu Sans Mono" font-size="10.00">next</text>
+<text text-anchor="start" x="51.5" y="-7" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-7" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<polygon fill="none" stroke="#2980b9" stroke-width="2" points="1,-1 1,-161 282,-161 282,-1 1,-1"/>
 </g>
 </g>
 </svg>
@@ -3542,44 +3551,47 @@ which reading is derived from which other reading(s) at each passage.</p>
 <!-- Generated by graphviz version 2.43.0 (0)
  -->
 <!-- Title: G Pages: 1 -->
-<svg width="283pt" height="147pt"
- viewBox="0.00 0.00 283.00 147.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(0 147)">
+<svg width="283pt" height="162pt"
+ viewBox="0.00 0.00 283.00 162.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(0 162)">
 <title>G</title>
-<polygon fill="white" stroke="transparent" points="0,0 0,-147 283,-147 283,0 0,0"/>
+<polygon fill="white" stroke="transparent" points="0,0 0,-162 283,-162 283,0 0,0"/>
 <!-- Nestle29 -->
 <g id="node1" class="node">
 <title>Nestle29</title>
-<polygon fill="#e7f2fa" stroke="transparent" points="0,0 0,-147 283,-147 283,0 0,0"/>
-<polyline fill="none" stroke="#2980b9" stroke-width="2" points="3.5,-122.5 280.5,-122.5 "/>
-<text text-anchor="start" x="50.5" y="-131.5" font-family="DejaVu Sans Mono" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="123.5" y="-131.5" font-family="DejaVu Sans Mono" font-weight="bold" font-size="10.00">Nestle29</text>
-<text text-anchor="start" x="172.5" y="-131.5" font-family="DejaVu Sans Mono" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="4.5" y="-111.5" font-family="DejaVu Sans Mono" font-size="10.00">book</text>
-<text text-anchor="start" x="51.5" y="-111.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-111.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<text text-anchor="start" x="4.5" y="-96.5" font-family="DejaVu Sans Mono" font-size="10.00">chapter</text>
-<text text-anchor="start" x="51.5" y="-96.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-96.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<text text-anchor="start" x="4.5" y="-81.5" font-family="DejaVu Sans Mono" font-size="10.00">verse</text>
-<text text-anchor="start" x="51.5" y="-81.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-81.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<text text-anchor="start" x="4.5" y="-66.5" font-family="DejaVu Sans Mono" font-size="10.00">word</text>
-<text text-anchor="start" x="51.5" y="-66.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-66.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<text text-anchor="start" x="4.5" y="-51.5" font-family="DejaVu Sans Mono" font-size="10.00">content</text>
-<text text-anchor="start" x="51.5" y="-51.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-51.5" font-family="DejaVu Sans Mono" font-size="10.00">VARCHAR(255) COLLATE utf8_unicode_ci</text>
-<text text-anchor="start" x="4.5" y="-36.5" font-family="DejaVu Sans Mono" font-size="10.00">prev</text>
-<text text-anchor="start" x="51.5" y="-36.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-36.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<text text-anchor="start" x="4.5" y="-21.5" font-family="DejaVu Sans Mono" font-size="10.00">adr</text>
-<text text-anchor="start" x="51.5" y="-21.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-21.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<text text-anchor="start" x="4.5" y="-6.5" font-family="DejaVu Sans Mono" font-size="10.00">next</text>
-<text text-anchor="start" x="51.5" y="-6.5" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
-<text text-anchor="start" x="62.5" y="-6.5" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
-<polygon fill="none" stroke="#2980b9" stroke-width="2" points="1,-1 1,-146 282,-146 282,-1 1,-1"/>
+<polygon fill="#e7f2fa" stroke="transparent" points="0,0 0,-162 283,-162 283,0 0,0"/>
+<polyline fill="none" stroke="#2980b9" stroke-width="2" points="3.5,-138 280.5,-138 "/>
+<text text-anchor="start" x="50.5" y="-147" font-family="DejaVu Sans Mono" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="123.5" y="-147" font-family="DejaVu Sans Mono" font-weight="bold" font-size="10.00">Nestle29</text>
+<text text-anchor="start" x="172.5" y="-147" font-family="DejaVu Sans Mono" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="4.5" y="-127" font-family="DejaVu Sans Mono" font-size="10.00">id</text>
+<text text-anchor="start" x="51.5" y="-127" font-family="DejaVu Sans Mono" font-size="10.00">★</text>
+<text text-anchor="start" x="62.5" y="-127" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-112" font-family="DejaVu Sans Mono" font-size="10.00">book</text>
+<text text-anchor="start" x="51.5" y="-112" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-112" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-97" font-family="DejaVu Sans Mono" font-size="10.00">chapter</text>
+<text text-anchor="start" x="51.5" y="-97" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-97" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-82" font-family="DejaVu Sans Mono" font-size="10.00">verse</text>
+<text text-anchor="start" x="51.5" y="-82" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-82" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-67" font-family="DejaVu Sans Mono" font-size="10.00">word</text>
+<text text-anchor="start" x="51.5" y="-67" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-67" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-52" font-family="DejaVu Sans Mono" font-size="10.00">content</text>
+<text text-anchor="start" x="51.5" y="-52" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-52" font-family="DejaVu Sans Mono" font-size="10.00">VARCHAR(255) COLLATE utf8_unicode_ci</text>
+<text text-anchor="start" x="4.5" y="-37" font-family="DejaVu Sans Mono" font-size="10.00">prev</text>
+<text text-anchor="start" x="51.5" y="-37" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-37" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-22" font-family="DejaVu Sans Mono" font-size="10.00">adr</text>
+<text text-anchor="start" x="51.5" y="-22" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-22" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<text text-anchor="start" x="4.5" y="-7" font-family="DejaVu Sans Mono" font-size="10.00">next</text>
+<text text-anchor="start" x="51.5" y="-7" font-family="DejaVu Sans Mono" font-size="10.00">◦</text>
+<text text-anchor="start" x="62.5" y="-7" font-family="DejaVu Sans Mono" font-size="10.00">INTEGER(11)</text>
+<polygon fill="none" stroke="#2980b9" stroke-width="2" points="1,-1 1,-161 282,-161 282,-1 1,-1"/>
 </g>
 </g>
 </svg>
@@ -3608,7 +3620,7 @@ Francisco.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="ntg_common.html" class="btn btn-neutral float-right" title="Various Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="ntg_common.html" class="btn btn-neutral float-right" title="Common Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="scripts_dev.html" class="btn btn-neutral float-left" title="Scripts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

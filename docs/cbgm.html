@@ -168,6 +168,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ntg_common.html">Various Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.cbgm_common">ntg_common.cbgm_common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.config">ntg_common.config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.db_tools">ntg_common.db_tools</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ntg_common.html#module-ntg_common.tools">ntg_common.tools</a></li>
 </ul>
@@ -553,6 +555,7 @@ CBGM step.</p>
 <p>Put the old database in read-only mode (set WRITE_ACCESS=”nobody”):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> ~/prj/ntg/ntg/instance
 emacs mark_ph22.conf
+sudo /bin/systemctl restart ntg
 </pre></div>
 </div>
 <p>Then use the <a class="reference internal" href="scripts_user.html#save-edits-py"><span class="std std-ref">scripts/cceh/save_edits.py</span></a> script to save the editorial decisions

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Various Functions &mdash; NTG 0.1.1 documentation</title>
+  <title>Common Functions &mdash; NTG 0.1.1 documentation</title>
   
 
   
@@ -167,8 +167,11 @@
 <li class="toctree-l3"><a class="reference internal" href="database.html#literature">Literature</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Various Functions</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Common Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-ntg_common.cbgm_common">ntg_common.cbgm_common</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ntg_common.config">ntg_common.config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ntg_common.db_tools">ntg_common.db_tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-ntg_common.exceptions">ntg_common.exceptions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-ntg_common.tools">ntg_common.tools</a></li>
 </ul>
 </li>
@@ -249,7 +252,7 @@
         
           <li><a href="developer.html">Developer Manual</a> &raquo;</li>
         
-      <li>Various Functions</li>
+      <li>Common Functions</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -268,8 +271,205 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <span class="target" id="module-ntg_common"></span><div class="section" id="various-functions">
-<h1>Various Functions<a class="headerlink" href="#various-functions" title="Permalink to this headline">¶</a></h1>
+  <span class="target" id="module-ntg_common"></span><div class="section" id="common-functions">
+<h1>Common Functions<a class="headerlink" href="#common-functions" title="Permalink to this headline">¶</a></h1>
+<p>Here are the functions used by the server and the commandline scripts.</p>
+<div class="section" id="module-ntg_common.cbgm_common">
+<span id="ntg-common-cbgm-common"></span><h2>ntg_common.cbgm_common<a class="headerlink" href="#module-ntg_common.cbgm_common" title="Permalink to this headline">¶</a></h2>
+<p>Common routines for the CBGM.</p>
+<dl class="py class">
+<dt id="ntg_common.cbgm_common.CBGM_Params">
+<em class="property">class </em><code class="sig-name descname">CBGM_Params</code><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure that holds intermediate results of the CBGM.</p>
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.ancestor_matrix">
+<code class="sig-name descname">ancestor_matrix</code><em class="property"> = None</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.ancestor_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer matrix (ranges x mss x mss) with counts of the passages that are
+older in ms1 than in ms2.  This matrix is asymmetrical.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.and_matrix">
+<code class="sig-name descname">and_matrix</code><em class="property"> = None</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.and_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer matrix (ranges x mss x mss) with counts of the passages that are
+defined in both mss.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.def_matrix">
+<code class="sig-name descname">def_matrix</code><em class="property"> = None</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.def_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean matrix (mss x passages) set if ms. is defined at passage.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.eq_matrix">
+<code class="sig-name descname">eq_matrix</code><em class="property"> = None</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.eq_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer matrix (ranges x mss x mss) with counts of the passages that are
+equal in both mss.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.labez_matrix">
+<code class="sig-name descname">labez_matrix</code><em class="property"> = None</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.labez_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer matrix (mss x passages) of labez.  Each entry represents one reading:
+0 = lacuna, 1 = ‘a’, 2 = ‘b’, …  Used by the pre-coherence computations.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.n_mss">
+<code class="sig-name descname">n_mss</code><em class="property"> = 0</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.n_mss" title="Permalink to this definition">¶</a></dt>
+<dd><p>No. of manuscripts</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.n_passages">
+<code class="sig-name descname">n_passages</code><em class="property"> = 0</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.n_passages" title="Permalink to this definition">¶</a></dt>
+<dd><p>No. of passages</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.n_ranges">
+<code class="sig-name descname">n_ranges</code><em class="property"> = 0</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.n_ranges" title="Permalink to this definition">¶</a></dt>
+<dd><p>No. of ranges</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.parent_matrix">
+<code class="sig-name descname">parent_matrix</code><em class="property"> = None</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.parent_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer matrix (ranges x mss x mss) with counts of the passages that are
+older in ms1 than in ms2, using only immediate descendence.  This matrix is
+asymmetrical.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.ranges">
+<code class="sig-name descname">ranges</code><em class="property"> = None</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.ranges" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of (named tuple Range)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.unclear_ancestor_matrix">
+<code class="sig-name descname">unclear_ancestor_matrix</code><em class="property"> = None</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.unclear_ancestor_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer matrix (ranges x mss x mss) with counts of the passages whose
+relationship is unclear in ms1 and ms2.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.unclear_parent_matrix">
+<code class="sig-name descname">unclear_parent_matrix</code><em class="property"> = None</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.unclear_parent_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer matrix (ranges x mss x mss) with counts of the passages whose
+relationship is unclear in ms1 and ms2, using only immediate descendence.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="ntg_common.cbgm_common.CBGM_Params.variant_matrix">
+<code class="sig-name descname">variant_matrix</code><em class="property"> = None</em><a class="headerlink" href="#ntg_common.cbgm_common.CBGM_Params.variant_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean (1 x passages) matrix of invariant passages.  We will need this the
+day we decide <em>not</em> to eliminate all invariant readings from the
+database.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="ntg_common.cbgm_common.calculate_mss_similarity_postco">
+<code class="sig-name descname">calculate_mss_similarity_postco</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dba</span></em>, <em class="sig-param"><span class="n">parameters</span></em>, <em class="sig-param"><span class="n">val</span></em>, <em class="sig-param"><span class="n">do_checks</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.cbgm_common.calculate_mss_similarity_postco" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate post-coherence mss similarity</p>
+<p>Genealogical coherence outputs asymmetrical matrices.
+Loop over all mss O(n_mss² * n_ranges * n_passages).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ntg_common.cbgm_common.calculate_mss_similarity_preco">
+<code class="sig-name descname">calculate_mss_similarity_preco</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_dba</span></em>, <em class="sig-param"><span class="n">_parameters</span></em>, <em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.cbgm_common.calculate_mss_similarity_preco" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate pre-coherence mss similarity</p>
+<p>The pre-coherence similarity is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\mbox{similarity}=\frac{\mbox{equal passages}}{\mbox{passages in common}}\]</div>
+<blockquote>
+<div><p>Kapitelweise füllen auf Basis von Vergleichen einzelner
+Variantenspektren in ECM_Acts_Sp.  Vergleich von je zwei Handschriften:
+An wieviel Stellen haben sie gemeinsam Text, an wieviel Stellen stimmen
+sie überein bzw. unterscheiden sie sich (inklusive Quotient)?  Die
+Informationen werden sowohl auf Kapitel- wie auch Buchebene
+festgehalten.</p>
+<p class="attribution">—VGA/VG05_all3.pl</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ntg_common.cbgm_common.count_by_range">
+<code class="sig-name descname">count_by_range</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">range_starts</span></em>, <em class="sig-param"><span class="n">range_ends</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.cbgm_common.count_by_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count true bits in array ranges</p>
+<p>Count the bits that are true in multiple ranges of the same array of booleans.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>np.Array of np.bool:</em>) – Input array</p></li>
+<li><p><strong>range_starts</strong> (<em>int</em><em>[</em><em>]</em>) – Starting offsets of the ranges to count.</p></li>
+<li><p><strong>range_ends</strong> (<em>int</em><em>[</em><em>]</em>) – Ending offsets of the ranges to count.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ntg_common.cbgm_common.create_labez_matrix">
+<code class="sig-name descname">create_labez_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dba</span></em>, <em class="sig-param"><span class="n">parameters</span></em>, <em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.cbgm_common.create_labez_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the <code class="xref py py-attr docutils literal notranslate"><span class="pre">labez</span> <span class="pre">matrix</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ntg_common.cbgm_common.write_affinity_table">
+<code class="sig-name descname">write_affinity_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dba</span></em>, <em class="sig-param"><span class="n">parameters</span></em>, <em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.cbgm_common.write_affinity_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write back the new affinity (and ms_ranges) tables.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-ntg_common.config">
+<span id="ntg-common-config"></span><h2>ntg_common.config<a class="headerlink" href="#module-ntg_common.config" title="Permalink to this headline">¶</a></h2>
+<p>The commandline and configuration stuff.</p>
+<dl class="py class">
+<dt id="ntg_common.config.Formatter">
+<em class="property">class </em><code class="sig-name descname">Formatter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fmt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">datefmt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">style</span><span class="o">=</span><span class="default_value">'%'</span></em>, <em class="sig-param"><span class="n">validate</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.config.Formatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logging formatter. Allows colorful formatting of log lines.</p>
+<dl class="py method">
+<dt id="ntg_common.config.Formatter.format">
+<code class="sig-name descname">format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">record</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.config.Formatter.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format the specified record as text.</p>
+<p>The record’s attribute dictionary is used as the operand to a
+string formatting operation which yields the returned string.
+Before formatting the dictionary, a couple of preparatory steps
+are carried out. The message attribute of the record is computed
+using LogRecord.getMessage(). If the formatting string uses the
+time (as determined by a call to usesTime(), formatTime() is
+called to format the event time. If there is exception information,
+it is formatted using formatException() and appended to the message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt id="ntg_common.config.args">
+<code class="sig-name descname">args</code><em class="property"> = &lt;ntg_common.config.Args object&gt;</em><a class="headerlink" href="#ntg_common.config.args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Globally accessible arguments from command line.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ntg_common.config.config_from_pyfile">
+<code class="sig-name descname">config_from_pyfile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.config.config_from_pyfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emulate the Flask config file parser.</p>
+<p>Emulate the Flask config file parser so we can use the same config files for
+the server and the commandline script.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ntg_common.config.init_logging">
+<code class="sig-name descname">init_logging</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">handlers</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.config.init_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Init the logging stuff.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="module-ntg_common.db_tools">
 <span id="ntg-common-db-tools"></span><h2>ntg_common.db_tools<a class="headerlink" href="#module-ntg_common.db_tools" title="Permalink to this headline">¶</a></h2>
 <p>This module contains functions for database access.</p>
@@ -383,6 +583,25 @@ isolated.  Needed in edit mode.</p>
 <p>Uses an output format similar to the one produced by the mysql commandline
 utility.</p>
 </dd></dl>
+
+</div>
+<div class="section" id="module-ntg_common.exceptions">
+<span id="ntg-common-exceptions"></span><h2>ntg_common.exceptions<a class="headerlink" href="#module-ntg_common.exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="py exception">
+<dt id="ntg_common.exceptions.EditError">
+<em class="property">exception </em><code class="sig-name descname">EditError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">status_code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">payload</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.exceptions.EditError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt id="ntg_common.exceptions.EditException">
+<em class="property">exception </em><code class="sig-name descname">EditException</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">status_code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">payload</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.exceptions.EditException" title="Permalink to this definition">¶</a></dt>
+<dd><p>See: <a class="reference external" href="http://flask.pocoo.org/docs/0.12/patterns/apierrors/">http://flask.pocoo.org/docs/0.12/patterns/apierrors/</a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="ntg_common.exceptions.PrivilegeError">
+<em class="property">exception </em><code class="sig-name descname">PrivilegeError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">status_code</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">payload</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ntg_common.exceptions.PrivilegeError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="module-ntg_common.tools">

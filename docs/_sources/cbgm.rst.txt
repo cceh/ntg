@@ -302,6 +302,7 @@ Put the old database in read-only mode (set WRITE_ACCESS="nobody"):
 
    cd ~/prj/ntg/ntg/instance
    emacs mark_ph22.conf
+   sudo /bin/systemctl restart ntg
 
 Then use the `save_edits.py` script to save the editorial decisions
 of the previous phase and the `load_edits.py` script to load them

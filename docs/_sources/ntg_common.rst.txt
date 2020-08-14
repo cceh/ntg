@@ -1,9 +1,27 @@
 .. module:: ntg_common
-   :synopsis: Various Functions
+   :synopsis: Common Functions
 
-===================
- Various Functions
-===================
+==================
+ Common Functions
+==================
+
+Here are the functions used by the server and the commandline scripts.
+
+
+ntg_common.cbgm_common
+======================
+
+.. automodule:: ntg_common.cbgm_common
+   :synopsis: Common functions for the CBGM
+   :members:
+
+
+ntg_common.config
+=================
+
+.. automodule:: ntg_common.config
+   :synopsis: Configuration stuff
+   :members:
 
 
 ntg_common.db_tools
@@ -11,6 +29,14 @@ ntg_common.db_tools
 
 .. automodule:: ntg_common.db_tools
    :synopsis: Various Functions for Database Access
+   :members:
+
+
+ntg_common.exceptions
+=====================
+
+.. automodule:: ntg_common.exceptions
+   :synopsis: Custom Exceptions
    :members:
 
 

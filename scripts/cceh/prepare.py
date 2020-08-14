@@ -583,8 +583,8 @@ def delete_corrector_hands (dba, parameters):
     Delete all corrections except those by the first hand.
 
         Lesarten löschen, die nicht von der ersten Hand stammen.  [...]
-        Ausnahme: Bei Selbstkorrekturen wird die *-Lesart gelöscht und die
-        C*-Lesart beibehalten.
+        Ausnahme: Bei Selbstkorrekturen wird die \*-Lesart gelöscht und die
+        C\*-Lesart beibehalten.
 
         --prepare4cbgm_6.py
 
@@ -644,15 +644,15 @@ def process_sigla (dba, parameters):
 
         Handschriften, die mit einem "V" für videtur gekennzeichnet sind, werden
         ebenso wie alle anderen behandelt.  Das "V" kann also getilgt werden.
-        Die Eintragungen für "ursprünglich (*)" und "C*" werden ebenfalls
+        Die Eintragungen für "ursprünglich (\*)" und "C\*" werden ebenfalls
         gelöscht.  Schließlich auch die Zusätze zur Handschriftennummer wie
         "T1".  Diese Eintragungen werden (bisher) einfach an die
         Handschriftenbezeichnung angehängt.
 
         Der Eintrag 'videtur', gekennzeichnet durch ein 'V' hinter der
         Handschriftennummer, spielt für die CBGM keine Rolle.  Ein eventuell
-        vorhandenes 'V' muss getilgt werden.  Gleiches gilt für die Einträge '*'
-        und 'C*'.
+        vorhandenes 'V' muss getilgt werden.  Gleiches gilt für die Einträge '\*'
+        und 'C\*'.
 
         --prepare4cbgm_6b.py
 
@@ -922,40 +922,11 @@ def copy_nestle (dbdest, parameters):
 
 
 def copy_genealogical (dbdest, parameters):
-    """Copy / fix genealogical data
+    """Copy and fix genealogical data for Acts
 
-        kopiert die Daten aus ECM_Acts_CBGM nach VarGenAtt_Act, zur weiteren
-        Bearbeitung im Stemma-Editor
-
-        --VGA/Att2CBGMPh3.pl
-
-        Kopiert die genealogischen Informationen von einer Phase zur nächsten.
-
-        Splitts müssen nur dort übertragen werden, wo sich der Apparat nicht
-        geändert hat.  Hat sich der Apparat geändert, d.h. gibt es in der neuen
-        Phase für eine Adresse keine Entsprechung in der vorhergehenden Phase,
-        so werden die Defaultwerte eingetragen.  Zuerst muss festgestellt
-        werden, wo Splitts oder Zusammenlegungen stattgefunden haben.  Dann
-        werden diese Lesarten gelöscht und aus der vorhergehenden Phase kopiert.
-
-        Stellen mit geänderter Leitzeile werden zunächst einfach übergangen.
-
-        Defaultwerte eintragen, wenn eine variierte Stelle mit gleicher
-        numerischer Adresse mehr Lesarten als in der vorhergehenden Phase hat,
-        die nicht nur versionell bezeugt sind.
-
-        -- VGA/PortCBGMInfoPh3.pl
-
-    VarGenAtt_ActPh2 -> VarGenAtt_ActPh3
-
-    1. copy entries from att with default values (every other labez depends on
-       a) (done in the last step)
-
-    2. overwrite with values from locstemed (done in this step)
-
-    FIXME: do we really need step 1? To provide the new passages if the
-    apparatus changed? At least it doesn't do any damage because there should be
-    no passages in att that are not in locstemed also.
+    This function is relevant only for Acts, where we had to import genealogical
+    data from a previous implementation of the CBGM.  It is not used for new
+    projects.
 
     """
 

@@ -13,7 +13,7 @@ args = Args ()
 
 
 class Formatter (logging.Formatter):
-    """ Allows colorful formatting of log lines. """
+    """ Logging formatter. Allows colorful formatting of log lines. """
     COLORS = {
         logging.CRITICAL : ('\x1B[38;2;255;0;0m',  '\x1B[0m'),
         logging.ERROR    : ('\x1B[38;2;255;0;0m',  '\x1B[0m'),
@@ -28,10 +28,10 @@ class Formatter (logging.Formatter):
 
 
 def config_from_pyfile (filename):
-    """Mimic Flask config files.
+    """Emulate the Flask config file parser.
 
-    Emulate the Flask config file parser so we can use the same config files for both,
-    the server and this script.
+    Emulate the Flask config file parser so we can use the same config files for
+    the server and the commandline script.
 
     """
 

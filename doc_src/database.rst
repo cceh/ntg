@@ -7,9 +7,20 @@
 CBGM Database
 =============
 
-The CBGM database is built from the `source-db` by the :mod:`import
-<scripts.cceh.import>` script.  The :mod:`API server <server>` uses this
+The CBGM database is built from the `source-db` by the :mod:`prepare
+<scripts.cceh.prepare>` script.  The :mod:`API server <server>` uses this
 database.
+
+Blue: initialized by the `scripts.cceh.prepare` script.  These tables change
+only between phases.  The Apparatus table is also updated by the
+`scripts.cceh.cbgm` script where manuscript 'A' is concerned.
+
+Green: updated by the `server`.  Backed up by `scripts.cceh.save_edits`.
+Restored by `scripts.cceh.load_edits`.  The editors update these tables through
+a graph editor.  These tables are `journalled <tts>` to eventually provide undo
+functionality.
+
+Red: updated by the `scripts.cceh.cbgm` script.
 
 .. _db-overwiew:
 
@@ -18,13 +29,6 @@ database.
 
    Overview of the CBGM database (some columns omitted)
 
-The editors update the tables shown in green through a graphical editor.  These
-tables are `journalled <tts>` to provide undo functionality.
-
-The CBGM process updates the tables shown in red and the Apparatus table where
-manuscript 'A' is concerned.
-
-The `server` uses all these tables.
 
 .. Palette https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Paired.js
 

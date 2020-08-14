@@ -156,6 +156,10 @@ def import_genealogical_fdw (dbsrc, dbdest, parameters):
 
     Import the (28 * 3) mysql tables to 3 tables in the postgres database.
 
+    This function is relevant only for Acts, where we had to import genealogical
+    data from a previous implementation of the CBGM.  It is not used for new
+    projects.
+
     """
 
     if not config.get ('MYSQL_VG_DB'):
