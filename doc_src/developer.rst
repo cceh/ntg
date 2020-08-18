@@ -10,6 +10,7 @@ Developer Manual
    server_config
    scripts_dev
    database
+   database_faq
    ntg_common
    vm
    cbgm
