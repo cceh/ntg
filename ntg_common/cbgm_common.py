@@ -239,6 +239,137 @@ def calculate_mss_similarity_postco (dba, parameters, val, do_checks = True):
     Genealogical coherence outputs asymmetrical matrices.
     Loop over all mss O(n_mss² * n_ranges * n_passages).
 
+    The main idea in this function is to get the DAG (directed acyclic graph)
+    into a representation that can be used by numpy.  Numpy gives us a
+    tremendous speed boost.
+
+    For every passage and every reading we build
+
+    - a bitmask for the reading and
+    - a bitmask for all prior readings of this reading.
+
+    Then for every passage and every manuscript we look up what the manuscript
+    offers and store the relative bitmasks in 2 matrices.
+
+    For illustration we refer to this passage (Mc 10:10/16-22 pass_id == 3240):
+
+    .. pic:: dot
+       :file: local-stemma-mark-3240.dot
+       :align: center
+
+    In a first step every reading (labez and clique) gets assigned a bitmask:
+
+    .. code-block:: none
+
+       labez | clique |                               mask
+       ------+--------+-----------------------------------------------------------------
+       ?     |        | 0000000000000000000000000000000000000000000000000000000000000001
+       a     | 1      | 0000000000000000000000000000000000000000000000000000000000000010
+       a     | 2      | 0000000000000000000000000000000000000000000000000000000000000100
+       b     | 1      | 0000000000000000000000000000000000000000000000000000000000001000
+       c     | 1      | 0000000000000000000000000000000000000000000000000000000000010000
+       c     | 2      | 0000000000000000000000000000000000000000000000000000000000100000
+       c     | 3      | 0000000000000000000000000000000000000000000000000000000001000000
+       d     | 1      | 0000000000000000000000000000000000000000000000000000000010000000
+       d     | 2      | 0000000000000000000000000000000000000000000000000000000100000000
+       e     | 1      | 0000000000000000000000000000000000000000000000000000001000000000
+       f     | 1      | 0000000000000000000000000000000000000000000000000000010000000000
+       f     | 2      | 0000000000000000000000000000000000000000000000000000100000000000
+       g     | 1      | 0000000000000000000000000000000000000000000000000001000000000000
+       h     | 1      | 0000000000000000000000000000000000000000000000000010000000000000
+       i     | 1      | 0000000000000000000000000000000000000000000000000100000000000000
+       j     | 1      | 0000000000000000000000000000000000000000000000001000000000000000
+       k     | 1      | 0000000000000000000000000000000000000000000000010000000000000000
+       l     | 1      | 0000000000000000000000000000000000000000000000100000000000000000
+       m     | 1      | 0000000000000000000000000000000000000000000001000000000000000000
+       n     | 1      | 0000000000000000000000000000000000000000000010000000000000000000
+       o     | 1      | 0000000000000000000000000000000000000000000100000000000000000000
+       p     | 1      | 0000000000000000000000000000000000000000001000000000000000000000
+       q     | 1      | 0000000000000000000000000000000000000000010000000000000000000000
+       r     | 1      | 0000000000000000000000000000000000000000100000000000000000000000
+       s     | 1      | 0000000000000000000000000000000000000001000000000000000000000000
+       t     | 1      | 0000000000000000000000000000000000000010000000000000000000000000
+       u     | 1      | 0000000000000000000000000000000000000100000000000000000000000000
+       v     | 1      | 0000000000000000000000000000000000001000000000000000000000000000
+       v     | 2      | 0000000000000000000000000000000000010000000000000000000000000000
+       v     | 3      | 0000000000000000000000000000000000100000000000000000000000000000
+       w     | 1      | 0000000000000000000000000000000001000000000000000000000000000000
+
+    Note that we have an extra bitmask for '?'.  This allows quick testing for
+    unknown origin.
+
+    In the second step we build the ancestor bitmasks.
+
+    Reading 'f' has prior readings 'c', 'm', and 'a'.  Thus the ancestor bitmask
+    for reading 'f' is the bitwise_or of the masks for 'c', 'm', and 'a':
+
+    .. code-block:: none
+
+       labez | clique |                               mask
+       ------+--------+-----------------------------------------------------------------
+       c     | 1      | 0000000000000000000000000000000000000000000000000000000000010000
+       m     | 1      | 0000000000000000000000000000000000000000000001000000000000000000
+       a     | 1      | 0000000000000000000000000000000000000000000000000000000000000010
+
+       labez | clique |                            ancestor mask
+       ------+--------+-----------------------------------------------------------------
+       f     | 1      | 0000000000000000000000000000000000000000000001000000000000010010
+
+    Another example: Reading 'w' has prior readings 'a2', 'a2' is of unknown
+    origin. The ancestor mask for 'w' is the bitwise_or of the masks for 'a2' and '?':
+
+    .. code-block:: none
+
+       labez | clique |                               mask
+       ------+--------+-----------------------------------------------------------------
+       a     | 2      | 0000000000000000000000000000000000000000000000000000000000000100
+       ?     |        | 0000000000000000000000000000000000000000000000000000000000000001
+
+       labez | clique |                            ancestor mask
+       ------+--------+-----------------------------------------------------------------
+       w     | 1      | 0000000000000000000000000000000000000000000000000000000000000101
+
+    After building the masks for every reading at every passage we put the masks
+    into 2 matrices of dimension (mss x passages), the mask_matrix and the
+    ancestor_matrix.  The mask_matrix contains the mask for the reading the
+    manuscript offers, the ancestor_matrix contains the ancestor mask for that reading.
+
+    Manuscript 1457 (ms_id == 156) (at pass_id == 3240) reads 'c', so the
+    mask_matrix contains:
+
+    .. code-block::
+
+       mask_matrix[156,3240] = b'0000000000000000000000000000000000000000000000000000000000010000'
+
+    Manuscript 706 (ms_id == 102) (at pass_id == 3240) reads 'f', so the
+    ancestor_matrix contains:
+
+    .. code-block::
+
+       ancestor_matrix[102,3240] = b'0000000000000000000000000000000000000000000001000000000000010010'
+
+    To test for ancestrality between mss. 1457 and 706 we do a bitwise_and of the
+    mask_matrix of 1457 and the ancestor_matrix of 706. If the result is non-zero then
+    1457 is ancestral to 706.
+
+    .. code-block::
+
+       is_ancestral = np.bitwise_and (mask_matrix[156,3240], ancestor_matrix[102,3240]) > 0
+
+    But that would be very slow.  Numpy allows to operate on whole matrix rows
+    at a time so we can calculate the ancestrality for all passages with a
+    single call to numpy.
+
+    .. code-block::
+
+       is_ancestral = np.bitwise_and (mask_matrix[156], ancestor_matrix[102]) > 0
+
+    is_ancestral is an array of booleans.  We only have to count how many
+    elements of it are True to obtain the number of prior readings.
+
+    Reversing the role of the two manuscripts (mask_matrix and ancestor_matrix)
+    gives us the number of posterior readings.
+
     """
 
     with dba.engine.begin () as conn:

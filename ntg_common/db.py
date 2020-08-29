@@ -261,6 +261,10 @@ class Att (Base):
           wahrscheinliche Lesung.  Ist für die CBGM als sichere Lesart zu
           akzeptieren.
 
+       .. data:: r
+
+          Regularisiert
+
     .. attribute:: fehler
 
        Denotes an orthografical error in Catholic Letters.  This became part of
