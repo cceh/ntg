@@ -18,4 +18,4 @@ Ziele:
 
 Website:  http://ntg.uni-muenster.de/
 
-Developer documentation: https://cceh.github.io/ntg/
+Achtung! Das Projekt wird nun weiterentwickelt unter https://github.com/SCDH/intf-cbgm
